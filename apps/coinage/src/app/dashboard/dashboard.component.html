@@ -1,0 +1,9 @@
+<p>{{ message }}</p>
+
+<div>
+    <ul>
+        <li *ngFor="let item of transactionList">
+            {{ item.description }}, {{ item.amount }}
+        </li>
+    </ul>
+</div>

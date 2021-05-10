@@ -1,34 +1,28 @@
 {
-  "implicitDependencies": {
-    "angular.json": "*",
-    "package.json": {
-      "dependencies": "*",
-      "devDependencies": "*"
+    "implicitDependencies": {
+        "angular.json": "*",
+        "package.json": { "dependencies": "*", "devDependencies": "*" },
+        "tsconfig.base.json": "*",
+        "tslint.json": "*",
+        ".eslintrc.json": "*",
+        "nx.json": "*"
     },
-    "tsconfig.base.json": "*",
-    "tslint.json": "*",
-    ".eslintrc.json": "*",
-    "nx.json": "*"
-  },
-  "affected": {
-    "defaultBase": "master"
-  },
-  "npmScope": "ws-coinage-app",
-  "tasksRunnerOptions": {
-    "default": {
-      "runner": "@nrwl/workspace/tasks-runners/default",
-      "options": {
-        "cacheableOperations": ["build", "lint", "test", "e2e"]
-      }
-    }
-  },
-  "projects": {
-    "coinage": {
-      "tags": []
+    "affected": { "defaultBase": "master" },
+    "npmScope": "coinage-app",
+    "tasksRunnerOptions": {
+        "default": {
+            "runner": "@nrwl/workspace/tasks-runners/default",
+            "options": {
+                "cacheableOperations": ["build", "lint", "test", "e2e"]
+            }
+        }
     },
-    "coinage-e2e": {
-      "tags": [],
-      "implicitDependencies": ["coinage"]
+    "projects": {
+        "coinage": { "tags": [], "implicitDependencies": ["router"] },
+        "coinage-e2e": { "tags": [], "implicitDependencies": ["coinage"] },
+        "api": { "tags": [] },
+        "data": { "tags": [] },
+        "interfaces": { "tags": [] },
+        "router": { "tags": [] }
     }
-  }
 }
