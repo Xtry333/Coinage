@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
-import { RestApiService } from '../restapi.service';
+import { TransferDetailsDTO } from '@coinage-app/interfaces';
+import { CoinageDataService } from '../coinageData.service';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -9,12 +9,12 @@ import { RestApiService } from '../restapi.service';
     styleUrls: ['./transfer-details.component.less'],
 })
 export class TransferDetailsComponent implements OnInit {
+    showPage = false;
     transfer: TransferDetailsDTO;
-    transactionId: number = 0;
 
     constructor(
         private readonly route: ActivatedRoute,
-        private readonly restApi: RestApiService
+        private readonly coinageData: CoinageDataService
     ) {
         // this.restApi
         //     .getTransactionsObserver()
@@ -24,16 +24,13 @@ export class TransferDetailsComponent implements OnInit {
     }
 
     ngOnInit(): void {
-        this.loadData();
-    }
-
-    private loadData(): void {
+        this.showPage = false;
         this.route.paramMap.subscribe((params) => {
             const id = parseInt(params.get('id'));
             if (id) {
-                this.restApi.getTransferDetails(id).then((transfer) => {
+                this.coinageData.getTransferDetails(id).then((transfer) => {
                     this.transfer = transfer;
-                    console.log(transfer);
+                    this.showPage = true;
                 });
             } else {
                 //this.route.

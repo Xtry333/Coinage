@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { RestApiService } from './restapi.service';
+import { CoinageDataService } from './coinageData.service';
 
-describe('RestApiService', () => {
-    let service: RestApiService;
+describe('CoinageDataService', () => {
+    let service: CoinageDataService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(RestApiService);
+        service = TestBed.inject(CoinageDataService);
     });
 
     it('should be created', () => {

@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { TransferDTO } from '@coinage-app/interfaces';
-import { Observable } from 'rxjs';
-import { RestApiService } from '../restapi.service';
-import { of } from 'rxjs';
-import { ajax } from 'rxjs/ajax';
-import { map, finalize } from 'rxjs/operators';
+import { CoinageDataService } from '../coinageData.service';
+import { finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'coinage-app-dashboard',
@@ -16,21 +12,17 @@ export class DashboardComponent implements OnInit {
     message: string = '';
     transactionId: number = 0;
     lastTransactions: TransferDTO[];
-    loading = false;
+    showPage = false;
 
-    constructor(
-        private readonly route: ActivatedRoute,
-        private readonly restApi: RestApiService
-    ) {}
+    constructor(private readonly coinageData: CoinageDataService) {}
 
     ngOnInit(): void {
-        this.loading = true;
-        this.restApi
+        this.showPage = false;
+        this.coinageData
             .getTransactionsObserver()
             .pipe(
                 finalize(() => {
-                    this.loading = false;
-                    console.log(this.lastTransactions);
+                    this.showPage = true;
                 })
             )
             .subscribe(

@@ -9,9 +9,9 @@
         <h4>{{ datetime | date: 'short' }}</h4>
     </div>
 </header>
-<main [ngClass]="{ hidden: isLoading }">
+<main>
     <router-outlet></router-outlet>
 </main>
-<div class="loader-transition" [ngClass]="{ hidden: !isLoading }">
+<div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">
     <coinage-app-spinner></coinage-app-spinner>
 </div>

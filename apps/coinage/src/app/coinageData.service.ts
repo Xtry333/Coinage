@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 @Injectable({
     providedIn: 'root',
 })
-export class RestApiService {
+export class CoinageDataService {
     constructor(private http: HttpClient, private path: ApiPathsModule) {}
 
     getTransactionsObserver(): Observable<TransferDTO[]> {
