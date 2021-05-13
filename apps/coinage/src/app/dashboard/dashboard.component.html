@@ -1,9 +1,30 @@
-<p>{{ message }}</p>
-
 <div>
-    <ul>
-        <li *ngFor="let item of transactionList">
-            {{ item.description }}, {{ item.amount }}
-        </li>
-    </ul>
+    <h1>Hello</h1>
+    <h5></h5>
+    <div *ngIf="loading">Loading...</div>
+    <table class="last-transactions-table">
+        <caption>
+            Recent Transactions
+        </caption>
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let transaction of lastTransactions">
+                <td>{{ transaction.category }}</td>
+                <td>
+                    <a routerLink="/details/{{ transaction.id }}">
+                        {{ transaction.description }}
+                    </a>
+                </td>
+                <td class="currency">{{ transaction.amount | plnCurrency }}</td>
+                <td>{{ transaction.date | date }}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>

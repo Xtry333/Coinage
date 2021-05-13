@@ -17,13 +17,16 @@ export class Transfer {
     description: string;
 
     @Column('decimal', { precision: 20, scale: 2, nullable: false })
-    amount: number;
+    amount: string; // Decimal returns a string for precision, we will parse it later in DTO
 
     @Column({ nullable: true })
     date: Date;
 
-    @Column({ nullable: true })
-    edited_date: string;
+    @Column({ name: 'edited_date', nullable: false })
+    editedDate: Date;
+
+    @Column({ name: 'created_date', nullable: true })
+    createdDate: Date;
 
     @ManyToOne(() => Category, { eager: true, nullable: true })
     @JoinColumn({ name: 'category' })

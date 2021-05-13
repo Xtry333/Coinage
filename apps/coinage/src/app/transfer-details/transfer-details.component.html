@@ -1,0 +1,11 @@
+<h4>
+    <ul class="category-path-list">
+        <li>Root</li>
+        <li *ngFor="let category of transfer?.categoryPath">
+            {{ category.name }}
+        </li>
+    </ul>
+</h4>
+<pre>
+    {{ transfer?.description }}
+</pre>

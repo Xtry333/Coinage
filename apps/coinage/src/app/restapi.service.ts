@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { TransferDTO } from '@coinage-app/interfaces';
+import { TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import { ApiPathsModule } from '@coinage-app/router';
 import { Observable } from 'rxjs';
 
@@ -14,9 +14,9 @@ export class RestApiService {
         return this.http.get<TransferDTO[]>(this.path.getApiUrl());
     }
 
-    getTransfer(id: number): Promise<TransferDTO> {
+    getTransferDetails(id: number): Promise<TransferDetailsDTO> {
         return this.http
-            .get<TransferDTO>(this.path.getTransfer(id))
+            .get<TransferDetailsDTO>(this.path.getTransfer(id))
             .toPromise();
     }
 }

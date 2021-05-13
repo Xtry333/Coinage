@@ -1,9 +1,17 @@
 <header class="flex">
-    <img alt="Coinage logo" width="75" src="assets/images/coin.png" />
-    <h1>Welcome to {{ title }}!</h1>
+    <div class="logo">
+        <a routerLink="dashboard"
+            ><img alt="Coinage logo" width="75" [src]="logo"
+        /></a>
+        <h1>{{ title }}</h1>
+    </div>
+    <div class="datetime">
+        <h4>{{ datetime | date: 'short' }}</h4>
+    </div>
 </header>
-<main>
-    <h2>Main Menu</h2>
-    <p>Hello</p>
+<main [ngClass]="{ hidden: isLoading }">
     <router-outlet></router-outlet>
 </main>
+<div class="loader-transition" [ngClass]="{ hidden: !isLoading }">
+    <coinage-app-spinner></coinage-app-spinner>
+</div>
