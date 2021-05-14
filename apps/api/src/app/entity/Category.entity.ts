@@ -18,10 +18,10 @@ export class Category {
     @Column('text', { nullable: true })
     description: string;
 
-    @ManyToOne(() => Category, { nullable: true })
+    @ManyToOne('Category', { nullable: true })
     @JoinColumn({ name: 'parent' })
     parent: Promise<Category>;
 
-    @OneToMany(() => Category, (category) => category.parent, {})
+    @OneToMany('Category', 'parent', {})
     children: Promise<Category[]>;
 }

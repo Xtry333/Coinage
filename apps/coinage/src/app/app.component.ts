@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { LoadingService } from './loading.service';
+import { LoadingService } from './loaderGadget/loading.service';
 
 @Component({
     selector: 'coinage-app-root',
@@ -11,7 +11,7 @@ export class AppComponent implements OnInit, OnDestroy {
     title = 'Coinage';
     datetime = new Date();
     logo = 'assets/images/coin.png';
-    refreshInterval: ReturnType<typeof setTimeout>;
+    refreshInterval: ReturnType<typeof setInterval>;
 
     constructor(private loader: LoadingService) {}
 

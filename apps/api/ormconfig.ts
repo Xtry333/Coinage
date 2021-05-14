@@ -2,6 +2,7 @@ import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConnectionOptions } from 'typeorm';
 import { Category } from './src/app/entity/Category.entity';
 import { Contractor } from './src/app/entity/Contractor.entity';
+import { Receipt } from './src/app/entity/Receipt.entity';
 import { Transfer } from './src/app/entity/Transfer.entity';
 
 export default ({
@@ -14,5 +15,5 @@ export default ({
     database: 'coinage-db',
     synchronize: false,
     logging: false,
-    entities: [Category, Contractor, Transfer],
+    entities: [Category, Contractor, Receipt, Transfer],
 } as ConnectionOptions) as TypeOrmModuleOptions;

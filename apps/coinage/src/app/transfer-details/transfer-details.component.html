@@ -8,6 +8,14 @@
         </ul>
     </h4>
     <pre>{{ transfer?.description }}</pre>
-    <pre>{{ transfer?.amount }}</pre>
-    <pre>{{ transfer?.date }}</pre>
+    <pre>Amount: {{ transfer?.amount | plnCurrency }}</pre>
+    <pre>Date: {{ transfer?.date }}</pre>
+    <div *ngIf="transfer?.contractor">
+        <pre>Contractor: {{ transfer?.contractor }}</pre>
+        <pre>
+Total payed to {{ transfer?.contractor }} on {{ transfer?.date }}: {{
+                totalPayment | plnCurrency
+            }}</pre
+        >
+    </div>
 </div>

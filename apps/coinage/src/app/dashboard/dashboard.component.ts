@@ -29,13 +29,4 @@ export class DashboardComponent implements OnInit {
                 (transactions) => (this.lastTransactions = transactions)
             );
     }
-
-    // private loadData(): void {
-    //     this.route.paramMap.subscribe((params) => {
-    //         const id = parseInt(params.get('id'));
-    //         this.restApi.getTransfer(id).then((transfer) => {
-    //             this.message = transfer.description;
-    //         });
-    //     });
-    // }
 }

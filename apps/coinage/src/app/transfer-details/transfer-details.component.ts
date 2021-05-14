@@ -11,6 +11,7 @@ import { CoinageDataService } from '../coinageData.service';
 export class TransferDetailsComponent implements OnInit {
     showPage = false;
     transfer: TransferDetailsDTO;
+    totalPayment: number;
 
     constructor(
         private readonly route: ActivatedRoute,
@@ -31,6 +32,13 @@ export class TransferDetailsComponent implements OnInit {
                 this.coinageData.getTransferDetails(id).then((transfer) => {
                     this.transfer = transfer;
                     this.showPage = true;
+                    this.totalPayment =
+                        transfer.amount +
+                        transfer.otherTransfers.reduce(
+                            (a, t) => a + t.amount,
+                            0
+                        );
+                    console.log(transfer);
                 });
             } else {
                 //this.route.

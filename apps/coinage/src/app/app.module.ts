@@ -7,10 +7,10 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { NetworkInterceptor } from './network.interceptor';
+import { NetworkInterceptor } from './loaderGadget/network.interceptor';
 import { PlnCurrencyPipe } from './pipes/pln-currency.pipe';
 import { TransferDetailsComponent } from './transfer-details/transfer-details.component';
-import { SpinnerComponent } from './spinner/spinner.component';
+import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
 
 @NgModule({
     declarations: [

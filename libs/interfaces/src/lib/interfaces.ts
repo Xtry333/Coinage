@@ -9,7 +9,7 @@ export interface TransferDTO {
     amount: number;
     category: string;
     categoryId: number;
-    date: Date;
+    date: string;
 }
 
 export interface CategoryPathDTO {
@@ -22,7 +22,9 @@ export interface TransferDetailsDTO {
     description: string;
     amount: number;
     categoryPath: CategoryPathDTO[];
-    date: Date;
+    contractor: string;
+    date: string;
     createdDate: Date;
     editedDate: Date;
+    otherTransfers: TransferDTO[];
 }
