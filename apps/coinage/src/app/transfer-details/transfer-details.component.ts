@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TransferDetailsDTO } from '@coinage-app/interfaces';
+import { AppRoutingModule } from '../app-routing/app-routing.module';
 import { CoinageDataService } from '../coinageData.service';
 
 @Component({
@@ -15,14 +16,9 @@ export class TransferDetailsComponent implements OnInit {
 
     constructor(
         private readonly route: ActivatedRoute,
+        private readonly router: Router,
         private readonly coinageData: CoinageDataService
-    ) {
-        // this.restApi
-        //     .getTransactionsObserver()
-        //     .subscribe(
-        //         (transactions) => (this.lastTransactions = transactions)
-        //     );
-    }
+    ) {}
 
     ngOnInit(): void {
         this.showPage = false;
@@ -38,10 +34,9 @@ export class TransferDetailsComponent implements OnInit {
                             (a, t) => a + t.amount,
                             0
                         );
-                    console.log(transfer);
                 });
             } else {
-                //this.route.
+                this.router.navigateByUrl('notFound');
             }
         });
     }

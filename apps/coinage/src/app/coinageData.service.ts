@@ -10,11 +10,11 @@ import { Observable } from 'rxjs';
 export class CoinageDataService {
     constructor(private http: HttpClient, private path: ApiPathsModule) {}
 
-    getTransactionsObserver(): Observable<TransferDTO[]> {
+    public getTransactionsObserver(): Observable<TransferDTO[]> {
         return this.http.get<TransferDTO[]>(this.path.getApiUrl());
     }
 
-    getTransferDetails(id: number): Promise<TransferDetailsDTO> {
+    public getTransferDetails(id: number): Promise<TransferDetailsDTO> {
         return this.http
             .get<TransferDetailsDTO>(this.path.getTransfer(id))
             .toPromise();
