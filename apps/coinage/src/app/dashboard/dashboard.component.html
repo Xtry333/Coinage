@@ -25,4 +25,23 @@
             </tr>
         </tbody>
     </table>
+    <table class="last-transactions-table">
+        <caption>
+            Total Outcomes/Month
+        </caption>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Transactions Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let outcome of totalOutcomesPerMonth">
+                <td class="month-name">{{ outcome.monthName }} {{ outcome.year }}</td>
+                <td class="currency">{{ outcome.amount | plnCurrency }}</td>
+                <td>{{ outcome.transactionsCount }}</td>
+            </tr>
+        </tbody>
+    </table>
 </div>

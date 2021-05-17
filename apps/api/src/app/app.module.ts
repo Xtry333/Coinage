@@ -5,10 +5,12 @@ import ormconfig from 'apps/api/ormconfig';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { TransfersController } from './controllers/transfers.controller';
+import { TransferService } from './services/transfer.service';
 
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
-    controllers: [AppController],
-    providers: [AppService, ApiPathsModule],
+    controllers: [AppController, TransfersController],
+    providers: [AppService, TransferService, ApiPathsModule],
 })
 export class AppModule {}

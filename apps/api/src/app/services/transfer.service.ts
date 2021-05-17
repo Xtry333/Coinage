@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { TotalOutcomesPerMonthDTO } from '@coinage-app/interfaces';
 import { Equal, getConnection } from 'typeorm';
 import { Transfer } from '../entity/Transfer.entity';
 
@@ -15,5 +16,13 @@ export class TransferService {
         }
         await transfer.category.parent;
         return transfer;
+    }
+
+    async getLimitedTotalOutcomes(): Promise<{ year: number; month: number; amount: string; count: number }[]> {
+        return await getConnection()
+            .getRepository(Transfer)
+            .query(
+                "SELECT YEAR(DATE) AS `year`, MONTH(DATE) AS `month`, SUM(amount) AS `amount`, COUNT(id) AS `count` FROM transfer WHERE TYPE = 'OUTCOME' GROUP BY YEAR(date), MONTH(DATE) ORDER BY `year` DESC, `month` DESC LIMIT 12"
+            );
     }
 }

@@ -28,3 +28,10 @@ export interface TransferDetailsDTO {
     editedDate: Date;
     otherTransfers: TransferDTO[];
 }
+
+export interface TotalOutcomesPerMonthDTO {
+    year: number;
+    month: number;
+    amount: number;
+    transactionsCount: number;
+}
