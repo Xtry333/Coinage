@@ -11,15 +11,11 @@ import { NetworkInterceptor } from './loaderGadget/network.interceptor';
 import { PlnCurrencyPipe } from './pipes/pln-currency.pipe';
 import { TransferDetailsComponent } from './transfer-details/transfer-details.component';
 import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
+import { CategoryManagerComponent } from './category-manager/category-manager.component';
+import { SummaryComponent } from './summary/summary.component';
 
 @NgModule({
-    declarations: [
-        AppComponent,
-        DashboardComponent,
-        PlnCurrencyPipe,
-        TransferDetailsComponent,
-        SpinnerComponent,
-    ],
+    declarations: [AppComponent, DashboardComponent, SummaryComponent, PlnCurrencyPipe, TransferDetailsComponent, SpinnerComponent, CategoryManagerComponent],
     imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule],
     providers: [
         ApiPathsModule,

@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { CoinageDataService } from '../coinageData.service';
+import { CoinageDataService } from '../services/coinageData.service';
 
 import { DashboardComponent } from './dashboard.component';
 
@@ -26,10 +26,7 @@ describe('DashboardComponent', () => {
     });
 
     beforeEach(() => {
-        jest.spyOn(
-            CoinageDataService.prototype,
-            'getTransactionsObserver'
-        ).mockImplementation(() =>
+        jest.spyOn(CoinageDataService.prototype, 'getTransactionsObserver').mockImplementation(() =>
             of([
                 {
                     id: 1,

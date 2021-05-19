@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { TransferDetailsDTO } from '@coinage-app/interfaces';
 import { AppRoutingModule } from '../app-routing/app-routing.module';
-import { CoinageDataService } from '../coinageData.service';
+import { CoinageDataService } from '../services/coinageData.service';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -14,11 +14,7 @@ export class TransferDetailsComponent implements OnInit {
     transfer: TransferDetailsDTO;
     totalPayment: number;
 
-    constructor(
-        private readonly route: ActivatedRoute,
-        private readonly router: Router,
-        private readonly coinageData: CoinageDataService
-    ) {}
+    constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
 
     ngOnInit(): void {
         this.showPage = false;
@@ -28,12 +24,7 @@ export class TransferDetailsComponent implements OnInit {
                 this.coinageData.getTransferDetails(id).then((transfer) => {
                     this.transfer = transfer;
                     this.showPage = true;
-                    this.totalPayment =
-                        transfer.amount +
-                        transfer.otherTransfers.reduce(
-                            (a, t) => a + t.amount,
-                            0
-                        );
+                    this.totalPayment = transfer.amount + transfer.otherTransfers.reduce((a, t) => a + t.amount, 0);
                 });
             } else {
                 this.router.navigateByUrl('notFound');

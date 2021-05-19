@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { TotalOutcomesPerMonthDTO } from '@coinage-app/interfaces';
 import { Equal, getConnection } from 'typeorm';
 import { Transfer } from '../entity/Transfer.entity';
 

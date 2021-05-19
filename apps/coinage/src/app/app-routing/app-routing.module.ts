@@ -4,6 +4,8 @@ import { RouterModule, Routes } from '@angular/router';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { BrowserModule } from '@angular/platform-browser';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
+import { CategoryManagerComponent } from '../category-manager/category-manager.component';
+import { SummaryComponent } from '../summary/summary.component';
 
 const routes: Routes = [
     {
@@ -18,6 +20,14 @@ const routes: Routes = [
     {
         path: 'details/:id',
         component: TransferDetailsComponent,
+    },
+    {
+        path: 'summary/:partialDate',
+        component: SummaryComponent,
+    },
+    {
+        path: 'manage/categories',
+        component: CategoryManagerComponent,
     },
 ];
 

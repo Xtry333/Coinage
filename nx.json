@@ -18,7 +18,7 @@
         }
     },
     "projects": {
-        "coinage": { "tags": [], "implicitDependencies": ["router"] },
+        "coinage": { "tags": [], "implicitDependencies": [] },
         "coinage-e2e": { "tags": [], "implicitDependencies": ["coinage"] },
         "api": { "tags": [] },
         "data": { "tags": [] },

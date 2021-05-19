@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { AppRoutingModule } from '../app-routing/app-routing.module';
 
-import { TransferDetailsComponent } from './transfer-details.component';
+import { SummaryComponent } from './summary.component';
 import { CoinageDataService } from '../services/coinageData.service';
 
 import { RouterTestingModule } from '@angular/router/testing';
@@ -10,14 +10,14 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ApiPathsModule } from '@coinage-app/router';
 import { of } from 'rxjs';
 
-describe('TransferDetailsComponent', () => {
-    let component: TransferDetailsComponent;
-    let fixture: ComponentFixture<TransferDetailsComponent>;
+describe('Summary Component', () => {
+    let component: SummaryComponent;
+    let fixture: ComponentFixture<SummaryComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [RouterTestingModule, HttpClientTestingModule],
-            declarations: [TransferDetailsComponent],
+            declarations: [SummaryComponent],
             providers: [
                 AppRoutingModule,
                 ApiPathsModule,
@@ -52,7 +52,7 @@ describe('TransferDetailsComponent', () => {
                     });
                 })
         );
-        fixture = TestBed.createComponent(TransferDetailsComponent);
+        fixture = TestBed.createComponent(SummaryComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

@@ -1,14 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { TotalOutcomesPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
-import { CoinageDataService } from '../coinageData.service';
+import { CoinageDataService } from '../services/coinageData.service';
 import { finalize } from 'rxjs/operators';
 import { DateTime } from 'luxon';
 import * as Rx from 'rxjs';
+import { DateParserService, PartedDate } from '../services/date-parser.service';
 
 interface UiTotalOutcomesPerMonth {
     date: string;
     year: number;
     monthName: string;
+    partedDate: PartedDate;
     amount: number;
     transactionsCount: number;
 }
@@ -25,7 +27,7 @@ export class DashboardComponent implements OnInit {
     totalOutcomesPerMonth: UiTotalOutcomesPerMonth[];
     showPage = false;
 
-    constructor(private readonly coinageData: CoinageDataService) {}
+    constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
 
     ngOnInit(): void {
         this.showPage = false;
@@ -46,9 +48,18 @@ export class DashboardComponent implements OnInit {
                 year: outcome.year,
                 date: outcome.year + '-' + (outcome.month + 1),
                 monthName: new Date(outcome.year, outcome.month).toLocaleString('pl', { month: 'long' }),
+                partedDate: { year: outcome.year, month: outcome.month + 1 },
                 amount: outcome.amount,
                 transactionsCount: outcome.transactionsCount,
             };
         });
+    }
+
+    public formatDate(date: string): string {
+        return this.partedDateService.formatDate(new Date(date));
+    }
+
+    public getTotalPerMonthDate(uiRow: UiTotalOutcomesPerMonth): string {
+        return this.partedDateService.joinPartedDate(uiRow.partedDate);
     }
 }

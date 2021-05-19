@@ -1,10 +1,4 @@
-import {
-    Entity,
-    JoinColumn,
-    Column,
-    PrimaryGeneratedColumn,
-    ManyToOne,
-} from 'typeorm';
+import { Entity, JoinColumn, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
 import { Receipt } from './Receipt.entity';
@@ -18,7 +12,7 @@ export class Transfer {
     description: string;
 
     @Column('decimal', { precision: 20, scale: 2, nullable: false })
-    amount: string; // Decimal returns a string for precision, we will parse it later in DTO
+    amount: string; // Decimal returns a string for precision, need to parse later in DTO
 
     @Column({ type: 'date', nullable: true })
     date: string;

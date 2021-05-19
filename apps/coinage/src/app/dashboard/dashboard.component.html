@@ -16,18 +16,20 @@
             <tr *ngFor="let transaction of lastTransactions">
                 <td>{{ transaction.category }}</td>
                 <td>
-                    <a routerLink="/details/{{ transaction.id }}">
+                    <a [routerLink]="['/details', transaction.id]">
                         {{ transaction.description }}
                     </a>
                 </td>
                 <td class="currency">{{ transaction.amount | plnCurrency }}</td>
-                <td>{{ transaction.date | date }}</td>
+                <td>
+                    <a [routerLink]="['/summary', this.formatDate(transaction.date)]">{{ transaction.date | date }}</a>
+                </td>
             </tr>
         </tbody>
     </table>
     <table class="last-transactions-table">
         <caption>
-            Total Outcomes/Month
+            Total Outcomes / Month
         </caption>
         <thead>
             <tr>
@@ -38,7 +40,9 @@
         </thead>
         <tbody>
             <tr *ngFor="let outcome of totalOutcomesPerMonth">
-                <td class="month-name">{{ outcome.monthName }} {{ outcome.year }}</td>
+                <td class="month-name">
+                    <a [routerLink]="['/summary', this.getTotalPerMonthDate(outcome)]">{{ outcome.monthName }} {{ outcome.year }}</a>
+                </td>
                 <td class="currency">{{ outcome.amount | plnCurrency }}</td>
                 <td>{{ outcome.transactionsCount }}</td>
             </tr>

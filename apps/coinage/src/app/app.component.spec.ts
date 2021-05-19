@@ -5,7 +5,7 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
 import { AppComponent } from './app.component';
 import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
 
-describe('AppComponent', () => {
+describe('App Component', () => {
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [RouterTestingModule],

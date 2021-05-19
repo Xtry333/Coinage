@@ -1,12 +1,16 @@
 <header class="flex">
     <div class="logo">
-        <a routerLink="dashboard"
-            ><img alt="Coinage logo" width="75" [src]="logo"
-        /></a>
+        <a routerLink="/"><img alt="Coinage logo" width="75" [src]="logo" /></a>
         <h1>{{ title }}</h1>
     </div>
+    <nav>
+        <ul class="nav-list">
+            <li><a routerLink="/dashboard">Dashboard</a></li>
+            <li><a routerLink="/manage/categories">Manage Categories</a></li>
+        </ul>
+    </nav>
     <div class="datetime">
-        <h4>{{ datetime | date: 'short' }}</h4>
+        <h4>{{ dateTime }}</h4>
     </div>
 </header>
 <main>

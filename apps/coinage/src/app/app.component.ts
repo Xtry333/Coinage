@@ -9,7 +9,7 @@ import { LoadingService } from './loaderGadget/loading.service';
 export class AppComponent implements OnInit, OnDestroy {
     isPageLoading: boolean;
     title = 'Coinage';
-    datetime = new Date();
+    dateTime = new Date().toLocaleString();
     logo = 'assets/images/coin.png';
     refreshInterval: ReturnType<typeof setInterval>;
 
@@ -20,7 +20,7 @@ export class AppComponent implements OnInit, OnDestroy {
             this.isPageLoading = loading;
         });
         this.refreshInterval = setInterval(() => {
-            this.datetime = new Date();
+            this.dateTime = new Date().toLocaleString();
         }, 1000);
     }
 
