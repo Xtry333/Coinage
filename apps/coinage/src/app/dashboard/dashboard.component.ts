@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TotalOutcomesPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { finalize } from 'rxjs/operators';
@@ -13,6 +13,7 @@ interface UiTotalOutcomesPerMonth {
     partedDate: PartedDate;
     amount: number;
     transactionsCount: number;
+    costPerDay: number;
 }
 
 @Component({
@@ -20,12 +21,13 @@ interface UiTotalOutcomesPerMonth {
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.less'],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
     message: string = '';
     transactionId: number = 0;
     lastTransactions: TransferDTO[];
     totalOutcomesPerMonth: UiTotalOutcomesPerMonth[];
     showPage = false;
+    refreshInterval: ReturnType<typeof setInterval>;
 
     constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
 
@@ -40,6 +42,18 @@ export class DashboardComponent implements OnInit {
             this.lastTransactions = values[0];
             this.totalOutcomesPerMonth = this.mapToUiOutcome(values[1]);
         });
+        this.refreshInterval = setInterval(() => this.refreshData(), 5000);
+    }
+
+    ngOnDestroy(): void {
+        clearInterval(this.refreshInterval);
+    }
+
+    private refreshData() {
+        Rx.zip(this.coinageData.getTransactionsObserver(), this.coinageData.getTotalOutcomesPerMonth()).subscribe((res) => {
+            this.lastTransactions = res[0];
+            this.totalOutcomesPerMonth = this.mapToUiOutcome(res[1]);
+        });
     }
 
     private mapToUiOutcome(totalOutcomes: TotalOutcomesPerMonthDTO[]): UiTotalOutcomesPerMonth[] {
@@ -51,8 +65,13 @@ export class DashboardComponent implements OnInit {
                 partedDate: { year: outcome.year, month: outcome.month + 1 },
                 amount: outcome.amount,
                 transactionsCount: outcome.transactionsCount,
+                costPerDay: outcome.amount / this.daysInMonth(outcome.year, outcome.month),
             };
         });
+    }
+
+    private daysInMonth(year: number, month: number) {
+        return new Date(year, month + 1, 0).getDate();
     }
 
     public formatDate(date: string): string {

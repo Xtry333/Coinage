@@ -1,0 +1,28 @@
+.category-path-list {
+    padding: 0;
+    display: flex;
+    list-style: none;
+    li {
+        padding: 5px;
+        + ::before {
+            margin-right: 5px;
+            content: '/';
+        }
+    }
+}
+
+.transaction-form,
+* {
+    input,
+    button,
+    select {
+        display: block;
+        padding: 10px;
+        height: 40px;
+        width: 300px;
+        margin: 10px;
+        // &[type='date'] {
+        //     padding: 2.5px;
+        // }
+    }
+}

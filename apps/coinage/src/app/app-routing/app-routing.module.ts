@@ -6,6 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { SummaryComponent } from '../summary/summary.component';
+import { CreateTransferComponent } from '../create-transfer/create-transfer.component';
 
 const routes: Routes = [
     {
@@ -20,6 +21,10 @@ const routes: Routes = [
     {
         path: 'details/:id',
         component: TransferDetailsComponent,
+    },
+    {
+        path: 'create/transfer',
+        component: CreateTransferComponent,
     },
     {
         path: 'summary/:partialDate',

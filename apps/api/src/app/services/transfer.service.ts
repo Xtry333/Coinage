@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Equal, getConnection } from 'typeorm';
+import { Equal, getConnection, InsertResult } from 'typeorm';
 import { Transfer } from '../entity/Transfer.entity';
 
 @Injectable({
@@ -23,5 +23,9 @@ export class TransferService {
             .query(
                 "SELECT YEAR(DATE) AS `year`, MONTH(DATE) AS `month`, SUM(amount) AS `amount`, COUNT(id) AS `count` FROM transfer WHERE TYPE = 'OUTCOME' GROUP BY YEAR(date), MONTH(DATE) ORDER BY `year` DESC, `month` DESC LIMIT 12"
             );
+    }
+
+    async insert(transfer: Transfer): Promise<InsertResult> {
+        return await getConnection().getRepository(Transfer).insert(transfer);
     }
 }

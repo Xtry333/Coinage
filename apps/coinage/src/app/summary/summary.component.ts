@@ -1,7 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { TotalInMonthByCategory } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
+
+export interface UiTotalInMonthByCategory {
+    categoryName: string;
+    amount: number;
+}
 
 @Component({
     selector: 'coinage-app-summary',
@@ -13,6 +19,7 @@ export class SummaryComponent implements OnInit {
     partedDate: PartedDate;
     datetime: Date;
     datePartsArray: string[];
+    outcomesPerCategory: UiTotalInMonthByCategory[];
 
     constructor(
         private readonly route: ActivatedRoute,
@@ -24,13 +31,27 @@ export class SummaryComponent implements OnInit {
     ngOnInit(): void {
         this.showPage = false;
         this.route.paramMap.subscribe((params) => {
+            this.showPage = false;
             this.datePartsArray = params.get('partialDate').split('-');
             const partialDate = this.datePartsArray.map((p) => parseInt(p));
             this.partedDate = { year: partialDate[0], month: partialDate[1], day: partialDate[2] };
             this.datetime = this.partedDateService.getDateFromParted(this.partedDate);
             console.log(this.partedDate);
             console.log(this.datetime);
-            this.showPage = true;
+            // if (this.partedDate.year && this.partedDate.month) {
+            this.coinageData.getTotalPerCategory(this.partedDate.year, this.partedDate.month).subscribe((response) => {
+                this.outcomesPerCategory = response.map((o) => {
+                    return {
+                        categoryName: o.categoryName,
+                        amount: parseFloat(o.amount),
+                    };
+                });
+                this.showPage = true;
+            });
+            // } else {
+            //     this.outcomesPerCategory = [];
+            //     this.showPage = true;
+            // }
         });
     }
 

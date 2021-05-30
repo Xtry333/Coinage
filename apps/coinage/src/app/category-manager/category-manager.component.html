@@ -1,1 +1,5 @@
-<p>category-manager works!</p>
+<p>Categories Tree</p>
+
+<ul *ngIf="parentCategory">
+    <coinage-app-category-list-item [category]="parentCategory"></coinage-app-category-list-item>
+</ul>

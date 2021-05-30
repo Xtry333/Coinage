@@ -6,7 +6,7 @@
             </li>
         </ul>
     </h4>
-    <dl>
+    <!-- <dl>
         <dd>
             {{ partedDate.year }}
         </dd>
@@ -16,7 +16,23 @@
         <dd>
             {{ partedDate.day }}
         </dd>
-    </dl>
+    </dl> -->
+
+    <table class="last-transactions-table">
+        <thead>
+            <tr>
+                <th>Category</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let outcome of outcomesPerCategory">
+                <td>{{ outcome.categoryName }}</td>
+                <td class="currency">{{ outcome.amount | plnCurrency }}</td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
     {{ datetime.toLocaleString('pl', { month: '2-digit', day: 'numeric', year: 'numeric' }) }}
     <button *ngIf="shouldShowGoUpButton()" (click)="goUp()">Go Up</button>
 </div>

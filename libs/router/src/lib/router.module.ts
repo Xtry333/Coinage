@@ -7,7 +7,7 @@
 // })
 export class ApiPathsModule {
     getTransfer(id: number): string {
-        return this.getApiUrl() + `/transfer/${id}`;
+        return this.getApiUrl() + `/transfer/get/${id}`;
     }
 
     getApiUrl(): string {

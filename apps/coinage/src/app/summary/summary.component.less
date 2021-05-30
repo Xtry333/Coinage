@@ -10,3 +10,31 @@
         }
     }
 }
+
+table.last-transactions-table {
+    caption {
+        font-weight: bold;
+        font-size: 20px;
+        padding: 5px;
+    }
+
+    width: max-content;
+    border-collapse: collapse;
+
+    td,
+    th {
+        //border-bottom: 1px solid black;
+        padding: 10px;
+        &.currency {
+            text-align: right;
+        }
+        &.month-name {
+            text-transform: capitalize;
+        }
+    }
+
+    tbody tr:nth-child(even),
+    thead tr {
+        background-color: rgb(221, 221, 221);
+    }
+}

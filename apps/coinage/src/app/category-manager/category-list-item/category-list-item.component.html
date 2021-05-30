@@ -1,0 +1,6 @@
+<li>
+    {{ category.name }}
+    <ul *ngIf="category.children">
+        <coinage-app-category-list-item *ngFor="let children of category.children" [category]="children"></coinage-app-category-list-item>
+    </ul>
+</li>

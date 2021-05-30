@@ -1,11 +1,4 @@
-import {
-    Entity,
-    Column,
-    PrimaryGeneratedColumn,
-    JoinColumn,
-    ManyToOne,
-    OneToMany,
-} from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 @Entity()
 export class Category {
@@ -17,6 +10,9 @@ export class Category {
 
     @Column('text', { nullable: true })
     description: string;
+
+    @Column({ name: 'parent' })
+    parentId: number;
 
     @ManyToOne('Category', { nullable: true })
     @JoinColumn({ name: 'parent' })

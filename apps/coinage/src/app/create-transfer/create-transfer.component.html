@@ -1,0 +1,15 @@
+<div *ngIf="showPage">
+    <div class="transaction-form">
+        <input name="description" [(ngModel)]="transfer.description" minlength="3" required />
+        <input name="amount" type="number" [(ngModel)]="transfer.amount" required />
+        <select [(ngModel)]="transfer.category" required>
+            <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+        </select>
+        <select [(ngModel)]="transfer.contractor">
+            <option *ngFor="let contractor of contractors" [ngValue]="contractor.id">{{ contractor.name }}</option>
+        </select>
+        <input name="date" type="date" [(ngModel)]="transfer.date" required />
+    </div>
+
+    <button (click)="onClickCreateTransfer()">Create</button>
+</div>

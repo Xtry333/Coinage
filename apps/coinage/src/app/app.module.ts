@@ -2,6 +2,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { ApiPathsModule } from '@coinage-app/router';
 import { AppRoutingModule } from './app-routing/app-routing.module';
 
@@ -13,10 +14,22 @@ import { TransferDetailsComponent } from './transfer-details/transfer-details.co
 import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
 import { CategoryManagerComponent } from './category-manager/category-manager.component';
 import { SummaryComponent } from './summary/summary.component';
+import { CreateTransferComponent } from './create-transfer/create-transfer.component';
+import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
 
 @NgModule({
-    declarations: [AppComponent, DashboardComponent, SummaryComponent, PlnCurrencyPipe, TransferDetailsComponent, SpinnerComponent, CategoryManagerComponent],
-    imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule],
+    declarations: [
+        AppComponent,
+        DashboardComponent,
+        SummaryComponent,
+        PlnCurrencyPipe,
+        TransferDetailsComponent,
+        SpinnerComponent,
+        CategoryManagerComponent,
+        CreateTransferComponent,
+        CategoryListItemComponent,
+    ],
+    imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule, FormsModule],
     providers: [
         ApiPathsModule,
         {
