@@ -9,10 +9,12 @@ import { TransfersController } from './controllers/transfers.controller';
 import { TransferService } from './services/transfer.service';
 import { CategoriesController } from './controllers/categories.controller';
 import { CategoryService } from './services/category.service';
+import { ContractorService } from './services/contractor.service';
+import { ContractorController } from './controllers/contractors.controller';
 
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
-    controllers: [AppController, TransfersController, CategoriesController],
-    providers: [AppService, TransferService, CategoryService, ApiPathsModule],
+    controllers: [AppController, TransfersController, CategoriesController, ContractorController],
+    providers: [AppService, TransferService, CategoryService, ContractorService, ApiPathsModule],
 })
 export class AppModule {}

@@ -1,15 +1,34 @@
 <div *ngIf="showPage">
     <div class="transaction-form">
-        <input name="description" [(ngModel)]="transfer.description" minlength="3" required />
-        <input name="amount" type="number" [(ngModel)]="transfer.amount" required />
-        <select [(ngModel)]="transfer.category" required>
-            <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-        </select>
-        <select [(ngModel)]="transfer.contractor">
-            <option *ngFor="let contractor of contractors" [ngValue]="contractor.id">{{ contractor.name }}</option>
-        </select>
-        <input name="date" type="date" [(ngModel)]="transfer.date" required />
-    </div>
+        <div>
+            <label for="description">Description</label>
+            <input id="description" [(ngModel)]="transferInput.description" minlength="3" required />
+        </div>
+        <div>
+            <label for="amount">Price</label>
+            <input id="amount" type="number" [(ngModel)]="transferInput.amount" [min]="0" step=".01" required />
+        </div>
+        <div>
+            <label for="category">Category</label>
+            <select id="category" [(ngModel)]="transferInput.category" required>
+                <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+            </select>
+        </div>
+        <div>
+            <label for="contractor">Contractor</label>
+            <select id="contractor" [(ngModel)]="transferInput.contractor">
+                <option *ngFor="let contractor of contractors" [ngValue]="contractor.id">{{ contractor.name }}</option>
+            </select>
+        </div>
+        <div>
+            <label for="date">Date</label>
+            <input id="date" type="date" [(ngModel)]="transferInput.date" required />
+        </div>
 
-    <button (click)="onClickCreateTransfer()">Create</button>
+        <button (click)="onClickSaveTransfer()">
+            <div *ngIf="editMode">Save</div>
+            <div *ngIf="!editMode">Create</div>
+        </button>
+        <button *ngIf="editMode" (click)="onClickDeleteTransfer()">Delete</button>
+    </div>
 </div>

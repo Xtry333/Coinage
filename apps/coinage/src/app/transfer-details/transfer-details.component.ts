@@ -1,8 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { TransferDetailsDTO } from '@coinage-app/interfaces';
+import { CategoryDTO, SaveTransferDTO, SplitTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
 import { AppRoutingModule } from '../app-routing/app-routing.module';
 import { CoinageDataService } from '../services/coinageData.service';
+import * as Rx from 'rxjs';
+import { finalize } from 'rxjs/operators';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -12,7 +14,12 @@ import { CoinageDataService } from '../services/coinageData.service';
 export class TransferDetailsComponent implements OnInit {
     showPage = false;
     transfer: TransferDetailsDTO;
+    @Input()
+    splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, category: 0 };
     totalPayment: number;
+    shouldShowSplit = false;
+
+    categories: CategoryDTO[];
 
     constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
 
@@ -21,14 +28,45 @@ export class TransferDetailsComponent implements OnInit {
         this.route.paramMap.subscribe((params) => {
             const id = parseInt(params.get('id'));
             if (id) {
-                this.coinageData.getTransferDetails(id).then((transfer) => {
-                    this.transfer = transfer;
-                    this.showPage = true;
-                    this.totalPayment = transfer.amount + transfer.otherTransfers.reduce((a, t) => a + t.amount, 0);
-                });
+                Rx.zip(this.coinageData.getTransferDetails(id), this.coinageData.getCategoryList())
+                    .pipe(
+                        finalize(() => {
+                            this.showPage = true;
+                        })
+                    )
+                    .subscribe(([transfer, categories]) => {
+                        this.transfer = transfer;
+                        this.totalPayment = transfer.amount + transfer.otherTransfers.reduce((a, t) => a + t.amount, 0);
+                        this.categories = categories;
+                        this.splitTransfer.amount = +(transfer.amount / 2).toFixed(2);
+                        this.splitTransfer.category = transfer.categoryPath[transfer.categoryPath.length - 1].id;
+                        this.splitTransfer.description = transfer.description;
+                    });
             } else {
                 this.router.navigateByUrl('notFound');
             }
         });
+    }
+
+    public onToggleShowSplit(): void {
+        this.shouldShowSplit = !this.shouldShowSplit;
+    }
+
+    public onClickSplitTransfer(): void {
+        this.coinageData
+            .postSplitTransaction({
+                id: this.transfer.id,
+                description: this.splitTransfer.description,
+                amount: parseFloat(this.splitTransfer.amount?.toString()) ?? null,
+                category: this.splitTransfer.category,
+            })
+            .subscribe((result) => {
+                this.shouldShowSplit = false;
+                this.router.navigateByUrl(`/details/${(result as any).insertedId}`);
+            });
+    }
+
+    public onClickEditMode(): void {
+        this.router.navigateByUrl(`/transfer/edit/${this.transfer.id}`);
     }
 }

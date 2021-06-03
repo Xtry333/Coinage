@@ -50,9 +50,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     private refreshData() {
-        Rx.zip(this.coinageData.getTransactionsObserver(), this.coinageData.getTotalOutcomesPerMonth()).subscribe((res) => {
-            this.lastTransactions = res[0];
-            this.totalOutcomesPerMonth = this.mapToUiOutcome(res[1]);
+        Rx.zip(this.coinageData.getTransactionsObserver(), this.coinageData.getTotalOutcomesPerMonth()).subscribe(([transactions, outcomes]) => {
+            this.lastTransactions = transactions;
+            this.totalOutcomesPerMonth = this.mapToUiOutcome(outcomes);
         });
     }
 
@@ -70,7 +70,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
     }
 
-    private daysInMonth(year: number, month: number) {
+    private daysInMonth(year: number, month: number): number {
+        if (new Date().getMonth() == month) {
+            return new Date().getDate();
+        }
         return new Date(year, month + 1, 0).getDate();
     }
 

@@ -33,8 +33,11 @@ export class Transfer {
 
     @ManyToOne('Receipt', { eager: true, nullable: true })
     @JoinColumn({ name: 'receipt' })
-    receipt: Receipt;
+    receipt: Receipt | null;
 
     @Column('varchar', { length: 50, nullable: false })
     type: string;
+
+    @Column({ nullable: true })
+    user: number;
 }

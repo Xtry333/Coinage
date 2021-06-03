@@ -47,6 +47,8 @@ describe('TransferDetailsComponent', () => {
                         date: '2021-05-16',
                         otherTransfers: [],
                         description: '',
+                        categoryId: 1,
+                        contractorId: 1,
                         createdDate: new Date('2021-05-16'),
                         editedDate: new Date('2021-05-16'),
                     });

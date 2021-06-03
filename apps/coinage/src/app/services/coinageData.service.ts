@@ -1,6 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { CategoryDTO, CreateTransferDTO, TotalInMonthByCategory, TotalOutcomesPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import {
+    CategoryDTO,
+    ContractorDTO,
+    SaveTransferDTO,
+    SplitTransferDTO,
+    TotalInMonthByCategory,
+    TotalOutcomesPerMonthDTO,
+    TransferDetailsDTO,
+    TransferDTO,
+} from '@coinage-app/interfaces';
 import { ApiPathsModule } from '@coinage-app/router';
 import { Observable } from 'rxjs';
 
@@ -32,8 +41,20 @@ export class CoinageDataService {
         return this.http.get<CategoryDTO[]>(`${CoinageDataService.API_URL}category/list`);
     }
 
-    public postCreateTransaction(request: CreateTransferDTO): Observable<void> {
-        return this.http.post<void>(`${CoinageDataService.API_URL}transfer/create`, request);
+    public getContractorList(): Observable<ContractorDTO[]> {
+        return this.http.get<ContractorDTO[]>(`${CoinageDataService.API_URL}contractor/list`);
+    }
+
+    public postCreateSaveTransaction(request: SaveTransferDTO): Observable<void> {
+        return this.http.post<void>(`${CoinageDataService.API_URL}transfer/save`, request);
+    }
+
+    deleteTransfer(id: number): Observable<boolean> {
+        return this.http.delete<boolean>(`${CoinageDataService.API_URL}transfer/${id}`);
+    }
+
+    public postSplitTransaction(request: SplitTransferDTO): Observable<void> {
+        return this.http.post<void>(`${CoinageDataService.API_URL}transfer/split`, request);
     }
 
     public getTotalPerCategory(year: number, month: number): Observable<TotalInMonthByCategory[]> {

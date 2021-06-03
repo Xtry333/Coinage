@@ -12,10 +12,26 @@
     <pre>Date: {{ transfer?.date }}</pre>
     <div *ngIf="transfer?.contractor">
         <pre>Contractor: {{ transfer?.contractor }}</pre>
-        <pre>
-Total payed to {{ transfer?.contractor }} on {{ transfer?.date }}: {{
-                totalPayment | plnCurrency
-            }}</pre
-        >
+        <pre>Total payed to {{ transfer?.contractor }} on {{ transfer?.date }}: {{ totalPayment | plnCurrency }}</pre>
+    </div>
+    <br /><br />
+    <button (click)="onClickEditMode()">Edit</button>
+    <button (click)="onToggleShowSplit()">Show Split Transfer</button>
+    <div *ngIf="shouldShowSplit" class="split-transaction-form">
+        <div>
+            <label for="description">Description</label>
+            <input id="description" type="text" [(ngModel)]="splitTransfer.description" required />
+        </div>
+        <div>
+            <label for="amount">Price</label>
+            <input id="amount" type="number" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer?.amount - 0.01" step=".01" required />
+        </div>
+        <div>
+            <label for="category">Category</label>
+            <select id="category" [(ngModel)]="splitTransfer.category" required>
+                <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+            </select>
+        </div>
+        <button (click)="onClickSplitTransfer()">Split</button>
     </div>
 </div>

@@ -1,18 +1,20 @@
-import { Body, Controller, Get, Next, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Next, Param, Post } from '@nestjs/common';
 
-import { CreateTransferDTO, TotalOutcomesPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import { SaveTransferDTO, SplitTransferDTO, TotalOutcomesPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import { TransferService } from '../services/transfer.service';
 import { Category } from '../entity/Category.entity';
 import { AppService } from '../app.service';
 import { CategoryService } from '../services/category.service';
 import { Transfer } from '../entity/Transfer.entity';
+import { ContractorService } from '../services/contractor.service';
 
 @Controller('transfer')
 export class TransfersController {
     constructor(
         private readonly transferService: TransferService,
         private readonly appService: AppService,
-        private readonly categoryService: CategoryService
+        private readonly categoryService: CategoryService,
+        private readonly contractorService: ContractorService
     ) {}
 
     @Get('details/:id')
@@ -56,6 +58,8 @@ export class TransfersController {
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
             contractor: transfer.contractor?.name,
+            contractorId: transfer.contractor.id,
+            categoryId: transfer.category.id,
             otherTransfers: otherTransfers,
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
@@ -97,20 +101,51 @@ export class TransfersController {
         return outcomes.sort((a, b) => new Date(b.year, b.month).getTime() - new Date(a.year, a.month).getTime()).slice(0, 12);
     }
 
-    @Post('create')
-    async createTransferObject(@Body() transfer: CreateTransferDTO): Promise<{ insertedId: number }> {
+    @Post('save')
+    async saveTransferObject(@Body() transfer: SaveTransferDTO): Promise<{ insertedId: number }> {
         console.log(transfer);
         console.log(transfer.date);
-        const entity = new Transfer();
+        let entity: Transfer;
+        if (transfer.id) {
+            entity = await this.transferService.getById(transfer.id);
+        } else {
+            entity = new Transfer();
+        }
         entity.description = transfer.description;
         entity.amount = transfer.amount.toString();
         entity.date = transfer.date;
         entity.createdDate = new Date();
-        entity.category = await this.categoryService.getById(parseInt(transfer.category?.toString()));
-        //entity.contractor = await this.contractorService.getById(parseInt(transfer.contractor?.toString()));
+        entity.category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
+        entity.contractor = await this.contractorService.getById(parseInt(transfer.contractorId?.toString()));
         console.log(entity);
-        const inserted = await this.transferService.insert(entity);
+        const inserted = await this.transferService.save(entity);
         console.log(inserted);
+        return { insertedId: inserted.id };
+    }
+
+    @Post('split')
+    async splitTransferObject(@Body() transfer: SplitTransferDTO): Promise<{ insertedId: number }> {
+        const id = parseInt(transfer.id?.toString());
+        const target = await this.transferService.getById(id);
+        target.amount = (parseFloat(target.amount) - transfer.amount).toString();
+        const entity = new Transfer();
+        entity.description = transfer.description;
+        entity.amount = transfer.amount.toString();
+        if (parseFloat(target.amount) <= 0) {
+            throw new Error('Amount too high!');
+        }
+        entity.date = target.date;
+        entity.user = target.user;
+        entity.createdDate = new Date();
+        entity.category = await this.categoryService.getById(parseInt(transfer.category?.toString()));
+        entity.contractor = target.contractor;
+        const inserted = await this.transferService.insert(entity);
+        await this.transferService.save(target);
         return { insertedId: inserted.identifiers[0].id };
+    }
+
+    @Delete(':id')
+    async removeTransferObject(@Param('id') id: number) {
+        return (await this.transferService.deleteById(id)).affected == 1;
     }
 }

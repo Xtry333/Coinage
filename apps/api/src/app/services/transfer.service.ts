@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Equal, getConnection, InsertResult } from 'typeorm';
+import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
 import { Transfer } from '../entity/Transfer.entity';
 
 @Injectable({
@@ -27,5 +27,15 @@ export class TransferService {
 
     async insert(transfer: Transfer): Promise<InsertResult> {
         return await getConnection().getRepository(Transfer).insert(transfer);
+    }
+
+    async save(transfer: Transfer): Promise<Transfer> {
+        return await getConnection().getRepository(Transfer).save(transfer);
+    }
+
+    async deleteById(id: number): Promise<DeleteResult> {
+        return await getConnection()
+            .getRepository(Transfer)
+            .delete({ id: Equal(id) });
     }
 }
