@@ -58,7 +58,7 @@ export class TransfersController {
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
             contractor: transfer.contractor?.name,
-            contractorId: transfer.contractor.id,
+            contractorId: transfer.contractor?.id,
             categoryId: transfer.category.id,
             otherTransfers: otherTransfers,
             date: transfer.date,
@@ -116,7 +116,7 @@ export class TransfersController {
         entity.date = transfer.date;
         entity.createdDate = new Date();
         entity.category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
-        entity.contractor = await this.contractorService.getById(parseInt(transfer.contractorId?.toString()));
+        entity.contractor = transfer.contractorId ? await this.contractorService.getById(parseInt(transfer.contractorId?.toString())) : null;
         console.log(entity);
         const inserted = await this.transferService.save(entity);
         console.log(inserted);

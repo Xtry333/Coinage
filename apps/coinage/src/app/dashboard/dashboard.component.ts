@@ -71,8 +71,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     private daysInMonth(year: number, month: number): number {
-        if (new Date().getMonth() == month) {
-            return new Date().getDate();
+        const today = new Date();
+        if (today.getFullYear() == year && today.getMonth() == month) {
+            return today.getDate();
         }
         return new Date(year, month + 1, 0).getDate();
     }

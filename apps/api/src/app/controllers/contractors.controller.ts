@@ -9,11 +9,13 @@ export class ContractorController {
 
     @Get('/list')
     async getCategoryList(): Promise<ContractorDTO[]> {
-        return (await this.contractorService.getAll()).map((c) => {
+        const contractors = (await this.contractorService.getAll()).map((c) => {
             return {
                 id: c.id,
                 name: c.name,
             };
         });
+        contractors.unshift({ id: null, name: '' });
+        return contractors;
     }
 }
