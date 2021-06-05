@@ -14,7 +14,7 @@ import { TransferDetailsComponent } from './transfer-details/transfer-details.co
 import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
 import { CategoryManagerComponent } from './category-manager/category-manager.component';
 import { SummaryComponent } from './summary/summary.component';
-import { CreateTransferComponent } from './create-transfer/create-transfer.component';
+import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
 
 @NgModule({
@@ -26,7 +26,7 @@ import { CategoryListItemComponent } from './category-manager/category-list-item
         TransferDetailsComponent,
         SpinnerComponent,
         CategoryManagerComponent,
-        CreateTransferComponent,
+        CreateEditTransferComponent,
         CategoryListItemComponent,
     ],
     imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule, FormsModule],

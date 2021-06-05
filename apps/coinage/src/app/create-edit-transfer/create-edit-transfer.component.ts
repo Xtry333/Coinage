@@ -7,10 +7,10 @@ import { CoinageDataService } from '../services/coinageData.service';
 
 @Component({
     selector: 'coinage-app-create-transfer',
-    templateUrl: './create-transfer.component.html',
-    styleUrls: ['./create-transfer.component.less'],
+    templateUrl: './create-edit-transfer.component.html',
+    styleUrls: ['./create-edit-transfer.component.less'],
 })
-export class CreateTransferComponent implements OnInit {
+export class CreateEditTransferComponent implements OnInit {
     showPage = true;
     totalPayment: number;
     categories: CategoryDTO[];

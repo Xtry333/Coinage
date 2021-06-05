@@ -6,7 +6,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { SummaryComponent } from '../summary/summary.component';
-import { CreateTransferComponent as CreateEditTransferComponent } from '../create-transfer/create-transfer.component';
+import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
 
 const routes: Routes = [
     {
