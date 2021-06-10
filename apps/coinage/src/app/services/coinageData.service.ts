@@ -21,8 +21,12 @@ export class CoinageDataService {
 
     constructor(private http: HttpClient, private path: ApiPathsModule) {}
 
-    public getTransactionsObserver(): Observable<TransferDTO[]> {
+    public getRecentTransactions(): Observable<TransferDTO[]> {
         return this.http.get<TransferDTO[]>(this.path.getApiUrl());
+    }
+
+    public getAllTransfers(): Observable<TransferDTO[]> {
+        return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/all`);
     }
 
     public getTransferDetails(id: number): Promise<TransferDetailsDTO> {

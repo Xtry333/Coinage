@@ -13,20 +13,21 @@ import { finalize } from 'rxjs/operators';
 })
 export class TransferDetailsComponent implements OnInit {
     showPage = false;
-    transfer: TransferDetailsDTO;
+    transfer!: TransferDetailsDTO;
+
     @Input()
     splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, category: 0 };
-    totalPayment: number;
+    totalPayment: number = 0;
     shouldShowSplit = false;
 
-    categories: CategoryDTO[];
+    categories: CategoryDTO[] = [];
 
     constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
 
     ngOnInit(): void {
         this.showPage = false;
         this.route.paramMap.subscribe((params) => {
-            const id = parseInt(params.get('id'));
+            const id = parseInt(params.get('id') ?? '');
             if (id) {
                 Rx.zip(this.coinageData.getTransferDetails(id), this.coinageData.getCategoryList())
                     .pipe(
@@ -41,6 +42,7 @@ export class TransferDetailsComponent implements OnInit {
                         this.splitTransfer.amount = +(transfer.amount / 2).toFixed(2);
                         this.splitTransfer.category = transfer.categoryPath[transfer.categoryPath.length - 1].id;
                         this.splitTransfer.description = transfer.description;
+                        console.log(this.transfer.otherTransfers);
                     });
             } else {
                 this.router.navigateByUrl('notFound');
@@ -53,20 +55,21 @@ export class TransferDetailsComponent implements OnInit {
     }
 
     public onClickSplitTransfer(): void {
-        this.coinageData
-            .postSplitTransaction({
-                id: this.transfer.id,
-                description: this.splitTransfer.description,
-                amount: parseFloat(this.splitTransfer.amount?.toString()) ?? null,
-                category: this.splitTransfer.category,
-            })
-            .subscribe((result) => {
-                this.shouldShowSplit = false;
-                this.router.navigateByUrl(`/details/${(result as any).insertedId}`);
-            });
+        if (this.transfer)
+            this.coinageData
+                .postSplitTransaction({
+                    id: this.transfer.id,
+                    description: this.splitTransfer.description,
+                    amount: parseFloat(this.splitTransfer.amount?.toString()) ?? null,
+                    category: this.splitTransfer.category,
+                })
+                .subscribe((result) => {
+                    this.shouldShowSplit = false;
+                    this.router.navigateByUrl(`/details/${(result as any).insertedId}`);
+                });
     }
 
     public onClickEditMode(): void {
-        this.router.navigateByUrl(`/transfer/edit/${this.transfer.id}`);
+        if (this.transfer) this.router.navigateByUrl(`/transfer/edit/${this.transfer.id}`);
     }
 }

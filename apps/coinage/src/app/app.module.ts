@@ -16,6 +16,7 @@ import { CategoryManagerComponent } from './category-manager/category-manager.co
 import { SummaryComponent } from './summary/summary.component';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
+import { TransferTableComponent } from './transfer-table/transfer-table.component';
 
 @NgModule({
     declarations: [
@@ -28,6 +29,7 @@ import { CategoryListItemComponent } from './category-manager/category-list-item
         CategoryManagerComponent,
         CreateEditTransferComponent,
         CategoryListItemComponent,
+        TransferTableComponent,
     ],
     imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule, FormsModule],
     providers: [

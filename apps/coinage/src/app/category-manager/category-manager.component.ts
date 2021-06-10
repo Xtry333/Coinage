@@ -10,8 +10,8 @@ import { CoinageDataService } from '../services/coinageData.service';
 })
 export class CategoryManagerComponent implements OnInit {
     showPage = false;
-    categories;
-    parentCategory: CategoryDTO;
+    categories = [];
+    parentCategory!: CategoryDTO;
 
     constructor(private readonly coinageDataService: CoinageDataService) {}
 

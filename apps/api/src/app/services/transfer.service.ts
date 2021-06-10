@@ -17,6 +17,12 @@ export class TransferService {
         return transfer;
     }
 
+    getAll() {
+        return getConnection()
+            .getRepository(Transfer)
+            .find({ order: { date: 'DESC', id: 'DESC' } });
+    }
+
     async getLimitedTotalOutcomes(): Promise<{ year: number; month: number; amount: string; count: number }[]> {
         return await getConnection()
             .getRepository(Transfer)

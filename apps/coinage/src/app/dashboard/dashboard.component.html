@@ -13,7 +13,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let transaction of lastTransactions">
+                <tr *ngFor="let transaction of lastTransactions; trackBy: transferIdTracker">
                     <td>{{ transaction.category }}</td>
                     <td>
                         <a [routerLink]="['/details', transaction.id]">
@@ -40,7 +40,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let outcome of totalOutcomesPerMonth">
+                <tr *ngFor="let outcome of totalOutcomesPerMonth; trackBy: totalOutcomesTracker">
                     <td class="month-name">
                         <a [routerLink]="['/summary', this.getTotalPerMonthDate(outcome)]">{{ outcome.monthName }} {{ outcome.year }}</a>
                     </td>

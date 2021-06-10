@@ -11,12 +11,15 @@ export class CategoriesController {
     @Get('/list')
     async getCategoryList(): Promise<CategoryDTO[]> {
         const categories = await this.categoryService.getAll();
-        return categories.map((c) => {
-            return {
-                id: c.id,
-                name: c.name,
-            };
-        });
+        return categories
+            .map((c) => {
+                return {
+                    id: c.id,
+                    name: c.name,
+                    parentId: c.parentId,
+                };
+            })
+            .sort((a, b) => a.name.localeCompare(b.name));
     }
 
     @Get('/tree')
@@ -31,6 +34,7 @@ export class CategoriesController {
             id: c.id,
             name: c.name,
             children: allCategories.filter((child) => child.parentId == c.id).map((cat) => this.mapToTree(cat, allCategories)),
+            parentId: c.parentId,
         };
     }
 
@@ -39,7 +43,7 @@ export class CategoriesController {
         const yearNum = parseInt(year),
             monthNum = parseInt(month);
         if (yearNum) {
-            return await this.categoryService.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : null);
+            return await this.categoryService.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : undefined);
         } else {
             return [];
         }

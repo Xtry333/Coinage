@@ -1,0 +1,45 @@
+div.transfer-table-container {
+    width: 60%;
+    max-width: 1000px;
+    margin: auto;
+    margin-top: 35px;
+    table.transfer-table {
+        width: 100%;
+        border-collapse: collapse;
+        caption {
+            font-weight: bold;
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        thead tr {
+            background-color: rgb(225, 225, 225);
+            border: gray 2px solid;
+            th {
+                padding: 15px;
+            }
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: rgb(240, 240, 240);
+        }
+
+        td {
+            padding: 10px 15px;
+            &.currency {
+                text-align: right;
+            }
+            &.month-name {
+                text-transform: capitalize;
+            }
+        }
+
+        .align-left {
+            text-align: left;
+        }
+
+        .align-right {
+            text-align: right;
+        }
+    }
+}

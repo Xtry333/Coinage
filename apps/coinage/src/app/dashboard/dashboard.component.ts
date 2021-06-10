@@ -1,5 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TotalOutcomesPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
+import { Component, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
+import { TotalOutcomesPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { finalize } from 'rxjs/operators';
 import { DateTime } from 'luxon';
@@ -22,18 +22,19 @@ interface UiTotalOutcomesPerMonth {
     styleUrls: ['./dashboard.component.less'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+    public static REFRESH_INTERVAL = 5000;
     message: string = '';
     transactionId: number = 0;
-    lastTransactions: TransferDTO[];
-    totalOutcomesPerMonth: UiTotalOutcomesPerMonth[];
+    lastTransactions: TransferDTO[] = [];
+    totalOutcomesPerMonth: UiTotalOutcomesPerMonth[] = [];
     showPage = false;
-    refreshInterval: ReturnType<typeof setInterval>;
+    refreshInterval?: ReturnType<typeof setInterval>;
 
     constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
 
     ngOnInit(): void {
         this.showPage = false;
-        const data = Rx.zip(this.coinageData.getTransactionsObserver(), this.coinageData.getTotalOutcomesPerMonth());
+        const data = Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth());
         data.pipe(
             finalize(() => {
                 this.showPage = true;
@@ -42,15 +43,29 @@ export class DashboardComponent implements OnInit, OnDestroy {
             this.lastTransactions = values[0];
             this.totalOutcomesPerMonth = this.mapToUiOutcome(values[1]);
         });
-        this.refreshInterval = setInterval(() => this.refreshData(), 5000);
+        this.refreshInterval = setInterval(() => this.refreshData(), DashboardComponent.REFRESH_INTERVAL);
     }
 
     ngOnDestroy(): void {
-        clearInterval(this.refreshInterval);
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = undefined;
+        }
+    }
+
+    public transferIdTracker(index: number, item: TransferDTO): string {
+        return item.id.toString();
+    }
+
+    public totalOutcomesTracker(index: number, item: UiTotalOutcomesPerMonth): string {
+        if (item.partedDate.month) {
+            return item.partedDate.year.toString() + item.partedDate.month.toString();
+        }
+        return '';
     }
 
     private refreshData() {
-        Rx.zip(this.coinageData.getTransactionsObserver(), this.coinageData.getTotalOutcomesPerMonth()).subscribe(([transactions, outcomes]) => {
+        Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth()).subscribe(([transactions, outcomes]) => {
             this.lastTransactions = transactions;
             this.totalOutcomesPerMonth = this.mapToUiOutcome(outcomes);
         });

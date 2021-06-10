@@ -12,12 +12,12 @@ import { CoinageDataService } from '../services/coinageData.service';
 })
 export class CreateEditTransferComponent implements OnInit {
     showPage = true;
-    totalPayment: number;
-    categories: CategoryDTO[];
-    contractors: ContractorDTO[];
+    totalPayment: number = 0;
+    categories: CategoryDTO[] = [];
+    contractors: ContractorDTO[] = [];
     editMode = false;
-    transferDTO: TransferDetailsDTO;
-    transferId: number;
+    transferDTO!: TransferDetailsDTO;
+    transferId!: number;
 
     @Input('transfer')
     transferInput = { description: '', amount: 0, date: new Date().toISOString().slice(0, 10), category: 0, contractor: 0 };
@@ -35,10 +35,10 @@ export class CreateEditTransferComponent implements OnInit {
                     this.editMode = true;
                     this.transferInput = {
                         amount: t.amount,
-                        category: t.categoryPath[t.categoryPath.length - 1].id,
+                        category: t.categoryId,
                         date: t.date,
                         description: t.description,
-                        contractor: t.contractorId,
+                        contractor: t.contractorId ?? 0,
                     };
                 });
             }

@@ -6,7 +6,7 @@ import { Contractor } from '../entity/Contractor.entity';
     providedIn: 'root',
 })
 export class ContractorService {
-    async getById(id: number): Promise<Contractor> {
+    async getById(id: number): Promise<Contractor | undefined> {
         return await getConnection()
             .getRepository(Contractor)
             .findOne({ where: { id: Equal(id) } });

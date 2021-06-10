@@ -7,11 +7,11 @@ import { LoadingService } from './loaderGadget/loading.service';
     styleUrls: ['./app.component.less'],
 })
 export class AppComponent implements OnInit, OnDestroy {
-    isPageLoading: boolean;
+    isPageLoading: boolean = true;
     title = 'Coinage';
     dateTime = new Date().toLocaleString();
     logo = 'assets/images/coin.png';
-    refreshInterval: ReturnType<typeof setInterval>;
+    refreshInterval?: ReturnType<typeof setInterval>;
 
     constructor(private loader: LoadingService) {}
 
@@ -25,6 +25,9 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy(): void {
-        clearInterval(this.refreshInterval);
+        if (this.refreshInterval) {
+            clearInterval(this.refreshInterval);
+            this.refreshInterval = undefined;
+        }
     }
 }

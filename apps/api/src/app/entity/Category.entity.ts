@@ -3,21 +3,21 @@ import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMan
 @Entity()
 export class Category {
     @PrimaryGeneratedColumn()
-    id: number;
+    id!: number;
 
     @Column('varchar', { length: 50, nullable: false })
-    name: string;
+    name!: string;
 
     @Column('text', { nullable: true })
-    description: string;
+    description!: string;
 
     @Column({ name: 'parent' })
-    parentId: number;
+    parentId!: number;
 
     @ManyToOne('Category', { nullable: true })
     @JoinColumn({ name: 'parent' })
-    parent: Promise<Category>;
+    parent!: Promise<Category>;
 
     @OneToMany('Category', 'parent', {})
-    children: Promise<Category[]>;
+    children!: Promise<Category[]>;
 }

@@ -11,7 +11,7 @@ export class CategoryListItemComponent implements OnInit {
     constructor() {}
 
     @Input()
-    category: CategoryDTO;
+    category!: CategoryDTO;
 
     ngOnInit(): void {}
 }

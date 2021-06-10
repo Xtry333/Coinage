@@ -17,6 +17,19 @@ export class TransfersController {
         private readonly contractorService: ContractorService
     ) {}
 
+    @Get('all')
+    async getAllTransactions(): Promise<TransferDTO[]> {
+        return (await this.transferService.getAll()).map((t) => {
+            return {
+                id: t.id,
+                description: t.description,
+                amount: parseFloat(t.amount),
+                category: t.category?.name,
+                date: t.date,
+            } as TransferDTO;
+        });
+    }
+
     @Get('details/:id')
     async getTransferDetails(@Param('id') paramId: string): Promise<TransferDetailsDTO> {
         const id = parseInt(paramId);
@@ -116,7 +129,7 @@ export class TransfersController {
         entity.date = transfer.date;
         entity.createdDate = new Date();
         entity.category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
-        entity.contractor = transfer.contractorId ? await this.contractorService.getById(parseInt(transfer.contractorId?.toString())) : null;
+        entity.contractor = transfer.contractorId ? await this.contractorService.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         console.log(entity);
         const inserted = await this.transferService.save(entity);
         console.log(inserted);

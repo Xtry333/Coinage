@@ -8,9 +8,9 @@
         </ul>
     </h4>
     <pre>{{ transfer?.description }}</pre>
-    <pre>Amount: {{ transfer?.amount | plnCurrency }}</pre>
-    <pre>Date: {{ transfer?.date }}</pre>
-    <div *ngIf="transfer?.contractor">
+    <pre>Amount: {{ transfer.amount | plnCurrency }}</pre>
+    <pre>Date: {{ transfer.date }}</pre>
+    <div *ngIf="transfer.contractor">
         <pre>Contractor: {{ transfer?.contractor }}</pre>
         <pre>Total payed to {{ transfer?.contractor }} on {{ transfer?.date }}: {{ totalPayment | plnCurrency }}</pre>
     </div>
@@ -24,7 +24,7 @@
         </div>
         <div>
             <label for="amount">Price</label>
-            <input id="amount" type="number" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer?.amount - 0.01" step=".01" required />
+            <input id="amount" type="number" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer.amount - 0.01" step=".01" required />
         </div>
         <div>
             <label for="category">Category</label>

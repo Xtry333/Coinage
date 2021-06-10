@@ -15,7 +15,7 @@ export class ContractorController {
                 name: c.name,
             };
         });
-        contractors.unshift({ id: null, name: '' });
-        return contractors;
+        contractors.unshift({ id: 0, name: '' });
+        return contractors.sort((a, b) => a.name.localeCompare(b.name));
     }
 }

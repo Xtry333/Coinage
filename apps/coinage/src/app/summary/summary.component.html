@@ -17,7 +17,9 @@
             {{ partedDate.day }}
         </dd>
     </dl> -->
-
+    <div *ngIf="isDateTargetDay()">
+        <coinage-app-transfers-table [transfers]="transfers" [tableHeader]="tableHeader"></coinage-app-transfers-table>
+    </div>
     <table class="last-transactions-table">
         <thead>
             <tr>
@@ -34,5 +36,6 @@
     </table>
     <br />
     {{ datetime.toLocaleString('pl', { month: '2-digit', day: 'numeric', year: 'numeric' }) }}
+    <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="onDateChange()" />
     <button *ngIf="shouldShowGoUpButton()" (click)="goUp()">Go Up</button>
 </div>

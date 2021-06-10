@@ -23,8 +23,8 @@ export interface TransferDetailsDTO {
     amount: number;
     categoryPath: CategoryPathDTO[];
     categoryId: number;
-    contractor: string;
-    contractorId: number;
+    contractor?: string;
+    contractorId?: number;
     date: string;
     createdDate: Date;
     editedDate: Date;

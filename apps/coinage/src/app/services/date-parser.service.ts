@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
 export interface PartedDate {
-    year?: number;
+    year: number;
     month?: number;
     day?: number;
 }
@@ -17,6 +17,11 @@ export class DateParserService {
         return this.joinPartedDate(parted);
     }
 
+    public toPartedDate(dateString: string): PartedDate {
+        var dateParts = dateString.split('-');
+        return { year: +dateParts[0], month: +dateParts[1] - 1, day: +dateParts[2] };
+    }
+
     public joinPartedDate(parted: PartedDate): string {
         let date = parted.year.toString().padStart(4, '0');
         if (parted.month !== undefined) {
@@ -28,13 +33,25 @@ export class DateParserService {
         return date;
     }
 
-    public getDateFromParted(parted: PartedDate): Date {
-        if (parted.day) {
-            return new Date(parted.year, parted.month - 1, parted.day);
+    public toDate(parted: PartedDate): Date {
+        if (parted.day && parted.month) {
+            return new Date(parted.year, parted.month - 1, parted.day + 1);
         } else if (parted.month) {
             return new Date(parted.year, parted.month - 1, 1);
         } else {
             return new Date(parted.year, 0, 1);
         }
+    }
+
+    public isDateTargetYear(date: PartedDate): boolean {
+        return date.year !== undefined && date.month === undefined && date.day === undefined;
+    }
+
+    public isDateTargetMonth(date: PartedDate): boolean {
+        return date.year !== undefined && date.month !== undefined && date.day === undefined;
+    }
+
+    public isDateTargetDay(date: PartedDate): boolean {
+        return date.year !== undefined && date.month !== undefined && date.day !== undefined;
     }
 }

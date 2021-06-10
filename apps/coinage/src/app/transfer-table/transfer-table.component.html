@@ -1,0 +1,31 @@
+<div class="transfer-table-container">
+    <table class="transfer-table">
+        <caption *ngIf="isHeaderDisplayed">
+            {{
+                tableHeader
+            }}
+        </caption>
+        <thead>
+            <tr>
+                <th class="align-left">Category</th>
+                <th>Description</th>
+                <th class="align-right">Amount</th>
+                <th class="align-right">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let transfer of transfers; trackBy: transferIdTracker">
+                <td>{{ transfer.category }}</td>
+                <td>
+                    <a [routerLink]="['/details', transfer.id]">
+                        {{ transfer.description }}
+                    </a>
+                </td>
+                <td class="currency">{{ transfer.amount | plnCurrency }}</td>
+                <td class="align-right">
+                    <a [routerLink]="['/summary', transfer.date]">{{ transfer.date | date }}</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>
