@@ -6,6 +6,7 @@ export interface Message {
 export interface TransferDTO {
     id: number;
     description: string;
+    contractor?: string;
     amount: number;
     category: string;
     categoryId: number;
@@ -26,7 +27,7 @@ export interface TransferDetailsDTO {
     contractor?: string;
     contractorId?: number;
     date: string;
-    createdDate: Date;
+    createdDate?: Date;
     editedDate: Date;
     otherTransfers: TransferDTO[];
 }

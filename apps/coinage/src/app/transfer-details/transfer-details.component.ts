@@ -16,7 +16,7 @@ export class TransferDetailsComponent implements OnInit {
     transfer!: TransferDetailsDTO;
 
     @Input()
-    splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, category: 0 };
+    splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
     totalPayment: number = 0;
     shouldShowSplit = false;
 
@@ -40,7 +40,7 @@ export class TransferDetailsComponent implements OnInit {
                         this.totalPayment = transfer.amount + transfer.otherTransfers.reduce((a, t) => a + t.amount, 0);
                         this.categories = categories;
                         this.splitTransfer.amount = +(transfer.amount / 2).toFixed(2);
-                        this.splitTransfer.category = transfer.categoryPath[transfer.categoryPath.length - 1].id;
+                        this.splitTransfer.categoryId = transfer.categoryPath[transfer.categoryPath.length - 1].id;
                         this.splitTransfer.description = transfer.description;
                         console.log(this.transfer.otherTransfers);
                     });
@@ -61,7 +61,7 @@ export class TransferDetailsComponent implements OnInit {
                     id: this.transfer.id,
                     description: this.splitTransfer.description,
                     amount: parseFloat(this.splitTransfer.amount?.toString()) ?? null,
-                    category: this.splitTransfer.category,
+                    categoryId: this.splitTransfer.categoryId,
                 })
                 .subscribe((result) => {
                     this.shouldShowSplit = false;

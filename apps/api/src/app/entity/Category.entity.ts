@@ -9,7 +9,7 @@ export class Category {
     name!: string;
 
     @Column('text', { nullable: true })
-    description!: string;
+    description?: string;
 
     @Column({ name: 'parent' })
     parentId!: number;

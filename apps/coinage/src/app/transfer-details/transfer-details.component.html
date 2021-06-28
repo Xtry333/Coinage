@@ -28,7 +28,7 @@
         </div>
         <div>
             <label for="category">Category</label>
-            <select id="category" [(ngModel)]="splitTransfer.category" required>
+            <select id="category" [(ngModel)]="splitTransfer.categoryId" required>
                 <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
             </select>
         </div>

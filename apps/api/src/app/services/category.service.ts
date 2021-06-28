@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Equal, getConnection } from 'typeorm';
+import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
 import { Category } from '../entity/Category.entity';
 import { Transfer } from '../entity/Transfer.entity';
 import { TotalInMonthByCategory } from '@coinage-app/interfaces';
@@ -8,7 +8,7 @@ import { TotalInMonthByCategory } from '@coinage-app/interfaces';
     providedIn: 'root',
 })
 export class CategoryService {
-    async getById(id: number): Promise<Category> {
+    async getById(id: number): Promise<Category | undefined> {
         return await getConnection()
             .getRepository(Category)
             .findOne({ where: { id: Equal(id) } });
@@ -32,5 +32,15 @@ export class CategoryService {
             .andWhere('(:month IS NULL OR MONTH(Transfer.date) = :month)', { month: month })
             .groupBy('categoryId')
             .getRawMany();
+    }
+
+    async insert(category: Category): Promise<InsertResult> {
+        return getConnection().getRepository(Category).insert(category);
+    }
+
+    async deleteById(id: number): Promise<DeleteResult> {
+        return await getConnection()
+            .getRepository(Category)
+            .delete({ id: Equal(id) });
     }
 }

@@ -22,4 +22,8 @@ export class TransferTableComponent implements OnInit {
     get isHeaderDisplayed(): boolean {
         return this.tableHeader !== undefined;
     }
+
+    get noRowsFound(): boolean {
+        return !(this.transfers && this.transfers.length > 0);
+    }
 }

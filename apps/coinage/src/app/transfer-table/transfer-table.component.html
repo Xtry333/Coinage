@@ -9,6 +9,7 @@
             <tr>
                 <th class="align-left">Category</th>
                 <th>Description</th>
+                <th>Contractor</th>
                 <th class="align-right">Amount</th>
                 <th class="align-right">Date</th>
             </tr>
@@ -21,10 +22,16 @@
                         {{ transfer.description }}
                     </a>
                 </td>
+                <td>
+                    {{ transfer.contractor }}
+                </td>
                 <td class="currency">{{ transfer.amount | plnCurrency }}</td>
                 <td class="align-right">
                     <a [routerLink]="['/summary', transfer.date]">{{ transfer.date | date }}</a>
                 </td>
+            </tr>
+            <tr *ngIf="noRowsFound">
+                <td colspan="4">No transfers found.</td>
             </tr>
         </tbody>
     </table>

@@ -58,9 +58,9 @@ CREATE TABLE IF NOT EXISTS `contractor` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Zrzucanie danych dla tabeli coinage-db.contractor: ~16 rows (około)
+-- Zrzucanie danych dla tabeli coinage-db.contractor: ~22 rows (około)
 /*!40000 ALTER TABLE `contractor` DISABLE KEYS */;
 REPLACE INTO `contractor` (`id`, `name`) VALUES
 	(1, 'Allegro'),
@@ -81,7 +81,12 @@ REPLACE INTO `contractor` (`id`, `name`) VALUES
 	(16, 'Spotify'),
 	(17, 'Rossman'),
 	(18, 'Decathlon'),
-	(19, 'MZKZG');
+	(19, 'MZKZG'),
+	(20, 'Play'),
+	(21, 'Mama'),
+	(22, 'Multikino'),
+	(23, 'Hashi Sushi'),
+	(24, 'Pyszne.pl');
 /*!40000 ALTER TABLE `contractor` ENABLE KEYS */;
 
 -- Zrzut struktury tabela coinage-db.income
@@ -104,13 +109,14 @@ CREATE TABLE IF NOT EXISTS `receipt` (
   PRIMARY KEY (`id`),
   KEY `FK_receipt_contractor` (`contractor`),
   CONSTRAINT `FK_receipt_contractor` FOREIGN KEY (`contractor`) REFERENCES `contractor` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Zrzucanie danych dla tabeli coinage-db.receipt: ~2 rows (około)
 /*!40000 ALTER TABLE `receipt` DISABLE KEYS */;
 REPLACE INTO `receipt` (`id`, `description`, `date`, `amount`, `contractor`) VALUES
 	(1, NULL, '2021-05-25', 401.30, 9),
-	(2, 'Lenovo Legion Y740-17', '2020-05-03', 7806.99, 1);
+	(2, 'Lenovo Legion Y740-17', '2020-05-03', 7806.99, 1),
+	(3, 'Opel Adam 2015', '2015-01-01', 50000.00, 21);
 /*!40000 ALTER TABLE `receipt` ENABLE KEYS */;
 
 -- Zrzut struktury tabela coinage-db.transfer
@@ -133,9 +139,9 @@ CREATE TABLE IF NOT EXISTS `transfer` (
   CONSTRAINT `FK_transfer_category` FOREIGN KEY (`category`) REFERENCES `category` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `FK_transfer_contractor` FOREIGN KEY (`contractor`) REFERENCES `contractor` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `FK_transfer_receipt` FOREIGN KEY (`receipt`) REFERENCES `receipt` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=201 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=229 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Zrzucanie danych dla tabeli coinage-db.transfer: ~171 rows (około)
+-- Zrzucanie danych dla tabeli coinage-db.transfer: ~183 rows (około)
 /*!40000 ALTER TABLE `transfer` DISABLE KEYS */;
 REPLACE INTO `transfer` (`id`, `description`, `amount`, `category`, `contractor`, `type`, `date`, `edited_date`, `created_date`, `receipt`, `user`) VALUES
 	(1, 'Roborock S6 MaxV', 2405.00, 3, 2, 'OUTCOME', '2021-03-23', '2021-05-30 11:36:48', '2021-05-11 23:44:21', NULL, 1),
@@ -220,14 +226,14 @@ REPLACE INTO `transfer` (`id`, `description`, `amount`, `category`, `contractor`
 	(83, 'Spotify Duo', 24.99, 5, 16, 'OUTCOME', '2021-05-11', '2021-05-30 11:36:48', '2021-05-22 20:58:17', NULL, 1),
 	(84, 'Doładowanie Tel Play', 40.00, 10, NULL, 'OUTCOME', '2021-05-15', '2021-05-30 11:36:48', '2021-05-22 21:38:51', NULL, 1),
 	(85, 'Zakupy Biedro Puck', 21.75, 8, 7, 'OUTCOME', '2021-05-11', '2021-05-30 11:36:48', '2021-05-22 19:43:01', NULL, 1),
-	(86, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-05-11', '2021-05-30 11:36:48', '2021-05-22 21:45:07', NULL, 1),
+	(86, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-05-11', '2021-06-15 20:28:07', '2021-05-22 21:45:07', 3, 1),
 	(87, 'Gdyńska Rybka', 18.10, 12, NULL, 'OUTCOME', '2021-05-09', '2021-05-30 11:36:48', '2021-05-22 21:46:49', NULL, 1),
 	(88, 'Tort', 99.90, 12, NULL, 'OUTCOME', '2021-05-07', '2021-05-30 11:36:48', '2021-05-22 21:47:55', NULL, 1),
 	(89, 'Lenovo Legion Rata', 400.00, 3, NULL, 'OUTCOME', '2021-05-01', '2021-05-30 11:36:48', '2021-05-22 21:49:18', NULL, 1),
 	(90, 'Lenovo Legion Rata', 400.00, 3, NULL, 'OUTCOME', '2021-04-01', '2021-05-30 11:36:48', '2021-05-22 21:49:18', NULL, 1),
 	(91, 'Lenovo Legion Rata', 400.00, 3, NULL, 'OUTCOME', '2021-03-01', '2021-05-30 11:36:48', '2021-05-22 21:49:18', NULL, 1),
-	(92, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-04-11', '2021-05-30 11:36:48', '2021-05-22 21:45:07', NULL, 1),
-	(93, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-03-11', '2021-05-30 11:36:48', '2021-05-22 21:45:07', NULL, 1),
+	(92, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-04-11', '2021-06-15 20:28:11', '2021-05-22 21:45:07', 3, 1),
+	(93, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-03-11', '2021-06-15 20:28:13', '2021-05-22 21:45:07', 3, 1),
 	(94, 'Nintendo Gra', 84.50, 6, 3, 'OUTCOME', '2021-04-07', '2021-05-30 11:36:48', '2021-05-22 21:52:36', NULL, 1),
 	(95, 'Nintendo Gra', 12.60, 6, 3, 'OUTCOME', '2021-04-07', '2021-05-30 11:36:48', '2021-05-22 21:52:36', NULL, 1),
 	(96, 'Kainos Income Premia', 4002.22, 9, NULL, 'INCOME', '2021-04-08', '2021-05-30 11:36:48', '2021-05-22 19:53:32', NULL, 1),
@@ -301,14 +307,42 @@ REPLACE INTO `transfer` (`id`, `description`, `amount`, `category`, `contractor`
 	(188, 'SKM', 7.60, 14, 19, 'OUTCOME', '2021-06-06', '2021-06-07 15:41:58', '2021-06-06 19:21:03', NULL, 1),
 	(189, 'Najem', 1600.00, 4, 5, 'OUTCOME', '2021-06-07', '2021-06-08 15:28:49', '2021-06-08 17:28:49', NULL, 1),
 	(190, 'Rachunki', 550.00, 4, 5, 'OUTCOME', '2021-06-04', '2021-06-07 15:41:03', '2021-06-07 17:41:04', NULL, 1),
-	(191, 'Ubezpieczenie samochód', 1771.00, 2, NULL, 'OUTCOME', '2021-06-07', '2021-06-08 15:40:03', '2021-06-08 17:40:04', NULL, 1),
-	(192, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-02-11', '2021-05-30 11:36:48', '2021-05-22 21:45:07', NULL, 1),
-	(193, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-01-11', '2021-05-30 11:36:48', '2021-05-22 21:45:07', NULL, 1),
-	(194, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-06-11', '2021-06-07 16:03:42', '2021-06-07 18:03:45', NULL, 1),
+	(191, 'Ubezpieczenie samochód', 1771.00, 2, 21, 'OUTCOME', '2021-06-07', '2021-06-26 18:12:25', '2021-06-08 17:40:04', NULL, 3),
+	(192, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-02-11', '2021-06-15 20:28:17', '2021-05-22 21:45:07', 3, 1),
+	(193, 'Samochód Rata', 650.00, 2, NULL, 'OUTCOME', '2021-01-11', '2021-06-15 20:28:23', '2021-05-22 21:45:07', 3, 1),
+	(194, 'Samochód Rata', 650.00, 2, 21, 'OUTCOME', '2021-06-11', '2021-06-15 20:27:48', '2021-06-15 22:25:45', 3, 1),
 	(195, 'Kainos Income', 5199.54, 9, NULL, 'INCOME', '2021-06-09', '2021-06-09 22:34:47', '2021-06-10 00:34:47', NULL, 1),
 	(196, 'Owoce i warzywa', 45.00, 17, NULL, 'OUTCOME', '2021-06-07', '2021-06-07 17:11:36', '2021-06-07 19:11:04', NULL, 2),
-	(199, 'Gumki', 61.99, 19, 1, 'OUTCOME', '2021-06-08', '2021-06-09 22:35:40', '2021-06-10 00:35:41', NULL, NULL),
-	(200, 'Przegląd techniczny', 99.00, 2, NULL, 'OUTCOME', '2021-06-10', '2021-06-10 13:29:07', '2021-06-10 15:29:07', NULL, NULL);
+	(199, 'Gumki', 61.99, 19, 1, 'OUTCOME', '2021-06-08', '2021-06-15 20:27:02', '2021-06-10 00:35:41', NULL, 1),
+	(200, 'Przegląd techniczny', 99.00, 2, NULL, 'OUTCOME', '2021-06-10', '2021-06-15 20:27:56', '2021-06-10 15:29:07', NULL, 1),
+	(201, 'Bilety', 9.80, 14, 19, 'OUTCOME', '2021-06-12', '2021-06-12 00:56:23', '2021-06-12 00:56:19', NULL, 1),
+	(202, 'Conjuring 3 Kino x2', 48.60, 5, 22, 'OUTCOME', '2021-06-11', '2021-06-15 20:27:37', '2021-06-12 00:57:30', NULL, 1),
+	(203, 'Auchan zakupy na driny', 30.12, 8, 9, 'OUTCOME', '2021-06-12', '2021-06-15 20:27:06', '2021-06-13 11:13:22', NULL, 1),
+	(204, 'Malibu', 49.90, 11, 7, 'OUTCOME', '2021-06-12', '2021-06-15 20:27:07', '2021-06-13 11:13:38', NULL, 2),
+	(205, 'Rimworld Royalty DLC', 71.99, 6, 4, 'OUTCOME', '2021-06-13', '2021-06-15 20:27:08', '2021-06-13 17:36:34', NULL, 1),
+	(206, 'Paliwo 5,49 PLN/L', 88.55, 1, 10, 'OUTCOME', '2021-06-15', '2021-06-15 20:27:08', '2021-06-15 21:17:35', NULL, 1),
+	(207, 'Mcd', 27.90, 12, 14, 'OUTCOME', '2021-06-15', '2021-06-15 20:27:09', '2021-06-15 21:18:10', NULL, 1),
+	(208, 'Samochód olej', 270.00, 2, NULL, 'OUTCOME', '2021-06-15', '2021-06-15 20:27:10', '2021-06-15 21:18:34', NULL, 1),
+	(209, 'Tele doładowanie', 40.00, 10, 20, 'OUTCOME', '2021-06-15', '2021-06-15 20:27:10', '2021-06-15 22:25:10', NULL, 1),
+	(210, 'Biedro na droge', 25.55, 8, 7, 'OUTCOME', '2021-06-16', '2021-06-17 08:39:55', '2021-06-17 10:39:32', NULL, NULL),
+	(211, 'Sushi Kyoko x2', 35.98, 12, 7, 'OUTCOME', '2021-06-16', '2021-06-19 14:16:45', '2021-06-17 10:40:13', NULL, NULL),
+	(212, 'Nintendo Bubble Bobble', 103.99, 6, 3, 'OUTCOME', '2021-06-19', '2021-06-19 16:17:54', '2021-06-19 16:17:54', NULL, NULL),
+	(213, 'Paliwo 5,49 PLN/L Nowogród', 155.64, 1, 10, 'OUTCOME', '2021-06-17', '2021-06-19 14:24:48', '2021-06-19 16:24:49', NULL, NULL),
+	(214, 'Mcd', 22.40, 12, 14, 'OUTCOME', '2021-06-17', '2021-06-19 16:20:03', '2021-06-19 16:20:04', NULL, NULL),
+	(215, 'Sushi Toshii', 29.97, 12, 7, 'OUTCOME', '2021-06-21', '2021-06-21 20:58:23', '2021-06-21 22:58:23', NULL, NULL),
+	(216, 'Żarcie dla kota, kurczak', 56.06, 8, 7, 'OUTCOME', '2021-06-21', '2021-06-21 22:17:13', '2021-06-22 00:17:14', NULL, NULL),
+	(217, 'Kwiatek', 9.99, 7, 7, 'OUTCOME', '2021-06-19', '2021-06-21 21:00:42', '2021-06-21 23:00:43', NULL, NULL),
+	(218, 'Kapelutek', 19.99, 19, 7, 'OUTCOME', '2021-06-21', '2021-06-21 22:17:03', '2021-06-22 00:17:03', NULL, NULL),
+	(219, 'SNKRX', 10.99, 6, 4, 'OUTCOME', '2021-06-22', '2021-06-22 07:43:20', '2021-06-22 09:43:21', NULL, NULL),
+	(220, 'Paliwo 5,56 PLN/L Nowogród', 74.84, 1, 10, 'OUTCOME', '2021-06-24', '2021-06-24 22:45:37', '2021-06-25 00:45:37', NULL, NULL),
+	(221, 'Biedro na droge', 45.79, 8, 7, 'OUTCOME', '2021-06-24', '2021-06-24 22:46:24', '2021-06-25 00:45:55', NULL, NULL),
+	(222, 'Sushi Shiro x2', 43.98, 12, 7, 'OUTCOME', '2021-06-24', '2021-06-24 22:46:24', '2021-06-25 00:46:25', NULL, NULL),
+	(223, 'SKM', 15.00, 14, 19, 'OUTCOME', '2021-06-25', '2021-06-25 13:58:25', '2021-06-25 15:58:25', NULL, NULL),
+	(224, 'Sushi', 242.00, 12, 23, 'OUTCOME', '2021-06-25', '2021-06-25 19:48:48', '2021-06-25 21:48:49', NULL, NULL),
+	(225, 'SKM', 12.00, 14, 19, 'OUTCOME', '2021-06-25', '2021-06-25 19:49:04', '2021-06-25 21:49:05', NULL, NULL),
+	(226, 'Żarcie u rodziców', 80.00, 12, 24, 'OUTCOME', '2021-06-26', '2021-06-26 18:09:09', '2021-06-26 20:09:07', NULL, NULL),
+	(227, 'Paliwo 5,59 PLN/L Władysławowo', 143.72, 1, 10, 'OUTCOME', '2021-06-26', '2021-06-26 18:10:50', '2021-06-26 20:10:48', NULL, NULL),
+	(228, 'Biedro dla rodziców', 144.82, 8, 7, 'OUTCOME', '2021-06-26', '2021-06-26 18:11:28', '2021-06-26 20:11:26', NULL, NULL);
 /*!40000 ALTER TABLE `transfer` ENABLE KEYS */;
 
 -- Zrzut struktury wyzwalacz coinage-db.disallow_self_ref_before_insert

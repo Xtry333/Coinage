@@ -1,32 +1,6 @@
 <div *ngIf="showPage">
     <div class="table-container">
-        <table class="last-transactions-table">
-            <caption>
-                Recent Transactions
-            </caption>
-            <thead>
-                <tr>
-                    <th class="align-left">Category</th>
-                    <th>Description</th>
-                    <th class="align-right">Amount</th>
-                    <th class="align-right">Date</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let transaction of lastTransactions; trackBy: transferIdTracker">
-                    <td>{{ transaction.category }}</td>
-                    <td>
-                        <a [routerLink]="['/details', transaction.id]">
-                            {{ transaction.description }}
-                        </a>
-                    </td>
-                    <td class="currency">{{ transaction.amount | plnCurrency }}</td>
-                    <td class="align-right">
-                        <a [routerLink]="['/summary', this.formatDate(transaction.date)]">{{ transaction.date | date }}</a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+        <coinage-app-transfers-table [transfers]="lastTransactions" [tableHeader]="'Recent Transfers'"></coinage-app-transfers-table>
         <table class="last-transactions-table">
             <caption>
                 Total Outcomes / Month

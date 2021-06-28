@@ -119,6 +119,7 @@ export class TransfersController {
         console.log(transfer);
         console.log(transfer.date);
         let entity: Transfer;
+        const category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
         if (transfer.id) {
             entity = await this.transferService.getById(transfer.id);
         } else {
@@ -128,8 +129,20 @@ export class TransfersController {
         entity.amount = transfer.amount.toString();
         entity.date = transfer.date;
         entity.createdDate = new Date();
-        entity.category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
+        if (category) {
+            entity.category = category;
+        } else {
+            throw new Error(`Cannot find category ${transfer.categoryId}`);
+        }
         entity.contractor = transfer.contractorId ? await this.contractorService.getById(parseInt(transfer.contractorId?.toString())) : undefined;
+        if (entity.category.name === 'Paliwo') {
+            try {
+                entity.metadata = { unitPrice: entity.description.split(' ')[1], location: entity.description.split(' ')[3] };
+            } catch (e) {
+                console.log('Could not set metadata for transfer on', entity.date);
+                console.log(e);
+            }
+        }
         console.log(entity);
         const inserted = await this.transferService.save(entity);
         console.log(inserted);
@@ -138,6 +151,7 @@ export class TransfersController {
 
     @Post('split')
     async splitTransferObject(@Body() transfer: SplitTransferDTO): Promise<{ insertedId: number }> {
+        const category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
         const id = parseInt(transfer.id?.toString());
         const target = await this.transferService.getById(id);
         target.amount = (parseFloat(target.amount) - transfer.amount).toString();
@@ -150,7 +164,11 @@ export class TransfersController {
         entity.date = target.date;
         entity.user = target.user;
         entity.createdDate = new Date();
-        entity.category = await this.categoryService.getById(parseInt(transfer.category?.toString()));
+        if (category) {
+            entity.category = category;
+        } else {
+            throw new Error(`Cannot find category ${transfer.categoryId}`);
+        }
         entity.contractor = target.contractor;
         const inserted = await this.transferService.insert(entity);
         await this.transferService.save(target);

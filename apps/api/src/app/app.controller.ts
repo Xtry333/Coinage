@@ -14,6 +14,7 @@ export class AppController {
             return {
                 id: t.id,
                 description: t.description,
+                contractor: t.contractor?.name,
                 amount: parseFloat(t.amount),
                 category: t.category?.name,
                 date: t.date,
