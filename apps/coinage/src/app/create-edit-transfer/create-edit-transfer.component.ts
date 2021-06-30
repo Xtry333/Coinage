@@ -74,11 +74,13 @@ export class CreateEditTransferComponent implements OnInit {
                 date: this.transferInput.date,
             })
             .subscribe((result) => {
-                this.onSaveSuccess.emit();
-                this.clearInputData();
                 console.log(result);
+                if (result.insertedId) {
+                    this.onSaveSuccess.emit();
+                    this.clearInputData();
+                }
                 if (this.redirectAfterSave) {
-                    this.router.navigateByUrl(`/details/${(result as any).insertedId}`);
+                    this.router.navigateByUrl(`/details/${result.insertedId}`);
                 }
             });
     }

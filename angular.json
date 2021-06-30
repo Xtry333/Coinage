@@ -1,265 +1,297 @@
 {
-    "version": 1,
-    "cli": {
-        "defaultCollection": "@nrwl/angular"
+  "version": 1,
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "defaultProject": "coinage",
+  "schematics": {
+    "@nrwl/angular": {
+      "application": {
+        "linter": "eslint"
+      },
+      "library": {
+        "linter": "eslint"
+      },
+      "storybook-configuration": {
+        "linter": "eslint"
+      }
     },
-    "defaultProject": "coinage",
-    "schematics": {
-        "@nrwl/angular": {
-            "application": {
-                "linter": "eslint"
-            },
-            "library": {
-                "linter": "eslint"
-            },
-            "storybook-configuration": {
-                "linter": "eslint"
-            }
-        },
-        "@nrwl/angular:application": {
-            "style": "less",
-            "linter": "eslint",
-            "unitTestRunner": "jest",
-            "e2eTestRunner": "cypress"
-        },
-        "@nrwl/angular:library": {
-            "style": "less",
-            "linter": "eslint",
-            "unitTestRunner": "jest"
-        },
-        "@nrwl/angular:component": {
-            "style": "less"
-        }
+    "@nrwl/angular:application": {
+      "style": "less",
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
     },
-    "projects": {
-        "coinage": {
-            "projectType": "application",
-            "root": "apps/coinage",
-            "sourceRoot": "apps/coinage/src",
-            "prefix": "coinage-app",
-            "architect": {
-                "build": {
-                    "builder": "@angular-devkit/build-angular:browser",
-                    "options": {
-                        "outputPath": "dist/apps/coinage",
-                        "index": "apps/coinage/src/index.html",
-                        "main": "apps/coinage/src/main.ts",
-                        "polyfills": "apps/coinage/src/polyfills.ts",
-                        "tsConfig": "apps/coinage/tsconfig.app.json",
-                        "aot": true,
-                        "assets": [
-                            "apps/coinage/src/favicon.ico",
-                            "apps/coinage/src/assets"
-                        ],
-                        "styles": ["apps/coinage/src/styles.less"],
-                        "scripts": []
-                    },
-                    "configurations": {
-                        "production": {
-                            "fileReplacements": [
-                                {
-                                    "replace": "apps/coinage/src/environments/environment.ts",
-                                    "with": "apps/coinage/src/environments/environment.prod.ts"
-                                }
-                            ],
-                            "optimization": true,
-                            "outputHashing": "all",
-                            "sourceMap": false,
-                            "namedChunks": false,
-                            "extractLicenses": true,
-                            "vendorChunk": false,
-                            "buildOptimizer": true,
-                            "budgets": [
-                                {
-                                    "type": "initial",
-                                    "maximumWarning": "2mb",
-                                    "maximumError": "5mb"
-                                },
-                                {
-                                    "type": "anyComponentStyle",
-                                    "maximumWarning": "6kb",
-                                    "maximumError": "10kb"
-                                }
-                            ]
-                        }
-                    }
-                },
-                "serve": {
-                    "builder": "@angular-devkit/build-angular:dev-server",
-                    "options": {
-                        "browserTarget": "coinage:build",
-                        "proxyConfig": "apps/coinage/proxy.conf.json"
-                    },
-                    "configurations": {
-                        "production": {
-                            "browserTarget": "coinage:build:production"
-                        }
-                    }
-                },
-                "extract-i18n": {
-                    "builder": "@angular-devkit/build-angular:extract-i18n",
-                    "options": {
-                        "browserTarget": "coinage:build"
-                    }
-                },
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": [
-                            "apps/coinage/src/**/*.ts",
-                            "apps/coinage/src/**/*.html"
-                        ]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/apps/coinage"],
-                    "options": {
-                        "jestConfig": "apps/coinage/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
-        },
-        "coinage-e2e": {
-            "root": "apps/coinage-e2e",
-            "sourceRoot": "apps/coinage-e2e/src",
-            "projectType": "application",
-            "architect": {
-                "e2e": {
-                    "builder": "@nrwl/cypress:cypress",
-                    "options": {
-                        "cypressConfig": "apps/coinage-e2e/cypress.json",
-                        "tsConfig": "apps/coinage-e2e/tsconfig.e2e.json",
-                        "devServerTarget": "coinage:serve"
-                    },
-                    "configurations": {
-                        "production": {
-                            "devServerTarget": "coinage:serve:production"
-                        }
-                    }
-                },
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": ["apps/coinage-e2e/**/*.{js,ts}"]
-                    }
-                }
-            }
-        },
-        "api": {
-            "root": "apps/api",
-            "sourceRoot": "apps/api/src",
-            "projectType": "application",
-            "prefix": "api",
-            "architect": {
-                "build": {
-                    "builder": "@nrwl/node:build",
-                    "outputs": ["{options.outputPath}"],
-                    "options": {
-                        "outputPath": "dist/apps/api",
-                        "main": "apps/api/src/main.ts",
-                        "tsConfig": "apps/api/tsconfig.app.json",
-                        "assets": ["apps/api/src/assets"]
-                    },
-                    "configurations": {
-                        "production": {
-                            "optimization": true,
-                            "extractLicenses": true,
-                            "inspect": false,
-                            "fileReplacements": [
-                                {
-                                    "replace": "apps/api/src/environments/environment.ts",
-                                    "with": "apps/api/src/environments/environment.prod.ts"
-                                }
-                            ]
-                        }
-                    }
-                },
-                "serve": {
-                    "builder": "@nrwl/node:execute",
-                    "options": {
-                        "buildTarget": "api:build"
-                    }
-                },
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": ["apps/api/**/*.ts"]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/apps/api"],
-                    "options": {
-                        "jestConfig": "apps/api/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
-        },
-        "data": {
-            "root": "libs/data",
-            "sourceRoot": "libs/data/src",
-            "projectType": "library",
-            "architect": {
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": ["libs/data/**/*.ts"]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/data"],
-                    "options": {
-                        "jestConfig": "libs/data/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
-        },
-        "interfaces": {
-            "root": "libs/interfaces",
-            "sourceRoot": "libs/interfaces/src",
-            "projectType": "library",
-            "architect": {
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": ["libs/interfaces/**/*.ts"]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/interfaces"],
-                    "options": {
-                        "jestConfig": "libs/interfaces/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
-        },
-        "router": {
-            "root": "libs/router",
-            "sourceRoot": "libs/router/src",
-            "projectType": "library",
-            "architect": {
-                "lint": {
-                    "builder": "@nrwl/linter:eslint",
-                    "options": {
-                        "lintFilePatterns": ["libs/router/**/*.ts"]
-                    }
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/router"],
-                    "options": {
-                        "jestConfig": "libs/router/jest.config.js",
-                        "passWithNoTests": true
-                    }
-                }
-            }
-        }
+    "@nrwl/angular:library": {
+      "style": "less",
+      "linter": "eslint",
+      "unitTestRunner": "jest"
+    },
+    "@nrwl/angular:component": {
+      "style": "less"
     }
+  },
+  "projects": {
+    "api": {
+      "root": "apps/api",
+      "sourceRoot": "apps/api/src",
+      "projectType": "application",
+      "prefix": "api",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "outputs": [
+            "{options.outputPath}"
+          ],
+          "options": {
+            "outputPath": "dist/apps/api",
+            "main": "apps/api/src/main.ts",
+            "tsConfig": "apps/api/tsconfig.app.json",
+            "assets": [
+              "apps/api/src/assets"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/api/src/environments/environment.ts",
+                  "with": "apps/api/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "api:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/api/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/api"
+          ],
+          "options": {
+            "jestConfig": "apps/api/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "coinage": {
+      "projectType": "application",
+      "root": "apps/coinage",
+      "sourceRoot": "apps/coinage/src",
+      "prefix": "coinage-app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/coinage",
+            "index": "apps/coinage/src/index.html",
+            "main": "apps/coinage/src/main.ts",
+            "polyfills": "apps/coinage/src/polyfills.ts",
+            "tsConfig": "apps/coinage/tsconfig.app.json",
+            "assets": [
+              "apps/coinage/src/favicon.ico",
+              "apps/coinage/src/assets"
+            ],
+            "styles": [
+              "apps/coinage/src/styles.less"
+            ],
+            "scripts": [],
+            "vendorChunk": true,
+            "extractLicenses": false,
+            "buildOptimizer": false,
+            "sourceMap": true,
+            "optimization": false,
+            "namedChunks": true
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/coinage/src/environments/environment.ts",
+                  "with": "apps/coinage/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          },
+          "defaultConfiguration": ""
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "coinage:build",
+            "proxyConfig": "apps/coinage/proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "coinage:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "coinage:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/coinage/src/**/*.ts",
+              "apps/coinage/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/apps/coinage"
+          ],
+          "options": {
+            "jestConfig": "apps/coinage/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "coinage-e2e": {
+      "root": "apps/coinage-e2e",
+      "sourceRoot": "apps/coinage-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/coinage-e2e/cypress.json",
+            "tsConfig": "apps/coinage-e2e/tsconfig.e2e.json",
+            "devServerTarget": "coinage:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "coinage:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/coinage-e2e/**/*.{js,ts}"
+            ]
+          }
+        }
+      }
+    },
+    "data": {
+      "root": "libs/data",
+      "sourceRoot": "libs/data/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/data/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/data"
+          ],
+          "options": {
+            "jestConfig": "libs/data/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "interfaces": {
+      "root": "libs/interfaces",
+      "sourceRoot": "libs/interfaces/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/interfaces/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/interfaces"
+          ],
+          "options": {
+            "jestConfig": "libs/interfaces/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "router": {
+      "root": "libs/router",
+      "sourceRoot": "libs/router/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/router/**/*.ts"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": [
+            "coverage/libs/router"
+          ],
+          "options": {
+            "jestConfig": "libs/router/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    }
+  }
 }

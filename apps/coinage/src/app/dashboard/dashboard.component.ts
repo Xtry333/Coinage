@@ -64,7 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return '';
     }
 
-    private refreshData() {
+    public refreshData() {
         Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth()).subscribe(([transactions, outcomes]) => {
             this.lastTransactions = transactions;
             this.totalOutcomesPerMonth = this.mapToUiOutcome(outcomes);

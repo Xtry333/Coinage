@@ -1,11 +1,11 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 @Component({
     selector: 'coinage-app-trinket',
     templateUrl: './trinket.component.html',
     styleUrls: ['./trinket.component.less'],
 })
-export class TrinketComponent implements OnInit {
+export class TrinketComponent implements OnInit, OnChanges {
     private trinketElement!: HTMLElement;
     private isGrabbed: boolean = false;
     private offset: { x: number; y: number } = { x: 0, y: 0 };
@@ -25,6 +25,13 @@ export class TrinketComponent implements OnInit {
             this.trinketElement.style.left = this.getPageWidth() - 400 + 'px';
             this.trinketElement.style.top = '35px';
             this.trinketElement.id = this.trinketHolderId;
+        }
+    }
+
+    ngOnChanges(changes: any): void {
+        if (changes.isDisplayed && changes.isDisplayed.currentValue === false && changes.isDisplayed.previousValue === true) {
+            this.trinketElement.style.left = this.getPageWidth() - 400 + 'px';
+            this.trinketElement.style.top = '35px';
         }
     }
 
@@ -67,8 +74,6 @@ export class TrinketComponent implements OnInit {
     }
 
     public hideTrinket(): void {
-        this.trinketElement.style.left = this.getPageWidth() - 400 + 'px';
-        this.trinketElement.style.top = '35px';
         this.onHideModal.emit();
     }
 

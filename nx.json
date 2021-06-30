@@ -1,13 +1,18 @@
 {
     "implicitDependencies": {
         "angular.json": "*",
-        "package.json": { "dependencies": "*", "devDependencies": "*" },
+        "package.json": {
+            "dependencies": "*",
+            "devDependencies": "*"
+        },
         "tsconfig.base.json": "*",
         "tslint.json": "*",
         ".eslintrc.json": "*",
         "nx.json": "*"
     },
-    "affected": { "defaultBase": "master" },
+    "affected": {
+        "defaultBase": "master"
+    },
     "npmScope": "coinage-app",
     "tasksRunnerOptions": {
         "default": {
@@ -18,11 +23,33 @@
         }
     },
     "projects": {
-        "coinage": { "tags": [], "implicitDependencies": [] },
-        "coinage-e2e": { "tags": [], "implicitDependencies": ["coinage"] },
-        "api": { "tags": [] },
-        "data": { "tags": [] },
-        "interfaces": { "tags": [] },
-        "router": { "tags": [] }
+        "api": {
+            "tags": []
+        },
+        "coinage": {
+            "tags": [],
+            "implicitDependencies": []
+        },
+        "coinage-e2e": {
+            "tags": [],
+            "implicitDependencies": ["coinage"]
+        },
+        "data": {
+            "tags": []
+        },
+        "interfaces": {
+            "tags": []
+        },
+        "router": {
+            "tags": []
+        }
+    },
+    "targetDependencies": {
+        "build": [
+            {
+                "target": "build",
+                "projects": "dependencies"
+            }
+        ]
     }
 }

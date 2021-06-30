@@ -1,5 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
 
 @Component({
@@ -16,6 +17,9 @@ export class AppComponent implements OnInit, OnDestroy {
 
     @ViewChild(CreateEditTransferComponent)
     createEditTransferComponent!: CreateEditTransferComponent;
+
+    @ViewChild(DashboardComponent)
+    dashboardComponent?: DashboardComponent;
 
     isTrinketDisplayed = false;
 
@@ -52,5 +56,11 @@ export class AppComponent implements OnInit, OnDestroy {
     public hideTrinketModal(): void {
         this.createEditTransferComponent.clearInputData();
         this.isTrinketDisplayed = false;
+    }
+
+    public forceDashboardRefresh(): void {
+        if (this.dashboardComponent) {
+            this.dashboardComponent.refreshData();
+        }
     }
 }

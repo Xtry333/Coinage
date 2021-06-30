@@ -4,6 +4,7 @@ import {
     CategoryDTO,
     ContractorDTO,
     SaveTransferDTO,
+    SaveTransferDTOResponse,
     SplitTransferDTO,
     TotalInMonthByCategory,
     TotalOutcomesPerMonthDTO,
@@ -49,8 +50,8 @@ export class CoinageDataService {
         return this.http.get<ContractorDTO[]>(`${CoinageDataService.API_URL}contractor/list`);
     }
 
-    public postCreateSaveTransaction(request: SaveTransferDTO): Observable<void> {
-        return this.http.post<void>(`${CoinageDataService.API_URL}transfer/save`, request);
+    public postCreateSaveTransaction(request: SaveTransferDTO): Observable<SaveTransferDTOResponse> {
+        return this.http.post<SaveTransferDTOResponse>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
     deleteTransfer(id: number): Observable<boolean> {
