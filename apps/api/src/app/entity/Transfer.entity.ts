@@ -21,7 +21,7 @@ export class Transfer {
     editedDate!: Date;
 
     @Column({ name: 'created_date', type: 'timestamp', nullable: true })
-    createdDate?: Date;
+    createdDate?: Date | undefined;
 
     @ManyToOne('Category', { eager: true, nullable: false })
     @JoinColumn({ name: 'category' })
@@ -38,9 +38,9 @@ export class Transfer {
     @Column('varchar', { length: 50, nullable: false })
     type!: string;
 
-    @Column({ nullable: true })
-    user?: number;
+    @Column({ nullable: true, type: 'numeric' })
+    user?: number | undefined;
 
     @Column({ nullable: true, type: 'json' })
-    metadata?: { [key: string]: string | number };
+    metadata?: { [key: string]: string | number } | undefined;
 }

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, ContractorDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
@@ -19,13 +19,20 @@ export class CreateEditTransferComponent implements OnInit {
     transferDTO!: TransferDetailsDTO;
     transferId!: number;
 
+    @Input()
+    redirectAfterSave = true;
+
     @Input('transfer')
-    transferInput = { description: '', amount: 0, date: new Date().toISOString().slice(0, 10), category: 0, contractor: 0 };
+    transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: 0, contractor: 0 };
+
+    @Output()
+    onSaveSuccess: EventEmitter<void> = new EventEmitter();
 
     constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
 
     ngOnInit(): void {
         this.showPage = false;
+        this.clearInputData();
         this.route.params.subscribe((r) => {
             const id = parseInt(r.id);
             if (id) {
@@ -67,8 +74,12 @@ export class CreateEditTransferComponent implements OnInit {
                 date: this.transferInput.date,
             })
             .subscribe((result) => {
+                this.onSaveSuccess.emit();
+                this.clearInputData();
                 console.log(result);
-                this.router.navigateByUrl(`/details/${(result as any).insertedId}`);
+                if (this.redirectAfterSave) {
+                    this.router.navigateByUrl(`/details/${(result as any).insertedId}`);
+                }
             });
     }
 
@@ -80,5 +91,14 @@ export class CreateEditTransferComponent implements OnInit {
                 }
             });
         }
+    }
+
+    get todayInputFormat(): string {
+        const today = new Date().toLocaleDateString().split('.');
+        return [today[2], today[1], today[0]].join('-');
+    }
+
+    public clearInputData(): void {
+        this.transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: 0, contractor: 0 };
     }
 }

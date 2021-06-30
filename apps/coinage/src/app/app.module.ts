@@ -17,6 +17,7 @@ import { SummaryComponent } from './summary/summary.component';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
 import { TransferTableComponent } from './transfer-table/transfer-table.component';
+import { TrinketComponent } from './dashboard/trinket/trinket.component';
 
 @NgModule({
     declarations: [
@@ -30,6 +31,7 @@ import { TransferTableComponent } from './transfer-table/transfer-table.componen
         CreateEditTransferComponent,
         CategoryListItemComponent,
         TransferTableComponent,
+        TrinketComponent,
     ],
     imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule, FormsModule],
     providers: [

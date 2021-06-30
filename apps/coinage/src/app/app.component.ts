@@ -1,4 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { LoadingService } from './loaderGadget/loading.service';
 
 @Component({
@@ -12,6 +13,11 @@ export class AppComponent implements OnInit, OnDestroy {
     dateTime = new Date().toLocaleString();
     logo = 'assets/images/coin.png';
     refreshInterval?: ReturnType<typeof setInterval>;
+
+    @ViewChild(CreateEditTransferComponent)
+    createEditTransferComponent!: CreateEditTransferComponent;
+
+    isTrinketDisplayed = false;
 
     constructor(private loader: LoadingService) {}
 
@@ -29,5 +35,22 @@ export class AppComponent implements OnInit, OnDestroy {
             clearInterval(this.refreshInterval);
             this.refreshInterval = undefined;
         }
+    }
+
+    public toggleTrinketModal(): void {
+        if (this.isTrinketDisplayed) {
+            this.hideTrinketModal();
+        } else {
+            this.showTrinketModal();
+        }
+    }
+
+    public showTrinketModal(): void {
+        this.isTrinketDisplayed = true;
+    }
+
+    public hideTrinketModal(): void {
+        this.createEditTransferComponent.clearInputData();
+        this.isTrinketDisplayed = false;
     }
 }

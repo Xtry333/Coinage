@@ -7,7 +7,8 @@
         <ul class="nav-list">
             <li><a routerLink="/dashboard">Dashboard</a></li>
             <li><a routerLink="/manage/categories">Manage Categories</a></li>
-            <li><a routerLink="/transfer/add">Add transfer</a></li>
+            <!-- <li><a routerLink="/transfer/add">Add transfer</a></li> -->
+            <li><a (click)="toggleTrinketModal()">Add transfer</a></li>
         </ul>
     </nav>
     <div class="datetime">
@@ -15,6 +16,11 @@
     </div>
 </header>
 <main>
+    <coinage-app-trinket [isDisplayed]="isTrinketDisplayed" (onHideModal)="hideTrinketModal()">
+        <div>
+            <coinage-app-create-transfer (onSaveSuccess)="hideTrinketModal()" [redirectAfterSave]="false"></coinage-app-create-transfer>
+        </div>
+    </coinage-app-trinket>
     <router-outlet></router-outlet>
 </main>
 <div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">
