@@ -5,3 +5,4 @@ export * from './lib/TotalInMonthByCategory.response';
 export * from './lib/CategoryDTO.response';
 export * from './lib/ContractorDTO';
 export * from './lib/SplitTransferDTO.request';
+export * from './lib/BaseResponseDTO.response';

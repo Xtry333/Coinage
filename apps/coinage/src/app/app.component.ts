@@ -9,7 +9,7 @@ import { LoadingService } from './loaderGadget/loading.service';
     styleUrls: ['./app.component.less'],
 })
 export class AppComponent implements OnInit, OnDestroy {
-    isPageLoading: boolean = true;
+    isPageLoading = true;
     title = 'Coinage';
     dateTime = new Date().toLocaleString();
     logo = 'assets/images/coin.png';

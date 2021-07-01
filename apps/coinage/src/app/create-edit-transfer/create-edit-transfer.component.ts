@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CategoryDTO, ContractorDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import { CategoryDTO, ContractorDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { CoinageDataService } from '../services/coinageData.service';
@@ -12,7 +12,7 @@ import { CoinageDataService } from '../services/coinageData.service';
 })
 export class CreateEditTransferComponent implements OnInit {
     showPage = true;
-    totalPayment: number = 0;
+    totalPayment = 0;
     categories: CategoryDTO[] = [];
     contractors: ContractorDTO[] = [];
     editMode = false;
@@ -22,11 +22,11 @@ export class CreateEditTransferComponent implements OnInit {
     @Input()
     redirectAfterSave = true;
 
-    @Input('transfer')
+    @Input()
     transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: 0, contractor: 0 };
 
     @Output()
-    onSaveSuccess: EventEmitter<void> = new EventEmitter();
+    saveSuccess: EventEmitter<void> = new EventEmitter();
 
     constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
 
@@ -76,7 +76,7 @@ export class CreateEditTransferComponent implements OnInit {
             .subscribe((result) => {
                 console.log(result);
                 if (result.insertedId) {
-                    this.onSaveSuccess.emit();
+                    this.saveSuccess.emit();
                     this.clearInputData();
                 }
                 if (this.redirectAfterSave) {

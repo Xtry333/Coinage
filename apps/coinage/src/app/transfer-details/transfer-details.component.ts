@@ -1,7 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { CategoryDTO, SaveTransferDTO, SplitTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
-import { AppRoutingModule } from '../app-routing/app-routing.module';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -17,7 +16,7 @@ export class TransferDetailsComponent implements OnInit {
 
     @Input()
     splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
-    totalPayment: number = 0;
+    totalPayment = 0;
     shouldShowSplit = false;
 
     categories: CategoryDTO[] = [];
@@ -65,7 +64,7 @@ export class TransferDetailsComponent implements OnInit {
                 })
                 .subscribe((result) => {
                     this.shouldShowSplit = false;
-                    this.router.navigateByUrl(`/details/${(result as any).insertedId}`);
+                    this.router.navigateByUrl(`/details/${result.insertedId}`);
                 });
     }
 

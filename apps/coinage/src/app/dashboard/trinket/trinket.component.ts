@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 
 @Component({
     selector: 'coinage-app-trinket',
@@ -7,16 +7,16 @@ import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output
 })
 export class TrinketComponent implements OnInit, OnChanges {
     private trinketElement!: HTMLElement;
-    private isGrabbed: boolean = false;
+    private isGrabbed = false;
     private offset: { x: number; y: number } = { x: 0, y: 0 };
     private trinketHolderId = 'trinket-container-' + (Math.random() * 10000).toFixed(0);
 
-    @Input() isDisplayed: boolean = false;
+    @Input() isDisplayed = false;
 
-    @Output() onHideModal: EventEmitter<void> = new EventEmitter();
-    @Output() onMoveModal = new EventEmitter<boolean>();
+    @Output() hideModal: EventEmitter<void> = new EventEmitter();
+    @Output() moveModal: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    constructor() {}
+    // constructor() {}
 
     ngOnInit(): void {
         const el = document.getElementById('fresh-trinket-container');
@@ -28,7 +28,7 @@ export class TrinketComponent implements OnInit, OnChanges {
         }
     }
 
-    ngOnChanges(changes: any): void {
+    ngOnChanges(changes: SimpleChanges): void {
         if (changes.isDisplayed && changes.isDisplayed.currentValue === false && changes.isDisplayed.previousValue === true) {
             this.trinketElement.style.left = this.getPageWidth() - 400 + 'px';
             this.trinketElement.style.top = '35px';
@@ -39,7 +39,7 @@ export class TrinketComponent implements OnInit, OnChanges {
     onMouseDown(event: MouseEvent) {
         if (event.target === this.trinketElement) {
             this.isGrabbed = true;
-            this.onMoveModal.emit(true);
+            this.moveModal.emit(true);
             this.offset = {
                 x: event.clientX - (this.parsePx(this.trinketElement.style.left) || event.clientX),
                 y: event.clientY - (this.parsePx(this.trinketElement.style.top) || event.clientY),
@@ -50,7 +50,7 @@ export class TrinketComponent implements OnInit, OnChanges {
     @HostListener('document:mouseup', ['$event'])
     onMouseUp() {
         this.isGrabbed = false;
-        this.onMoveModal.emit(false);
+        this.moveModal.emit(false);
         this.trinketElement.setAttribute('attr-moving', 'false');
     }
 
@@ -58,7 +58,7 @@ export class TrinketComponent implements OnInit, OnChanges {
     onMouseMove(event: MouseEvent) {
         if (this.isGrabbed) {
             this.trinketElement.style.right = '';
-            this.onMoveModal.emit(true);
+            this.moveModal.emit(true);
 
             if (event.clientX - this.offset.x > 0 && event.clientX - this.offset.x < this.getPageWidth() - this.trinketElement.clientWidth) {
                 this.trinketElement.style.left = event.clientX - this.offset.x + 'px';
@@ -74,7 +74,7 @@ export class TrinketComponent implements OnInit, OnChanges {
     }
 
     public hideTrinket(): void {
-        this.onHideModal.emit();
+        this.hideModal.emit();
     }
 
     private getPageWidth(): number {

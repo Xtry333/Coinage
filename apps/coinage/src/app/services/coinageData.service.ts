@@ -1,10 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import {
+    BaseResponseDTO,
     CategoryDTO,
     ContractorDTO,
     SaveTransferDTO,
-    SaveTransferDTOResponse,
     SplitTransferDTO,
     TotalInMonthByCategory,
     TotalOutcomesPerMonthDTO,
@@ -50,16 +50,16 @@ export class CoinageDataService {
         return this.http.get<ContractorDTO[]>(`${CoinageDataService.API_URL}contractor/list`);
     }
 
-    public postCreateSaveTransaction(request: SaveTransferDTO): Observable<SaveTransferDTOResponse> {
-        return this.http.post<SaveTransferDTOResponse>(`${CoinageDataService.API_URL}transfer/save`, request);
+    public postCreateSaveTransaction(request: SaveTransferDTO): Observable<BaseResponseDTO> {
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
     deleteTransfer(id: number): Observable<boolean> {
         return this.http.delete<boolean>(`${CoinageDataService.API_URL}transfer/${id}`);
     }
 
-    public postSplitTransaction(request: SplitTransferDTO): Observable<void> {
-        return this.http.post<void>(`${CoinageDataService.API_URL}transfer/split`, request);
+    public postSplitTransaction(request: SplitTransferDTO): Observable<BaseResponseDTO> {
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/split`, request);
     }
 
     public getTotalPerCategory(year: number, month: number): Observable<TotalInMonthByCategory[]> {

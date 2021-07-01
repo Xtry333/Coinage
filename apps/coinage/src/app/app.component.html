@@ -16,9 +16,9 @@
     </div>
 </header>
 <main>
-    <coinage-app-trinket [isDisplayed]="isTrinketDisplayed" (onHideModal)="hideTrinketModal()">
+    <coinage-app-trinket [isDisplayed]="isTrinketDisplayed" (hideModal)="hideTrinketModal()">
         <div>
-            <coinage-app-create-transfer (onSaveSuccess)="hideTrinketModal(); forceDashboardRefresh()" [redirectAfterSave]="false"></coinage-app-create-transfer>
+            <coinage-app-create-transfer (saveSuccess)="hideTrinketModal(); forceDashboardRefresh()" [redirectAfterSave]="false"></coinage-app-create-transfer>
         </div>
     </coinage-app-trinket>
     <router-outlet></router-outlet>
