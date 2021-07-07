@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Next, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
 import { SaveTransferDTO, SplitTransferDTO, TotalOutcomesPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import { TransferService } from '../services/transfer.service';
@@ -24,9 +24,27 @@ export class TransfersController {
                 id: t.id,
                 description: t.description,
                 amount: parseFloat(t.amount),
+                categoryId: t.category?.id,
                 category: t.category?.name,
+                contractor: t.contractor?.name,
                 date: t.date,
-            } as TransferDTO;
+            };
+        });
+    }
+
+    @Get('recent')
+    async getRecentTransactions(): Promise<TransferDTO[]> {
+        const recentCount = 10;
+        return (await this.transferService.getAllLimited(recentCount)).map((t) => {
+            return {
+                id: t.id,
+                description: t.description,
+                amount: parseFloat(t.amount),
+                categoryId: t.category?.id,
+                category: t.category?.name,
+                contractor: t.contractor?.name,
+                date: t.date,
+            };
         });
     }
 
@@ -68,6 +86,7 @@ export class TransfersController {
             id: transfer.id,
             description: transfer.description,
             amount: parseFloat(transfer.amount),
+            type: transfer.type,
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
             contractor: transfer.contractor?.name,
@@ -128,6 +147,7 @@ export class TransfersController {
         entity.description = transfer.description;
         entity.amount = transfer.amount.toString();
         entity.date = transfer.date;
+        entity.user = 1;
         entity.createdDate = new Date();
         if (category) {
             entity.category = category;

@@ -22,6 +22,7 @@ export interface TransferDetailsDTO {
     id: number;
     description: string;
     amount: number;
+    type: string;
     categoryPath: CategoryPathDTO[];
     categoryId: number;
     contractor?: string;

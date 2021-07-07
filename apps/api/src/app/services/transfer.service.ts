@@ -23,11 +23,17 @@ export class TransferService {
             .find({ order: { date: 'DESC', id: 'DESC' } });
     }
 
+    getAllLimited(count?: number) {
+        return getConnection()
+            .getRepository(Transfer)
+            .find({ where: { user: 1 }, order: { date: 'DESC', id: 'DESC' }, take: count });
+    }
+
     async getLimitedTotalOutcomes(): Promise<{ year: number; month: number; amount: string; count: number }[]> {
         return await getConnection()
             .getRepository(Transfer)
             .query(
-                "SELECT YEAR(DATE) AS `year`, MONTH(DATE) AS `month`, SUM(amount) AS `amount`, COUNT(id) AS `count` FROM transfer WHERE TYPE = 'OUTCOME' GROUP BY YEAR(date), MONTH(DATE) ORDER BY `year` DESC, `month` DESC LIMIT 12"
+                "SELECT YEAR(DATE) AS `year`, MONTH(DATE) AS `month`, SUM(amount) AS `amount`, COUNT(id) AS `count` FROM transfer WHERE TYPE = 'OUTCOME' AND `USER` = 1 GROUP BY YEAR(date), MONTH(DATE) ORDER BY `year` DESC, `month` DESC LIMIT 12"
             );
     }
 

@@ -6,6 +6,7 @@
     <nav>
         <ul class="nav-list">
             <li><a routerLink="/dashboard">Dashboard</a></li>
+            <li><a routerLink="/transfers">Transfers</a></li>
             <li><a routerLink="/manage/categories">Manage Categories</a></li>
             <!-- <li><a routerLink="/transfer/add">Add transfer</a></li> -->
             <li><a (click)="toggleTrinketModal()">Add transfer</a></li>
@@ -21,7 +22,7 @@
             <coinage-app-create-transfer (saveSuccess)="hideTrinketModal(); forceDashboardRefresh()" [redirectAfterSave]="false"></coinage-app-create-transfer>
         </div>
     </coinage-app-trinket>
-    <router-outlet></router-outlet>
+    <router-outlet (activate)="onActivateRoute($event)"></router-outlet>
 </main>
 <div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">
     <coinage-app-spinner></coinage-app-spinner>

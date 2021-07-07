@@ -10,15 +10,13 @@ export interface PartedDate {
     providedIn: 'root',
 })
 export class DateParserService {
-    constructor() {}
-
     public formatDate(date: Date): string {
         const parted: PartedDate = { year: date.getFullYear(), month: date.getMonth() + 1, day: date.getDate() };
         return this.joinPartedDate(parted);
     }
 
     public toPartedDate(dateString: string): PartedDate {
-        var dateParts = dateString.split('-');
+        const dateParts = dateString.split('-');
         return { year: +dateParts[0], month: +dateParts[1] - 1, day: +dateParts[2] };
     }
 

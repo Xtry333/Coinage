@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { TransferDTO } from '@coinage-app/interfaces';
 
 @Component({
@@ -6,14 +6,15 @@ import { TransferDTO } from '@coinage-app/interfaces';
     templateUrl: './transfer-table.component.html',
     styleUrls: ['./transfer-table.component.less'],
 })
-export class TransferTableComponent implements OnInit {
+export class TransferTableComponent {
     @Input()
     tableHeader?: string;
 
     @Input()
     transfers?: TransferDTO[];
 
-    ngOnInit(): void {}
+    @Input()
+    showFilters?: boolean = false;
 
     public transferIdTracker(index: number, item: TransferDTO): string {
         return item.id.toString();

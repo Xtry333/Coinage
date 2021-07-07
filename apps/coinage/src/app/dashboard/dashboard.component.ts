@@ -1,8 +1,7 @@
-import { Component, OnDestroy, OnInit, TrackByFunction } from '@angular/core';
-import { TotalOutcomesPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { TotalOutcomesPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { finalize } from 'rxjs/operators';
-import { DateTime } from 'luxon';
 import * as Rx from 'rxjs';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
 
@@ -22,9 +21,9 @@ interface UiTotalOutcomesPerMonth {
     styleUrls: ['./dashboard.component.less'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-    public static REFRESH_INTERVAL = 5000;
-    message: string = '';
-    transactionId: number = 0;
+    public static REFRESH_INTERVAL = 10000;
+    message = '';
+    transactionId = 0;
     lastTransactions: TransferDTO[] = [];
     totalOutcomesPerMonth: UiTotalOutcomesPerMonth[] = [];
     showPage = false;
@@ -62,6 +61,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
             return item.partedDate.year.toString() + item.partedDate.month.toString();
         }
         return '';
+    }
+
+    public addTransferBeforeRefresh(transfer: TransferDTO) {
+        this.lastTransactions.unshift(transfer);
+        this.lastTransactions.splice(10, 1);
     }
 
     public refreshData() {

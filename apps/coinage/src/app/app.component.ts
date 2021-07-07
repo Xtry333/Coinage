@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
+import { TransfersListComponent } from './transfers-list/transfers-list.component';
 
 @Component({
     selector: 'coinage-app-root',
@@ -18,8 +19,8 @@ export class AppComponent implements OnInit, OnDestroy {
     @ViewChild(CreateEditTransferComponent)
     createEditTransferComponent!: CreateEditTransferComponent;
 
-    @ViewChild(DashboardComponent)
     dashboardComponent?: DashboardComponent;
+    transfersListComponent?: TransfersListComponent;
 
     isTrinketDisplayed = false;
 
@@ -32,6 +33,11 @@ export class AppComponent implements OnInit, OnDestroy {
         this.refreshInterval = setInterval(() => {
             this.dateTime = new Date().toLocaleString();
         }, 1000);
+    }
+
+    onActivateRoute(component: Component): void {
+        this.dashboardComponent = component instanceof DashboardComponent ? component : undefined;
+        this.transfersListComponent = component instanceof TransfersListComponent ? component : undefined;
     }
 
     ngOnDestroy(): void {
@@ -47,6 +53,7 @@ export class AppComponent implements OnInit, OnDestroy {
         } else {
             this.showTrinketModal();
         }
+        console.log(this);
     }
 
     public showTrinketModal(): void {
@@ -59,8 +66,7 @@ export class AppComponent implements OnInit, OnDestroy {
     }
 
     public forceDashboardRefresh(): void {
-        if (this.dashboardComponent) {
-            this.dashboardComponent.refreshData();
-        }
+        this.dashboardComponent?.refreshData();
+        this.transfersListComponent?.refreshData();
     }
 }

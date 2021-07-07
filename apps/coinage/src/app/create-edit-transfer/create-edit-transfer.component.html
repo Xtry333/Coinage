@@ -1,34 +1,36 @@
 <div *ngIf="showPage">
-    <div class="transaction-form">
-        <div>
-            <label for="description">Description</label>
-            <input id="description" [(ngModel)]="transferInput.description" minlength="3" required />
-        </div>
-        <div>
-            <label for="amount">Price</label>
-            <input id="amount" type="number" [(ngModel)]="transferInput.amount" [min]="0" step=".01" required />
-        </div>
-        <div>
-            <label for="category">Category</label>
-            <select id="category" [(ngModel)]="transferInput.category" required>
-                <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-            </select>
-        </div>
-        <div>
-            <label for="contractor">Contractor</label>
-            <select id="contractor" [(ngModel)]="transferInput.contractor">
-                <option *ngFor="let contractor of contractors" [ngValue]="contractor.id">{{ contractor.name }}</option>
-            </select>
-        </div>
-        <div>
-            <label for="date">Date</label>
-            <input id="date" type="date" [(ngModel)]="transferInput.date" required />
-        </div>
+    <form>
+        <div class="transaction-form">
+            <div>
+                <label for="description">Description</label>
+                <input id="description" name="description" [(ngModel)]="transferInput.description" minlength="3" required />
+            </div>
+            <div>
+                <label for="amount">Price</label>
+                <input id="amount" name="amount" type="number" [(ngModel)]="transferInput.amount" [min]="0" step=".01" required />
+            </div>
+            <div>
+                <label for="category">Category</label>
+                <select id="category" name="category" [(ngModel)]="transferInput.category" required>
+                    <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
+                </select>
+            </div>
+            <div>
+                <label for="contractor">Contractor</label>
+                <select id="contractor" name="contractor" [(ngModel)]="transferInput.contractor">
+                    <option *ngFor="let contractor of contractors" [ngValue]="contractor.id">{{ contractor.name }}</option>
+                </select>
+            </div>
+            <div>
+                <label for="date">Date</label>
+                <input id="date" name="date" type="date" [(ngModel)]="transferInput.date" required />
+            </div>
 
-        <button (click)="onClickSaveTransfer()">
-            <div *ngIf="editMode">Save</div>
-            <div *ngIf="!editMode">Create</div>
-        </button>
-        <button *ngIf="editMode" (click)="onClickDeleteTransfer()">Delete</button>
-    </div>
+            <button (click)="onClickSaveTransfer()">
+                <div *ngIf="editMode">Save</div>
+                <div *ngIf="!editMode">Create</div>
+            </button>
+            <button *ngIf="editMode" (click)="onClickDeleteTransfer()">Delete</button>
+        </div>
+    </form>
 </div>

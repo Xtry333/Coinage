@@ -7,7 +7,7 @@
         </caption>
         <thead>
             <tr>
-                <th class="align-left">Category</th>
+                <th class="align-left">Category <coinage-app-table-filter *ngIf="showFilters">x</coinage-app-table-filter></th>
                 <th>Description</th>
                 <th>Contractor</th>
                 <th class="align-right">Amount</th>
@@ -23,7 +23,7 @@
                     </a>
                 </td>
                 <td>
-                    {{ transfer.contractor }}
+                    {{ transfer.contractor ?? '-' }}
                 </td>
                 <td class="currency">{{ transfer.amount | plnCurrency }}</td>
                 <td class="align-right">

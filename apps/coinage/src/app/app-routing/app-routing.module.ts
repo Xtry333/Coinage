@@ -7,6 +7,7 @@ import { TransferDetailsComponent } from '../transfer-details/transfer-details.c
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { SummaryComponent } from '../summary/summary.component';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
+import { TransfersListComponent } from '../transfers-list/transfers-list.component';
 
 const routes: Routes = [
     {
@@ -21,6 +22,10 @@ const routes: Routes = [
     {
         path: 'details/:id',
         component: TransferDetailsComponent,
+    },
+    {
+        path: 'transfers',
+        component: TransfersListComponent,
     },
     {
         path: 'transfer/add',
