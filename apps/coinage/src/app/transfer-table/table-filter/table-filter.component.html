@@ -1,3 +1,14 @@
 <div class="coinage-app-table-filter">
-    <button>.</button>
+    <button class="filter-icon-btn" (click)="onShowPopup()">
+        <fa-icon [icon]="isFilterApplied ? filterAppliedIcon : filterIcon"></fa-icon>
+    </button>
+    <div *ngIf="isPopupDisplayed" class="filter-popup">
+        <form (ngSubmit)="onDoFilter()">
+            <span *ngIf="isFilterTextBox">
+                <input autofocus name="filterValue" [(ngModel)]="filterEvent.value" />
+            </span>
+            <button type="submit">Filter</button>
+            <button type="reset" (click)="onClear()">Clear</button>
+        </form>
+    </div>
 </div>

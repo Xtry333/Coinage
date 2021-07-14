@@ -1,4 +1,5 @@
 import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'coinage-app-trinket',
@@ -10,6 +11,8 @@ export class TrinketComponent implements OnInit, OnChanges {
     private isGrabbed = false;
     private offset: { x: number; y: number } = { x: 0, y: 0 };
     private trinketHolderId = 'trinket-container-' + (Math.random() * 10000).toFixed(0);
+
+    public closeIcon = faTimes;
 
     @Input() isDisplayed = false;
 

@@ -1,5 +1,5 @@
 <div *ngIf="showPage">
-    <form>
+    <form (submit)="onClickSaveTransfer()">
         <div class="transaction-form">
             <div>
                 <label for="description">Description</label>
@@ -26,7 +26,7 @@
                 <input id="date" name="date" type="date" [(ngModel)]="transferInput.date" required />
             </div>
 
-            <button (click)="onClickSaveTransfer()">
+            <button type="submit">
                 <div *ngIf="editMode">Save</div>
                 <div *ngIf="!editMode">Create</div>
             </button>

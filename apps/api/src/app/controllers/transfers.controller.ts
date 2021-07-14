@@ -86,7 +86,7 @@ export class TransfersController {
             id: transfer.id,
             description: transfer.description,
             amount: parseFloat(transfer.amount),
-            type: transfer.type,
+            type: transfer.category.type,
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
             contractor: transfer.contractor?.name,
@@ -151,6 +151,7 @@ export class TransfersController {
         entity.createdDate = new Date();
         if (category) {
             entity.category = category;
+            entity.type = category.type;
         } else {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
@@ -186,6 +187,7 @@ export class TransfersController {
         entity.createdDate = new Date();
         if (category) {
             entity.category = category;
+            entity.type = category.type;
         } else {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }

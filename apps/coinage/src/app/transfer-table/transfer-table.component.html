@@ -7,15 +7,21 @@
         </caption>
         <thead>
             <tr>
-                <th class="align-left">Category <coinage-app-table-filter *ngIf="showFilters">x</coinage-app-table-filter></th>
+                <th class="align-left">
+                    Category
+                    <coinage-app-table-filter *ngIf="showFilters" (filter)="onCategoryFilter($event)"></coinage-app-table-filter>
+                </th>
                 <th>Description</th>
-                <th>Contractor</th>
+                <th>
+                    Contractor
+                    <coinage-app-table-filter *ngIf="showFilters" (filter)="onContractorFilter($event)"></coinage-app-table-filter>
+                </th>
                 <th class="align-right">Amount</th>
                 <th class="align-right">Date</th>
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let transfer of transfers; trackBy: transferIdTracker">
+            <tr *ngFor="let transfer of transfersForTable; trackBy: transferIdTracker">
                 <td>{{ transfer.category }}</td>
                 <td>
                     <a [routerLink]="['/details', transfer.id]">
@@ -23,7 +29,7 @@
                     </a>
                 </td>
                 <td>
-                    {{ transfer.contractor ?? '-' }}
+                    {{ transfer.contractor }}
                 </td>
                 <td class="currency">{{ transfer.amount | plnCurrency }}</td>
                 <td class="align-right">
@@ -31,7 +37,10 @@
                 </td>
             </tr>
             <tr *ngIf="noRowsFound">
-                <td colspan="4">No transfers found.</td>
+                <td colspan="4">
+                    No transfers found.
+                    <span *ngIf="isAnyFilterApplied && !noRows"> Please check filters, there are {{ transfers?.length }} unmatched transfers. </span>
+                </td>
             </tr>
         </tbody>
     </table>

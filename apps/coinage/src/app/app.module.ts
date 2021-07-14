@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ApiPathsModule } from '@coinage-app/router';
 import { AppRoutingModule } from './app-routing/app-routing.module';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -37,7 +38,7 @@ import { TableFilterComponent } from './transfer-table/table-filter/table-filter
         TransfersListComponent,
         TableFilterComponent,
     ],
-    imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule, FormsModule],
+    imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule, FormsModule, FontAwesomeModule],
     providers: [
         ApiPathsModule,
         {

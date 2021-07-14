@@ -14,6 +14,9 @@ export class Category {
     @Column({ name: 'parent' })
     parentId!: number;
 
+    @Column('varchar', { length: 50, nullable: false })
+    type!: string;
+
     @ManyToOne('Category', { nullable: true })
     @JoinColumn({ name: 'parent' })
     parent!: Promise<Category>;

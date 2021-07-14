@@ -71,4 +71,8 @@ export class TransferDetailsComponent implements OnInit {
     public onClickEditMode(): void {
         if (this.transfer) this.router.navigateByUrl(`/transfer/edit/${this.transfer.id}`);
     }
+
+    get isOutcome(): boolean {
+        return this.transfer.type === 'OUTCOME';
+    }
 }
