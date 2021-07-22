@@ -1,13 +1,16 @@
 <div class="coinage-app-table-filter">
     <button class="filter-icon-btn" (click)="onShowPopup()">
-        <fa-icon [icon]="isFilterApplied ? filterAppliedIcon : filterIcon"></fa-icon>
+        <fa-icon class="icon" [icon]="filterIcon"></fa-icon>
     </button>
-    <div *ngIf="isPopupDisplayed" class="filter-popup">
+    <div *ngIf="isPopupDisplayed" class="filter-popup" [ngClass]="popupSide === 'toLeft' ? 'right' : 'left'">
         <form (ngSubmit)="onDoFilter()">
             <span *ngIf="isFilterTextBox">
                 <input autofocus name="filterValue" [(ngModel)]="filterEvent.value" />
             </span>
-            <button type="submit">Filter</button>
+            <span *ngIf="isFilterDateRange || isFilterAmountRange">
+                <span>Hey. That's not implemented!</span>
+            </span>
+            <button type="submit">Apply</button>
             <button type="reset" (click)="onClear()">Clear</button>
         </form>
     </div>

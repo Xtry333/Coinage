@@ -1,4 +1,5 @@
 import { Entity, JoinColumn, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Account } from './Account.entity';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
 import { Receipt } from './Receipt.entity';
@@ -39,7 +40,11 @@ export class Transfer {
     type!: string;
 
     @Column({ nullable: true, type: 'numeric' })
-    user?: number | undefined;
+    accountId?: number | undefined;
+
+    @ManyToOne('Account', { eager: true, nullable: true })
+    @JoinColumn({ name: 'account_id' })
+    account?: Account | undefined;
 
     @Column({ nullable: true, type: 'json' })
     metadata?: { [key: string]: string | number } | undefined;

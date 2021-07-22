@@ -1,19 +1,28 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { TransferDTO } from '@coinage-app/interfaces';
 import { FilterEvent } from './table-filter/table-filter.component';
+
+export interface TableFilterFields {
+    category?: string;
+    description?: string;
+    contractor?: string;
+    [key: string]: string | undefined;
+}
 
 @Component({
     selector: 'coinage-app-transfers-table',
     templateUrl: './transfer-table.component.html',
     styleUrls: ['./transfer-table.component.less'],
 })
-export class TransferTableComponent implements OnInit {
+export class TransferTableComponent implements OnInit, OnChanges {
     public static EMPTY_CONTRACTOR = '-';
-    private filterCategory?: string;
-    private filterContractor?: string;
+    public static EMPTY_DESCRIPTION = '-';
+
+    private filter: TableFilterFields = { category: '', contractor: '', description: '' };
+    public outcomesSum = 0;
+
     @Input()
     tableHeader?: string;
-
     @Input()
     transfers?: TransferDTO[];
 
@@ -26,48 +35,57 @@ export class TransferTableComponent implements OnInit {
         this.doFiltering();
     }
 
+    public ngOnChanges(): void {
+        this.doFiltering();
+    }
+
     public transferIdTracker(index: number, item: TransferDTO): string {
         return item.id.toString();
     }
 
-    public onCategoryFilter(ev: FilterEvent) {
-        this.filterCategory = ev.value?.toLocaleLowerCase();
+    public onFilter(ev: FilterEvent) {
+        switch (ev.name) {
+            case 'category':
+                this.filter.category = ev.value;
+                break;
+            case 'description':
+                this.filter.description = ev.value;
+                break;
+            case 'contractor':
+                this.filter.contractor = ev.value;
+                break;
+        }
         this.doFiltering();
     }
-
-    public onContractorFilter(ev: FilterEvent) {
-        this.filterContractor = ev.value?.toLocaleLowerCase();
-        this.doFiltering();
-    }
-
-    // public isFilteredOut(row: TransferDTO): boolean {
-    //     return (
-    //         (this.filterCategory !== undefined && !row.category.toLocaleLowerCase().includes(this.filterCategory)) ||
-    //         (this.filterContractor !== undefined && !row.contractor?.toLocaleLowerCase().includes(this.filterContractor)) ||
-    //         (row.contractor === undefined && this.filterCategory === TransferTableComponent.EMPTY_CONTRACTOR)
-    //     );
-    // }
 
     public isDisplayed(row: TransferDTO): boolean {
         return (
-            (this.filterCategory === undefined || row.category.toLocaleLowerCase().includes(this.filterCategory)) &&
-            (this.filterContractor === undefined ||
-                row.contractor?.toLocaleLowerCase().includes(this.filterContractor) ||
-                (this.filterContractor === TransferTableComponent.EMPTY_CONTRACTOR && row.contractor === undefined))
+            (this.filter.category === undefined || this.caseInsensitiveIncludes(row.category, this.filter.category)) &&
+            (this.filter.description === undefined || this.caseInsensitiveIncludes(row.description, this.filter.description)) &&
+            (this.filter.contractor === undefined ||
+                this.caseInsensitiveIncludes(row.contractor ?? TransferTableComponent.EMPTY_CONTRACTOR, this.filter.contractor))
         );
     }
 
     public doFiltering(): void {
+        this.outcomesSum = 0;
         if (this.transfers) {
             this.transfersForTable = this.transfers
                 .filter((t) => this.isDisplayed(t))
                 .map((t) => {
+                    if (t.type === 'OUTCOME') {
+                        this.outcomesSum += t.amount;
+                    }
                     return {
                         ...t,
                         contractor: t.contractor !== undefined ? t.contractor : TransferTableComponent.EMPTY_CONTRACTOR,
                     };
                 });
         }
+    }
+
+    private caseInsensitiveIncludes(a: string, b: string) {
+        return a.toLocaleLowerCase().includes(b.toLocaleLowerCase());
     }
 
     get isHeaderDisplayed(): boolean {
@@ -83,6 +101,11 @@ export class TransferTableComponent implements OnInit {
     }
 
     get isAnyFilterApplied(): boolean {
-        return this.filterCategory !== undefined || this.filterContractor !== undefined;
+        for (const key in this.filter) {
+            if (this.filter[key] != undefined) {
+                return true;
+            }
+        }
+        return false;
     }
 }

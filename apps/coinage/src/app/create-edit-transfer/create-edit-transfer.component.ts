@@ -76,7 +76,7 @@ export class CreateEditTransferComponent implements OnInit {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
             if (result.insertedId && cat) {
-                this.saveSuccess.emit({ ...newTransfer, id: result.insertedId, category: cat.name });
+                this.saveSuccess.emit({ ...newTransfer, id: result.insertedId, category: cat.name, type: '' });
                 this.clearInputData();
             }
             if (this.redirectAfterSave) {

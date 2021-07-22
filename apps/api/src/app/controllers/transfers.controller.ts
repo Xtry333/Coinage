@@ -1,8 +1,8 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
-import { SaveTransferDTO, SplitTransferDTO, TotalOutcomesPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import { SaveTransferDTO, SplitTransferDTO, TotalAmountPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import { TransferService } from '../services/transfer.service';
-import { Category } from '../entity/Category.entity';
+import { Category, TransferType } from '../entity/Category.entity';
 import { AppService } from '../app.service';
 import { CategoryService } from '../services/category.service';
 import { Transfer } from '../entity/Transfer.entity';
@@ -24,6 +24,7 @@ export class TransfersController {
                 id: t.id,
                 description: t.description,
                 amount: parseFloat(t.amount),
+                type: t.type,
                 categoryId: t.category?.id,
                 category: t.category?.name,
                 contractor: t.contractor?.name,
@@ -40,6 +41,7 @@ export class TransfersController {
                 id: t.id,
                 description: t.description,
                 amount: parseFloat(t.amount),
+                type: t.type,
                 categoryId: t.category?.id,
                 category: t.category?.name,
                 contractor: t.contractor?.name,
@@ -74,13 +76,12 @@ export class TransfersController {
                     id: t.id,
                     description: t.description,
                     amount: parseFloat(t.amount),
+                    type: t.type,
                     category: t.category.name,
                     date: t.date,
                     categoryId: t.category.id,
                 };
             });
-
-        console.log(transfer);
 
         return {
             id: transfer.id,
@@ -92,6 +93,7 @@ export class TransfersController {
             contractor: transfer.contractor?.name,
             contractorId: transfer.contractor?.id,
             categoryId: transfer.category.id,
+            account: transfer.account,
             otherTransfers: otherTransfers,
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
@@ -101,13 +103,22 @@ export class TransfersController {
     }
 
     @Get('/totalOutcomesPerMonth')
-    async getLastTotalOutcomesPerMonth(): Promise<TotalOutcomesPerMonthDTO[]> {
-        const outcomes: TotalOutcomesPerMonthDTO[] = (await this.transferService.getLimitedTotalOutcomes()).map((outcome) => {
+    async getLastTotalOutcomesPerMonth(): Promise<TotalAmountPerMonthDTO[]> {
+        // TODO: Join queries into one async
+        const outcomes = (await this.transferService.getLimitedTotalMonthlyAmount(1, TransferType.Outcome)).map((outcome) => {
             return {
                 year: outcome.year,
                 month: outcome.month - 1,
                 amount: parseFloat(outcome.amount),
                 transactionsCount: outcome.count,
+            };
+        });
+        const incomes = (await this.transferService.getLimitedTotalMonthlyAmount(1, TransferType.Income)).map((income) => {
+            return {
+                year: income.year,
+                month: income.month - 1,
+                amount: parseFloat(income.amount),
+                transactionsCount: income.count,
             };
         });
 
@@ -130,7 +141,16 @@ export class TransfersController {
                 month = 11;
             }
         }
-        return outcomes.sort((a, b) => new Date(b.year, b.month).getTime() - new Date(a.year, a.month).getTime()).slice(0, 12);
+        return outcomes
+            .sort((a, b) => new Date(b.year, b.month).getTime() - new Date(a.year, a.month).getTime())
+            .slice(0, 12)
+            .map((o) => {
+                return {
+                    ...o,
+                    outcomes: o.amount,
+                    incomes: incomes.find((i) => i.year === o.year && i.month === o.month)?.amount ?? 0,
+                };
+            });
     }
 
     @Post('save')
@@ -147,7 +167,7 @@ export class TransfersController {
         entity.description = transfer.description;
         entity.amount = transfer.amount.toString();
         entity.date = transfer.date;
-        entity.user = 1;
+        entity.accountId = 1;
         entity.createdDate = new Date();
         if (category) {
             entity.category = category;
@@ -183,7 +203,7 @@ export class TransfersController {
             throw new Error('Amount too high!');
         }
         entity.date = target.date;
-        entity.user = target.user;
+        entity.accountId = target.accountId;
         entity.createdDate = new Date();
         if (category) {
             entity.category = category;

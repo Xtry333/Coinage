@@ -2,13 +2,14 @@
     text-align: left;
     margin-left: 5px;
     display: inline;
-    position: absolute;
+    position: relative;
 
     .filter-icon-btn {
-        margin-top: -7px;
+        margin-top: -1px;
         text-align: center;
-        width: 25px;
-        height: 25px;
+        width: 24px;
+        height: 24px;
+        padding: 2px;
         background-color: rgb(225, 225, 225);
         border: gray 2px solid;
         cursor: pointer;
@@ -18,11 +19,19 @@
     }
 
     .filter-popup {
-        position: relative;
+        position: absolute;
         margin-top: -2px;
         background-color: rgb(225, 225, 225);
         border: gray 2px solid;
         padding: 10px;
+
+        &.left {
+            left: 0px;
+        }
+
+        &.right {
+            right: 0px;
+        }
 
         input {
             padding: 10px;

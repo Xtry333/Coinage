@@ -1,8 +1,7 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get } from '@nestjs/common';
 
 import { AppService } from './app.service';
-import { TransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
-import { Category } from './entity/Category.entity';
+import { TransferDTO } from '@coinage-app/interfaces';
 
 @Controller()
 export class AppController {

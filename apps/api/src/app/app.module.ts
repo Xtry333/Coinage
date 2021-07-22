@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApiPathsModule } from '@coinage-app/router';
-import ormconfig from 'apps/api/ormconfig';
+import ormconfig from '../../ormconfig';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';

@@ -9,15 +9,54 @@
             <tr>
                 <th class="align-left">
                     Category
-                    <coinage-app-table-filter *ngIf="showFilters" (filter)="onCategoryFilter($event)"></coinage-app-table-filter>
+                    <coinage-app-table-filter
+                        *ngIf="showFilters"
+                        [filterName]="'category'"
+                        (filter)="onFilter($event)"
+                        [filterType]="'textBox'"
+                        [popupSide]="'toRight'"
+                    ></coinage-app-table-filter>
                 </th>
-                <th>Description</th>
+                <th>
+                    Description
+                    <coinage-app-table-filter
+                        *ngIf="showFilters"
+                        [filterName]="'description'"
+                        (filter)="onFilter($event)"
+                        [filterType]="'textBox'"
+                        [popupSide]="'toRight'"
+                    ></coinage-app-table-filter>
+                </th>
                 <th>
                     Contractor
-                    <coinage-app-table-filter *ngIf="showFilters" (filter)="onContractorFilter($event)"></coinage-app-table-filter>
+                    <coinage-app-table-filter
+                        *ngIf="showFilters"
+                        [filterName]="'contractor'"
+                        (filter)="onFilter($event)"
+                        [filterType]="'textBox'"
+                        [popupSide]="'toLeft'"
+                    ></coinage-app-table-filter>
                 </th>
-                <th class="align-right">Amount</th>
-                <th class="align-right">Date</th>
+                <th class="align-right">
+                    Amount
+                    <coinage-app-table-filter
+                        *ngIf="showFilters"
+                        [filterName]="'amount'"
+                        (filter)="onFilter($event)"
+                        [filterType]="'amountRange'"
+                        [popupSide]="'toLeft'"
+                    ></coinage-app-table-filter>
+                </th>
+                <th class="align-right">
+                    Date
+                    <coinage-app-table-filter
+                        *ngIf="showFilters"
+                        [filterName]="'date'"
+                        (filter)="onFilter($event)"
+                        [filterType]="'dateRange'"
+                        [popupSide]="'toLeft'"
+                    ></coinage-app-table-filter>
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -35,6 +74,12 @@
                 <td class="align-right">
                     <a [routerLink]="['/summary', transfer.date]">{{ transfer.date | date }}</a>
                 </td>
+            </tr>
+            <tr *ngIf="!noRows" class="sum-row">
+                <td colspan="2">Outcomes Sum</td>
+                <td>{{ transfersForTable.length }}</td>
+                <td class="currency">{{ outcomesSum | plnCurrency }}</td>
+                <td></td>
             </tr>
             <tr *ngIf="noRowsFound">
                 <td colspan="4">

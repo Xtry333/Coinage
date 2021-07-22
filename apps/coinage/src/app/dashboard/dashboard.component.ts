@@ -1,16 +1,17 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TotalOutcomesPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
+import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { finalize } from 'rxjs/operators';
 import * as Rx from 'rxjs';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
 
-interface UiTotalOutcomesPerMonth {
+interface UiTotalAmountPerMonth {
     date: string;
     year: number;
     monthName: string;
     partedDate: PartedDate;
-    amount: number;
+    incomes: number;
+    outcomes: number;
     transactionsCount: number;
     costPerDay: number;
 }
@@ -25,9 +26,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     message = '';
     transactionId = 0;
     lastTransactions: TransferDTO[] = [];
-    totalOutcomesPerMonth: UiTotalOutcomesPerMonth[] = [];
+    totalAmountPerMonth: UiTotalAmountPerMonth[] = [];
     showPage = false;
     refreshInterval?: ReturnType<typeof setInterval>;
+    averageAmountLimit = 5;
 
     constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
 
@@ -40,7 +42,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             })
         ).subscribe((values) => {
             this.lastTransactions = values[0];
-            this.totalOutcomesPerMonth = this.mapToUiOutcome(values[1]);
+            this.totalAmountPerMonth = this.mapToUiOutcome(values[1]);
         });
         this.refreshInterval = setInterval(() => this.refreshData(), DashboardComponent.REFRESH_INTERVAL);
     }
@@ -56,7 +58,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return item.id.toString();
     }
 
-    public totalOutcomesTracker(index: number, item: UiTotalOutcomesPerMonth): string {
+    public totalOutcomesTracker(index: number, item: UiTotalAmountPerMonth): string {
         if (item.partedDate.month) {
             return item.partedDate.year.toString() + item.partedDate.month.toString();
         }
@@ -71,20 +73,21 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public refreshData() {
         Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth()).subscribe(([transactions, outcomes]) => {
             this.lastTransactions = transactions;
-            this.totalOutcomesPerMonth = this.mapToUiOutcome(outcomes);
+            this.totalAmountPerMonth = this.mapToUiOutcome(outcomes);
         });
     }
 
-    private mapToUiOutcome(totalOutcomes: TotalOutcomesPerMonthDTO[]): UiTotalOutcomesPerMonth[] {
-        return totalOutcomes.map((outcome) => {
+    private mapToUiOutcome(totalOutcomes: TotalAmountPerMonthDTO[]): UiTotalAmountPerMonth[] {
+        return totalOutcomes.map((total) => {
             return {
-                year: outcome.year,
-                date: outcome.year + '-' + (outcome.month + 1),
-                monthName: new Date(outcome.year, outcome.month).toLocaleString('pl', { month: 'long' }),
-                partedDate: { year: outcome.year, month: outcome.month + 1 },
-                amount: outcome.amount,
-                transactionsCount: outcome.transactionsCount,
-                costPerDay: outcome.amount / this.daysInMonth(outcome.year, outcome.month),
+                year: total.year,
+                date: total.year + '-' + (total.month + 1),
+                monthName: new Date(total.year, total.month).toLocaleString('pl', { month: 'long' }),
+                partedDate: { year: total.year, month: total.month + 1 },
+                outcomes: total.outcomes,
+                incomes: total.incomes,
+                transactionsCount: total.transactionsCount,
+                costPerDay: total.outcomes / this.daysInMonth(total.year, total.month),
             };
         });
     }
@@ -101,7 +104,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return this.partedDateService.formatDate(new Date(date));
     }
 
-    public getTotalPerMonthDate(uiRow: UiTotalOutcomesPerMonth): string {
+    public getTotalPerMonthDate(uiRow: UiTotalAmountPerMonth): string {
         return this.partedDateService.joinPartedDate(uiRow.partedDate);
+    }
+
+    get rollingAverageIncomes() {
+        return this.totalAmountPerMonth.slice(0, this.averageAmountLimit).reduce((a, i) => a + i.incomes, 0) / this.averageAmountLimit;
+    }
+
+    get rollingAverageOutcomes() {
+        return this.totalAmountPerMonth.slice(0, this.averageAmountLimit).reduce((a, i) => a + i.outcomes, 0) / this.averageAmountLimit;
     }
 }

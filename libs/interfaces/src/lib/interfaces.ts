@@ -8,9 +8,15 @@ export interface TransferDTO {
     description: string;
     contractor?: string;
     amount: number;
+    type: string;
     category: string;
     categoryId: number;
     date: string;
+}
+
+export interface AccountDTO {
+    id: number;
+    name: string;
 }
 
 export interface CategoryPathDTO {
@@ -23,6 +29,7 @@ export interface TransferDetailsDTO {
     description: string;
     amount: number;
     type: string;
+    account?: AccountDTO;
     categoryPath: CategoryPathDTO[];
     categoryId: number;
     contractor?: string;
@@ -33,9 +40,10 @@ export interface TransferDetailsDTO {
     otherTransfers: TransferDTO[];
 }
 
-export interface TotalOutcomesPerMonthDTO {
+export interface TotalAmountPerMonthDTO {
     year: number;
     month: number;
-    amount: number;
+    outcomes: number;
+    incomes: number;
     transactionsCount: number;
 }

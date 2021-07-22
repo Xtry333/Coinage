@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
+import { TransferType } from '../entity/Category.entity';
 import { Transfer } from '../entity/Transfer.entity';
 
 @Injectable({
@@ -26,14 +27,14 @@ export class TransferService {
     getAllLimited(count?: number) {
         return getConnection()
             .getRepository(Transfer)
-            .find({ where: { user: 1 }, order: { date: 'DESC', id: 'DESC' }, take: count });
+            .find({ where: { accountId: 1 }, order: { date: 'DESC', id: 'DESC' }, take: count });
     }
 
-    async getLimitedTotalOutcomes(): Promise<{ year: number; month: number; amount: string; count: number }[]> {
+    async getLimitedTotalMonthlyAmount(accountId: number, type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {
         return await getConnection()
             .getRepository(Transfer)
             .query(
-                "SELECT YEAR(DATE) AS `year`, MONTH(DATE) AS `month`, SUM(amount) AS `amount`, COUNT(id) AS `count` FROM transfer WHERE TYPE = 'OUTCOME' AND `USER` = 1 GROUP BY YEAR(date), MONTH(DATE) ORDER BY `year` DESC, `month` DESC LIMIT 12"
+                `SELECT YEAR(DATE) AS \`year\`, MONTH(DATE) AS \`month\`, SUM(amount) AS \`amount\`, COUNT(id) AS \`count\` FROM transfer WHERE TYPE = '${type}' AND \`account_id\` = ${accountId} GROUP BY YEAR(date), MONTH(DATE) ORDER BY \`year\` DESC, \`month\` DESC LIMIT 12`
             );
     }
 

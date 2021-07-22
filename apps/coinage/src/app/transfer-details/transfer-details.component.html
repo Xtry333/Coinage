@@ -11,6 +11,9 @@
     <pre>Amount: {{ transfer.amount | plnCurrency }}</pre>
     <pre>Date: {{ transfer.date }}</pre>
     <pre>Type: {{ transfer.type }}</pre>
+    <div *ngIf="transfer.account">
+        <pre>Account: {{ transfer.account!.name }}</pre>
+    </div>
     <div *ngIf="transfer.contractor">
         <pre>Contractor: {{ transfer?.contractor }}</pre>
         <pre>Total {{ isOutcome ? 'payed to' : 'received from' }} {{ transfer?.contractor }} on {{ transfer?.date }}: {{ totalPayment | plnCurrency }}</pre>

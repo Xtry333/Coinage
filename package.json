@@ -4,10 +4,19 @@
     "license": "MIT",
     "scripts": {
         "ng": "nx",
-        "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
         "nx": "nx",
-        "start": "ng serve",
-        "build": "ng build",
+        "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
+        "start": "run-p start:api start:coinage",
+        "start:api": "ng serve api",
+        "start:coinage": "ng serve coinage",
+        "build": "run-s build:api build:coinage build:docker",
+        "build:api": "ng build api",
+        "build:coinage": "ng build api --prod",
+        "build:docker": "run-s docker:build-api docker:build-coinage",
+        "docker:build-api": "docker image build -t coinage-api -f api.Dockerfile .",
+        "docker:build-coinage": "docker image build -t coinage-webapp -f webapp.Dockerfile .",
+        "docker:up": "docker-compose up -d",
+        "docker:down": "docker-compose down",
         "test": "ng test",
         "lint": "nx workspace-lint && ng lint",
         "e2e": "ng e2e",
@@ -52,7 +61,8 @@
         "rxjs": "~6.6.3",
         "sequelize": "^6.6.2",
         "tslib": "^2.0.0",
-        "typeorm": "^0.2.32"
+        "typeorm": "^0.2.32",
+        "typeorm-naming-strategies": "^2.0.0"
     },
     "devDependencies": {
         "@angular-devkit/build-angular": "12.1.0",

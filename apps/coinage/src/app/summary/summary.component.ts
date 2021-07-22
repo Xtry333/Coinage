@@ -52,16 +52,26 @@ export class SummaryComponent implements OnInit {
             } else {
                 this.showPage = true;
             }
-            if (this.isDateTargetDay()) {
+            if (this.isDateTargetDay) {
                 this.coinageData.getAllTransfers().subscribe((response) => {
                     this.transfers = response.filter((t) => t.date === this.selectedDate);
+                });
+            } else if (this.isDateTargetMonth) {
+                this.coinageData.getAllTransfers().subscribe((response) => {
+                    this.transfers = response.filter(
+                        (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
+                    );
                 });
             }
         });
     }
 
-    isDateTargetDay(): boolean {
+    get isDateTargetDay(): boolean {
         return this.partedDateService.isDateTargetDay(this.partedDate);
+    }
+
+    get isDateTargetMonth(): boolean {
+        return this.partedDateService.isDateTargetMonth(this.partedDate);
     }
 
     getParentPartedDate(): PartedDate {

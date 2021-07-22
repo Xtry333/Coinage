@@ -7,7 +7,7 @@ import {
     SaveTransferDTO,
     SplitTransferDTO,
     TotalInMonthByCategory,
-    TotalOutcomesPerMonthDTO,
+    TotalAmountPerMonthDTO,
     TransferDetailsDTO,
     TransferDTO,
 } from '@coinage-app/interfaces';
@@ -34,8 +34,8 @@ export class CoinageDataService {
         return this.http.get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/details/${id}`).toPromise();
     }
 
-    public getTotalOutcomesPerMonth(): Observable<TotalOutcomesPerMonthDTO[]> {
-        return this.http.get<TotalOutcomesPerMonthDTO[]>(`${CoinageDataService.API_URL}transfer/totalOutcomesPerMonth`);
+    public getTotalOutcomesPerMonth(): Observable<TotalAmountPerMonthDTO[]> {
+        return this.http.get<TotalAmountPerMonthDTO[]>(`${CoinageDataService.API_URL}transfer/totalOutcomesPerMonth`);
     }
 
     public getCategoryTree(): Observable<CategoryDTO[]> {

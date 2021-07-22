@@ -40,3 +40,6 @@ Thumbs.db
 
 # DB Files
 coinage-data.sql
+
+# Environment
+.env

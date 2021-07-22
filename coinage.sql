@@ -17,6 +17,15 @@
 CREATE DATABASE IF NOT EXISTS `coinage-db` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
 USE `coinage-db`;
 
+-- Zrzut struktury tabela coinage-db.account
+CREATE TABLE IF NOT EXISTS `account` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(50) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- Eksport danych został odznaczony.
+
 -- Zrzut struktury tabela coinage-db.category
 CREATE TABLE IF NOT EXISTS `category` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -28,7 +37,7 @@ CREATE TABLE IF NOT EXISTS `category` (
   UNIQUE KEY `name` (`name`),
   KEY `FK_category_category` (`parent`),
   CONSTRAINT `FK_category_category` FOREIGN KEY (`parent`) REFERENCES `category` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Eksport danych został odznaczony.
 
@@ -37,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `contractor` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(50) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Eksport danych został odznaczony.
 
@@ -75,16 +84,18 @@ CREATE TABLE IF NOT EXISTS `transfer` (
   `edited_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `created_date` timestamp NULL DEFAULT NULL,
   `receipt` int DEFAULT NULL,
-  `user` int DEFAULT NULL,
+  `account_id` int DEFAULT NULL,
   `metadata` json DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `FK_transfer_receipt` (`receipt`),
-  KEY `FK_transfer_category` (`category`),
   KEY `FK_transfer_contractor` (`contractor`),
-  CONSTRAINT `FK_transfer_category` FOREIGN KEY (`category`) REFERENCES `category` (`id`) ON UPDATE CASCADE,
+  KEY `FK_transfer_category` (`category`),
+  KEY `FK_transfer_account` (`account_id`),
+  CONSTRAINT `FK_transfer_account` FOREIGN KEY (`account_id`) REFERENCES `account` (`id`),
+  CONSTRAINT `FK_transfer_category` FOREIGN KEY (`category`) REFERENCES `category` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `FK_transfer_contractor` FOREIGN KEY (`contractor`) REFERENCES `contractor` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `FK_transfer_receipt` FOREIGN KEY (`receipt`) REFERENCES `receipt` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=251 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=345 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Eksport danych został odznaczony.
 

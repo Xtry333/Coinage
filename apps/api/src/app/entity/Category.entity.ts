@@ -1,5 +1,10 @@
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
+export enum TransferType {
+    Income = 'INCOME',
+    Outcome = 'OUTCOME',
+}
+
 @Entity()
 export class Category {
     @PrimaryGeneratedColumn()
