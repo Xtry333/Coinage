@@ -12,7 +12,7 @@ export interface TableFilterFields {
 @Component({
     selector: 'coinage-app-transfers-table',
     templateUrl: './transfer-table.component.html',
-    styleUrls: ['./transfer-table.component.less'],
+    styleUrls: ['./transfer-table.component.scss'],
 })
 export class TransferTableComponent implements OnInit, OnChanges {
     public static EMPTY_CONTRACTOR = '-';

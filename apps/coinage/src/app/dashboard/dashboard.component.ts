@@ -19,7 +19,7 @@ interface UiTotalAmountPerMonth {
 @Component({
     selector: 'coinage-app-dashboard',
     templateUrl: './dashboard.component.html',
-    styleUrls: ['./dashboard.component.less'],
+    styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
     public static REFRESH_INTERVAL = 10000;

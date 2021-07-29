@@ -6,7 +6,7 @@ import { CoinageDataService } from '../services/coinageData.service';
 @Component({
     selector: 'coinage-app-category-manager',
     templateUrl: './category-manager.component.html',
-    styleUrls: ['./category-manager.component.less'],
+    styleUrls: ['./category-manager.component.scss'],
 })
 export class CategoryManagerComponent implements OnInit {
     showPage = false;

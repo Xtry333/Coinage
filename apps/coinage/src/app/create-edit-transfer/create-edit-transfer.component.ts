@@ -8,7 +8,7 @@ import { CoinageDataService } from '../services/coinageData.service';
 @Component({
     selector: 'coinage-app-create-transfer',
     templateUrl: './create-edit-transfer.component.html',
-    styleUrls: ['./create-edit-transfer.component.less'],
+    styleUrls: ['./create-edit-transfer.component.scss'],
 })
 export class CreateEditTransferComponent implements OnInit {
     showPage = true;
@@ -18,6 +18,8 @@ export class CreateEditTransferComponent implements OnInit {
     editMode = false;
     transferDTO!: TransferDetailsDTO;
     transferId!: number;
+
+    enableExperimental = true;
 
     @Input()
     redirectAfterSave = true;

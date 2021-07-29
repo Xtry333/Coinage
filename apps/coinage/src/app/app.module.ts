@@ -2,10 +2,9 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms';
-import { ApiPathsModule } from '@coinage-app/router';
-import { AppRoutingModule } from './app-routing/app-routing.module';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -38,9 +37,8 @@ import { TableFilterComponent } from './transfer-table/table-filter/table-filter
         TransfersListComponent,
         TableFilterComponent,
     ],
-    imports: [BrowserModule, HttpClientModule, AppRoutingModule, RouterModule, FormsModule, FontAwesomeModule],
+    imports: [BrowserModule, HttpClientModule, RouterModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [
-        ApiPathsModule,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: NetworkInterceptor,

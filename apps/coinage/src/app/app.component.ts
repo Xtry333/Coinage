@@ -7,7 +7,7 @@ import { TransfersListComponent } from './transfers-list/transfers-list.componen
 @Component({
     selector: 'coinage-app-root',
     templateUrl: './app.component.html',
-    styleUrls: ['./app.component.less'],
+    styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
     isPageLoading = true;

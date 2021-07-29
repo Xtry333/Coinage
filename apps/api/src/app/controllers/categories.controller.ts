@@ -1,5 +1,5 @@
-import { CategoryDTO, TotalInMonthByCategory } from '@coinage-app/interfaces';
-import { Controller, Get, Param } from '@nestjs/common';
+import { BaseResponseDTO, CategoryDTO, CreateEditCategoryDTO, TotalInMonthByCategory } from '@coinage-app/interfaces';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Category } from '../entity/Category.entity';
 
 import { CategoryService } from '../services/category.service';
@@ -7,6 +7,26 @@ import { CategoryService } from '../services/category.service';
 @Controller('category')
 export class CategoriesController {
     constructor(private readonly categoryService: CategoryService) {}
+
+    @Post('save')
+    async saveCategory(@Body() category: CreateEditCategoryDTO): Promise<BaseResponseDTO> {
+        let entity: Category;
+
+        if (category.id) {
+            const result = await this.categoryService.getById(category.id);
+            if (result) {
+                entity = result;
+            } else {
+                throw new Error('Id not found.');
+            }
+        } else {
+            entity = new Category();
+        }
+
+        const inserted = await this.categoryService.save(entity);
+
+        return { insertedId: inserted.id };
+    }
 
     @Get('/list')
     async getCategoryList(): Promise<CategoryDTO[]> {

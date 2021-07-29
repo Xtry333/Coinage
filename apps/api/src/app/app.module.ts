@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ApiPathsModule } from '@coinage-app/router';
 import ormconfig from '../../ormconfig';
 
 import { AppController } from './app.controller';
@@ -15,6 +14,6 @@ import { ContractorController } from './controllers/contractors.controller';
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
     controllers: [AppController, TransfersController, CategoriesController, ContractorController],
-    providers: [AppService, TransferService, CategoryService, ContractorService, ApiPathsModule],
+    providers: [AppService, TransferService, CategoryService, ContractorService],
 })
 export class AppModule {}

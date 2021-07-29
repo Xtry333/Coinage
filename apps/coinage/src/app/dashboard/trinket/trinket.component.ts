@@ -4,7 +4,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
 @Component({
     selector: 'coinage-app-trinket',
     templateUrl: './trinket.component.html',
-    styleUrls: ['./trinket.component.less'],
+    styleUrls: ['./trinket.component.scss'],
 })
 export class TrinketComponent implements OnInit, OnChanges {
     private trinketElement!: HTMLElement;

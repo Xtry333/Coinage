@@ -34,13 +34,7 @@
             "tags": [],
             "implicitDependencies": ["coinage"]
         },
-        "data": {
-            "tags": []
-        },
         "interfaces": {
-            "tags": []
-        },
-        "router": {
             "tags": []
         }
     },

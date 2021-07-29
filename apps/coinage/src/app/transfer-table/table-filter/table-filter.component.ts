@@ -14,7 +14,7 @@ export interface FilterOption {
 @Component({
     selector: 'coinage-app-table-filter',
     templateUrl: './table-filter.component.html',
-    styleUrls: ['./table-filter.component.less'],
+    styleUrls: ['./table-filter.component.scss'],
 })
 export class TableFilterComponent implements OnInit {
     public filterDefaultIcon = faCaretDown;

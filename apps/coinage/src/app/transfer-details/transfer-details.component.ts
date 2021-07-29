@@ -8,7 +8,7 @@ import { finalize } from 'rxjs/operators';
 @Component({
     selector: 'coinage-app-transfer-details',
     templateUrl: './transfer-details.component.html',
-    styleUrls: ['./transfer-details.component.less'],
+    styleUrls: ['./transfer-details.component.scss'],
 })
 export class TransferDetailsComponent implements OnInit {
     showPage = false;

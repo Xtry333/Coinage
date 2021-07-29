@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 @Component({
     selector: 'coinage-app-transfers-list',
     templateUrl: './transfers-list.component.html',
-    styleUrls: ['./transfers-list.component.less'],
+    styleUrls: ['./transfers-list.component.scss'],
 })
 export class TransfersListComponent implements OnInit, OnDestroy {
     public static REFRESH_INTERVAL = 10000;

@@ -25,4 +25,13 @@
         //     padding: 2.5px;
         // }
     }
+
+    .ng-select ::ng-deep .ng-select-container {
+        display: block;
+        padding: 10px;
+        height: 40px;
+        width: 300px;
+        margin: 10px;
+        background: white;
+    }
 }

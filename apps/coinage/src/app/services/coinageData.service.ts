@@ -11,7 +11,6 @@ import {
     TransferDetailsDTO,
     TransferDTO,
 } from '@coinage-app/interfaces';
-import { ApiPathsModule } from '@coinage-app/router';
 import { Observable } from 'rxjs';
 
 @Injectable({
@@ -20,7 +19,7 @@ import { Observable } from 'rxjs';
 export class CoinageDataService {
     public static readonly API_URL = '/api/';
 
-    constructor(private http: HttpClient, private path: ApiPathsModule) {}
+    constructor(private http: HttpClient) {}
 
     public getAllTransfers(): Observable<TransferDTO[]> {
         return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/all`);

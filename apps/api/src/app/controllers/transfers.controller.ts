@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
-import { SaveTransferDTO, SplitTransferDTO, TotalAmountPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import { BaseResponseDTO, SaveTransferDTO, SplitTransferDTO, TotalAmountPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import { TransferService } from '../services/transfer.service';
 import { Category, TransferType } from '../entity/Category.entity';
 import { AppService } from '../app.service';
@@ -154,7 +154,7 @@ export class TransfersController {
     }
 
     @Post('save')
-    async saveTransferObject(@Body() transfer: SaveTransferDTO): Promise<{ insertedId: number }> {
+    async saveTransferObject(@Body() transfer: SaveTransferDTO): Promise<BaseResponseDTO> {
         console.log(transfer);
         console.log(transfer.date);
         let entity: Transfer;
@@ -184,14 +184,13 @@ export class TransfersController {
                 console.log(e);
             }
         }
-        console.log(entity);
         const inserted = await this.transferService.save(entity);
         console.log(inserted);
         return { insertedId: inserted.id };
     }
 
     @Post('split')
-    async splitTransferObject(@Body() transfer: SplitTransferDTO): Promise<{ insertedId: number }> {
+    async splitTransferObject(@Body() transfer: SplitTransferDTO): Promise<BaseResponseDTO> {
         const category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
         const id = parseInt(transfer.id?.toString());
         const target = await this.transferService.getById(id);

@@ -38,6 +38,10 @@ export class CategoryService {
         return getConnection().getRepository(Category).insert(category);
     }
 
+    async save(category: Category): Promise<Category> {
+        return getConnection().getRepository(Category).save(category);
+    }
+
     async deleteById(id: number): Promise<DeleteResult> {
         return await getConnection()
             .getRepository(Category)

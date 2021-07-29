@@ -12,7 +12,7 @@ export interface UiTotalInMonthByCategory {
 @Component({
     selector: 'coinage-app-summary',
     templateUrl: './summary.component.html',
-    styleUrls: ['./summary.component.less'],
+    styleUrls: ['./summary.component.scss'],
 })
 export class SummaryComponent implements OnInit {
     showPage = false;

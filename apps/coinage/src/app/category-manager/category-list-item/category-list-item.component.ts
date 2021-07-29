@@ -1,17 +1,12 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CategoryDTO } from '@coinage-app/interfaces';
 
 @Component({
     selector: 'coinage-app-category-list-item',
     templateUrl: './category-list-item.component.html',
-    styleUrls: ['./category-list-item.component.less'],
-    inputs: ['category'],
+    styleUrls: ['./category-list-item.component.scss'],
 })
-export class CategoryListItemComponent implements OnInit {
-    constructor() {}
-
+export class CategoryListItemComponent {
     @Input()
     category!: CategoryDTO;
-
-    ngOnInit(): void {}
 }
