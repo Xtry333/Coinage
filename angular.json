@@ -1,7 +1,8 @@
 {
     "version": 1,
     "cli": {
-        "defaultCollection": "@nrwl/angular"
+        "defaultCollection": "@nrwl/angular",
+        "poll": 1000
     },
     "defaultProject": "coinage",
     "schematics": {

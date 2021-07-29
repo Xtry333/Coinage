@@ -1,16 +1,5 @@
 # CoinageApp
 
-## Running
-
--   App Stack
-    -   `yarn dev`
--   Webapp
-    -   `yarn dev:coinage`
--   Api
-    -   `yarn dev:api`
-
----
-
 This project was generated using [Nx](https://nx.dev).
 
 <p align="center"><img src="https://raw.githubusercontent.com/nrwl/nx/master/images/nx-logo.png" width="450"></p>
