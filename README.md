@@ -1,4 +1,15 @@
-# WsCoinageApp
+# CoinageApp
+
+## Running
+
+-   App Stack
+    -   `yarn dev`
+-   Webapp
+    -   `yarn dev:coinage`
+-   Api
+    -   `yarn dev:api`
+
+---
 
 This project was generated using [Nx](https://nx.dev).
 

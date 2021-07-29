@@ -20,6 +20,7 @@ import { TransferTableComponent } from './transfer-table/transfer-table.componen
 import { TrinketComponent } from './dashboard/trinket/trinket.component';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 import { TableFilterComponent } from './transfer-table/table-filter/table-filter.component';
+import { AppRoutingModule } from './app-routing/app-routing.module';
 
 @NgModule({
     declarations: [
@@ -37,7 +38,7 @@ import { TableFilterComponent } from './transfer-table/table-filter/table-filter
         TransfersListComponent,
         TableFilterComponent,
     ],
-    imports: [BrowserModule, HttpClientModule, RouterModule, NgSelectModule, FormsModule, FontAwesomeModule],
+    imports: [BrowserModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,

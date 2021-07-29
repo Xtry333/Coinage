@@ -38,6 +38,18 @@ export class TransferService {
             );
     }
 
+    async getTransferByDateContractor(
+        date: string,
+        contractorId: number
+    ): Promise<Transfer[]> {
+        const transfers = await getConnection()
+            .getRepository(Transfer)
+            .find({
+                where: { date: Equal(date), contractor: Equal(contractorId) },
+            });
+        return transfers;
+    }
+
     async insert(transfer: Transfer): Promise<InsertResult> {
         return await getConnection().getRepository(Transfer).insert(transfer);
     }

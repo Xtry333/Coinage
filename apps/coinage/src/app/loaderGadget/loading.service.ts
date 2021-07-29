@@ -11,8 +11,6 @@ export class LoadingService {
         .asObservable()
         .pipe(startWith(true), delay(0));
 
-    constructor() {}
-
     show() {
         this._loading.next(true);
     }

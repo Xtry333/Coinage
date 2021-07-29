@@ -69,7 +69,7 @@ export class TransfersController {
             }
         }
 
-        const otherTransfers: TransferDTO[] = (await this.appService.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
+        const otherTransfers: TransferDTO[] = (await this.transferService.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
             .filter((t) => t.id !== transfer.id)
             .map((t) => {
                 return {

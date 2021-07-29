@@ -17,8 +17,7 @@
         "baseUrl": ".",
         "paths": {
             "@coinage-app/data": ["libs/data/src/index.ts"],
-            "@coinage-app/interfaces": ["libs/interfaces/src/index.ts"],
-            "@coinage-app/router": ["libs/router/src/index.ts"]
+            "@coinage-app/interfaces": ["libs/interfaces/src/index.ts"]
         }
     },
     "exclude": ["node_modules", "tmp"],

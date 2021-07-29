@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import ormconfig from '../../ormconfig';
 
-import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TransfersController } from './controllers/transfers.controller';
 import { TransferService } from './services/transfer.service';
@@ -13,7 +12,7 @@ import { ContractorController } from './controllers/contractors.controller';
 
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
-    controllers: [AppController, TransfersController, CategoriesController, ContractorController],
+    controllers: [TransfersController, CategoriesController, ContractorController],
     providers: [AppService, TransferService, CategoryService, ContractorService],
 })
 export class AppModule {}

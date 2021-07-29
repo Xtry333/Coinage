@@ -11,9 +11,12 @@
             </div>
             <div>
                 <label for="category">Category</label>
-                <select id="category" name="category" [(ngModel)]="transferInput.category" required>
+                <!-- <select id="category" name="category" [(ngModel)]="transferInput.category" required>
                     <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-                </select>
+                </select> -->
+                <ng-select id="category" name="category" [(ngModel)]="transferInput.category" [clearable]='false'>
+                    <ng-option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</ng-option>
+                </ng-select>
             </div>
             <div>
                 <label for="contractor">Contractor</label>
