@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
+import { DeleteResult, Equal, getConnection } from 'typeorm';
 import { Contractor } from '../entity/Contractor.entity';
 
 @Injectable({
@@ -16,8 +16,8 @@ export class ContractorService {
         return await getConnection().getRepository(Contractor).find();
     }
 
-    async insert(contractor: Contractor): Promise<InsertResult> {
-        return getConnection().getRepository(Contractor).insert(contractor);
+    async save(contractor: Contractor): Promise<Contractor> {
+        return getConnection().getRepository(Contractor).save(contractor);
     }
 
     async deleteById(id: number): Promise<DeleteResult> {

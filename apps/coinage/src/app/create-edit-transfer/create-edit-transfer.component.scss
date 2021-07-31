@@ -21,21 +21,47 @@
         height: 40px;
         width: 300px;
         margin: 10px;
-        // &[type='date'] {
-        //     padding: 2.5px;
-        // }
     }
 
-    .ng-select ::ng-deep .ng-select-container {
-        // padding: 10px;
-        // padding-right: 0px;
+    .ng-select ::ng-deep {
+        $borderColor: #5d5d5d;
         height: 40px;
         width: 300px;
         margin: 10px;
 
-        .combobox {
-            padding: 5px;
-            //padding-left: 15px;
+        .ng-select-container {
+            height: 40px;
+            border-radius: 2px;
+            border-color: $borderColor;
+        }
+
+        .ng-arrow {
+            border-color: #444444 transparent transparent;
+        }
+
+        .ng-input {
+            padding: 10px;
+            top: 0;
+            input {
+                font-size: 16px;
+            }
+        }
+
+        .ng-dropdown-panel {
+            border-color: $borderColor;
+            &.ng-select-bottom {
+                border-top-color: #b8b8b8;
+            }
+            &.ng-select-top {
+                border-bottom-color: #b8b8b8;
+            }
+            .ng-dropdown-panel-items {
+                max-height: 300px;
+
+                .ng-option {
+                    padding: 10px;
+                }
+            }
         }
     }
 }

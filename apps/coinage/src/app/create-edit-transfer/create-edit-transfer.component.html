@@ -11,23 +11,35 @@
             </div>
             <div>
                 <label for="category">Category</label>
-                <!-- <select id="category" name="category" [(ngModel)]="transferInput.category" required>
-                    <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-                </select> -->
-                <ng-select id="category" name="category" [(ngModel)]="transferInput.category" [clearable]='false'>
-                    <ng-option *ngFor="let category of categories" [value]="category.id">{{ category.name }}</ng-option>
+                <ng-select
+                    name="category"
+                    labelForId="category"
+                    [(ngModel)]="transferInput.category"
+                    [clearable]="false"
+                    [required]="true"
+                    [editableSearchTerm]="true"
+                    [items]="categories"
+                    bindLabel="name"
+                    bindValue="id"
+                    [addTag]="onAddNewCategory"
+                    addTagText="Add category"
+                >
                 </ng-select>
             </div>
             <div>
                 <label for="contractor">Contractor</label>
-                <select id="contractor" name="contractor" [(ngModel)]="transferInput.contractor">
-                    <option *ngFor="let contractor of contractors" [ngValue]="contractor.id">{{ contractor.name }}</option>
-                </select>
-            </div>
-            <div *ngIf="enableExperimental">
-                <label for="searchInputBox">Experimental</label>
-                <ng-select id="contractor" name="contractor" [(ngModel)]="transferInput.contractor">
-                    <ng-option *ngFor="let contractor of contractors" [value]="contractor.id">{{ contractor.name }}</ng-option>
+                <ng-select
+                    name="contractor"
+                    labelForId="contractor"
+                    [(ngModel)]="transferInput.contractor"
+                    [clearable]="true"
+                    [editableSearchTerm]="true"
+                    [items]="contractors"
+                    bindLabel="name"
+                    bindValue="id"
+                    [addTag]="onAddNewContractor"
+                    addTagText="Add contractor"
+                >
                 </ng-select>
             </div>
             <div>

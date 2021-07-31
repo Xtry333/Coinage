@@ -23,6 +23,8 @@ export class CategoriesController {
             entity = new Category();
         }
 
+        entity.name = category.name;
+
         const inserted = await this.categoryService.save(entity);
 
         return { insertedId: inserted.id };

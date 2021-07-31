@@ -10,6 +10,8 @@ import {
     TotalAmountPerMonthDTO,
     TransferDetailsDTO,
     TransferDTO,
+    CreateEditCategoryDTO,
+    CreateEditContractorDTO,
 } from '@coinage-app/interfaces';
 import { Observable } from 'rxjs';
 
@@ -53,7 +55,15 @@ export class CoinageDataService {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
-    deleteTransfer(id: number): Observable<boolean> {
+    public postCreateCategory(request: CreateEditCategoryDTO) {
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}category/save`, request);
+    }
+
+    public postCreateContractor(request: CreateEditContractorDTO) {
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}contractor/save`, request);
+    }
+
+    public deleteTransfer(id: number): Observable<boolean> {
         return this.http.delete<boolean>(`${CoinageDataService.API_URL}transfer/${id}`);
     }
 

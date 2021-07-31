@@ -5,6 +5,14 @@ import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { CoinageDataService } from '../services/coinageData.service';
 
+export interface TransferInput {
+    description: string;
+    amount: number;
+    date: string;
+    category?: number;
+    contractor?: number;
+}
+
 @Component({
     selector: 'coinage-app-create-transfer',
     templateUrl: './create-edit-transfer.component.html',
@@ -25,7 +33,7 @@ export class CreateEditTransferComponent implements OnInit {
     redirectAfterSave = true;
 
     @Input()
-    transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: 0, contractor: 0 };
+    transferInput!: TransferInput;
 
     @Output()
     saveSuccess: EventEmitter<TransferDTO> = new EventEmitter();
@@ -47,7 +55,7 @@ export class CreateEditTransferComponent implements OnInit {
                         category: t.categoryId,
                         date: t.date,
                         description: t.description,
-                        contractor: t.contractorId ?? 0,
+                        contractor: t.contractorId ?? undefined,
                     };
                 });
             }
@@ -70,8 +78,8 @@ export class CreateEditTransferComponent implements OnInit {
             id: this.transferId,
             description: this.transferInput.description,
             amount: parseFloat(this.transferInput.amount?.toString()) ?? null,
-            categoryId: this.transferInput.category,
-            contractorId: this.transferInput.contractor,
+            categoryId: this.transferInput.category ?? 0,
+            contractorId: this.transferInput.contractor ?? 0,
             date: this.transferInput.date,
         };
         this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
@@ -97,12 +105,22 @@ export class CreateEditTransferComponent implements OnInit {
         }
     }
 
+    public onAddNewCategory = async (name: string): Promise<CategoryDTO> => {
+        const response = await this.coinageData.postCreateCategory({ name }).toPromise();
+        return { id: response.insertedId ?? 0, name };
+    };
+
+    public onAddNewContractor = async (name: string): Promise<ContractorDTO> => {
+        const response = await this.coinageData.postCreateContractor({ name }).toPromise();
+        return { id: response.insertedId ?? 0, name };
+    };
+
     get todayInputFormat(): string {
         const today = new Date().toLocaleDateString().split('.');
         return [today[2], today[1], today[0].padStart(2, '0')].join('-');
     }
 
     public clearInputData(): void {
-        this.transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: 0, contractor: 0 };
+        this.transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: undefined, contractor: undefined };
     }
 }

@@ -7,3 +7,4 @@ export * from './lib/ContractorDTO';
 export * from './lib/SplitTransferDTO.request';
 export * from './lib/BaseResponseDTO.response';
 export * from './lib/CreateEditCategoryDTO.request';
+export * from './lib/CreateEditContractorDTO.request';
