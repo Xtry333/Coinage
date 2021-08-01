@@ -115,6 +115,12 @@ export class CreateEditTransferComponent implements OnInit {
         return { id: response.insertedId ?? 0, name };
     };
 
+    public onChangeCategory(): void {
+        if (this.transferInput.category === 1 && this.transferInput.description === '') {
+            this.transferInput.description = 'Paliwo x.xx PLN/L Miejsce';
+        }
+    }
+
     get todayInputFormat(): string {
         const today = new Date().toLocaleDateString().split('.');
         return [today[2], today[1], today[0].padStart(2, '0')].join('-');

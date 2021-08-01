@@ -11,50 +11,50 @@
                     Category
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="'category'"
-                        (filter)="onFilter($event)"
-                        [filterType]="'textBox'"
-                        [popupSide]="'toRight'"
+                        [filterName]="TableColumns.Category"
+                        (filterEvent)="onFilter($event)"
+                        [filterType]="FilterTypes.TextBox"
+                        [popupSide]="PopupSides.ToRight"
                     ></coinage-app-table-filter>
                 </th>
                 <th>
                     Description
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="'description'"
-                        (filter)="onFilter($event)"
-                        [filterType]="'textBox'"
-                        [popupSide]="'toRight'"
+                        [filterName]="TableColumns.Description"
+                        (filterEvent)="onFilter($event)"
+                        [filterType]="FilterTypes.TextBox"
+                        [popupSide]="PopupSides.ToLeft"
                     ></coinage-app-table-filter>
                 </th>
                 <th>
                     Contractor
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="'contractor'"
-                        (filter)="onFilter($event)"
-                        [filterType]="'textBox'"
-                        [popupSide]="'toLeft'"
+                        [filterName]="TableColumns.Contractor"
+                        (filterEvent)="onFilter($event)"
+                        [filterType]="FilterTypes.TextBox"
+                        [popupSide]="PopupSides.ToLeft"
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
                     Amount
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="'amount'"
-                        (filter)="onFilter($event)"
-                        [filterType]="'amountRange'"
-                        [popupSide]="'toLeft'"
+                        [filterName]="TableColumns.Amount"
+                        (filterEvent)="onFilter($event)"
+                        [filterType]="FilterTypes.AmountRange"
+                        [popupSide]="PopupSides.ToLeft"
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
                     Date
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="'date'"
-                        (filter)="onFilter($event)"
-                        [filterType]="'dateRange'"
-                        [popupSide]="'toLeft'"
+                        [filterName]="TableColumns.Date"
+                        (filterEvent)="onFilter($event)"
+                        [filterType]="FilterTypes.DateRange"
+                        [popupSide]="PopupSides.ToLeft"
                     ></coinage-app-table-filter>
                 </th>
             </tr>

@@ -1,6 +1,14 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import { TransferDTO } from '@coinage-app/interfaces';
-import { FilterEvent } from './table-filter/table-filter.component';
+import { FilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
+
+export enum TableColumns {
+    Category = 'category',
+    Description = 'description',
+    Contractor = 'contractor',
+    Amount = 'amount',
+    Date = 'date',
+}
 
 export interface TableFilterFields {
     category?: string;
@@ -45,13 +53,13 @@ export class TransferTableComponent implements OnInit, OnChanges {
 
     public onFilter(ev: FilterEvent) {
         switch (ev.name) {
-            case 'category':
+            case TableColumns.Category:
                 this.filter.category = ev.value;
                 break;
-            case 'description':
+            case TableColumns.Description:
                 this.filter.description = ev.value;
                 break;
-            case 'contractor':
+            case TableColumns.Contractor:
                 this.filter.contractor = ev.value;
                 break;
         }
@@ -107,5 +115,17 @@ export class TransferTableComponent implements OnInit, OnChanges {
             }
         }
         return false;
+    }
+
+    get FilterTypes() {
+        return FilterTypes;
+    }
+
+    get PopupSides() {
+        return PopupSides;
+    }
+
+    get TableColumns() {
+        return TableColumns;
     }
 }

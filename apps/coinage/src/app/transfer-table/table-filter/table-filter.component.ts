@@ -1,5 +1,16 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { faCaretDown, faEdit, faFilter, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+
+export enum FilterTypes {
+    TextBox = 'textBox',
+    DateRange = 'dateRange',
+    AmountRange = 'amountRange',
+}
+
+export enum PopupSides {
+    ToRight = 'toRight',
+    ToLeft = 'toLeft',
+}
 
 export interface FilterEvent {
     value?: string;
@@ -22,44 +33,87 @@ export class TableFilterComponent implements OnInit {
     public filterAppliedIcon = faFilter;
     public isPopupDisplayed = false;
 
-    public filterEvent: FilterEvent = {
+    public filterValue: FilterEvent = {
         value: undefined,
         name: '',
     };
     public lastFilterValue?: FilterEvent;
 
+    @ViewChildren('filterInput')
+    private filterInput!: QueryList<ElementRef<HTMLInputElement>>;
+
+    @ViewChild('tableFilterElement')
+    private tableFilterElement!: ElementRef<HTMLInputElement>;
+
     @Input()
-    public popupSide = 'toRight';
+    public popupSide = PopupSides.ToRight;
+
     @Input()
-    public filterType = 'textBox';
+    public filterType = FilterTypes.TextBox;
+
     @Input()
     public filterName = '';
 
     @Output()
-    public filter = new EventEmitter<FilterEvent>();
+    public filterEvent = new EventEmitter<FilterEvent>();
 
-    ngOnInit(): void {
-        this.filterEvent.name = this.filterName;
+    @Output()
+    public openEvent = new EventEmitter<void>();
+
+    @Output()
+    public closeEvent = new EventEmitter<void>();
+
+    @Output()
+    public focusEvent = new EventEmitter<boolean>();
+
+    public ngOnInit(): void {
+        this.filterValue.name = this.filterName;
     }
 
-    onShowPopup(): void {
-        this.isPopupDisplayed = !this.isPopupDisplayed;
-        if (document.activeElement instanceof HTMLElement) {
-            document.activeElement.blur();
+    @HostListener('document:mousedown', ['$event'])
+    handleMousedown($event: MouseEvent) {
+        if (this.isPopupDisplayed) {
+            const target = $event.target as HTMLElement;
+            if (!this.tableFilterElement.nativeElement.contains(target)) {
+                this.onToggleOpenHide();
+            }
         }
     }
 
-    onDoFilter(): void {
-        this.filterEvent.value = this.filterEvent.value?.trim();
-        this.lastFilterValue = { ...this.filterEvent };
-        this.filter.emit(this.filterEvent);
+    public onToggleOpenHide(): void {
+        this.isPopupDisplayed = !this.isPopupDisplayed;
+        if (this.isPopupDisplayed) {
+            this.focus();
+            this.openEvent.emit();
+        } else {
+            this.closeEvent.emit();
+        }
+    }
+
+    private focus(): void {
+        setTimeout(() => {
+            this.filterInput.first?.nativeElement.focus();
+        }, 0);
+    }
+
+    public onFilterBlur() {
+        if (this.isPopupDisplayed) {
+            this.onToggleOpenHide();
+        }
+        this.focusEvent.emit(false);
+    }
+
+    public onDoFilter(): void {
+        this.filterValue.value = this.filterValue.value?.trim();
+        this.lastFilterValue = { ...this.filterValue };
+        this.filterEvent.emit(this.filterValue);
         this.isPopupDisplayed = false;
     }
 
-    onClear(): void {
-        this.filterEvent.value = undefined;
-        this.lastFilterValue = { ...this.filterEvent };
-        this.filter.emit(this.filterEvent);
+    public onClear(): void {
+        this.filterValue.value = undefined;
+        this.lastFilterValue = { ...this.filterValue };
+        this.filterEvent.emit(this.filterValue);
         this.isPopupDisplayed = false;
     }
 
@@ -75,14 +129,14 @@ export class TableFilterComponent implements OnInit {
     }
 
     get isFilterTextBox(): boolean {
-        return this.filterType === 'textBox';
+        return this.filterType === FilterTypes.TextBox;
     }
 
     get isFilterDateRange(): boolean {
-        return this.filterType === 'dateRange';
+        return this.filterType === FilterTypes.DateRange;
     }
 
     get isFilterAmountRange(): boolean {
-        return this.filterType === 'amountRange';
+        return this.filterType === FilterTypes.AmountRange;
     }
 }
