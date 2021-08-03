@@ -15,6 +15,7 @@
                         (filterEvent)="onFilter($event)"
                         [filterType]="FilterTypes.TextBox"
                         [popupSide]="PopupSides.ToRight"
+                        [datalist]="categoryNames"
                     ></coinage-app-table-filter>
                 </th>
                 <th>
@@ -35,6 +36,7 @@
                         (filterEvent)="onFilter($event)"
                         [filterType]="FilterTypes.TextBox"
                         [popupSide]="PopupSides.ToLeft"
+                        [datalist]="contractorNames"
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
@@ -82,7 +84,7 @@
                 <td></td>
             </tr>
             <tr *ngIf="noRowsFound">
-                <td colspan="4">
+                <td colspan="5">
                     No transfers found.
                     <span *ngIf="isAnyFilterApplied && !noRows"> Please check filters, there are {{ transfers?.length }} unmatched transfers. </span>
                 </td>

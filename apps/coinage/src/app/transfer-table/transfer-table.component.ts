@@ -1,5 +1,7 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import * as Rx from 'rxjs';
 import { TransferDTO } from '@coinage-app/interfaces';
+import { CoinageDataService } from '../services/coinageData.service';
 import { FilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
 
 export enum TableColumns {
@@ -26,21 +28,37 @@ export class TransferTableComponent implements OnInit, OnChanges {
     public static EMPTY_CONTRACTOR = '-';
     public static EMPTY_DESCRIPTION = '-';
 
+    public FilterTypes = FilterTypes;
+    public PopupSides = PopupSides;
+    public TableColumns = TableColumns;
+
     private filter: TableFilterFields = { category: '', contractor: '', description: '' };
     public outcomesSum = 0;
 
+    public transfersForTable: TransferDTO[] = [];
+    public categoryNames: string[] = [];
+    public contractorNames: string[] = [];
+
     @Input()
     tableHeader?: string;
+
     @Input()
     transfers?: TransferDTO[];
-
-    transfersForTable: TransferDTO[] = [];
 
     @Input()
     showFilters?: boolean = false;
 
+    constructor(private readonly dataService: CoinageDataService) {}
+
     public ngOnInit(): void {
         this.doFiltering();
+
+        if (this.showFilters) {
+            Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList()).subscribe(([categories, contractors]) => {
+                this.categoryNames = categories.map((c) => c.name);
+                this.contractorNames = contractors.map((c) => c.name);
+            });
+        }
     }
 
     public ngOnChanges(): void {
@@ -115,17 +133,5 @@ export class TransferTableComponent implements OnInit, OnChanges {
             }
         }
         return false;
-    }
-
-    get FilterTypes() {
-        return FilterTypes;
-    }
-
-    get PopupSides() {
-        return PopupSides;
-    }
-
-    get TableColumns() {
-        return TableColumns;
     }
 }

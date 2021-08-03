@@ -19,6 +19,8 @@ export interface TransferInput {
     styleUrls: ['./create-edit-transfer.component.scss'],
 })
 export class CreateEditTransferComponent implements OnInit {
+    public static FUEL_TEMPLATE = 'Paliwo x,xx PLN/L Miejsce';
+
     showPage = true;
     totalPayment = 0;
     categories: CategoryDTO[] = [];
@@ -26,8 +28,6 @@ export class CreateEditTransferComponent implements OnInit {
     editMode = false;
     transferDTO!: TransferDetailsDTO;
     transferId!: number;
-
-    enableExperimental = true;
 
     @Input()
     redirectAfterSave = true;
@@ -117,7 +117,7 @@ export class CreateEditTransferComponent implements OnInit {
 
     public onChangeCategory(): void {
         if (this.transferInput.category === 1 && this.transferInput.description === '') {
-            this.transferInput.description = 'Paliwo x.xx PLN/L Miejsce';
+            this.transferInput.description = CreateEditTransferComponent.FUEL_TEMPLATE;
         }
     }
 

@@ -28,6 +28,8 @@ export interface FilterOption {
     styleUrls: ['./table-filter.component.scss'],
 })
 export class TableFilterComponent implements OnInit {
+    public PopupSides = PopupSides;
+
     public filterDefaultIcon = faCaretDown;
     public filterOpenIcon = faEdit;
     public filterAppliedIcon = faFilter;
@@ -53,6 +55,9 @@ export class TableFilterComponent implements OnInit {
 
     @Input()
     public filterName = '';
+
+    @Input()
+    public datalist: string[] = [];
 
     @Output()
     public filterEvent = new EventEmitter<FilterEvent>();
@@ -126,6 +131,14 @@ export class TableFilterComponent implements OnInit {
             return this.filterOpenIcon;
         }
         return this.isFilterApplied ? this.filterAppliedIcon : this.filterDefaultIcon;
+    }
+
+    get popupSideClass(): string {
+        return this.popupSide === PopupSides.ToLeft ? 'right' : 'left';
+    }
+
+    get filterDataProvided(): boolean {
+        return this.datalist.length > 0;
     }
 
     get isFilterTextBox(): boolean {

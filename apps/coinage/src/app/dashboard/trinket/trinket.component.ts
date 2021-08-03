@@ -14,6 +14,7 @@ export class TrinketComponent implements OnInit, OnChanges {
 
     public closeIcon = faTimes;
 
+    @Input() closeable = true;
     @Input() isDisplayed = false;
 
     @Output() hideModal: EventEmitter<void> = new EventEmitter();

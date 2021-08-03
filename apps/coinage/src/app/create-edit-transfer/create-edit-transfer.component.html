@@ -52,7 +52,7 @@
                 <div *ngIf="editMode">Save</div>
                 <div *ngIf="!editMode">Create</div>
             </button>
-            <button *ngIf="editMode" (click)="onClickDeleteTransfer()">Delete</button>
+            <button *ngIf="editMode" (click)="onClickDeleteTransfer()" type="button">Delete</button>
         </div>
     </form>
 </div>

@@ -2,13 +2,22 @@
     <button class="filter-icon-btn" (click)="onToggleOpenHide()">
         <fa-icon class="icon" [icon]="filterIcon"></fa-icon>
     </button>
-    <div *ngIf="isPopupDisplayed" class="filter-popup" [ngClass]="popupSide === 'toLeft' ? 'right' : 'left'">
+    <div *ngIf="isPopupDisplayed" class="filter-popup" [ngClass]="popupSideClass">
         <form (ngSubmit)="onDoFilter()">
             <span *ngIf="isFilterTextBox">
-                <input #filterInput name="filterValue" [(ngModel)]="filterValue.value" />
+                <input
+                    list="filterInputValues"
+                    #filterInput
+                    name="filterValue"
+                    [(ngModel)]="filterValue.value"
+                    [autocomplete]="filterDataProvided ? 'off' : ''"
+                />
+                <datalist *ngIf="filterDataProvided" id="filterInputValues">
+                    <option *ngFor="let opt of datalist" [value]="opt"></option>
+                </datalist>
             </span>
             <span *ngIf="isFilterDateRange || isFilterAmountRange">
-                <span>Hey. That's not implemented!</span>
+                <span>Not implemented!</span>
             </span>
             <button type="submit">Apply</button>
             <button type="reset" (click)="onClear()">Clear</button>

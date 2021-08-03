@@ -178,7 +178,7 @@ export class TransfersController {
         entity.contractor = transfer.contractorId ? await this.contractorService.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         if (entity.category.name === 'Paliwo') {
             try {
-                entity.metadata = { unitPrice: entity.description.split(' ')[1], location: entity.description.split(' ')[3] };
+                entity.metadata = { unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')), location: entity.description.split(' ')[3] };
             } catch (e) {
                 console.log('Could not set metadata for transfer on', entity.date);
                 console.log(e);

@@ -7,7 +7,6 @@ import { CoinageDataService } from '../services/coinageData.service';
 
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ApiPathsModule } from '@coinage-app/router';
 import { of } from 'rxjs';
 
 describe('CreateEditTransferComponent', () => {
