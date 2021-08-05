@@ -29,7 +29,7 @@ export interface TransferDetailsDTO {
     description: string;
     amount: number;
     type: string;
-    account?: AccountDTO;
+    account: AccountDTO;
     categoryPath: CategoryPathDTO[];
     categoryId: number;
     contractor?: string;

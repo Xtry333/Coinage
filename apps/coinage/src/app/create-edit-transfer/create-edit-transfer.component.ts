@@ -58,6 +58,7 @@ export class CreateEditTransferComponent implements OnInit {
                         date: t.date,
                         description: t.description,
                         contractor: t.contractorId ?? undefined,
+                        account: t.account.id,
                     };
                 });
             }
