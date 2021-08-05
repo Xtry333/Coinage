@@ -1,8 +1,0 @@
-<div id="fresh-trinket-container" class="trinket-container" [ngClass]="{ hidden: !isDisplayed }">
-    <div class="trinket" *ngIf="isDisplayed">
-        <div *ngIf="closeable" class="float-right">
-            <button class="btn-close" (click)="hideTrinket()"><fa-icon [icon]="closeIcon"></fa-icon></button>
-        </div>
-        <ng-content></ng-content>
-    </div>
-</div>

@@ -17,11 +17,11 @@
     </div>
 </header>
 <main>
-    <coinage-app-trinket [isDisplayed]="isTrinketDisplayed" (hideModal)="hideTrinketModal()">
+    <coinage-app-modal [isDisplayed]="isTrinketDisplayed" (hideModalEvent)="hideTrinketModal()">
         <div>
             <coinage-app-create-transfer (saveSuccess)="hideTrinketModal(); forceDashboardRefresh()" [redirectAfterSave]="false"></coinage-app-create-transfer>
         </div>
-    </coinage-app-trinket>
+    </coinage-app-modal>
     <router-outlet (activate)="onActivateRoute($event)"></router-outlet>
 </main>
 <div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">

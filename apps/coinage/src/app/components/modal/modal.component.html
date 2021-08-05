@@ -1,0 +1,8 @@
+<div #modalContainer id="fresh-modal-container" class="modal-container" [ngClass]="{ hidden: !isDisplayed, moveable: moveable }">
+    <div class="modal" *ngIf="isDisplayed">
+        <div *ngIf="closeable" class="float-right">
+            <button class="btn-close" (click)="hideModal()"><fa-icon [icon]="closeIcon"></fa-icon></button>
+        </div>
+        <ng-content></ng-content>
+    </div>
+</div>

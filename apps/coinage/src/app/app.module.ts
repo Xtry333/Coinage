@@ -17,7 +17,7 @@ import { SummaryComponent } from './summary/summary.component';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
 import { TransferTableComponent } from './transfer-table/transfer-table.component';
-import { TrinketComponent } from './dashboard/trinket/trinket.component';
+import { ModalComponent } from './components/modal/modal.component';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 import { TableFilterComponent } from './transfer-table/table-filter/table-filter.component';
 import { AppRoutingModule } from './app-routing/app-routing.module';
@@ -34,7 +34,7 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
         CreateEditTransferComponent,
         CategoryListItemComponent,
         TransferTableComponent,
-        TrinketComponent,
+        ModalComponent,
         TransfersListComponent,
         TableFilterComponent,
     ],
