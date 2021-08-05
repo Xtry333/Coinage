@@ -1,12 +1,12 @@
 import { BaseResponseDTO, ContractorDTO, CreateEditContractorDTO } from '@coinage-app/interfaces';
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { Contractor } from '../entity/Contractor.entity';
+import { Contractor } from '../entities/Contractor.entity';
 
-import { ContractorService } from '../services/contractor.service';
+import { ContractorDao } from '../daos/contractor.dao';
 
 @Controller('contractor')
 export class ContractorController {
-    constructor(private readonly contractorService: ContractorService) {}
+    constructor(private readonly contractorService: ContractorDao) {}
 
     @Get('/list')
     async getCategoryList(): Promise<ContractorDTO[]> {

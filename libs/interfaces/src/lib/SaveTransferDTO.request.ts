@@ -4,5 +4,6 @@ export interface SaveTransferDTO {
     amount: number;
     categoryId: number;
     contractorId: number;
+    accountId: number;
     date: string;
 }

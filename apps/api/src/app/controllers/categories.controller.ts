@@ -1,19 +1,19 @@
 import { BaseResponseDTO, CategoryDTO, CreateEditCategoryDTO, TotalInMonthByCategory } from '@coinage-app/interfaces';
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { Category } from '../entity/Category.entity';
+import { Category } from '../entities/Category.entity';
 
-import { CategoryService } from '../services/category.service';
+import { CategoryDao as CategoryDao } from '../daos/category.dao';
 
 @Controller('category')
 export class CategoriesController {
-    constructor(private readonly categoryService: CategoryService) {}
+    constructor(private readonly categoryDao: CategoryDao) {}
 
     @Post('save')
     async saveCategory(@Body() category: CreateEditCategoryDTO): Promise<BaseResponseDTO> {
         let entity: Category;
 
         if (category.id) {
-            const result = await this.categoryService.getById(category.id);
+            const result = await this.categoryDao.getById(category.id);
             if (result) {
                 entity = result;
             } else {
@@ -25,14 +25,14 @@ export class CategoriesController {
 
         entity.name = category.name;
 
-        const inserted = await this.categoryService.save(entity);
+        const inserted = await this.categoryDao.save(entity);
 
         return { insertedId: inserted.id };
     }
 
     @Get('/list')
     async getCategoryList(): Promise<CategoryDTO[]> {
-        const categories = await this.categoryService.getAll();
+        const categories = await this.categoryDao.getAll();
         return categories
             .map((c) => {
                 return {
@@ -46,7 +46,7 @@ export class CategoriesController {
 
     @Get('/tree')
     async getCategoryTree(): Promise<CategoryDTO[]> {
-        const categories = await this.categoryService.getAll();
+        const categories = await this.categoryDao.getAll();
         const roots = categories.filter((c) => c.parentId == null).map((c) => this.mapToTree(c, categories));
         return roots;
     }
@@ -65,7 +65,7 @@ export class CategoriesController {
         const yearNum = parseInt(year),
             monthNum = parseInt(month);
         if (yearNum) {
-            return await this.categoryService.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : undefined);
+            return await this.categoryDao.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : undefined);
         } else {
             return [];
         }

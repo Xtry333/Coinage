@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Equal, getConnection } from 'typeorm';
-import { Category } from './entity/Category.entity';
-import { Transfer } from './entity/Transfer.entity';
+import { Category } from './entities/Category.entity';
+import { Transfer } from './entities/Transfer.entity';
 
 @Injectable()
 export class AppService {
@@ -26,10 +26,7 @@ export class AppService {
         return transfer;
     }
 
-    async getTransferByDateContractor(
-        date: string,
-        contractorId: number
-    ): Promise<Transfer[]> {
+    async getTransferByDateContractor(date: string, contractorId: number): Promise<Transfer[]> {
         const transfers = await getConnection()
             .getRepository(Transfer)
             .find({

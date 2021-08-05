@@ -44,6 +44,20 @@
                 </ng-select>
             </div>
             <div>
+                <label for="account">Virtual Account</label>
+                <ng-select
+                    name="account"
+                    labelForId="account"
+                    [(ngModel)]="transferInput.account"
+                    [clearable]="false"
+                    [editableSearchTerm]="true"
+                    [items]="accounts"
+                    bindLabel="name"
+                    bindValue="id"
+                >
+                </ng-select>
+            </div>
+            <div>
                 <label for="date">Date</label>
                 <input id="date" name="date" type="date" [(ngModel)]="transferInput.date" required />
             </div>

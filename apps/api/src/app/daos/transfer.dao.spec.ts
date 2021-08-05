@@ -1,21 +1,21 @@
 import { TestBed } from '@angular/core/testing';
 
-import { TransferService } from './transfer.service';
+import { TransferDao } from './transfer.dao';
 
-describe('TransferService', () => {
-    let service: TransferService;
+describe('TransferDao', () => {
+    let dao: TransferDao;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(TransferService);
+        dao = TestBed.inject(TransferDao);
     });
 
     it('should be created', () => {
-        expect(service).toBeTruthy();
+        expect(dao).toBeTruthy();
     });
 
     it('should return by id', async () => {
-        const transfer = await service.getById(1);
+        const transfer = await dao.getById(1);
         expect(transfer).toBeDefined();
     });
 });

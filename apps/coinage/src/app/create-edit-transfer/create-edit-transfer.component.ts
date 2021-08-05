@@ -11,6 +11,7 @@ export interface TransferInput {
     date: string;
     category?: number;
     contractor?: number;
+    account?: number;
 }
 
 @Component({
@@ -25,18 +26,19 @@ export class CreateEditTransferComponent implements OnInit {
     totalPayment = 0;
     categories: CategoryDTO[] = [];
     contractors: ContractorDTO[] = [];
+    accounts: { id: number; name: string }[] = [
+        { id: 1, name: 'Michał' },
+        { id: 2, name: 'Paulina' },
+        { id: 4, name: 'Willa Woźniak' },
+    ];
     editMode = false;
     transferDTO!: TransferDetailsDTO;
     transferId!: number;
 
-    @Input()
-    redirectAfterSave = true;
+    @Input() redirectAfterSave = true;
+    @Input() transferInput!: TransferInput;
 
-    @Input()
-    transferInput!: TransferInput;
-
-    @Output()
-    saveSuccess: EventEmitter<TransferDTO> = new EventEmitter();
+    @Output() saveSuccess: EventEmitter<TransferDTO> = new EventEmitter();
 
     constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
 
@@ -80,6 +82,7 @@ export class CreateEditTransferComponent implements OnInit {
             amount: parseFloat(this.transferInput.amount?.toString()) ?? null,
             categoryId: this.transferInput.category ?? 0,
             contractorId: this.transferInput.contractor ?? 0,
+            accountId: this.transferInput.account ?? 0,
             date: this.transferInput.date,
         };
         this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
@@ -127,6 +130,6 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     public clearInputData(): void {
-        this.transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: undefined, contractor: undefined };
+        this.transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: undefined, contractor: undefined, account: 1 };
     }
 }

@@ -1,20 +1,20 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
 import { BaseResponseDTO, SaveTransferDTO, SplitTransferDTO, TotalAmountPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
-import { TransferService } from '../services/transfer.service';
-import { Category, TransferType } from '../entity/Category.entity';
+import { TransferDao } from '../daos/transfer.dao';
+import { Category, TransferType } from '../entities/Category.entity';
 import { AppService } from '../app.service';
-import { CategoryService } from '../services/category.service';
-import { Transfer } from '../entity/Transfer.entity';
-import { ContractorService } from '../services/contractor.service';
+import { CategoryDao } from '../daos/category.dao';
+import { Transfer } from '../entities/Transfer.entity';
+import { ContractorDao } from '../daos/contractor.dao';
 
 @Controller('transfer')
 export class TransfersController {
     constructor(
-        private readonly transferService: TransferService,
+        private readonly transferService: TransferDao,
         private readonly appService: AppService,
-        private readonly categoryService: CategoryService,
-        private readonly contractorService: ContractorService
+        private readonly categoryDao: CategoryDao,
+        private readonly contractorService: ContractorDao
     ) {}
 
     @Get('all')
@@ -158,7 +158,8 @@ export class TransfersController {
         console.log(transfer);
         console.log(transfer.date);
         let entity: Transfer;
-        const category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
+        const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
+        //const account = await this.acc.getById(parseInt(transfer.categoryId?.toString()));
         if (transfer.id) {
             entity = await this.transferService.getById(transfer.id);
         } else {
@@ -175,6 +176,7 @@ export class TransfersController {
         } else {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
+        entity.accountId = transfer.accountId;
         entity.contractor = transfer.contractorId ? await this.contractorService.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         if (entity.category.name === 'Paliwo') {
             try {
@@ -191,7 +193,7 @@ export class TransfersController {
 
     @Post('split')
     async splitTransferObject(@Body() transfer: SplitTransferDTO): Promise<BaseResponseDTO> {
-        const category = await this.categoryService.getById(parseInt(transfer.categoryId?.toString()));
+        const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
         const id = parseInt(transfer.id?.toString());
         const target = await this.transferService.getById(id);
         target.amount = (parseFloat(target.amount) - transfer.amount).toString();
