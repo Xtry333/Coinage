@@ -11,15 +11,15 @@ import { ContractorDao } from '../daos/contractor.dao';
 @Controller('transfer')
 export class TransfersController {
     constructor(
-        private readonly transferService: TransferDao,
+        private readonly transferDao: TransferDao,
         private readonly appService: AppService,
         private readonly categoryDao: CategoryDao,
-        private readonly contractorService: ContractorDao
+        private readonly contractorDao: ContractorDao
     ) {}
 
     @Get('all')
     async getAllTransactions(): Promise<TransferDTO[]> {
-        return (await this.transferService.getAll()).map((t) => {
+        return (await this.transferDao.getAll()).map((t) => {
             return {
                 id: t.id,
                 description: t.description,
@@ -36,18 +36,20 @@ export class TransfersController {
     @Get('recent')
     async getRecentTransactions(): Promise<TransferDTO[]> {
         const recentCount = 10;
-        return (await this.transferService.getAllLimited(recentCount)).map((t) => {
-            return {
-                id: t.id,
-                description: t.description,
-                amount: parseFloat(t.amount),
-                type: t.type,
-                categoryId: t.category?.id,
-                category: t.category?.name,
-                contractor: t.contractor?.name,
-                date: t.date,
-            };
-        });
+        return (await this.transferDao.getAllLimited(recentCount))
+            .sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
+            .map((t) => {
+                return {
+                    id: t.id,
+                    description: t.description,
+                    amount: parseFloat(t.amount),
+                    type: t.type,
+                    categoryId: t.category?.id,
+                    category: t.category?.name,
+                    contractor: t.contractor?.name,
+                    date: t.date,
+                };
+            });
     }
 
     @Get('details/:id')
@@ -56,7 +58,7 @@ export class TransfersController {
         if (!id) {
             throw new Error('Invalid ID provided');
         }
-        const transfer = await this.transferService.getById(id);
+        const transfer = await this.transferDao.getById(id);
         const categoryPath: Category[] = [];
         categoryPath.push(transfer.category);
         let parentCat = await transfer.category.parent;
@@ -69,7 +71,7 @@ export class TransfersController {
             }
         }
 
-        const otherTransfers: TransferDTO[] = (await this.transferService.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
+        const otherTransfers: TransferDTO[] = (await this.transferDao.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
             .filter((t) => t.id !== transfer.id)
             .map((t) => {
                 return {
@@ -93,7 +95,7 @@ export class TransfersController {
             contractor: transfer.contractor?.name,
             contractorId: transfer.contractor?.id,
             categoryId: transfer.category.id,
-            account: transfer.account,
+            account: { id: transfer.account?.id ?? 0, name: transfer.account?.name ?? '' },
             otherTransfers: otherTransfers,
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
@@ -105,7 +107,7 @@ export class TransfersController {
     @Get('/totalOutcomesPerMonth')
     async getLastTotalOutcomesPerMonth(): Promise<TotalAmountPerMonthDTO[]> {
         // TODO: Join queries into one async
-        const outcomes = (await this.transferService.getLimitedTotalMonthlyAmount(1, TransferType.Outcome)).map((outcome) => {
+        const outcomes = (await this.transferDao.getLimitedTotalMonthlyAmount(1, TransferType.Outcome)).map((outcome) => {
             return {
                 year: outcome.year,
                 month: outcome.month - 1,
@@ -113,7 +115,7 @@ export class TransfersController {
                 transactionsCount: outcome.count,
             };
         });
-        const incomes = (await this.transferService.getLimitedTotalMonthlyAmount(1, TransferType.Income)).map((income) => {
+        const incomes = (await this.transferDao.getLimitedTotalMonthlyAmount(1, TransferType.Income)).map((income) => {
             return {
                 year: income.year,
                 month: income.month - 1,
@@ -161,7 +163,7 @@ export class TransfersController {
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
         //const account = await this.acc.getById(parseInt(transfer.categoryId?.toString()));
         if (transfer.id) {
-            entity = await this.transferService.getById(transfer.id);
+            entity = await this.transferDao.getById(transfer.id);
         } else {
             entity = new Transfer();
         }
@@ -169,7 +171,10 @@ export class TransfersController {
         entity.amount = transfer.amount.toString();
         entity.date = transfer.date;
         entity.accountId = 1;
-        entity.createdDate = new Date();
+        if (!entity.createdDate) {
+            entity.createdDate = new Date();
+        }
+        entity.editedDate = new Date();
         if (category) {
             entity.category = category;
             entity.type = category.type;
@@ -177,7 +182,7 @@ export class TransfersController {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
         entity.accountId = transfer.accountId;
-        entity.contractor = transfer.contractorId ? await this.contractorService.getById(parseInt(transfer.contractorId?.toString())) : undefined;
+        entity.contractor = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         if (entity.category.name === 'Paliwo') {
             try {
                 entity.metadata = { unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')), location: entity.description.split(' ')[3] };
@@ -186,7 +191,7 @@ export class TransfersController {
                 console.log(e);
             }
         }
-        const inserted = await this.transferService.save(entity);
+        const inserted = await this.transferDao.save(entity);
         console.log(inserted);
         return { insertedId: inserted.id };
     }
@@ -195,7 +200,7 @@ export class TransfersController {
     async splitTransferObject(@Body() transfer: SplitTransferDTO): Promise<BaseResponseDTO> {
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
         const id = parseInt(transfer.id?.toString());
-        const target = await this.transferService.getById(id);
+        const target = await this.transferDao.getById(id);
         target.amount = (parseFloat(target.amount) - transfer.amount).toString();
         const entity = new Transfer();
         entity.description = transfer.description;
@@ -205,7 +210,10 @@ export class TransfersController {
         }
         entity.date = target.date;
         entity.accountId = target.accountId;
-        entity.createdDate = new Date();
+        if (!entity.createdDate) {
+            entity.createdDate = new Date();
+        }
+        entity.editedDate = new Date();
         if (category) {
             entity.category = category;
             entity.type = category.type;
@@ -213,13 +221,13 @@ export class TransfersController {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
         entity.contractor = target.contractor;
-        const inserted = await this.transferService.insert(entity);
-        await this.transferService.save(target);
+        const inserted = await this.transferDao.insert(entity);
+        await this.transferDao.save(target);
         return { insertedId: inserted.identifiers[0].id };
     }
 
     @Delete(':id')
     async removeTransferObject(@Param('id') id: number) {
-        return (await this.transferService.deleteById(id)).affected == 1;
+        return (await this.transferDao.deleteById(id)).affected == 1;
     }
 }

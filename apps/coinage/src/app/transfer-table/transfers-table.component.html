@@ -1,5 +1,5 @@
-<div class="transfer-table-container">
-    <table class="transfer-table">
+<div class="transfers-table-container">
+    <table class="transfers-table">
         <caption *ngIf="isHeaderDisplayed">
             {{
                 tableHeader
@@ -77,10 +77,16 @@
                     <a [routerLink]="['/summary', transfer.date]">{{ transfer.date | date }}</a>
                 </td>
             </tr>
-            <tr *ngIf="!noRows" class="sum-row">
-                <td colspan="2">Outcomes Sum</td>
-                <td>{{ transfersForTable.length }}</td>
+            <tr *ngIf="!noRows" class="sum-row top-border">
+                <td colspan="2">Expenses Sum</td>
+                <td>{{ outcomesCount }}</td>
                 <td class="currency">{{ outcomesSum | plnCurrency }}</td>
+                <td></td>
+            </tr>
+            <tr *ngIf="!noRows" class="sum-row">
+                <td colspan="2">Incomes Sum</td>
+                <td>{{ incomesCount }}</td>
+                <td class="currency">{{ incomesSum | plnCurrency }}</td>
                 <td></td>
             </tr>
             <tr *ngIf="noRowsFound">

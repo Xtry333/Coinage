@@ -19,7 +19,6 @@ describe('CreateEditTransferComponent', () => {
             declarations: [CreateEditTransferComponent],
             providers: [
                 AppRoutingModule,
-                ApiPathsModule,
                 {
                     provide: ActivatedRoute,
                     useValue: {

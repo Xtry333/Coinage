@@ -1,0 +1,72 @@
+div.notification {
+    z-index: 99;
+    position: relative;
+    // border-radius: 5px;
+    background-color: rgb(252, 252, 252);
+    border: gray 2px solid;
+    padding: 10px;
+    width: 350px;
+    margin: 5px;
+    overflow: hidden;
+
+    .btn-group {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        .btn-dismiss {
+            display: block;
+            cursor: pointer;
+            //padding: 0px 5.5px;
+            text-align: center;
+            border-radius: 5px;
+            //border: gray 2px solid;
+            border: 0;
+            width: 21px;
+            height: 21px;
+            // &::after {
+            //     content: '\00d7';
+            //     font-size: 19px;
+            //     // line-height: 19px;
+            //     display: inline-block;
+            // }
+
+            &:hover {
+                background-color: lightgray;
+            }
+        }
+
+        .btn-goto {
+            display: block;
+            cursor: pointer;
+            //padding: 0px 5.5px;
+            text-align: center;
+            border-radius: 5px;
+            margin-top: 5px;
+            //border: gray 2px solid;
+            border: 0;
+            width: 21px;
+            height: 21px;
+            // &::after {
+            //     content: '\00d7';
+            //     font-size: 19px;
+            //     // line-height: 19px;
+            //     display: inline-block;
+            // }
+
+            &:hover {
+                background-color: lightgray;
+            }
+        }
+    }
+
+    .title {
+        font-weight: bold;
+    }
+
+    .text {
+        margin-top: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 300px;
+    }
+}

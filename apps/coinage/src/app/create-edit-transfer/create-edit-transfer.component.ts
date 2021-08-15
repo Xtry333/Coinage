@@ -1,17 +1,19 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { CoinageDataService } from '../services/coinageData.service';
+import { NotificationService } from '../services/notification.service';
 
-export interface TransferInput {
+export interface NewTransferObject {
     description: string;
     amount: number;
     date: string;
-    category?: number;
-    contractor?: number;
-    account?: number;
+    categoryId?: number;
+    contractorId?: number;
+    accountId?: number;
 }
 
 @Component({
@@ -35,12 +37,23 @@ export class CreateEditTransferComponent implements OnInit {
     transferDTO!: TransferDetailsDTO;
     transferId!: number;
 
+    @ViewChildren('categorySelect')
+    private categorySelect?: QueryList<NgSelectComponent>;
+
+    @ViewChildren('contractorSelect')
+    private contractorSelect?: QueryList<NgSelectComponent>;
+
     @Input() redirectAfterSave = true;
-    @Input() transferInput!: TransferInput;
+    @Input() selectedTransferInputs!: NewTransferObject;
 
     @Output() saveSuccess: EventEmitter<TransferDTO> = new EventEmitter();
 
-    constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
+    constructor(
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
+        private readonly coinageData: CoinageDataService,
+        private readonly notificationService: NotificationService
+    ) {}
 
     ngOnInit(): void {
         this.showPage = false;
@@ -52,13 +65,13 @@ export class CreateEditTransferComponent implements OnInit {
                 this.coinageData.getTransferDetails(id).then((t) => {
                     this.transferDTO = t;
                     this.editMode = true;
-                    this.transferInput = {
+                    this.selectedTransferInputs = {
                         amount: t.amount,
-                        category: t.categoryId,
+                        categoryId: t.categoryId,
                         date: t.date,
                         description: t.description,
-                        contractor: t.contractorId ?? undefined,
-                        account: t.account.id,
+                        contractorId: t.contractorId ?? undefined,
+                        accountId: t.account.id,
                     };
                 });
             }
@@ -76,21 +89,22 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     onClickSaveTransfer(): void {
-        console.log(this.transferInput);
+        console.log(this.selectedTransferInputs);
         const newTransfer: SaveTransferDTO = {
             id: this.transferId,
-            description: this.transferInput.description,
-            amount: parseFloat(this.transferInput.amount?.toString()) ?? null,
-            categoryId: this.transferInput.category ?? 0,
-            contractorId: this.transferInput.contractor ?? 0,
-            accountId: this.transferInput.account ?? 0,
-            date: this.transferInput.date,
+            description: this.selectedTransferInputs.description,
+            amount: parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
+            categoryId: this.selectedTransferInputs.categoryId ?? 0,
+            contractorId: this.selectedTransferInputs.contractorId ?? 0,
+            accountId: this.selectedTransferInputs.accountId ?? 0,
+            date: this.selectedTransferInputs.date,
         };
         this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
             if (result.insertedId && cat) {
                 this.saveSuccess.emit({ ...newTransfer, id: result.insertedId, category: cat.name, type: '' });
+                this.notificationService.push({ title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`, message: newTransfer.description });
                 this.clearInputData();
             }
             if (this.redirectAfterSave) {
@@ -103,6 +117,10 @@ export class CreateEditTransferComponent implements OnInit {
         if (confirm('Are you sure you want to delete this transfer?')) {
             this.coinageData.deleteTransfer(this.transferId).subscribe((result) => {
                 if (result) {
+                    this.notificationService.push({
+                        title: `Transfer Removed`,
+                        message: `Transfer with ${this.selectedTransferInputs.description} has been deleted.`,
+                    });
                     this.router.navigateByUrl(`/dashboard`);
                 }
             });
@@ -111,17 +129,19 @@ export class CreateEditTransferComponent implements OnInit {
 
     public onAddNewCategory = async (name: string): Promise<CategoryDTO> => {
         const response = await this.coinageData.postCreateCategory({ name }).toPromise();
+        this.notificationService.push({ title: `Category Created`, message: name });
         return { id: response.insertedId ?? 0, name };
     };
 
     public onAddNewContractor = async (name: string): Promise<ContractorDTO> => {
         const response = await this.coinageData.postCreateContractor({ name }).toPromise();
+        this.notificationService.push({ title: `Contractor Created`, message: name });
         return { id: response.insertedId ?? 0, name };
     };
 
     public onChangeCategory(): void {
-        if (this.transferInput.category === 1 && this.transferInput.description === '') {
-            this.transferInput.description = CreateEditTransferComponent.FUEL_TEMPLATE;
+        if (this.selectedTransferInputs.categoryId === 1 && this.selectedTransferInputs.description === '') {
+            this.selectedTransferInputs.description = CreateEditTransferComponent.FUEL_TEMPLATE;
         }
     }
 
@@ -131,6 +151,8 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     public clearInputData(): void {
-        this.transferInput = { description: '', amount: 0, date: this.todayInputFormat, category: undefined, contractor: undefined, account: 1 };
+        this.selectedTransferInputs = { description: '', amount: 0, date: this.todayInputFormat, categoryId: undefined, contractorId: undefined, accountId: 1 };
+        this.categorySelect?.first.handleClearClick();
+        this.contractorSelect?.first.handleClearClick();
     }
 }

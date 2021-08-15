@@ -6,8 +6,8 @@
         <form (ngSubmit)="onDoFilter()">
             <span *ngIf="isFilterTextBox">
                 <input
-                    list="filterInputValues"
                     #filterInput
+                    list="filterInputValues"
                     name="filterValue"
                     [(ngModel)]="filterValue.value"
                     [autocomplete]="filterDataProvided ? 'off' : ''"

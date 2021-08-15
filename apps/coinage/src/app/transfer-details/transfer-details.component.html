@@ -12,7 +12,7 @@
     <pre>Date: {{ transfer.date }}</pre>
     <pre>Type: {{ transfer.type }}</pre>
     <div *ngIf="transfer.account">
-        <pre>Account: {{ transfer.account!.name }}</pre>
+        <pre>Account: {{ transfer.account.name }}</pre>
     </div>
     <div *ngIf="transfer.contractor">
         <pre>Contractor: {{ transfer?.contractor }}</pre>

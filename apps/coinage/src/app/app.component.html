@@ -23,6 +23,7 @@
         </div>
     </coinage-app-modal>
     <router-outlet (activate)="onActivateRoute($event)"></router-outlet>
+    <coinage-app-notifications-container></coinage-app-notifications-container>
 </main>
 <div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">
     <coinage-app-spinner></coinage-app-spinner>

@@ -1,6 +1,7 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
@@ -16,11 +17,13 @@ import { CategoryManagerComponent } from './category-manager/category-manager.co
 import { SummaryComponent } from './summary/summary.component';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
-import { TransferTableComponent } from './transfer-table/transfer-table.component';
+import { TransfersTableComponent } from './transfer-table/transfers-table.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 import { TableFilterComponent } from './transfer-table/table-filter/table-filter.component';
 import { AppRoutingModule } from './app-routing/app-routing.module';
+import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
+import { NotificationComponent } from './notifications-container/notification/notification.component';
 
 @NgModule({
     declarations: [
@@ -33,12 +36,14 @@ import { AppRoutingModule } from './app-routing/app-routing.module';
         CategoryManagerComponent,
         CreateEditTransferComponent,
         CategoryListItemComponent,
-        TransferTableComponent,
+        TransfersTableComponent,
         ModalComponent,
         TransfersListComponent,
         TableFilterComponent,
+        NotificationsContainerComponent,
+        NotificationComponent,
     ],
-    imports: [BrowserModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
+    imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [
         {
             provide: HTTP_INTERCEPTORS,

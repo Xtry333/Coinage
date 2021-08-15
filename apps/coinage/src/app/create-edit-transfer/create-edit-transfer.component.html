@@ -1,20 +1,21 @@
 <div *ngIf="showPage">
-    <form (submit)="onClickSaveTransfer()">
+    <form (ngSubmit)="onClickSaveTransfer()">
         <div class="transaction-form">
             <div>
                 <label for="description">Description</label>
-                <input id="description" name="description" [(ngModel)]="transferInput.description" minlength="3" required />
+                <input id="description" name="description" [(ngModel)]="selectedTransferInputs.description" minlength="3" required />
             </div>
             <div>
                 <label for="amount">Price</label>
-                <input id="amount" name="amount" type="number" [(ngModel)]="transferInput.amount" [min]="0" step=".01" required />
+                <input id="amount" name="amount" type="number" [(ngModel)]="selectedTransferInputs.amount" [min]="0" step=".01" required />
             </div>
             <div>
                 <label for="category">Category</label>
                 <ng-select
+                    #categorySelect
                     name="category"
                     labelForId="category"
-                    [(ngModel)]="transferInput.category"
+                    [(ngModel)]="selectedTransferInputs.categoryId"
                     [clearable]="false"
                     [required]="true"
                     [editableSearchTerm]="true"
@@ -30,9 +31,10 @@
             <div>
                 <label for="contractor">Contractor</label>
                 <ng-select
+                    #contractorSelect
                     name="contractor"
                     labelForId="contractor"
-                    [(ngModel)]="transferInput.contractor"
+                    [(ngModel)]="selectedTransferInputs.contractorId"
                     [clearable]="true"
                     [editableSearchTerm]="true"
                     [items]="contractors"
@@ -48,7 +50,7 @@
                 <ng-select
                     name="account"
                     labelForId="account"
-                    [(ngModel)]="transferInput.account"
+                    [(ngModel)]="selectedTransferInputs.accountId"
                     [clearable]="false"
                     [editableSearchTerm]="true"
                     [items]="accounts"
@@ -59,12 +61,15 @@
             </div>
             <div>
                 <label for="date">Date</label>
-                <input id="date" name="date" type="date" [(ngModel)]="transferInput.date" required />
+                <input id="date" name="date" type="date" [(ngModel)]="selectedTransferInputs.date" required />
             </div>
 
             <button type="submit">
                 <div *ngIf="editMode">Save</div>
                 <div *ngIf="!editMode">Create</div>
+            </button>
+            <button *ngIf="!editMode" (click)="clearInputData()" type="button">
+                <div>Clear</div>
             </button>
             <button *ngIf="editMode" (click)="onClickDeleteTransfer()" type="button">Delete</button>
         </div>

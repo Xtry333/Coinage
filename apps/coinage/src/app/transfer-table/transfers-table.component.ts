@@ -21,10 +21,10 @@ export interface TableFilterFields {
 
 @Component({
     selector: 'coinage-app-transfers-table',
-    templateUrl: './transfer-table.component.html',
-    styleUrls: ['./transfer-table.component.scss'],
+    templateUrl: './transfers-table.component.html',
+    styleUrls: ['./transfers-table.component.scss'],
 })
-export class TransferTableComponent implements OnInit, OnChanges {
+export class TransfersTableComponent implements OnInit, OnChanges {
     public static EMPTY_CONTRACTOR = '-';
     public static EMPTY_DESCRIPTION = '-';
 
@@ -34,19 +34,17 @@ export class TransferTableComponent implements OnInit, OnChanges {
 
     private filter: TableFilterFields = { category: '', contractor: '', description: '' };
     public outcomesSum = 0;
+    public outcomesCount = 0;
+    public incomesSum = 0;
+    public incomesCount = 0;
 
     public transfersForTable: TransferDTO[] = [];
     public categoryNames: string[] = [];
     public contractorNames: string[] = [];
 
-    @Input()
-    tableHeader?: string;
-
-    @Input()
-    transfers?: TransferDTO[];
-
-    @Input()
-    showFilters?: boolean = false;
+    @Input() tableHeader?: string;
+    @Input() transfers?: TransferDTO[];
+    @Input() showFilters?: boolean = false;
 
     constructor(private readonly dataService: CoinageDataService) {}
 
@@ -70,17 +68,19 @@ export class TransferTableComponent implements OnInit, OnChanges {
     }
 
     public onFilter(ev: FilterEvent) {
-        switch (ev.name) {
-            case TableColumns.Category:
-                this.filter.category = ev.value;
-                break;
-            case TableColumns.Description:
-                this.filter.description = ev.value;
-                break;
-            case TableColumns.Contractor:
-                this.filter.contractor = ev.value;
-                break;
-        }
+        this.filter[ev.name] = ev.value;
+        // Replaced by simpler code above
+        // switch (ev.name) {
+        //     case TableColumns.Category:
+        //         this.filter.category = ev.value;
+        //         break;
+        //     case TableColumns.Description:
+        //         this.filter.description = ev.value;
+        //         break;
+        //     case TableColumns.Contractor:
+        //         this.filter.contractor = ev.value;
+        //         break;
+        // }
         this.doFiltering();
     }
 
@@ -89,22 +89,29 @@ export class TransferTableComponent implements OnInit, OnChanges {
             (this.filter.category === undefined || this.caseInsensitiveIncludes(row.category, this.filter.category)) &&
             (this.filter.description === undefined || this.caseInsensitiveIncludes(row.description, this.filter.description)) &&
             (this.filter.contractor === undefined ||
-                this.caseInsensitiveIncludes(row.contractor ?? TransferTableComponent.EMPTY_CONTRACTOR, this.filter.contractor))
+                this.caseInsensitiveIncludes(row.contractor ?? TransfersTableComponent.EMPTY_CONTRACTOR, this.filter.contractor))
         );
     }
 
     public doFiltering(): void {
         this.outcomesSum = 0;
+        this.outcomesCount = 0;
+        this.incomesSum = 0;
+        this.incomesCount = 0;
         if (this.transfers) {
             this.transfersForTable = this.transfers
                 .filter((t) => this.isDisplayed(t))
                 .map((t) => {
                     if (t.type === 'OUTCOME') {
                         this.outcomesSum += t.amount;
+                        this.outcomesCount++;
+                    } else {
+                        this.incomesSum += t.amount;
+                        this.incomesCount++;
                     }
                     return {
                         ...t,
-                        contractor: t.contractor !== undefined ? t.contractor : TransferTableComponent.EMPTY_CONTRACTOR,
+                        contractor: t.contractor !== undefined ? t.contractor : TransfersTableComponent.EMPTY_CONTRACTOR,
                     };
                 });
         }

@@ -24,7 +24,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     isTrinketDisplayed = false;
 
-    constructor(private loader: LoadingService) {}
+    constructor(private readonly loader: LoadingService) {}
 
     ngOnInit(): void {
         this.loader.loading$.subscribe((loading) => {

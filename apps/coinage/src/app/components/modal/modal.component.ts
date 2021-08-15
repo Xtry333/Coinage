@@ -22,8 +22,6 @@ export class ModalComponent implements OnInit, OnChanges {
     @Output() hideModalEvent: EventEmitter<void> = new EventEmitter();
     @Output() moveModalEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    // constructor() {}
-
     ngOnInit(): void {
         const el = document.getElementById('fresh-modal-container');
         if (el) {

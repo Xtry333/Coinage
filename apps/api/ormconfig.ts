@@ -17,6 +17,7 @@ export default {
     database: 'coinage-db',
     synchronize: false,
     logging: false,
+
     entities: [Category, Contractor, Receipt, Transfer, Account],
     namingStrategy: new SnakeNamingStrategy(),
 } as ConnectionOptions as TypeOrmModuleOptions;

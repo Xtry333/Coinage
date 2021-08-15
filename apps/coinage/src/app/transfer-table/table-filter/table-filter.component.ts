@@ -47,29 +47,15 @@ export class TableFilterComponent implements OnInit {
     @ViewChild('tableFilterElement')
     private tableFilterElement!: ElementRef<HTMLInputElement>;
 
-    @Input()
-    public popupSide = PopupSides.ToRight;
+    @Input() public popupSide = PopupSides.ToRight;
+    @Input() public filterType = FilterTypes.TextBox;
+    @Input() public filterName = '';
+    @Input() public datalist: string[] = [];
 
-    @Input()
-    public filterType = FilterTypes.TextBox;
-
-    @Input()
-    public filterName = '';
-
-    @Input()
-    public datalist: string[] = [];
-
-    @Output()
-    public filterEvent = new EventEmitter<FilterEvent>();
-
-    @Output()
-    public openEvent = new EventEmitter<void>();
-
-    @Output()
-    public closeEvent = new EventEmitter<void>();
-
-    @Output()
-    public focusEvent = new EventEmitter<boolean>();
+    @Output() public filterEvent = new EventEmitter<FilterEvent>();
+    @Output() public openEvent = new EventEmitter<void>();
+    @Output() public closeEvent = new EventEmitter<void>();
+    @Output() public focusEvent = new EventEmitter<boolean>();
 
     public ngOnInit(): void {
         this.filterValue.name = this.filterName;
