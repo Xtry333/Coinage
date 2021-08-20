@@ -77,13 +77,13 @@
                     <a [routerLink]="['/summary', transfer.date]">{{ transfer.date | date }}</a>
                 </td>
             </tr>
-            <tr *ngIf="!noRows" class="sum-row top-border">
+            <tr *ngIf="!noRows && outcomesCount > 0" class="sum-row top-border">
                 <td colspan="2">Expenses Sum</td>
                 <td>{{ outcomesCount }}</td>
                 <td class="currency">{{ outcomesSum | plnCurrency }}</td>
                 <td></td>
             </tr>
-            <tr *ngIf="!noRows" class="sum-row">
+            <tr *ngIf="!noRows && incomesCount > 0" class="sum-row">
                 <td colspan="2">Incomes Sum</td>
                 <td>{{ incomesCount }}</td>
                 <td class="currency">{{ incomesSum | plnCurrency }}</td>
