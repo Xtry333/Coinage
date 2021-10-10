@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import { AccountDTO, CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -28,11 +28,7 @@ export class CreateEditTransferComponent implements OnInit {
     totalPayment = 0;
     categories: CategoryDTO[] = [];
     contractors: ContractorDTO[] = [];
-    accounts: { id: number; name: string }[] = [
-        { id: 1, name: 'Michał' },
-        { id: 2, name: 'Paulina' },
-        { id: 4, name: 'Willa Woźniak' },
-    ];
+    accounts: AccountDTO[] = [];
     editMode = false;
     transferDTO!: TransferDetailsDTO;
     transferId!: number;
@@ -76,15 +72,16 @@ export class CreateEditTransferComponent implements OnInit {
                 });
             }
         });
-        Rx.zip(this.coinageData.getCategoryList(), this.coinageData.getContractorList())
+        Rx.zip(this.coinageData.getCategoryList(), this.coinageData.getContractorList(), this.coinageData.getAllAvailableAccounts())
             .pipe(
                 finalize(() => {
                     this.showPage = true;
                 })
             )
-            .subscribe(([categories, contractors]) => {
+            .subscribe(([categories, contractors, accounts]) => {
                 this.categories = categories;
                 this.contractors = contractors;
+                this.accounts = accounts;
             });
     }
 

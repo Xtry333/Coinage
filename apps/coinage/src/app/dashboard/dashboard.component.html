@@ -14,6 +14,7 @@
                     <th class="align-left">Date</th>
                     <th class="align-right">Outcomes</th>
                     <th class="align-right">Incomes</th>
+                    <th class="align-right">Change</th>
                     <th class="align-left">Count</th>
                     <th class="align-right">Cost Per Day</th>
                 </tr>
@@ -25,8 +26,13 @@
                     </td>
                     <td class="currency">{{ outcome.outcomes | plnCurrency }}</td>
                     <td class="currency">{{ outcome.incomes | plnCurrency }}</td>
+                    <td class="currency">{{ outcome.incomes - outcome.outcomes | plnCurrency }}</td>
                     <td>{{ outcome.transactionsCount }}</td>
                     <td class="currency">{{ outcome.costPerDay | plnCurrency }}</td>
+                </tr>
+                <tr>
+                    <td colspan="3"></td>
+                    <td class="currency">{{ totalChange | plnCurrency }}</td>
                 </tr>
             </tbody>
         </table>

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import 'reflect-metadata';
 import ormconfig from '../../ormconfig';
 
 import { AppService } from './app.service';
@@ -10,10 +11,11 @@ import { CategoryDao } from './daos/category.dao';
 import { ContractorDao } from './daos/contractor.dao';
 import { TransferDao } from './daos/transfer.dao';
 import { AccountDao } from './daos/account.dao';
+import { AccountsController } from './controllers/accounts.controller';
 
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
-    controllers: [TransfersController, CategoriesController, ContractorController],
+    controllers: [TransfersController, CategoriesController, ContractorController, AccountsController],
     providers: [AppService, TransferDao, CategoryDao, ContractorDao, AccountDao],
 })
 export class AppModule {}

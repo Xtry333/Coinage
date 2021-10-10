@@ -12,6 +12,7 @@ import {
     TransferDTO,
     CreateEditCategoryDTO,
     CreateEditContractorDTO,
+    AccountDTO,
 } from '@coinage-app/interfaces';
 import { Observable } from 'rxjs';
 
@@ -49,6 +50,10 @@ export class CoinageDataService {
 
     public getContractorList(): Observable<ContractorDTO[]> {
         return this.http.get<ContractorDTO[]>(`${CoinageDataService.API_URL}contractor/list`);
+    }
+
+    public getAllAvailableAccounts(): Observable<AccountDTO[]> {
+        return this.http.get<AccountDTO[]>(`${CoinageDataService.API_URL}account/all`);
     }
 
     public postCreateSaveTransaction(request: SaveTransferDTO): Observable<BaseResponseDTO> {

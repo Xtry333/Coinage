@@ -20,6 +20,12 @@ export class AccountDao {
         return getConnection().getRepository(Account).find();
     }
 
+    public getForAccount(userId: number): Promise<Account[]> {
+        return getConnection()
+            .getRepository(Account)
+            .find({ where: { userId: Equal(userId) } });
+    }
+
     public save(account: Account): Promise<Account> {
         return getConnection().getRepository(Account).save(account);
     }
@@ -28,5 +34,15 @@ export class AccountDao {
         return getConnection()
             .getRepository(Account)
             .delete({ id: Equal(id) });
+    }
+
+    public async getAccountBalance(accountIds: number[]): Promise<number> {
+        return (
+            await getConnection().query(
+                `SELECT SUM(CASE WHEN t.type = 'INCOME' THEN t.amount WHEN t.type = 'OUTCOME' THEN t.amount * -1 ELSE 0 END) AS balance FROM transfer t WHERE t.account_id IN (${accountIds.join(
+                    ','
+                )});`
+            )
+        )[0].balance;
     }
 }

@@ -115,4 +115,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     get rollingAverageOutcomes() {
         return this.totalAmountPerMonth.slice(0, this.averageAmountLimit).reduce((a, i) => a + i.outcomes, 0) / this.averageAmountLimit;
     }
+
+    get totalChange() {
+        return this.totalAmountPerMonth.reduce((a, t) => a + t.incomes - t.outcomes, 0);
+    }
 }
