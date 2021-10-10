@@ -71,7 +71,8 @@
                     "builder": "@nrwl/linter:eslint",
                     "options": {
                         "lintFilePatterns": ["apps/api/**/*.ts"]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",
@@ -160,7 +161,8 @@
                     "builder": "@nrwl/linter:eslint",
                     "options": {
                         "lintFilePatterns": ["apps/coinage/src/**/*.ts", "apps/coinage/src/**/*.html"]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",
@@ -194,7 +196,8 @@
                     "builder": "@nrwl/linter:eslint",
                     "options": {
                         "lintFilePatterns": ["apps/coinage-e2e/**/*.{js,ts}"]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 }
             }
         },
@@ -207,7 +210,8 @@
                     "builder": "@nrwl/linter:eslint",
                     "options": {
                         "lintFilePatterns": ["libs/interfaces/**/*.ts"]
-                    }
+                    },
+                    "outputs": ["{options.outputFile}"]
                 },
                 "test": {
                     "builder": "@nrwl/jest:jest",

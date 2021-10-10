@@ -1,11 +1,8 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConnectionOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import { Account } from './src/app/entities/Account.entity';
-import { Category } from './src/app/entities/Category.entity';
-import { Contractor } from './src/app/entities/Contractor.entity';
-import { Receipt } from './src/app/entities/Receipt.entity';
-import { Transfer } from './src/app/entities/Transfer.entity';
+import migrations from './src/app/migrations/_index';
+import entities from './src/app/entities/_index';
 
 export default {
     name: 'default',
@@ -17,7 +14,12 @@ export default {
     database: 'coinage-db',
     synchronize: false,
     logging: false,
-
-    entities: [Category, Contractor, Receipt, Transfer, Account],
+    migrationsRun: true,
+    migrations: migrations,
+    migrationsTransactionMode: 'all',
+    entities: entities,
     namingStrategy: new SnakeNamingStrategy(),
+    cli: {
+        migrationsDir: 'migrations',
+    },
 } as ConnectionOptions as TypeOrmModuleOptions;
