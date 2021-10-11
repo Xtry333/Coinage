@@ -1,6 +1,7 @@
 version: '3'
 services:
     coinage-db:
+        restart: unless-stopped
         image: mysql
         env_file:
             - ./.env
