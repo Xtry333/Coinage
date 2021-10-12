@@ -13,6 +13,7 @@ import {
     CreateEditCategoryDTO,
     CreateEditContractorDTO,
     AccountDTO,
+    BalanceDTO,
 } from '@coinage-app/interfaces';
 import { Observable } from 'rxjs';
 
@@ -23,6 +24,10 @@ export class CoinageDataService {
     public static readonly API_URL = '/api/';
 
     constructor(private http: HttpClient) {}
+
+    public getBalanceForActiveAccounts(): Observable<BalanceDTO[]> {
+        return this.http.get<BalanceDTO[]>(`${CoinageDataService.API_URL}dashboard/balance`);
+    }
 
     public getAllTransfers(): Observable<TransferDTO[]> {
         return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/all`);

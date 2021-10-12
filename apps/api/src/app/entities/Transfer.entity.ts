@@ -1,4 +1,4 @@
-import { Entity, JoinColumn, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, JoinColumn, Column, PrimaryGeneratedColumn, ManyToOne, UpdateDateColumn, CreateDateColumn } from 'typeorm';
 import { Account } from './Account.entity';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
@@ -18,10 +18,10 @@ export class Transfer {
     @Column({ type: 'date', nullable: false })
     date!: string;
 
-    @Column({ name: 'edited_date', type: 'timestamp', nullable: false })
+    @UpdateDateColumn({ name: 'edited_date', type: 'timestamp', nullable: false })
     editedDate!: Date;
 
-    @Column({ name: 'created_date', type: 'timestamp', nullable: true })
+    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true })
     createdDate?: Date | undefined;
 
     @ManyToOne('Category', { eager: true, nullable: false })

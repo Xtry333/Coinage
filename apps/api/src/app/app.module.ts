@@ -12,10 +12,11 @@ import { ContractorDao } from './daos/contractor.dao';
 import { TransferDao } from './daos/transfer.dao';
 import { AccountDao } from './daos/account.dao';
 import { AccountsController } from './controllers/accounts.controller';
+import { DashboardComponent } from './controllers/dashboard.controller';
 
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
-    controllers: [TransfersController, CategoriesController, ContractorController, AccountsController],
+    controllers: [TransfersController, CategoriesController, ContractorController, AccountsController, DashboardComponent],
     providers: [AppService, TransferDao, CategoryDao, ContractorDao, AccountDao],
 })
 export class AppModule {}

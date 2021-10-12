@@ -24,6 +24,8 @@ import { TableFilterComponent } from './transfer-table/table-filter/table-filter
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
 import { NotificationComponent } from './notifications-container/notification/notification.component';
+import { BigCounterComponent } from './components/big-counter/big-counter.component';
+import { DashboardCountersComponent } from './dashboard/dashboard-counters/dashboard-counters.component';
 
 @NgModule({
     declarations: [
@@ -42,6 +44,8 @@ import { NotificationComponent } from './notifications-container/notification/no
         TableFilterComponent,
         NotificationsContainerComponent,
         NotificationComponent,
+        BigCounterComponent,
+        DashboardCountersComponent,
     ],
     imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [

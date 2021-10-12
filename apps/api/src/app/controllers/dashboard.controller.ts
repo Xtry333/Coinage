@@ -4,16 +4,13 @@ import { Controller, Get } from '@nestjs/common';
 import { AccountDao } from '../daos/account.dao';
 
 @Controller('dashboard')
-export class CategoriesController {
+export class DashboardComponent {
     constructor(private readonly accountDao: AccountDao) {}
 
     @Get('/balance')
-    async getBalance(): Promise<BalanceDTO> {
-        const accountIds = [1];
+    async getBalance(): Promise<BalanceDTO[]> {
+        const accountIds = [1, 4, 5];
         const balance = await this.accountDao.getAccountBalance(accountIds);
-        return {
-            accountIds: accountIds,
-            balance: balance,
-        };
+        return balance;
     }
 }

@@ -37,6 +37,13 @@ div.table-container {
     }
 }
 
+.counters-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    margin-top: 25px;
+}
+
 .align-left {
     text-align: left;
 }

@@ -1,4 +1,4 @@
 export interface BalanceDTO {
-    accountIds: number[];
+    accountId: number;
     balance: number;
 }

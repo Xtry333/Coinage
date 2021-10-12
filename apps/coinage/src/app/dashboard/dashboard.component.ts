@@ -22,7 +22,7 @@ interface UiTotalAmountPerMonth {
     styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
-    public static REFRESH_INTERVAL = 10000;
+    public static readonly REFRESH_INTERVAL = 10000;
     message = '';
     transactionId = 0;
     lastTransactions: TransferDTO[] = [];
@@ -30,20 +30,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     showPage = false;
     refreshInterval?: ReturnType<typeof setInterval>;
     averageAmountLimit = 5;
+    balanceMainAccount = 0;
+    balanceSecondary = 0;
 
     constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
 
     ngOnInit(): void {
         this.showPage = false;
-        const data = Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth());
-        data.pipe(
-            finalize(() => {
-                this.showPage = true;
-            })
-        ).subscribe((values) => {
-            this.lastTransactions = values[0];
-            this.totalAmountPerMonth = this.mapToUiOutcome(values[1]);
-        });
+        this.refreshData();
+        // const data = Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth());
+        // data.pipe(
+        //     finalize(() => {
+        //         this.showPage = true;
+        //     })
+        // ).subscribe((values) => {
+        //     this.lastTransactions = values[0];
+        //     this.totalAmountPerMonth = this.mapToUiOutcome(values[1]);
+        // });
         this.refreshInterval = setInterval(() => this.refreshData(), DashboardComponent.REFRESH_INTERVAL);
     }
 
@@ -71,10 +74,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     public refreshData() {
-        Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth()).subscribe(([transactions, outcomes]) => {
-            this.lastTransactions = transactions;
-            this.totalAmountPerMonth = this.mapToUiOutcome(outcomes);
-        });
+        Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth(), this.coinageData.getBalanceForActiveAccounts())
+            .pipe(
+                finalize(() => {
+                    this.showPage = true;
+                })
+            )
+            .subscribe(([transactions, outcomes, balance]) => {
+                this.lastTransactions = transactions;
+                this.totalAmountPerMonth = this.mapToUiOutcome(outcomes);
+                this.balanceMainAccount = balance[0].balance + balance[1].balance;
+                this.balanceSecondary = balance[2].balance;
+            });
     }
 
     private mapToUiOutcome(totalOutcomes: TotalAmountPerMonthDTO[]): UiTotalAmountPerMonth[] {

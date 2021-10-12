@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BalanceDTO } from '@coinage-app/interfaces';
 import { DeleteResult, Equal, getConnection } from 'typeorm';
 import { Account } from '../entities/Account.entity';
 
@@ -36,13 +37,29 @@ export class AccountDao {
             .delete({ id: Equal(id) });
     }
 
-    public async getAccountBalance(accountIds: number[]): Promise<number> {
-        return (
-            await getConnection().query(
-                `SELECT SUM(CASE WHEN t.type = 'INCOME' THEN t.amount WHEN t.type = 'OUTCOME' THEN t.amount * -1 ELSE 0 END) AS balance FROM transfer t WHERE t.account_id IN (${accountIds.join(
-                    ','
-                )});`
-            )
-        )[0].balance;
+    public async getAccountBalance(accountIds: number[]): Promise<BalanceDTO[]> {
+        const result = await getConnection().query(
+            // `SELECT SUM(CASE WHEN t.type = 'INCOME' THEN t.amount WHEN t.type = 'OUTCOME' THEN t.amount * -1 ELSE 0 END) AS balance FROM transfer t WHERE t.account_id IN (${accountIds.join(
+            //     ','
+            // )});`
+            `
+                SELECT t.account_id AS accountId,
+                SUM(CASE WHEN t.type = 'INCOME' THEN t.amount WHEN t.type = 'OUTCOME' THEN -t.amount ELSE 0 END) AS balance
+                FROM transfer t
+                JOIN account a ON t.account_id = a.id
+                WHERE t.date <= '${this.getToday()}' AND a.id IN (${accountIds.join(',')})
+                GROUP BY t.account_id;`
+        );
+        return result.map((r: { accountId: number; balance: string }) => {
+            return {
+                accountId: r.accountId,
+                balance: parseFloat(r.balance),
+            };
+        });
+    }
+
+    private getToday(): string {
+        const date = new Date();
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     }
 }

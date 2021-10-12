@@ -1,0 +1,25 @@
+div.big-counter-container {
+    display: flex;
+    padding: 5px;
+
+    .value {
+        font-size: 50px;
+        vertical-align: middle;
+        font-weight: bolder;
+    }
+
+    .metadata {
+        .top {
+            font-weight: bold;
+            font-size: 15px;
+            display: block;
+            padding: 5px;
+        }
+
+        .bottom {
+            font-size: 15px;
+            display: block;
+            padding: 5px;
+        }
+    }
+}
