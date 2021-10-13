@@ -1,11 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 
 @Component({
     selector: 'coinage-app-big-counter',
     templateUrl: './big-counter.component.html',
     styleUrls: ['./big-counter.component.scss'],
 })
-export class BigCounterComponent implements OnChanges {
+export class BigCounterComponent implements OnChanges, OnDestroy {
     @Input() value = 0;
     @Input() topHeader = '';
     @Input() botHeader = '';
@@ -28,11 +28,15 @@ export class BigCounterComponent implements OnChanges {
         }
     }
 
+    ngOnDestroy(): void {
+        this.tryClearAnimateInterval();
+    }
+
     animateCounterValue(targetValue: number) {
         const delta = Math.abs(targetValue - this.internalValue) / 25;
-        if (this.internalValue + delta < targetValue && this.internalValue < targetValue) {
+        if (this.internalValue + delta < targetValue && this.internalValue <= targetValue && delta > 0.0001) {
             this.internalValue += delta;
-        } else if (this.internalValue + delta > targetValue && this.internalValue > targetValue) {
+        } else if (this.internalValue + delta > targetValue && this.internalValue >= targetValue && delta > 0.0001) {
             this.internalValue -= delta;
         } else {
             this.internalValue = targetValue;
@@ -43,6 +47,7 @@ export class BigCounterComponent implements OnChanges {
     tryClearAnimateInterval() {
         if (this.animateInterval) {
             clearInterval(this.animateInterval);
+            this.animateInterval = undefined;
         }
     }
 
