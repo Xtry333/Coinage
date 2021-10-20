@@ -148,7 +148,17 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     public clearInputData(): void {
-        this.selectedTransferInputs = { description: '', amount: 0, date: this.todayInputFormat, categoryId: undefined, contractorId: undefined, accountId: 1 };
+        // this.selectedTransferInputs.description = '';
+        // this.selectedTransferInputs.amount = 0;
+        // this.selectedTransferInputs.date = this.todayInputFormat;
+        this.selectedTransferInputs = {
+            description: '',
+            amount: 0,
+            date: this.todayInputFormat,
+            categoryId: this.selectedTransferInputs?.categoryId,
+            contractorId: this.selectedTransferInputs?.contractorId,
+            accountId: this.selectedTransferInputs?.accountId,
+        };
         this.categorySelect?.first.handleClearClick();
         this.contractorSelect?.first.handleClearClick();
     }

@@ -46,6 +46,9 @@ export class Transfer {
     @JoinColumn({ name: 'account_id' })
     account?: Account | undefined;
 
+    @Column('bit', { nullable: false })
+    isInternal!: boolean;
+
     @Column({ nullable: true, type: 'json' })
     metadata?: { [key: string]: string | number } | undefined;
 }

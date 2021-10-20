@@ -12,6 +12,14 @@ export class DashboardCountersComponent implements OnInit {
     constructor(private readonly coinageData: CoinageDataService) {}
 
     ngOnInit(): void {
+        this.loadData();
+    }
+
+    public refreshData(): void {
+        this.loadData();
+    }
+
+    private loadData(): void {
         this.coinageData.getBalanceForActiveAccounts().subscribe((value) => (this.balance = value[0].balance));
     }
 }

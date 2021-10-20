@@ -1,9 +1,10 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { finalize } from 'rxjs/operators';
 import * as Rx from 'rxjs';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
+import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
 
 interface UiTotalAmountPerMonth {
     date: string;
@@ -33,9 +34,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     balanceMainAccount = 0;
     balanceSecondary = 0;
 
+    @ViewChild(DashboardCountersComponent)
+    countersComponent!: DashboardCountersComponent;
+
     constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
 
     ngOnInit(): void {
+        console.log(this);
         this.showPage = false;
         this.refreshData();
         // const data = Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth());
@@ -83,9 +88,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .subscribe(([transactions, outcomes, balance]) => {
                 this.lastTransactions = transactions;
                 this.totalAmountPerMonth = this.mapToUiOutcome(outcomes);
-                this.balanceMainAccount = balance[0].balance + balance[1].balance;
-                this.balanceSecondary = balance[2].balance;
+                this.balanceMainAccount = balance[0].balance;
+                this.balanceSecondary = balance[1].balance;
             });
+        if (this.countersComponent) {
+            this.countersComponent.refreshData();
+        }
     }
 
     private mapToUiOutcome(totalOutcomes: TotalAmountPerMonthDTO[]): UiTotalAmountPerMonth[] {

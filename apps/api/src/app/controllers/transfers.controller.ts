@@ -36,7 +36,7 @@ export class TransfersController {
     @Get('recent')
     async getRecentTransactions(): Promise<TransferDTO[]> {
         const recentCount = 10;
-        return (await this.transferDao.getAllLimited(recentCount))
+        return (await this.transferDao.getRecent(recentCount))
             .sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
             .map((t) => {
                 return {

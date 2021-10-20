@@ -17,14 +17,16 @@ export class AccountDao {
         return account;
     }
 
-    public getAll(): Promise<Account[]> {
-        return getConnection().getRepository(Account).find();
+    public getAllActive(): Promise<Account[]> {
+        return getConnection()
+            .getRepository(Account)
+            .find({ where: { isActive: Equal(true) } });
     }
 
     public getForAccount(userId: number): Promise<Account[]> {
         return getConnection()
             .getRepository(Account)
-            .find({ where: { userId: Equal(userId) } });
+            .find({ where: { userId: Equal(userId), isActive: Equal(true) } });
     }
 
     public save(account: Account): Promise<Account> {

@@ -15,4 +15,7 @@ export class Account {
     @ManyToOne('User', { eager: true, nullable: false })
     @JoinColumn({ name: 'user_id' })
     user!: User;
+
+    @Column('bit', { nullable: false })
+    isActive!: boolean;
 }

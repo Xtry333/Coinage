@@ -30,11 +30,17 @@ export class TransferDao {
             .find({ where: { accountId: 1 }, order: { date: 'DESC', id: 'DESC' }, take: count });
     }
 
+    getRecent(count?: number) {
+        return getConnection()
+            .getRepository(Transfer)
+            .find({ where: { accountId: 1 }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
+    }
+
     async getLimitedTotalMonthlyAmount(accountId: number, type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {
         return await getConnection()
             .getRepository(Transfer)
             .query(
-                `SELECT YEAR(DATE) AS \`year\`, MONTH(DATE) AS \`month\`, SUM(amount) AS \`amount\`, COUNT(id) AS \`count\` FROM transfer WHERE TYPE = '${type}' AND \`account_id\` = ${accountId} GROUP BY YEAR(date), MONTH(DATE) ORDER BY \`year\` DESC, \`month\` DESC LIMIT 12`
+                `SELECT YEAR(DATE) AS \`year\`, MONTH(DATE) AS \`month\`, SUM(amount) AS \`amount\`, COUNT(id) AS \`count\` FROM transfer WHERE TYPE = '${type}' AND \`account_id\` = ${accountId} AND \`date\` <= '${this.getToday()}' GROUP BY YEAR(date), MONTH(DATE) ORDER BY \`year\` DESC, \`month\` DESC LIMIT 12`
             );
     }
 
@@ -59,5 +65,10 @@ export class TransferDao {
         return await getConnection()
             .getRepository(Transfer)
             .delete({ id: Equal(id) });
+    }
+
+    private getToday(): string {
+        const date = new Date();
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     }
 }

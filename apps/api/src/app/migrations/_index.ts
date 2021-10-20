@@ -4,6 +4,8 @@ import { InitUserTable1633906474866 } from './1633906474866-InitUserTable';
 import { InitAccountTable1633907815890 } from './1633907815890-InitAccountTable';
 import { InitReceiptTable1633908144642 } from './1633908144642-InitReceiptTable';
 import { InitTransferTable1633908272116 } from './1633908272116-InitTransferTable';
+import { AddAccountIsActive1634246370948 } from './1634246370948-AddAccountIsActive';
+import { AddInternalFlag1634687320599 } from './1634687320599-AddInternalFlag';
 
 export default [
     InitContractorTable1633906124577,
@@ -12,4 +14,6 @@ export default [
     InitAccountTable1633907815890,
     InitReceiptTable1633908144642,
     InitTransferTable1633908272116,
+    AddAccountIsActive1634246370948,
+    AddInternalFlag1634687320599,
 ];
