@@ -24,6 +24,9 @@ export class Transfer {
     @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true })
     createdDate?: Date | undefined;
 
+    @Column({ name: 'category', type: 'integer', nullable: false })
+    categoryId!: number;
+
     @ManyToOne('Category', { eager: true, nullable: false })
     @JoinColumn({ name: 'category' })
     category!: Category;

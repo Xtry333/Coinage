@@ -9,3 +9,5 @@ export * from './lib/BaseResponseDTO.response';
 export * from './lib/CreateEditCategoryDTO.request';
 export * from './lib/CreateEditContractorDTO.request';
 export * from './lib/BalanceDTO.response';
+export * from './lib/CreateInternalTransferDTO.request';
+export * from './lib/CreateInternalTransferDTO.response';

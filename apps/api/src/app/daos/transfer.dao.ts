@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
+import { DeleteResult, Equal, getConnection, In, InsertResult, MoreThan } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 
@@ -33,14 +33,17 @@ export class TransferDao {
     getRecent(count?: number) {
         return getConnection()
             .getRepository(Transfer)
-            .find({ where: { accountId: 1 }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
+            .find({ where: { accountId: In([1, 4, 5]) }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
     }
 
     async getLimitedTotalMonthlyAmount(accountId: number, type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {
         return await getConnection()
             .getRepository(Transfer)
             .query(
-                `SELECT YEAR(DATE) AS \`year\`, MONTH(DATE) AS \`month\`, SUM(amount) AS \`amount\`, COUNT(id) AS \`count\` FROM transfer WHERE TYPE = '${type}' AND \`account_id\` = ${accountId} AND \`date\` <= '${this.getToday()}' GROUP BY YEAR(date), MONTH(DATE) ORDER BY \`year\` DESC, \`month\` DESC LIMIT 12`
+                `SELECT YEAR(DATE) AS \`year\`, MONTH(DATE) AS \`month\`, SUM(amount) AS \`amount\`, COUNT(id) AS \`count\` 
+                FROM transfer 
+                WHERE TYPE = '${type}' AND \`account_id\` = ${accountId} AND \`date\` <= '${this.getToday()}' AND is_internal = 0 
+                GROUP BY YEAR(date), MONTH(DATE) ORDER BY \`year\` DESC, \`month\` DESC LIMIT 12`
             );
     }
 
@@ -49,6 +52,15 @@ export class TransferDao {
             .getRepository(Transfer)
             .find({
                 where: { date: Equal(date), contractor: Equal(contractorId) },
+            });
+        return transfers;
+    }
+
+    async getByCategory(categoryId: number) {
+        const transfers = await getConnection()
+            .getRepository(Transfer)
+            .find({
+                where: { categoryId: Equal(categoryId) },
             });
         return transfers;
     }

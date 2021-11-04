@@ -45,16 +45,17 @@ export class AccountDao {
             //     ','
             // )});`
             `
-                SELECT t.account_id AS accountId,
+                SELECT t.account_id AS accountId, a.name, 
                 SUM(CASE WHEN t.type = 'INCOME' THEN t.amount WHEN t.type = 'OUTCOME' THEN -t.amount ELSE 0 END) AS balance
                 FROM transfer t
                 JOIN account a ON t.account_id = a.id
                 WHERE t.date <= '${this.getToday()}' AND a.id IN (${accountIds.join(',')})
                 GROUP BY t.account_id;`
         );
-        return result.map((r: { accountId: number; balance: string }) => {
+        return result.map((r: { accountId: number; name: string; balance: string }) => {
             return {
                 accountId: r.accountId,
+                name: r.name,
                 balance: parseFloat(r.balance),
             };
         });

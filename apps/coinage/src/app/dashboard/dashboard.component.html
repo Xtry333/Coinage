@@ -1,10 +1,10 @@
 <div *ngIf="showPage">
     <div class="table-container">
-        <!-- <coinage-app-dashboard-counters></coinage-app-dashboard-counters> -->
-        <div class="counters-container">
+        <coinage-app-dashboard-counters></coinage-app-dashboard-counters>
+        <!-- <div class="counters-container">
             <coinage-app-big-counter [value]="balanceMainAccount" [topHeader]="'PLN'" [botHeader]="'Konto PKO'"></coinage-app-big-counter>
             <coinage-app-big-counter [value]="balanceSecondary" [topHeader]="'PLN'" [botHeader]="'Portfel'"></coinage-app-big-counter>
-        </div>
+        </div> -->
 
         <coinage-app-transfers-table [transfers]="lastTransactions" [tableHeader]="'Recently Edited Transfers'"></coinage-app-transfers-table>
         <div>
@@ -20,7 +20,7 @@
                     <th class="align-left">Date</th>
                     <th class="align-right">Outcomes</th>
                     <th class="align-right">Incomes</th>
-                    <th class="align-right">Change</th>
+                    <th class="align-right">Profit</th>
                     <th class="align-left">Count</th>
                     <th class="align-right">Cost Per Day</th>
                 </tr>

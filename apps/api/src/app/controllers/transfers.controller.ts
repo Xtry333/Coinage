@@ -1,12 +1,22 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
-import { BaseResponseDTO, SaveTransferDTO, SplitTransferDTO, TotalAmountPerMonthDTO, TransferDetailsDTO, TransferDTO } from '@coinage-app/interfaces';
+import {
+    BaseResponseDTO,
+    CreateInternalTransferDTO,
+    CreateInternalTransferDTOResponse,
+    SaveTransferDTO,
+    SplitTransferDTO,
+    TotalAmountPerMonthDTO,
+    TransferDetailsDTO,
+    TransferDTO,
+} from '@coinage-app/interfaces';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category, TransferType } from '../entities/Category.entity';
 import { AppService } from '../app.service';
 import { CategoryDao } from '../daos/category.dao';
 import { Transfer } from '../entities/Transfer.entity';
 import { ContractorDao } from '../daos/contractor.dao';
+import { AccountDao } from '../daos/account.dao';
 
 @Controller('transfer')
 export class TransfersController {
@@ -14,7 +24,8 @@ export class TransfersController {
         private readonly transferDao: TransferDao,
         private readonly appService: AppService,
         private readonly categoryDao: CategoryDao,
-        private readonly contractorDao: ContractorDao
+        private readonly contractorDao: ContractorDao,
+        private readonly accountDao: AccountDao
     ) {}
 
     @Get('all')
@@ -228,5 +239,87 @@ export class TransfersController {
     @Delete(':id')
     async removeTransferObject(@Param('id') id: number) {
         return (await this.transferDao.deleteById(id)).affected == 1;
+    }
+
+    @Get('/weekly/:id')
+    async getWeeklySpendings(@Param('id') id: string): Promise<any> {
+        const idNum = parseInt(id);
+        if (!idNum) {
+            return {};
+        }
+
+        const transfers = await (await this.transferDao.getAll()).filter((t) => t.type === 'OUTCOME' && t.categoryId === idNum); //getByCategory(idNum);
+
+        const weeks: { week: number; indetifier: string; outcomes: number }[] = [];
+        transfers.forEach((transfer) => {
+            const date = new Date(transfer.date);
+            const indetifier = `${date.getFullYear()}.${this.getWeek(date).toString().padStart(2, '0')}`;
+            //const indetifier = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
+            const week = weeks.find((w) => w.indetifier === indetifier);
+            if (week) {
+                week.outcomes += parseFloat(transfer.amount);
+            } else {
+                weeks.push({
+                    indetifier,
+                    week: this.getWeek(date),
+                    outcomes: parseFloat(transfer.amount),
+                });
+            }
+        });
+
+        return weeks.sort((a, b) => b.indetifier.localeCompare(a.indetifier));
+    }
+
+    getWeek = function (date: Date) {
+        const onejan = new Date(date.getFullYear(), 0, 1);
+        const millisecsInDay = 86400000;
+        return Math.ceil((((date as any) - (onejan as any)) / millisecsInDay + onejan.getDay() + 1) / 7);
+    };
+
+    @Post('create/internal/:originId/:targetId')
+    async createInternalTransfer(
+        @Body() transfer: CreateInternalTransferDTO,
+        @Param('originId') originId: string,
+        @Param('targetId') targetId: string
+    ): Promise<CreateInternalTransferDTOResponse> {
+        console.log(transfer);
+        console.log(transfer.date);
+        console.log(originId, targetId);
+
+        const originAccount = await this.accountDao.getById(parseInt(originId));
+        const targetAccount = await this.accountDao.getById(parseInt(targetId));
+
+        if (!originAccount) {
+            throw new Error(`Cannot find origin account id ${originId}`);
+        }
+        if (!targetAccount) {
+            throw new Error(`Cannot find target account id ${targetId}`);
+        }
+
+        //TODO: Introduce some sort of key to find categories via instead of ids
+        const categoryFrom = (await this.categoryDao.getById(31)) as Category;
+        const categoryTo = (await this.categoryDao.getById(32)) as Category;
+        const entityFrom = new Transfer(),
+            entityTo = new Transfer();
+
+        entityFrom.description = transfer.description;
+        entityFrom.amount = transfer.amount.toString();
+        entityFrom.categoryId = categoryFrom.id;
+        entityFrom.accountId = originAccount.id;
+        entityFrom.date = transfer.date;
+        entityFrom.type = categoryFrom.type;
+        entityFrom.isInternal = true;
+
+        entityTo.description = transfer.description;
+        entityTo.amount = transfer.amount.toString();
+        entityTo.categoryId = categoryTo.id;
+        entityTo.accountId = targetAccount.id;
+        entityTo.date = transfer.date;
+        entityTo.type = categoryTo.type;
+        entityTo.isInternal = true;
+
+        const insertedFrom = await this.transferDao.save(entityFrom);
+        const insertedTo = await this.transferDao.save(entityTo);
+        return { originTransferId: insertedFrom.id, targetTransferId: insertedTo.id };
     }
 }

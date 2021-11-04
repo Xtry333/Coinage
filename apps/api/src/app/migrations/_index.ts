@@ -6,6 +6,7 @@ import { InitReceiptTable1633908144642 } from './1633908144642-InitReceiptTable'
 import { InitTransferTable1633908272116 } from './1633908272116-InitTransferTable';
 import { AddAccountIsActive1634246370948 } from './1634246370948-AddAccountIsActive';
 import { AddInternalFlag1634687320599 } from './1634687320599-AddInternalFlag';
+import { SetCreatedDateToCurrent1636045473486 } from './1636045473486-SetCreatedDateToCurrent';
 
 export default [
     InitContractorTable1633906124577,
@@ -16,4 +17,5 @@ export default [
     InitTransferTable1633908272116,
     AddAccountIsActive1634246370948,
     AddInternalFlag1634687320599,
+    SetCreatedDateToCurrent1636045473486,
 ];

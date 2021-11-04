@@ -26,6 +26,7 @@ import { NotificationsContainerComponent } from './notifications-container/notif
 import { NotificationComponent } from './notifications-container/notification/notification.component';
 import { BigCounterComponent } from './components/big-counter/big-counter.component';
 import { DashboardCountersComponent } from './dashboard/dashboard-counters/dashboard-counters.component';
+import { StatisticsComponent } from './statistics/statistics.component';
 
 @NgModule({
     declarations: [
@@ -46,6 +47,7 @@ import { DashboardCountersComponent } from './dashboard/dashboard-counters/dashb
         NotificationComponent,
         BigCounterComponent,
         DashboardCountersComponent,
+        StatisticsComponent,
     ],
     imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [

@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { BalanceDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../../services/coinageData.service';
 
 @Component({
@@ -7,7 +8,7 @@ import { CoinageDataService } from '../../services/coinageData.service';
     styleUrls: ['./dashboard-counters.component.scss'],
 })
 export class DashboardCountersComponent implements OnInit {
-    balance = 0;
+    balance: BalanceDTO[] = [];
 
     constructor(private readonly coinageData: CoinageDataService) {}
 
@@ -20,6 +21,10 @@ export class DashboardCountersComponent implements OnInit {
     }
 
     private loadData(): void {
-        this.coinageData.getBalanceForActiveAccounts().subscribe((value) => (this.balance = value[0].balance));
+        this.coinageData.getBalanceForActiveAccounts().subscribe((res) => (this.balance = res));
+    }
+
+    trackByAccountId(index: number, item: BalanceDTO) {
+        return item.accountId;
     }
 }

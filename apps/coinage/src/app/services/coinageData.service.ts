@@ -14,6 +14,8 @@ import {
     CreateEditContractorDTO,
     AccountDTO,
     BalanceDTO,
+    CreateInternalTransferDTOResponse,
+    CreateInternalTransferDTO,
 } from '@coinage-app/interfaces';
 import { Observable } from 'rxjs';
 
@@ -63,6 +65,13 @@ export class CoinageDataService {
 
     public postCreateSaveTransaction(request: SaveTransferDTO): Observable<BaseResponseDTO> {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
+    }
+
+    public postCreateInternalTransfer(request: CreateInternalTransferDTO, originAccountId: number, targetAccountId: number) {
+        return this.http.post<CreateInternalTransferDTOResponse>(
+            `${CoinageDataService.API_URL}transfer/create/internal/${originAccountId}/${targetAccountId}`,
+            request
+        );
     }
 
     public postCreateCategory(request: CreateEditCategoryDTO) {
