@@ -65,4 +65,9 @@ export class AccountDao {
         const date = new Date();
         return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     }
+
+    public async getLastTransferDate(accountId: number): Promise<string> {
+        const result = await getConnection().query(`SELECT t.date FROM transfer t WHERE t.account_id = ${accountId} ORDER BY t.date DESC LIMIT 1;`);
+        return result[0].date;
+    }
 }

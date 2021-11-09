@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import * as Rx from 'rxjs';
-import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
+import { TransferDTO, TransferType } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { FilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
 

@@ -108,6 +108,14 @@ export class TransfersController {
             categoryId: transfer.category.id,
             account: { id: transfer.account?.id ?? 0, name: transfer.account?.name ?? '' },
             otherTransfers: otherTransfers,
+            receipt: {
+                id: transfer.receipt?.id ?? 0,
+                description: transfer.receipt?.description ?? '',
+                amount: parseFloat(transfer.receipt?.amount ?? '0'),
+                date: transfer.receipt?.date,
+                contractor: transfer.receipt?.contractor?.name ?? '',
+                transferIds: (await transfer.receipt?.transfers)?.map((t) => t.id) ?? [],
+            },
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
                 return { id: cat.id, name: cat.name };

@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { log } from 'console';
 import { DeleteResult, Equal, getConnection, In, InsertResult, MoreThan } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
@@ -10,7 +11,13 @@ export class TransferDao {
     async getById(id: number): Promise<Transfer> {
         const transfer = await getConnection()
             .getRepository(Transfer)
-            .findOne({ where: { id: Equal(id) } });
+            .findOne({
+                where: { id: Equal(id) },
+                join: {
+                    alias: 'transfer',
+                    leftJoinAndSelect: { receipt: 'transfer.receipt', contractor: 'receipt.contractor', transfers: 'receipt.transfers' },
+                },
+            });
         if (!transfer) {
             throw new Error('Transfer not found');
         }
