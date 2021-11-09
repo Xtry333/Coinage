@@ -1,6 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
+import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -35,6 +35,7 @@ export class TransferDetailsComponent implements OnInit {
                         })
                     )
                     .subscribe(([transfer, categories]) => {
+                        console.log(transfer);
                         this.transfer = transfer;
                         this.totalPayment = transfer.amount + transfer.otherTransfers.reduce((a, t) => a + t.amount, 0);
                         this.categories = categories;
@@ -72,7 +73,15 @@ export class TransferDetailsComponent implements OnInit {
         if (this.transfer) this.router.navigateByUrl(`/transfer/edit/${this.transfer.id}`);
     }
 
+    get transferTypeDisplayName(): string {
+        return TransferType[this.transfer.type].displayName;
+    }
+
+    get transferTypeDisplaySymbol(): string {
+        return TransferType[this.transfer.type].symbol;
+    }
+
     get isOutcome(): boolean {
-        return this.transfer.type === 'OUTCOME';
+        return this.transfer.type === TransferTypeEnum.OUTCOME;
     }
 }

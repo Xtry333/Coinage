@@ -1,5 +1,5 @@
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { NgModule, PipeTransform } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -27,13 +27,16 @@ import { NotificationComponent } from './notifications-container/notification/no
 import { BigCounterComponent } from './components/big-counter/big-counter.component';
 import { DashboardCountersComponent } from './dashboard/dashboard-counters/dashboard-counters.component';
 import { StatisticsComponent } from './statistics/statistics.component';
+import { NullTransformPipe } from './pipes/null-transform.pipe';
+
+const pipes = [PlnCurrencyPipe, NullTransformPipe];
 
 @NgModule({
     declarations: [
+        ...pipes,
         AppComponent,
         DashboardComponent,
         SummaryComponent,
-        PlnCurrencyPipe,
         TransferDetailsComponent,
         SpinnerComponent,
         CategoryManagerComponent,
@@ -51,6 +54,7 @@ import { StatisticsComponent } from './statistics/statistics.component';
     ],
     imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [
+        ...pipes,
         {
             provide: HTTP_INTERCEPTORS,
             useClass: NetworkInterceptor,

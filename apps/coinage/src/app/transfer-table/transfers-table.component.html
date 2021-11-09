@@ -72,7 +72,7 @@
                 <td>
                     {{ transfer.contractor }}
                 </td>
-                <td class="currency">{{ transfer.amount | plnCurrency }}</td>
+                <td class="currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
                 <td class="align-right">
                     <a [routerLink]="['/summary', transfer.date]">{{ transfer.date | date }}</a>
                 </td>

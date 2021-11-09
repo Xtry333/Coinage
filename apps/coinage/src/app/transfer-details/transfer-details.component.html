@@ -7,13 +7,40 @@
             </li>
         </ul>
     </h4>
+    <table>
+        <tr>
+            <th>Description</th>
+            <td>{{ transfer?.description }}</td>
+        </tr>
+        <tr>
+            <th>Amount</th>
+            <td>{{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</td>
+        </tr>
+        <tr>
+            <th>Type</th>
+            <td>{{ transferTypeDisplayName }}</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>{{ transfer.date | date }}</td>
+        </tr>
+        <tr>
+            <th>Contractor</th>
+            <td>{{ transfer.contractor | nullTransform }}</td>
+        </tr>
+        <tr>
+            <th>Category</th>
+            <td>{{ transfer.categoryPath[0].name }}</td>
+        </tr>
+        <tr>
+            <th>Account Name</th>
+            <td>{{ transfer.account.name }}</td>
+        </tr>
+    </table>
     <pre>{{ transfer?.description }}</pre>
     <pre>Amount: {{ transfer.amount | plnCurrency }}</pre>
     <pre>Date: {{ transfer.date }}</pre>
     <pre>Type: {{ transfer.type }}</pre>
-    <div *ngIf="transfer.account">
-        <pre>Account: {{ transfer.account.name }}</pre>
-    </div>
     <div *ngIf="transfer.contractor">
         <pre>Contractor: {{ transfer?.contractor }}</pre>
         <pre>Total {{ isOutcome ? 'payed to' : 'received from' }} {{ transfer?.contractor }} on {{ transfer?.date }}: {{ totalPayment | plnCurrency }}</pre>

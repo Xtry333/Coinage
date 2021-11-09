@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 import * as Rx from 'rxjs';
-import { TransferDTO } from '@coinage-app/interfaces';
+import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { FilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
 
@@ -38,7 +38,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public incomesSum = 0;
     public incomesCount = 0;
 
-    public transfersForTable: TransferDTO[] = [];
+    public transfersForTable: (TransferDTO & { typeSymbol: string })[] = [];
     public categoryNames: string[] = [];
     public contractorNames: string[] = [];
 
@@ -111,6 +111,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     }
                     return {
                         ...t,
+                        typeSymbol: TransferType[t.type].symbol,
                         contractor: t.contractor !== undefined ? t.contractor : TransfersTableComponent.EMPTY_CONTRACTOR,
                     };
                 });

@@ -1,3 +1,4 @@
+import { TransferTypeEnum } from '@coinage-app/interfaces';
 import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
 
 export enum TransferType {
@@ -20,7 +21,7 @@ export class Category {
     parentId!: number;
 
     @Column('varchar', { length: 50, nullable: false })
-    type!: string;
+    type!: TransferTypeEnum;
 
     @ManyToOne('Category', { nullable: true })
     @JoinColumn({ name: 'parent' })

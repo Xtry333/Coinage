@@ -1,3 +1,4 @@
+import { TransferTypeEnum } from '@coinage-app/interfaces';
 import { Entity, JoinColumn, Column, PrimaryGeneratedColumn, ManyToOne, UpdateDateColumn, CreateDateColumn } from 'typeorm';
 import { Account } from './Account.entity';
 import { Category } from './Category.entity';
@@ -35,12 +36,12 @@ export class Transfer {
     @JoinColumn({ name: 'contractor' })
     contractor?: Contractor | undefined;
 
-    @ManyToOne('Receipt', { eager: true, nullable: true })
+    @ManyToOne('Receipt', { eager: false, nullable: true })
     @JoinColumn({ name: 'receipt' })
     receipt?: Receipt | undefined;
 
     @Column('varchar', { length: 50, nullable: false })
-    type!: string;
+    type!: TransferTypeEnum;
 
     @Column({ nullable: true, type: 'numeric' })
     accountId?: number | undefined;
