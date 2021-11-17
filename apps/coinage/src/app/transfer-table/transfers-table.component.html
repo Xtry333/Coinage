@@ -70,7 +70,7 @@
                     </a>
                 </td>
                 <td>
-                    {{ transfer.contractor }}
+                    {{ transfer.contractor | undefined }}
                 </td>
                 <td class="currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
                 <td class="align-right">

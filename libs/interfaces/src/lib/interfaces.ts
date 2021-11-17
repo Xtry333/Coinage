@@ -39,6 +39,7 @@ export interface TransferDetailsDTO {
     editedDate: Date;
     otherTransfers: TransferDTO[];
     receipt?: ReceiptDTO;
+    isPlanned: boolean;
 }
 
 export enum TransferTypeEnum {

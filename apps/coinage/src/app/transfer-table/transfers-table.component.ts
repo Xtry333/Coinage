@@ -112,7 +112,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     return {
                         ...t,
                         typeSymbol: TransferType[t.type].symbol,
-                        contractor: t.contractor !== undefined ? t.contractor : TransfersTableComponent.EMPTY_CONTRACTOR,
+                        //contractor: t.contractor !== undefined ? t.contractor : TransfersTableComponent.EMPTY_CONTRACTOR,
                     };
                 });
         }

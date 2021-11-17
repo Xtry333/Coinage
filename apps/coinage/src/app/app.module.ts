@@ -28,6 +28,7 @@ import { BigCounterComponent } from './components/big-counter/big-counter.compon
 import { DashboardCountersComponent } from './dashboard/dashboard-counters/dashboard-counters.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { NullTransformPipe } from './pipes/null-transform.pipe';
+import { ReplacePipe } from './pipes/replace.pipe';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe];
 
@@ -51,6 +52,7 @@ const pipes = [PlnCurrencyPipe, NullTransformPipe];
         BigCounterComponent,
         DashboardCountersComponent,
         StatisticsComponent,
+        ReplacePipe,
     ],
     imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [

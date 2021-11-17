@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { log } from 'console';
-import { DeleteResult, Equal, getConnection, In, InsertResult, MoreThan } from 'typeorm';
+import { DeleteResult, Equal, getConnection, In, InsertResult } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 
@@ -40,7 +39,7 @@ export class TransferDao {
     getRecent(count?: number) {
         return getConnection()
             .getRepository(Transfer)
-            .find({ where: { accountId: In([1, 4, 5]) }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
+            .find({ where: { accountId: In([1, 4, 5, 6]) }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
     }
 
     async getLimitedTotalMonthlyAmount(accountId: number, type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {

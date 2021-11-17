@@ -4,6 +4,8 @@ import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, Transf
 import { CoinageDataService } from '../services/coinageData.service';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { faClock, faReceipt } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -11,6 +13,8 @@ import { finalize } from 'rxjs/operators';
     styleUrls: ['./transfer-details.component.scss'],
 })
 export class TransferDetailsComponent implements OnInit {
+    plannedIcon: IconDefinition = faClock;
+    receiptIcon: IconDefinition = faReceipt;
     showPage = false;
     transfer!: TransferDetailsDTO;
 

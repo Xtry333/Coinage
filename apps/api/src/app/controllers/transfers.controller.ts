@@ -47,20 +47,22 @@ export class TransfersController {
     @Get('recent')
     async getRecentTransactions(): Promise<TransferDTO[]> {
         const recentCount = 10;
-        return (await this.transferDao.getRecent(recentCount))
-            .sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
-            .map((t) => {
-                return {
-                    id: t.id,
-                    description: t.description,
-                    amount: parseFloat(t.amount),
-                    type: t.type,
-                    categoryId: t.category?.id,
-                    category: t.category?.name,
-                    contractor: t.contractor?.name,
-                    date: t.date,
-                };
-            });
+        return (
+            (await this.transferDao.getRecent(recentCount))
+                //.sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
+                .map((t) => {
+                    return {
+                        id: t.id,
+                        description: t.description,
+                        amount: parseFloat(t.amount),
+                        type: t.type,
+                        categoryId: t.category?.id,
+                        category: t.category?.name,
+                        contractor: t.contractor?.name,
+                        date: t.date,
+                    };
+                })
+        );
     }
 
     @Get('details/:id')
@@ -95,6 +97,14 @@ export class TransfersController {
                     categoryId: t.category.id,
                 };
             });
+        const receipt = {
+            id: transfer.receipt?.id ?? 0,
+            description: transfer.receipt?.description ?? '',
+            amount: parseFloat(transfer.receipt?.amount ?? '0'),
+            date: transfer.receipt?.date,
+            contractor: transfer.receipt?.contractor?.name ?? '',
+            transferIds: (await transfer.receipt?.transfers)?.map((t) => t.id) ?? [],
+        };
 
         return {
             id: transfer.id,
@@ -108,18 +118,12 @@ export class TransfersController {
             categoryId: transfer.category.id,
             account: { id: transfer.account?.id ?? 0, name: transfer.account?.name ?? '' },
             otherTransfers: otherTransfers,
-            receipt: {
-                id: transfer.receipt?.id ?? 0,
-                description: transfer.receipt?.description ?? '',
-                amount: parseFloat(transfer.receipt?.amount ?? '0'),
-                date: transfer.receipt?.date,
-                contractor: transfer.receipt?.contractor?.name ?? '',
-                transferIds: (await transfer.receipt?.transfers)?.map((t) => t.id) ?? [],
-            },
+            receipt: receipt.id ? receipt : undefined,
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
                 return { id: cat.id, name: cat.name };
             }),
+            isPlanned: new Date(transfer.date) > new Date(),
         };
     }
 

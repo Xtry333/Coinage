@@ -14,7 +14,14 @@
         </tr>
         <tr>
             <th>Amount</th>
-            <td>{{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</td>
+            <td>
+                <span> {{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</span>
+                <span class="planned-icon" *ngIf="transfer.receipt">
+                    <a [routerLink]="['/', 'receipt', transfer.receipt?.id]">
+                        <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
+                    </a>
+                </span>
+            </td>
         </tr>
         <tr>
             <th>Type</th>
@@ -22,15 +29,26 @@
         </tr>
         <tr>
             <th>Date</th>
-            <td>{{ transfer.date | date }}</td>
+            <td>
+                <span>{{ transfer.date | date }}</span>
+                <span *ngIf="transfer.isPlanned" class="planned-icon">
+                    <fa-icon [icon]="plannedIcon" [fixedWidth]="true" title="Transfer is planned"></fa-icon>
+                </span>
+            </td>
         </tr>
         <tr>
             <th>Contractor</th>
-            <td>{{ transfer.contractor | nullTransform }}</td>
+            <td>{{ transfer.contractor | undefined }}</td>
         </tr>
         <tr>
             <th>Category</th>
-            <td>{{ transfer.categoryPath[0].name }}</td>
+            <td>
+                <ul class="category-path-list">
+                    <li *ngFor="let category of transfer?.categoryPath">
+                        {{ category.name }}
+                    </li>
+                </ul>
+            </td>
         </tr>
         <tr>
             <th>Account Name</th>

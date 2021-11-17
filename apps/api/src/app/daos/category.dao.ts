@@ -15,7 +15,9 @@ export class CategoryDao {
     }
 
     async getAll(): Promise<Category[]> {
-        return await getConnection().getRepository(Category).find();
+        return await getConnection()
+            .getRepository(Category)
+            .find({ order: { name: 'ASC' } });
     }
 
     async getTotalByCategoryMonth(year: number, month: number | undefined): Promise<TotalInMonthByCategory[]> {

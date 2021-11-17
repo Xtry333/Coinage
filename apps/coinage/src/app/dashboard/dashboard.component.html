@@ -32,7 +32,7 @@
                     </td>
                     <td class="currency">{{ outcome.outcomes | plnCurrency }}</td>
                     <td class="currency">{{ outcome.incomes | plnCurrency }}</td>
-                    <td class="currency">{{ outcome.incomes - outcome.outcomes | plnCurrency }}</td>
+                    <td class="currency">{{ outcome.incomes - outcome.outcomes | plnCurrency | replace: '-':'− ' }}</td>
                     <td>{{ outcome.transactionsCount }}</td>
                     <td class="currency">{{ outcome.costPerDay | plnCurrency }}</td>
                 </tr>
