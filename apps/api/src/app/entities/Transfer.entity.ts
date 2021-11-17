@@ -23,7 +23,7 @@ export class Transfer {
     editedDate!: Date;
 
     @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true })
-    createdDate?: Date | undefined;
+    createdDate!: Date;
 
     @Column({ name: 'category', type: 'integer', nullable: false })
     categoryId!: number;
@@ -54,5 +54,5 @@ export class Transfer {
     isInternal!: boolean;
 
     @Column({ nullable: true, type: 'json' })
-    metadata?: { [key: string]: string | number } | undefined;
+    metadata!: { [key: string]: string | number };
 }

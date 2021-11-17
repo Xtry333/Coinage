@@ -7,6 +7,7 @@ import { InitTransferTable1633908272116 } from './1633908272116-InitTransferTabl
 import { AddAccountIsActive1634246370948 } from './1634246370948-AddAccountIsActive';
 import { AddInternalFlag1634687320599 } from './1634687320599-AddInternalFlag';
 import { SetCreatedDateToCurrent1636045473486 } from './1636045473486-SetCreatedDateToCurrent';
+import { SetMetadataToDefaultEmpty1637152551502 } from './1637152551502-SetMetadataToDefaultEmpty';
 
 export default [
     InitContractorTable1633906124577,
@@ -18,4 +19,5 @@ export default [
     AddAccountIsActive1634246370948,
     AddInternalFlag1634687320599,
     SetCreatedDateToCurrent1636045473486,
+    SetMetadataToDefaultEmpty1637152551502,
 ];
