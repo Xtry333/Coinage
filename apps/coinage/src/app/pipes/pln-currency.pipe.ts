@@ -4,8 +4,8 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'plnCurrency',
 })
 export class PlnCurrencyPipe implements PipeTransform {
-    public readonly CURRENCY = 'zł';
-    transform(value: number): unknown {
-        return value.toFixed(2).replace('.', ',') + ' ' + this.CURRENCY;
+    public readonly CURRENCY_SYMBOL = 'zł';
+    transform(value: number): string {
+        return value.toFixed(2).replace('.', ',') + ' ' + this.CURRENCY_SYMBOL;
     }
 }

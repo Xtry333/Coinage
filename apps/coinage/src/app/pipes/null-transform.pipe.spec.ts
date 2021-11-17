@@ -10,13 +10,13 @@ describe('NullTransformPipe', () => {
     it('changes value into default if undefined', () => {
         const pipe = new NullTransformPipe();
         const value: string | undefined = undefined;
-        expect(pipe.transform(value)).toEqual(value);
+        expect(pipe.transform(value)).toEqual(NullTransformPipe.DEFAULT_SYMBOL);
     });
 
     it('changes value into passed if undefined', () => {
         const pipe = new NullTransformPipe();
-        const value: string | undefined = undefined;
         const passed = '!!!';
+        const value: string | undefined = undefined;
         expect(pipe.transform(value, passed)).toEqual(passed);
     });
 });
