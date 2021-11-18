@@ -4,6 +4,7 @@ import {
     BaseResponseDTO,
     CreateInternalTransferDTO,
     CreateInternalTransferDTOResponse,
+    RefundTransferDTO,
     SaveTransferDTO,
     SplitTransferDTO,
     TotalAmountPerMonthDTO,
@@ -17,15 +18,17 @@ import { CategoryDao } from '../daos/category.dao';
 import { Transfer } from '../entities/Transfer.entity';
 import { ContractorDao } from '../daos/contractor.dao';
 import { AccountDao } from '../daos/account.dao';
+import { DateParserService } from '../services/date-parser.service';
 
-@Controller('transfer')
+@Controller('transfer(s)?')
 export class TransfersController {
     constructor(
         private readonly transferDao: TransferDao,
         private readonly appService: AppService,
         private readonly categoryDao: CategoryDao,
         private readonly contractorDao: ContractorDao,
-        private readonly accountDao: AccountDao
+        private readonly accountDao: AccountDao,
+        private readonly dateParserService: DateParserService
     ) {}
 
     @Get('all')
@@ -84,6 +87,15 @@ export class TransfersController {
             }
         }
 
+        let refundTransfer: Transfer | undefined;
+        try {
+            refundTransfer = transfer.metadata.refundedBy ? await this.transferDao.getById(Number(transfer.metadata.refundedBy)) : undefined;
+        } catch (e) {
+            console.log(e);
+            delete transfer.metadata.refundedBy;
+            this.transferDao.save(transfer);
+        }
+
         const otherTransfers: TransferDTO[] = (await this.transferDao.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
             .filter((t) => t.id !== transfer.id)
             .map((t) => {
@@ -109,7 +121,7 @@ export class TransfersController {
         return {
             id: transfer.id,
             description: transfer.description,
-            amount: parseFloat(transfer.amount),
+            amount: Number(transfer.amount),
             type: transfer.category.type,
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
@@ -124,6 +136,9 @@ export class TransfersController {
                 return { id: cat.id, name: cat.name };
             }),
             isPlanned: new Date(transfer.date) > new Date(),
+            refundedBy: refundTransfer?.id,
+            refundedOn: refundTransfer?.date,
+            isRefundable: !transfer.metadata.refundedBy && !transfer.metadata.refundTargetId,
         };
     }
 
@@ -248,8 +263,45 @@ export class TransfersController {
         return { insertedId: inserted.identifiers[0].id };
     }
 
+    @Post('refund')
+    async refundTransfer(@Body() refundDTO: RefundTransferDTO): Promise<BaseResponseDTO> {
+        const refundTargetId = Math.floor(Number(refundDTO.refundTargetId));
+        const refundDate = new Date(refundDTO.refundDate);
+
+        const transfer = await this.transferDao.getById(refundTargetId);
+
+        // TODO: getBySystemTag('refund');
+        const refundCategory = await this.categoryDao.getById(34);
+
+        if (!transfer || !refundCategory) {
+            throw new Error('Invalid Transfer or Category ID.');
+        }
+
+        if (transfer.metadata.refundedBy || transfer.metadata.refundTargetId) {
+            throw new Error('Cannot refund a refund or a refund target.');
+        }
+        const refundTransferEntity = new Transfer();
+        refundTransferEntity.description = `Refund: ${transfer.description}`;
+        refundTransferEntity.amount = transfer.amount;
+        refundTransferEntity.type = refundCategory.type;
+        refundTransferEntity.categoryId = refundCategory.id;
+        refundTransferEntity.date = this.dateParserService.formatMySql(refundDate);
+        refundTransferEntity.accountId = transfer.accountId;
+        refundTransferEntity.metadata.refundTargetId = refundTargetId;
+        refundTransferEntity.contractor = transfer.contractor;
+
+        const inserted = await this.transferDao.save(refundTransferEntity);
+
+        transfer.metadata.refundedBy = inserted.id;
+
+        await this.transferDao.save(transfer);
+        return { insertedId: inserted.id, message: `Succesfully saved refund of ${transfer.id}.` };
+    }
+
     @Delete(':id')
     async removeTransferObject(@Param('id') id: number) {
+        // TODO: On remove delete refundedBy metadata from target
+        //const refundTransfer = transfer.metadata.refundedBy ? await this.transferDao.getById(Number(transfer.metadata.refundedBy)) : undefined;
         return (await this.transferDao.deleteById(id)).affected == 1;
     }
 

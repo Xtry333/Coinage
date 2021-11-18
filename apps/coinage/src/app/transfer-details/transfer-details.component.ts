@@ -5,7 +5,8 @@ import { CoinageDataService } from '../services/coinageData.service';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 import { IconDefinition } from '@fortawesome/fontawesome-common-types';
-import { faClock, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -15,6 +16,7 @@ import { faClock, faReceipt } from '@fortawesome/free-solid-svg-icons';
 export class TransferDetailsComponent implements OnInit {
     plannedIcon: IconDefinition = faClock;
     receiptIcon: IconDefinition = faReceipt;
+    refundedIcon: IconDefinition = faReply;
     showPage = false;
     transfer!: TransferDetailsDTO;
 
@@ -25,7 +27,12 @@ export class TransferDetailsComponent implements OnInit {
 
     categories: CategoryDTO[] = [];
 
-    constructor(private readonly route: ActivatedRoute, private readonly router: Router, private readonly coinageData: CoinageDataService) {}
+    constructor(
+        private readonly route: ActivatedRoute,
+        private readonly router: Router,
+        private readonly coinageData: CoinageDataService,
+        private readonly notificationService: NotificationService
+    ) {}
 
     ngOnInit(): void {
         this.showPage = false;
@@ -71,6 +78,22 @@ export class TransferDetailsComponent implements OnInit {
                     this.shouldShowSplit = false;
                     this.router.navigateByUrl(`/details/${result.insertedId}`);
                 });
+    }
+
+    public onClickRefundTransfer(): void {
+        this.coinageData.refundTransfer(this.transfer.id, new Date()).subscribe((result) => {
+            if (result) {
+                this.notificationService.push({
+                    title: `Added Refund`,
+                    message: result.message ?? 'Refunded succesfully.',
+                });
+
+                // TODO: Find better way to reload page/data after creating a refund
+                this.router
+                    .navigateByUrl(`/`, { skipLocationChange: true })
+                    .then(() => this.router.navigateByUrl(`/details/${this.transfer.id}`, { skipLocationChange: true }));
+            }
+        });
     }
 
     public onClickEditMode(): void {

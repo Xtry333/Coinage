@@ -34,6 +34,11 @@
                 <span *ngIf="transfer.isPlanned" class="planned-icon">
                     <fa-icon [icon]="plannedIcon" [fixedWidth]="true" title="Transfer is planned"></fa-icon>
                 </span>
+                <span *ngIf="transfer.refundedBy" class="planned-icon">
+                    <a [routerLink]="['/', 'details', transfer.refundedBy]">
+                        ({{ transfer.refundedOn | date }} <fa-icon [icon]="refundedIcon" [fixedWidth]="true" title="Refunded"></fa-icon>)
+                    </a>
+                </span>
             </td>
         </tr>
         <tr>
@@ -66,6 +71,9 @@
     <br /><br />
     <button (click)="onClickEditMode()">Edit</button>
     <button (click)="onToggleShowSplit()">Show Split Transfer</button>
+    <button *ngIf="transfer.isRefundable" (click)="onClickRefundTransfer()" type="button">
+        <div>Refund</div>
+    </button>
     <div *ngIf="shouldShowSplit" class="split-transaction-form">
         <div>
             <label for="description">Description</label>

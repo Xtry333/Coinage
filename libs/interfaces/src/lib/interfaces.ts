@@ -39,7 +39,10 @@ export interface TransferDetailsDTO {
     editedDate: Date;
     otherTransfers: TransferDTO[];
     receipt?: ReceiptDTO;
+    refundedBy?: number;
+    refundedOn?: string;
     isPlanned: boolean;
+    isRefundable: boolean;
 }
 
 export enum TransferTypeEnum {

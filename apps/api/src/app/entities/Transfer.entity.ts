@@ -7,6 +7,10 @@ import { Receipt } from './Receipt.entity';
 
 @Entity()
 export class Transfer {
+    constructor() {
+        this.metadata = {};
+    }
+
     @PrimaryGeneratedColumn()
     id!: number;
 
@@ -55,4 +59,12 @@ export class Transfer {
 
     @Column({ nullable: true, type: 'json' })
     metadata!: { [key: string]: string | number };
+}
+
+interface TransferMetadata {
+    location?: string;
+    unitPrice?: number;
+    refundTransfer?: number;
+    refundTargetId?: number;
+    subject?: string;
 }

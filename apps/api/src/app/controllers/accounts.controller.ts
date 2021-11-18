@@ -1,6 +1,6 @@
 import { Controller, Get, Param } from '@nestjs/common';
 
-import { AccountDTO } from '@coinage-app/interfaces';
+import { AccountDTO, BalanceDTO } from '@coinage-app/interfaces';
 import { AccountDao } from '../daos/account.dao';
 
 @Controller('account')
@@ -14,9 +14,17 @@ export class AccountsController {
     }
 
     @Get('balance/:accountId/:asOfDate')
-    async getAccountBalanceAsOfDate(@Param() params: { [key: string]: string }): Promise<number> {
-        const accountId = parseInt(params.accountId);
+    async getAccountBalanceAsOfDate(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
+        const accountIds = params.accountId.split(',').map((id) => parseInt(id, 10));
         const asOfDate = new Date(params.asOfDate);
-        return (await this.accountDao.getAccountBalanceForAccountAsOfDate([accountId], asOfDate))[0].balance;
+        if (!accountIds || !asOfDate || asOfDate.toString() === 'Invalid Date') {
+            throw new Error('Invalid parameters');
+        }
+        const balanceDTOs = await this.accountDao.getAccountBalanceForAccountAsOfDate(accountIds, asOfDate);
+        if (balanceDTOs.length === 0) {
+            return [];
+        } else {
+            return balanceDTOs;
+        }
     }
 }

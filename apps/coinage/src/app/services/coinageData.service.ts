@@ -16,6 +16,7 @@ import {
     BalanceDTO,
     CreateInternalTransferDTOResponse,
     CreateInternalTransferDTO,
+    RefundTransferDTO,
 } from '@coinage-app/interfaces';
 import { Observable } from 'rxjs';
 
@@ -65,6 +66,14 @@ export class CoinageDataService {
 
     public postCreateSaveTransaction(request: SaveTransferDTO): Observable<BaseResponseDTO> {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
+    }
+
+    public refundTransfer(transferId: number, arg1: Date) {
+        const request: RefundTransferDTO = {
+            refundTargetId: transferId,
+            refundDate: arg1.toISOString().slice(0, 10),
+        };
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/refund`, request);
     }
 
     public postCreateInternalTransfer(request: CreateInternalTransferDTO, originAccountId: number, targetAccountId: number) {
