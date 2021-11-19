@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
+import { CoinageLocalStorageService } from './services/coinage-local-storage.service';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 
 @Component({
@@ -24,7 +25,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
     isTrinketDisplayed = false;
 
-    constructor(private readonly loader: LoadingService) {}
+    constructor(private readonly loader: LoadingService, private readonly localStorageService: CoinageLocalStorageService) {
+        console.log(this);
+        this.localStorageService.setObject('k1', new Date());
+        console.log(this.localStorageService.getObject('k1', (x) => new Date(x)));
+    }
 
     ngOnInit(): void {
         this.loader.loading$.subscribe((loading) => {

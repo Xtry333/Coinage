@@ -36,6 +36,7 @@ export class TransferDetailsComponent implements OnInit {
 
     ngOnInit(): void {
         this.showPage = false;
+        this.route.paramMap.toPromise();
         this.route.paramMap.subscribe((params) => {
             const id = parseInt(params.get('id') ?? '');
             if (id) {

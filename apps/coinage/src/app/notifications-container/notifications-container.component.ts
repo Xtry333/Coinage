@@ -14,7 +14,6 @@ export class NotificationsContainerComponent implements OnInit {
     ngOnInit(): void {
         this.notificationService.notifications$.subscribe((notification) => {
             this.notificationsList.push(notification);
-            console.log(notification);
         });
         // this.notificationService.push({ title: 'Test', message: 'Test Notification. Quite long message added to the notification for testing purposes.', autoCloseDelay: 0 });
     }

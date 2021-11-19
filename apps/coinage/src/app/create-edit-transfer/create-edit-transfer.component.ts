@@ -4,6 +4,7 @@ import { AccountDTO, CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetail
 import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { CoinageDataService } from '../services/coinageData.service';
 import { NotificationService } from '../services/notification.service';
 
@@ -48,7 +49,8 @@ export class CreateEditTransferComponent implements OnInit {
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly coinageData: CoinageDataService,
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
+        private readonly coinageLocalStorageService: CoinageLocalStorageService
     ) {}
 
     ngOnInit(): void {
@@ -108,6 +110,7 @@ export class CreateEditTransferComponent implements OnInit {
                 this.router.navigateByUrl(`/details/${result.insertedId}`);
             }
         });
+        this.coinageLocalStorageService.setNumber('lastUsedAccountId', this.selectedTransferInputs.accountId);
     }
 
     public onClickDeleteTransfer(): void {
@@ -157,7 +160,7 @@ export class CreateEditTransferComponent implements OnInit {
             date: this.todayInputFormat,
             categoryId: this.selectedTransferInputs?.categoryId,
             contractorId: this.selectedTransferInputs?.contractorId,
-            accountId: this.selectedTransferInputs?.accountId,
+            accountId: this.selectedTransferInputs?.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
         };
         this.categorySelect?.first.handleClearClick();
         this.contractorSelect?.first.handleClearClick();

@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { CoinageLocalStorageService } from './coinage-local-storage.service';
 
 export interface CoinageNotification {
     id: number;
@@ -15,6 +16,7 @@ export type NewNotification = Omit<CoinageNotification, 'id'>;
     providedIn: 'root',
 })
 export class NotificationService {
+    public static readonly NOTIFICATION_KEY = 'notification';
     public static readonly DEFAULT_CLOSE_DELAY = 15000;
     private idCounter = 0;
 
@@ -22,17 +24,35 @@ export class NotificationService {
 
     public readonly notifications$ = this.incomingNotifications.asObservable();
 
-    // constructor() {
-    //     console.log(this);
-    // }
+    constructor(private readonly coinageLocalStorageService: CoinageLocalStorageService) {
+        window.addEventListener(
+            'storage',
+            (event) => {
+                if (event.key === CoinageLocalStorageService.KEY_OBJECT_TEMPLATE(NotificationService.NOTIFICATION_KEY)) {
+                    const sharedNofitication = this.coinageLocalStorageService.getObject<CoinageNotification>(NotificationService.NOTIFICATION_KEY);
+                    if (sharedNofitication) {
+                        this.incomingNotifications.next(this.buildNotification(sharedNofitication));
+                    }
+                }
+            },
+            true
+        );
 
-    push(notification: NewNotification): number {
-        const n = {
+        console.log(this);
+    }
+
+    push(newNotification: NewNotification): number {
+        const notification = this.buildNotification(newNotification);
+        this.incomingNotifications.next(notification);
+        this.coinageLocalStorageService.setObject(NotificationService.NOTIFICATION_KEY, notification);
+        return notification.id;
+    }
+
+    private buildNotification(notification: NewNotification): CoinageNotification {
+        return {
             ...notification,
             id: this.idCounter++,
             autoCloseDelay: notification.autoCloseDelay ?? NotificationService.DEFAULT_CLOSE_DELAY,
         };
-        this.incomingNotifications.next(n);
-        return n.id;
     }
 }
