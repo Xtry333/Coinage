@@ -58,13 +58,13 @@ export class Transfer {
     isInternal!: boolean;
 
     @Column({ nullable: true, type: 'json' })
-    metadata!: { [key: string]: string | number };
+    metadata!: TransferMetadata & { [key: string]: string | number };
 }
 
 interface TransferMetadata {
     location?: string;
     unitPrice?: number;
-    refundTransfer?: number;
+    redundedBy?: number;
     refundTargetId?: number;
     subject?: string;
 }

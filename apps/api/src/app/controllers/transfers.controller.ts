@@ -295,7 +295,7 @@ export class TransfersController {
         transfer.metadata.refundedBy = inserted.id;
 
         await this.transferDao.save(transfer);
-        return { insertedId: inserted.id, message: `Succesfully saved refund of ${transfer.id}.` };
+        return { insertedId: inserted.id, message: `Succesfully saved refund of ${transfer.description} #${transfer.id}.` };
     }
 
     @Delete(':id')
