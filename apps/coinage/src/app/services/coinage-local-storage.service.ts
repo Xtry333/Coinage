@@ -4,6 +4,8 @@ import { Injectable } from '@angular/core';
     providedIn: 'root',
 })
 export class CoinageLocalStorageService {
+    public static readonly STORAGE_EVENT = 'storage';
+
     private readonly localStorage: Storage;
 
     public static readonly KEY_NUMBER_TEMPLATE = (key: string) => `${key}-n`;
@@ -13,6 +15,10 @@ export class CoinageLocalStorageService {
 
     constructor() {
         this.localStorage = window.localStorage;
+    }
+
+    public attachEventListener(listener: (event: StorageEvent) => void): void {
+        window.addEventListener(CoinageLocalStorageService.STORAGE_EVENT, listener);
     }
 
     public setNumber(key: string, value: number | undefined): void {
@@ -30,7 +36,7 @@ export class CoinageLocalStorageService {
         }
     }
 
-    public setString(key: string, value: string): void {
+    public setString(key: string, value: string | undefined): void {
         if (value !== undefined) {
             this.localStorage.setItem(CoinageLocalStorageService.KEY_STRING_TEMPLATE(key), value);
         } else {
@@ -42,12 +48,12 @@ export class CoinageLocalStorageService {
         return this.localStorage.getItem(CoinageLocalStorageService.KEY_STRING_TEMPLATE(key)) ?? undefined;
     }
 
-    public setObject<T>(key: string, object: T): void {
+    public setObject<T>(key: string, object: T | undefined): void {
         if (object !== undefined) {
             const serializedObject = JSON.stringify(object);
             this.localStorage.setItem(CoinageLocalStorageService.KEY_OBJECT_TEMPLATE(key), serializedObject);
         } else {
-            this.localStorage.removeItem(CoinageLocalStorageService.KEY_STRING_TEMPLATE(key));
+            this.localStorage.removeItem(CoinageLocalStorageService.KEY_OBJECT_TEMPLATE(key));
         }
     }
 
