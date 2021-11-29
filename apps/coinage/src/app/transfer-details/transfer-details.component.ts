@@ -100,7 +100,7 @@ export class TransferDetailsComponent implements OnInit {
                 // TODO: Find better way to reload page/data after creating a refund
                 this.router
                     .navigateByUrl(`/`, { skipLocationChange: true })
-                    .then(() => this.router.navigateByUrl(`/details/${this.transfer.id}`, { skipLocationChange: true }));
+                    .then(() => this.router.navigateByUrl(NavigatorPages.TransferDetails(this.transfer.id), { skipLocationChange: true }));
             }
         });
     }

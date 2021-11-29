@@ -7,6 +7,7 @@ import { finalize } from 'rxjs/operators';
 
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { CoinageDataService } from '../services/coinageData.service';
+import { NavigatorPages, NavigatorService } from '../services/navigator-service.service';
 import { NotificationService } from '../services/notification.service';
 
 export interface NewTransferObject {
@@ -49,6 +50,7 @@ export class CreateEditTransferComponent implements OnInit {
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
+        private readonly navigator: NavigatorService,
         private readonly coinageData: CoinageDataService,
         private readonly notificationService: NotificationService,
         private readonly coinageLocalStorageService: CoinageLocalStorageService
@@ -113,8 +115,8 @@ export class CreateEditTransferComponent implements OnInit {
                 this.notificationService.push({ title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`, message: newTransfer.description });
                 this.clearInputData();
             }
-            if (this.redirectAfterSave) {
-                this.router.navigateByUrl(`/transfer/details/${result.insertedId}`);
+            if (this.redirectAfterSave && result.insertedId) {
+                this.navigator.goTo(NavigatorPages.TransferDetails(result.insertedId));
             }
         });
         this.coinageLocalStorageService.setNumber('lastUsedAccountId', this.selectedTransferInputs.accountId);
@@ -128,7 +130,7 @@ export class CreateEditTransferComponent implements OnInit {
                         title: `Transfer Removed`,
                         message: `Transfer with ${this.selectedTransferInputs.description} has been deleted.`,
                     });
-                    this.router.navigateByUrl(`/dashboard`);
+                    this.navigator.goTo(NavigatorPages.Dashboard());
                 }
             });
         }
