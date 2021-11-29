@@ -1,9 +1,11 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
-import { CoinageDataService } from '../services/coinageData.service';
-import { finalize } from 'rxjs/operators';
 import * as Rx from 'rxjs';
+import { finalize } from 'rxjs/operators';
+
+import { CoinageDataService } from '../services/coinageData.service';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
+import { NavigatorPages } from '../services/navigator-service.service';
 import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
 
 interface UiTotalAmountPerMonth {
@@ -24,6 +26,9 @@ interface UiTotalAmountPerMonth {
 })
 export class DashboardComponent implements OnInit, OnDestroy {
     public static readonly REFRESH_INTERVAL = 10000;
+
+    public NavigatorPages = NavigatorPages;
+
     message = '';
     transactionId = 0;
     lastTransactions: TransferDTO[] = [];

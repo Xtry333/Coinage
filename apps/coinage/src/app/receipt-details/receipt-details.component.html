@@ -1,0 +1,41 @@
+<div *ngIf="showPage" class="receipt-details-component">
+    <table class="receipt-details-table">
+        <tr>
+            <th>Description</th>
+            <td>{{ receiptDetails?.description }}</td>
+        </tr>
+        <tr>
+            <th>Amount</th>
+            <td>
+                <span>{{ receiptDirectionDisplaySymbol }} {{ receiptDetails.amount | plnCurrency }}</span>
+            </td>
+        </tr>
+        <tr>
+            <th>Total Transferred</th>
+            <td>{{ receiptDetails.totalTransferred | plnCurrency }} / {{ receiptDetails.totalAmount | plnCurrency }}</td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>
+                <span>{{ receiptDetails.date | date }}</span>
+            </td>
+        </tr>
+        <tr *ngIf="receiptDetails.nextTransferDate">
+            <th>Next Transfer Date</th>
+            <td>
+                <span>{{ receiptDetails.nextTransferDate | date }}</span>
+            </td>
+        </tr>
+        <tr>
+            <th>Contractor</th>
+            <td>{{ receiptDetails.contractor?.name | undefined }}</td>
+        </tr>
+    </table>
+    <coinage-app-transfers-table
+        [tableHeader]="'Transfers in receipt'"
+        [transfers]="receiptDetails.allTransfers"
+        [showFilters]="false"
+        [showSummary]="false"
+        [showReceiptIcon]="false"
+    ></coinage-app-transfers-table>
+</div>

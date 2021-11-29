@@ -1,4 +1,4 @@
-<div *ngIf="showPage">
+<div *ngIf="showPage" class="transfer-details-component">
     <h4>
         <ul class="category-path-list">
             <li>Root</li>
@@ -7,17 +7,25 @@
             </li>
         </ul>
     </h4>
-    <table>
+    <table class="transfer-details-table">
         <tr>
             <th>Description</th>
             <td>{{ transfer?.description }}</td>
+        </tr>
+        <tr *ngIf="transfer.receipt">
+            <th>Receipt</th>
+            <td>
+                <a [routerLink]="receiptDetailsLink">
+                    {{ transfer?.receipt?.description }}
+                </a>
+            </td>
         </tr>
         <tr>
             <th>Amount</th>
             <td>
                 <span> {{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</span>
                 <span class="planned-icon" *ngIf="transfer.receipt">
-                    <a [routerLink]="['/', 'receipt', transfer.receipt?.id]">
+                    <a [routerLink]="receiptDetailsLink">
                         <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
                     </a>
                 </span>
@@ -35,7 +43,7 @@
                     <fa-icon [icon]="plannedIcon" [fixedWidth]="true" title="Transfer is planned"></fa-icon>
                 </span>
                 <span *ngIf="transfer.refundedBy" class="planned-icon">
-                    <a [routerLink]="['/', 'details', transfer.refundedBy]">
+                    <a [routerLink]="refundedByLink">
                         ({{ transfer.refundedOn | date }} <fa-icon [icon]="refundedIcon" [fixedWidth]="true" title="Refunded"></fa-icon>)
                     </a>
                 </span>
@@ -44,6 +52,10 @@
         <tr>
             <th>Contractor</th>
             <td>{{ transfer.contractor | undefined }}</td>
+        </tr>
+        <tr>
+            <th>Total {{ totalPayment < 0 ? 'payed to' : 'received from' }} {{ transfer?.contractor }}</th>
+            <td>{{ transfer?.date }}: {{ totalPayment | mathAbs | plnCurrency }}</td>
         </tr>
         <tr>
             <th>Category</th>
@@ -60,20 +72,12 @@
             <td>{{ transfer.account.name }}</td>
         </tr>
     </table>
-    <pre>{{ transfer?.description }}</pre>
-    <pre>Amount: {{ transfer.amount | plnCurrency }}</pre>
-    <pre>Date: {{ transfer.date }}</pre>
-    <pre>Type: {{ transfer.type }}</pre>
-    <div *ngIf="transfer.contractor">
-        <pre>Contractor: {{ transfer?.contractor }}</pre>
-        <pre>Total {{ isOutcome ? 'payed to' : 'received from' }} {{ transfer?.contractor }} on {{ transfer?.date }}: {{ totalPayment | plnCurrency }}</pre>
+    <br />
+    <div class="button-group">
+        <button (click)="onClickEditMode()">Edit</button>
+        <button (click)="onToggleShowSplit()">Show Split Transfer</button>
+        <button *ngIf="transfer.isRefundable" (click)="onClickRefundTransfer()" type="button">Refund</button>
     </div>
-    <br /><br />
-    <button (click)="onClickEditMode()">Edit</button>
-    <button (click)="onToggleShowSplit()">Show Split Transfer</button>
-    <button *ngIf="transfer.isRefundable" (click)="onClickRefundTransfer()" type="button">
-        <div>Refund</div>
-    </button>
     <div *ngIf="shouldShowSplit" class="split-transaction-form">
         <div>
             <label for="description">Description</label>

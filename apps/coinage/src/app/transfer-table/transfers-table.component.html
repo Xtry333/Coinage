@@ -50,6 +50,16 @@
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
+                    Account
+                    <coinage-app-table-filter
+                        *ngIf="showFilters"
+                        [filterName]="TableColumns.Account"
+                        (filterEvent)="onFilter($event)"
+                        [filterType]="FilterTypes.TextBox"
+                        [popupSide]="PopupSides.ToLeft"
+                    ></coinage-app-table-filter>
+                </th>
+                <th class="align-right">
                     Date
                     <coinage-app-table-filter
                         *ngIf="showFilters"
@@ -62,35 +72,43 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let transfer of transfersForTable; trackBy: transferIdTracker">
-                <td>{{ transfer.category }}</td>
-                <td>
-                    <a [routerLink]="['/details', transfer.id]">
-                        {{ transfer.description }}
-                    </a>
-                </td>
-                <td>
-                    {{ transfer.contractor | undefined }}
-                </td>
-                <td class="currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
-                <td class="align-right">
-                    <a [routerLink]="['/summary', transfer.date]">{{ transfer.date | date }}</a>
-                </td>
+            <tr *ngFor="let transfer of transfersForTable; trackBy: transferIdTracker" [ngClass]="{ 'today-marker-row': transfer.isTodayMarkerRow }">
+                <ng-container *ngIf="!transfer.isTodayMarkerRow">
+                    <td>{{ transfer.category }}</td>
+                    <td>
+                        <a [routerLink]="NavigatorPages.TransferDetails(transfer.id)">
+                            {{ transfer.description }}
+                        </a>
+                        <span class="planned-icon" *ngIf="transfer.receiptId">
+                            <a [routerLink]="NavigatorPages.ReceiptDetails(transfer.receiptId)">
+                                <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
+                            </a>
+                        </span>
+                    </td>
+                    <td>
+                        {{ transfer.contractor | undefined }}
+                    </td>
+                    <td class="currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
+                    <td>{{ transfer.account }}</td>
+                    <td class="align-right nowrap">
+                        <a [routerLink]="NavigatorPages.Summary(transfer.date)">{{ transfer.date | date }}</a>
+                    </td>
+                </ng-container>
             </tr>
-            <tr *ngIf="!noRows && outcomesCount > 0" class="sum-row top-border">
+            <tr *ngIf="showSummary && !noRows && outcomesCount > 0" class="sum-row top-border">
                 <td colspan="2">Expenses Sum</td>
                 <td>{{ outcomesCount }}</td>
                 <td class="currency">{{ outcomesSum | plnCurrency }}</td>
-                <td></td>
+                <td colspan="2"></td>
             </tr>
-            <tr *ngIf="!noRows && incomesCount > 0" class="sum-row">
+            <tr *ngIf="showSummary && !noRows && incomesCount > 0" class="sum-row">
                 <td colspan="2">Incomes Sum</td>
                 <td>{{ incomesCount }}</td>
                 <td class="currency">{{ incomesSum | plnCurrency }}</td>
-                <td></td>
+                <td colspan="2"></td>
             </tr>
             <tr *ngIf="noRowsFound">
-                <td colspan="5">
+                <td colspan="6">
                     No transfers found.
                     <span *ngIf="isAnyFilterApplied && !noRows"> Please check filters, there are {{ transfers?.length }} unmatched transfers. </span>
                 </td>

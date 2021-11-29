@@ -5,9 +5,9 @@
     </div>
     <nav>
         <ul class="nav-list">
-            <li><a routerLink="/dashboard">Dashboard</a></li>
-            <li><a routerLink="/transfers">Transfers</a></li>
-            <li><a routerLink="/manage/categories">Manage Categories</a></li>
+            <li><a [routerLink]="NavigatorPages.Dashboard()">Dashboard</a></li>
+            <li><a [routerLink]="NavigatorPages.TransfersList()">Transfers</a></li>
+            <li><a [routerLink]="'/manage/categories'">Manage Categories</a></li>
             <!-- <li><a routerLink="/transfer/add">Add transfer</a></li> -->
             <li><a (click)="toggleTrinketModal()">Add transfer</a></li>
             <li><a routerLink="/accounts">Account Settings</a></li>

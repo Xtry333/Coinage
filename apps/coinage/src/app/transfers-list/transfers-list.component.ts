@@ -1,8 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { TransferDTO } from '@coinage-app/interfaces';
-import { CoinageDataService } from '../services/coinageData.service';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
+
+import { CoinageDataService } from '../services/coinageData.service';
 
 @Component({
     selector: 'coinage-app-transfers-list',

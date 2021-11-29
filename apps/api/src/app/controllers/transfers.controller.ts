@@ -42,7 +42,10 @@ export class TransfersController {
                 categoryId: t.category?.id,
                 category: t.category?.name,
                 contractor: t.contractor?.name,
+                account: t.account.name,
+                accountId: t.accountId,
                 date: t.date,
+                receiptId: t.receiptId,
             };
         });
     }
@@ -62,7 +65,10 @@ export class TransfersController {
                         categoryId: t.category?.id,
                         category: t.category?.name,
                         contractor: t.contractor?.name,
+                        account: t.account.name,
+                        accountId: t.account.id,
                         date: t.date,
+                        receiptId: t.receiptId,
                     };
                 })
         );
@@ -105,6 +111,8 @@ export class TransfersController {
                     amount: parseFloat(t.amount),
                     type: t.type,
                     category: t.category.name,
+                    accountId: t.account.id,
+                    account: t.account.name,
                     date: t.date,
                     categoryId: t.category.id,
                 };
@@ -218,7 +226,6 @@ export class TransfersController {
         } else {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
-        entity.account = undefined;
         entity.accountId = transfer.accountId;
         entity.contractor = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         if (entity.category.name === 'Paliwo') {

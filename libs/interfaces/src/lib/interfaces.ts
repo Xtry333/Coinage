@@ -11,6 +11,9 @@ export interface TransferDTO {
     type: TransferTypeEnum;
     category: string;
     categoryId: number;
+    account: string;
+    accountId: number;
+    receiptId?: number;
     date: string;
 }
 
@@ -51,10 +54,15 @@ export enum TransferTypeEnum {
 }
 
 export class TransferType {
-    public static readonly INCOME = new TransferType('Income', TransferTypeEnum.INCOME, '+');
-    public static readonly OUTCOME = new TransferType('Expense', TransferTypeEnum.OUTCOME, '−');
+    public static readonly INCOME = new TransferType('Income', TransferTypeEnum.INCOME, '+', 1);
+    public static readonly OUTCOME = new TransferType('Expense', TransferTypeEnum.OUTCOME, '−', -1);
 
-    constructor(public readonly displayName: string, public readonly value: TransferTypeEnum, public readonly symbol: string) {}
+    constructor(
+        public readonly displayName: string,
+        public readonly value: TransferTypeEnum,
+        public readonly symbol: string,
+        public readonly mathSymbol: number
+    ) {}
 }
 
 export interface TotalAmountPerMonthDTO {

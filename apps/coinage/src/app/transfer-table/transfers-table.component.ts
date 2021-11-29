@@ -1,8 +1,12 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
+import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
-import { TransferDTO, TransferType } from '@coinage-app/interfaces';
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
+
 import { CoinageDataService } from '../services/coinageData.service';
-import { FilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
+import { NavigatorPages } from '../services/navigator-service.service';
+import { OnFilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
 
 export enum TableColumns {
     Category = 'category',
@@ -10,14 +14,18 @@ export enum TableColumns {
     Contractor = 'contractor',
     Amount = 'amount',
     Date = 'date',
+    Account = 'account',
 }
 
 export interface TableFilterFields {
     category?: string;
     description?: string;
     contractor?: string;
+    account?: string;
     [key: string]: string | undefined;
 }
+
+export type UiTransfer = TransferDTO & { typeSymbol: string; isTodayMarkerRow?: boolean };
 
 @Component({
     selector: 'coinage-app-transfers-table',
@@ -31,22 +39,29 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public FilterTypes = FilterTypes;
     public PopupSides = PopupSides;
     public TableColumns = TableColumns;
+    public NavigatorPages = NavigatorPages;
 
-    private filter: TableFilterFields = { category: '', contractor: '', description: '' };
+    public receiptIcon: IconDefinition = faReceipt;
+
+    private filter: TableFilterFields = { category: '', contractor: '', description: '', account: '' };
     public outcomesSum = 0;
     public outcomesCount = 0;
     public incomesSum = 0;
     public incomesCount = 0;
 
-    public transfersForTable: (TransferDTO & { typeSymbol: string })[] = [];
+    public transfersForTable: UiTransfer[] = [];
     public categoryNames: string[] = [];
     public contractorNames: string[] = [];
 
     @Input() tableHeader?: string;
     @Input() transfers?: TransferDTO[];
     @Input() showFilters?: boolean = false;
+    @Input() showSummary?: boolean = true;
+    @Input() showReceiptIcon?: boolean = true;
+    @Input() showTodayMarker?: boolean = true;
+    @Input() cachingName?: string;
 
-    constructor(private readonly dataService: CoinageDataService) {}
+    constructor(private readonly dataService: CoinageDataService, private readonly localStorageService: CoinageLocalStorageService) {}
 
     public ngOnInit(): void {
         this.doFiltering();
@@ -56,6 +71,13 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                 this.categoryNames = categories.map((c) => c.name);
                 this.contractorNames = contractors.map((c) => c.name);
             });
+            if (this.cachingName) {
+                // this.localStorageService.get(this.cachingName).subscribe((filter) => {
+                //     if (filter) {
+                //         this.filter = filter;
+                //     }
+                // });
+            }
         }
     }
 
@@ -67,8 +89,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         return item.id.toString();
     }
 
-    public onFilter(ev: FilterEvent) {
-        this.filter[ev.name] = ev.value;
+    public onFilter(event: OnFilterEvent) {
+        this.filter[event.name] = event.value;
         // Replaced by simpler code above
         // switch (ev.name) {
         //     case TableColumns.Category:
@@ -88,6 +110,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         return (
             (this.filter.category === undefined || this.caseInsensitiveIncludes(row.category, this.filter.category)) &&
             (this.filter.description === undefined || this.caseInsensitiveIncludes(row.description, this.filter.description)) &&
+            (this.filter.account === undefined || this.caseInsensitiveIncludes(row.account, this.filter.account)) &&
             (this.filter.contractor === undefined ||
                 this.caseInsensitiveIncludes(row.contractor ?? TransfersTableComponent.EMPTY_CONTRACTOR, this.filter.contractor))
         );
@@ -116,6 +139,19 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     };
                 });
         }
+        if (this.showTodayMarker) {
+            this.placeTodayMarkerRow();
+        }
+    }
+
+    private placeTodayMarkerRow(): void {
+        const todayStr = new Date().toISOString().substring(0, 10);
+        const todayTransfersIndex = this.transfersForTable.findIndex((t) => t.date.localeCompare(todayStr) <= 0);
+        if (todayTransfersIndex != -1) {
+            this.transfersForTable.splice(todayTransfersIndex, 0, this.dummyTransfer, this.dummyTransfer);
+        } else {
+            this.transfersForTable.push(this.dummyTransfer, this.dummyTransfer);
+        }
     }
 
     private caseInsensitiveIncludes(a: string, b: string) {
@@ -141,5 +177,22 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             }
         }
         return false;
+    }
+
+    get dummyTransfer(): UiTransfer {
+        return {
+            id: -1,
+            date: '',
+            type: TransferTypeEnum.OUTCOME,
+            accountId: 0,
+            categoryId: 0,
+            amount: 0,
+            category: '',
+            description: '',
+            contractor: '',
+            account: '',
+            typeSymbol: TransferType.OUTCOME.symbol,
+            isTodayMarkerRow: true,
+        };
     }
 }

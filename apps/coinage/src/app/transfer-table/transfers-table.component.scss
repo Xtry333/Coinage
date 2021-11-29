@@ -29,6 +29,11 @@ div.transfers-table-container {
             font-weight: bold;
         }
 
+        tr.today-marker-row {
+            border-bottom: #65aafa 1px solid;
+            height: 1px;
+        }
+
         tbody tr:nth-child(even) {
             background-color: rgb(240, 240, 240);
         }
@@ -40,6 +45,9 @@ div.transfers-table-container {
             }
             &.month-name {
                 text-transform: capitalize;
+            }
+            &.nowrap {
+                white-space: nowrap;
             }
         }
 

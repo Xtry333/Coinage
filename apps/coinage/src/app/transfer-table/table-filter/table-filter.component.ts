@@ -12,7 +12,7 @@ export enum PopupSides {
     ToLeft = 'toLeft',
 }
 
-export interface FilterEvent {
+export interface OnFilterEvent {
     value?: string;
     name: string;
 }
@@ -35,11 +35,11 @@ export class TableFilterComponent implements OnInit {
     public filterAppliedIcon = faFilter;
     public isPopupDisplayed = false;
 
-    public filterValue: FilterEvent = {
+    public filterValue: OnFilterEvent = {
         value: undefined,
         name: '',
     };
-    public lastFilterValue?: FilterEvent;
+    public lastFilterValue?: OnFilterEvent;
 
     @ViewChildren('filterInput')
     private filterInput!: QueryList<ElementRef<HTMLInputElement>>;
@@ -52,7 +52,7 @@ export class TableFilterComponent implements OnInit {
     @Input() public filterName = '';
     @Input() public datalist: string[] = [];
 
-    @Output() public filterEvent = new EventEmitter<FilterEvent>();
+    @Output() public filterEvent = new EventEmitter<OnFilterEvent>();
     @Output() public openEvent = new EventEmitter<void>();
     @Output() public closeEvent = new EventEmitter<void>();
     @Output() public focusEvent = new EventEmitter<boolean>();

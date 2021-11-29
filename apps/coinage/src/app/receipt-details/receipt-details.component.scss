@@ -1,0 +1,27 @@
+.receipt-details-component {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+
+    table.receipt-details-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        table-layout: fixed;
+        margin-top: 20px;
+        tr {
+            border-bottom: 1px solid #ccc;
+        }
+        td,
+        th {
+            padding: 10px;
+            text-align: left;
+        }
+        border: 1px solid #ccc;
+        td {
+            .planned-icon {
+                margin-left: 5px;
+            }
+        }
+    }
+}

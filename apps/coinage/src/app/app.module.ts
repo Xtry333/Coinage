@@ -29,8 +29,10 @@ import { DashboardCountersComponent } from './dashboard/dashboard-counters/dashb
 import { StatisticsComponent } from './statistics/statistics.component';
 import { NullTransformPipe } from './pipes/null-transform.pipe';
 import { ReplacePipe } from './pipes/replace.pipe';
+import { ReceiptDetailsComponent } from './receipt-details/receipt-details.component';
+import { MathAbsPipe } from './pipes/math-abs.pipe';
 
-const pipes = [PlnCurrencyPipe, NullTransformPipe];
+const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
 @NgModule({
     declarations: [
@@ -39,6 +41,7 @@ const pipes = [PlnCurrencyPipe, NullTransformPipe];
         DashboardComponent,
         SummaryComponent,
         TransferDetailsComponent,
+        ReceiptDetailsComponent,
         SpinnerComponent,
         CategoryManagerComponent,
         CreateEditTransferComponent,
@@ -52,7 +55,6 @@ const pipes = [PlnCurrencyPipe, NullTransformPipe];
         BigCounterComponent,
         DashboardCountersComponent,
         StatisticsComponent,
-        ReplacePipe,
     ],
     imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [

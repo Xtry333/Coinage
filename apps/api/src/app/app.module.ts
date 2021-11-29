@@ -15,10 +15,11 @@ import { AccountsController } from './controllers/accounts.controller';
 import { DashboardComponent } from './controllers/dashboard.controller';
 import { ReceiptDao } from './daos/receipt.dao';
 import { DateParserService } from './services/date-parser.service';
+import { ReceiptsController } from './controllers/receipts.controller';
 
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
-    controllers: [TransfersController, CategoriesController, ContractorController, AccountsController, DashboardComponent],
+    controllers: [TransfersController, ReceiptsController, CategoriesController, ContractorController, AccountsController, DashboardComponent],
     providers: [AppService, TransferDao, CategoryDao, ContractorDao, AccountDao, ReceiptDao, DateParserService],
 })
 export class AppModule {}

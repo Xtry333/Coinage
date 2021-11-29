@@ -7,6 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 import { NotificationService } from '../services/notification.service';
+import { NavigatorPages, NavigatorService } from '../services/navigator-service.service';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -20,6 +21,8 @@ export class TransferDetailsComponent implements OnInit {
     showPage = false;
     transfer!: TransferDetailsDTO;
 
+    public NavigatorPages = NavigatorPages;
+
     @Input()
     splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
     totalPayment = 0;
@@ -30,6 +33,7 @@ export class TransferDetailsComponent implements OnInit {
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
+        private readonly navigator: NavigatorService,
         private readonly coinageData: CoinageDataService,
         private readonly notificationService: NotificationService
     ) {}
@@ -49,7 +53,9 @@ export class TransferDetailsComponent implements OnInit {
                     .subscribe(([transfer, categories]) => {
                         console.log(transfer);
                         this.transfer = transfer;
-                        this.totalPayment = transfer.amount + transfer.otherTransfers.reduce((a, t) => a + t.amount, 0);
+                        this.totalPayment =
+                            transfer.amount * TransferType[transfer.type].mathSymbol +
+                            transfer.otherTransfers.reduce((a, t) => a + t.amount * TransferType[t.type].mathSymbol, 0);
                         this.categories = categories;
                         this.splitTransfer.amount = +(transfer.amount / 2).toFixed(2);
                         this.splitTransfer.categoryId = transfer.categoryPath[transfer.categoryPath.length - 1].id;
@@ -57,7 +63,7 @@ export class TransferDetailsComponent implements OnInit {
                         console.log(this.transfer.otherTransfers);
                     });
             } else {
-                this.router.navigateByUrl('notFound');
+                this.navigator.goToNotFoundPage();
             }
         });
     }
@@ -77,7 +83,9 @@ export class TransferDetailsComponent implements OnInit {
                 })
                 .subscribe((result) => {
                     this.shouldShowSplit = false;
-                    this.router.navigateByUrl(`/details/${result.insertedId}`);
+                    if (result.insertedId) {
+                        this.navigator.goTo(NavigatorPages.TransferDetails(result.insertedId));
+                    }
                 });
     }
 
@@ -98,18 +106,32 @@ export class TransferDetailsComponent implements OnInit {
     }
 
     public onClickEditMode(): void {
-        if (this.transfer) this.router.navigateByUrl(`/transfer/edit/${this.transfer.id}`);
+        if (this.transfer) {
+            this.navigator.goTo(NavigatorPages.TransferEdit(this.transfer.id));
+        }
     }
 
-    get transferTypeDisplayName(): string {
+    public get receiptDetailsLink(): string | undefined {
+        if (this.transfer.receipt?.id) {
+            return NavigatorPages.ReceiptDetails(this.transfer.receipt?.id);
+        }
+    }
+
+    public get refundedByLink(): string | undefined {
+        if (this.transfer.refundedBy) {
+            return NavigatorPages.TransferDetails(this.transfer.refundedBy);
+        }
+    }
+
+    public get transferTypeDisplayName(): string {
         return TransferType[this.transfer.type].displayName;
     }
 
-    get transferTypeDisplaySymbol(): string {
+    public get transferTypeDisplaySymbol(): string {
         return TransferType[this.transfer.type].symbol;
     }
 
-    get isOutcome(): boolean {
+    public get isOutcome(): boolean {
         return this.transfer.type === TransferTypeEnum.OUTCOME;
     }
 }

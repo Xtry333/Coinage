@@ -9,6 +9,7 @@ import {
     TotalInMonthByCategory,
     TotalAmountPerMonthDTO,
     TransferDetailsDTO,
+    ReceiptDetailsDTO,
     TransferDTO,
     CreateEditCategoryDTO,
     CreateEditContractorDTO,
@@ -42,6 +43,10 @@ export class CoinageDataService {
 
     public getTransferDetails(id: number): Promise<TransferDetailsDTO> {
         return this.http.get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/details/${id}`).toPromise();
+    }
+
+    public getReceiptDetails(id: number): Observable<ReceiptDetailsDTO> {
+        return this.http.get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/details/${id}`);
     }
 
     public getTotalOutcomesPerMonth(): Observable<TotalAmountPerMonthDTO[]> {

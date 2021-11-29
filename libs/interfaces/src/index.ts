@@ -12,3 +12,4 @@ export * from './lib/BalanceDTO.response';
 export * from './lib/CreateInternalTransferDTO.request';
 export * from './lib/CreateInternalTransferDTO.response';
 export * from './lib/RefundTransferDTO.request';
+export * from './lib/ReceiptDetailsDTO.response';

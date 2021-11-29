@@ -4,6 +4,7 @@ import { AccountDTO, CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetail
 import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
+
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { CoinageDataService } from '../services/coinageData.service';
 import { NotificationService } from '../services/notification.service';
@@ -102,12 +103,18 @@ export class CreateEditTransferComponent implements OnInit {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
             if (result.insertedId && cat) {
-                this.saveSuccess.emit({ ...newTransfer, id: result.insertedId, category: cat.name, type: TransferTypeEnum.OUTCOME });
+                this.saveSuccess.emit({
+                    ...newTransfer,
+                    id: result.insertedId,
+                    category: cat.name,
+                    type: TransferTypeEnum.OUTCOME,
+                    account: this.accounts.find((a) => a.id === newTransfer.accountId)?.name ?? '',
+                });
                 this.notificationService.push({ title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`, message: newTransfer.description });
                 this.clearInputData();
             }
             if (this.redirectAfterSave) {
-                this.router.navigateByUrl(`/details/${result.insertedId}`);
+                this.router.navigateByUrl(`/transfer/details/${result.insertedId}`);
             }
         });
         this.coinageLocalStorageService.setNumber('lastUsedAccountId', this.selectedTransferInputs.accountId);

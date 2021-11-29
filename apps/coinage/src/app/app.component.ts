@@ -3,6 +3,7 @@ import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
 import { CoinageLocalStorageService } from './services/coinage-local-storage.service';
+import { NavigatorPages } from './services/navigator-service.service';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 
 @Component({
@@ -11,6 +12,8 @@ import { TransfersListComponent } from './transfers-list/transfers-list.componen
     styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnInit, OnDestroy {
+    public NavigatorPages = NavigatorPages;
+
     isPageLoading = true;
     title = 'Coinage';
     dateTime = new Date().toLocaleString();
@@ -25,11 +28,7 @@ export class AppComponent implements OnInit, OnDestroy {
 
     isTrinketDisplayed = false;
 
-    constructor(private readonly loader: LoadingService, private readonly localStorageService: CoinageLocalStorageService) {
-        console.log(this);
-        this.localStorageService.setObject('k1', new Date());
-        console.log(this.localStorageService.getObject('k1', (x) => new Date(x)));
-    }
+    constructor(private readonly loader: LoadingService, private readonly localStorageService: CoinageLocalStorageService) {}
 
     ngOnInit(): void {
         this.loader.loading$.subscribe((loading) => {

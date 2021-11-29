@@ -1,3 +1,9 @@
+.transfer-details-component {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
 .category-path-list {
     padding: 0;
     margin: 0;
@@ -15,10 +21,21 @@
     }
 }
 
-button {
-    cursor: pointer;
-    margin: 5px;
-    padding: 5px;
+.button-group {
+    width: 100%;
+    display: flex;
+    button {
+        width: 100%;
+        cursor: pointer;
+        margin: 5px 0px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 0px;
+        align-self: center;
+        &:hover {
+            background-color: #f5f5f5;
+        }
+    }
 }
 
 .split-transaction-form {
@@ -34,7 +51,7 @@ button {
     }
 }
 
-table {
+table.transfer-details-table {
     width: 100%;
     border-collapse: collapse;
     border-spacing: 0;

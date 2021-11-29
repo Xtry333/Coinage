@@ -40,6 +40,9 @@ export class Transfer {
     @JoinColumn({ name: 'contractor' })
     contractor?: Contractor | undefined;
 
+    @Column({ name: 'receipt', type: 'numeric', nullable: true })
+    receiptId?: number | undefined;
+
     @ManyToOne('Receipt', { eager: false, nullable: true })
     @JoinColumn({ name: 'receipt' })
     receipt?: Receipt | undefined;
@@ -47,12 +50,12 @@ export class Transfer {
     @Column('varchar', { length: 50, nullable: false })
     type!: TransferTypeEnum;
 
-    @Column({ nullable: true, type: 'numeric' })
-    accountId?: number | undefined;
+    @Column({ type: 'numeric' })
+    accountId!: number;
 
     @ManyToOne('Account', { eager: true, nullable: true })
     @JoinColumn({ name: 'account_id' })
-    account?: Account | undefined;
+    account!: Account;
 
     @Column('bit', { nullable: false })
     isInternal!: boolean;

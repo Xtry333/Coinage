@@ -8,6 +8,7 @@ import { CategoryManagerComponent } from '../category-manager/category-manager.c
 import { SummaryComponent } from '../summary/summary.component';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
 import { TransfersListComponent } from '../transfers-list/transfers-list.component';
+import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
 
 const routes: Routes = [
     {
@@ -20,8 +21,12 @@ const routes: Routes = [
         component: DashboardComponent,
     },
     {
-        path: 'details/:id',
+        path: 'transfer/details/:id',
         component: TransferDetailsComponent,
+    },
+    {
+        path: 'receipt/details/:id',
+        component: ReceiptDetailsComponent,
     },
     {
         path: 'transfers',
