@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { NavigatorService } from './navigator-service.service';
+import { NavigatorService } from './navigator.service';
 
 describe('NavigatorServiceService', () => {
     let service: NavigatorService;

@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 import { NotificationService } from '../services/notification.service';
-import { NavigatorPages, NavigatorService } from '../services/navigator-service.service';
+import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 
 @Component({
     selector: 'coinage-app-transfer-details',

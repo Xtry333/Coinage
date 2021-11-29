@@ -5,7 +5,7 @@ import * as Rx from 'rxjs';
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 
 import { CoinageDataService } from '../services/coinageData.service';
-import { NavigatorPages } from '../services/navigator-service.service';
+import { NavigatorPages } from '../services/navigator.service';
 import { OnFilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
 
 export enum TableColumns {

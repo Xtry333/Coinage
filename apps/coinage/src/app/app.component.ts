@@ -3,7 +3,7 @@ import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
 import { CoinageLocalStorageService } from './services/coinage-local-storage.service';
-import { NavigatorPages } from './services/navigator-service.service';
+import { NavigatorPages } from './services/navigator.service';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 
 @Component({

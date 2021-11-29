@@ -7,7 +7,7 @@ import { finalize } from 'rxjs/operators';
 
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { CoinageDataService } from '../services/coinageData.service';
-import { NavigatorPages, NavigatorService } from '../services/navigator-service.service';
+import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 import { NotificationService } from '../services/notification.service';
 
 export interface NewTransferObject {

@@ -5,7 +5,7 @@ import { finalize } from 'rxjs/operators';
 
 import { CoinageDataService } from '../services/coinageData.service';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
-import { NavigatorPages } from '../services/navigator-service.service';
+import { NavigatorPages } from '../services/navigator.service';
 import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
 
 interface UiTotalAmountPerMonth {
