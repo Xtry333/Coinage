@@ -81,6 +81,10 @@ export class CoinageDataService {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/refund`, request);
     }
 
+    public duplicateTransfer(transferId: number) {
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/duplicate`, {});
+    }
+
     public postCreateInternalTransfer(request: CreateInternalTransferDTO, originAccountId: number, targetAccountId: number) {
         return this.http.post<CreateInternalTransferDTOResponse>(
             `${CoinageDataService.API_URL}transfer/create/internal/${originAccountId}/${targetAccountId}`,

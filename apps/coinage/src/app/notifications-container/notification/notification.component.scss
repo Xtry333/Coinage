@@ -68,5 +68,6 @@ div.notification {
         overflow: hidden;
         text-overflow: ellipsis;
         width: 300px;
+        white-space: pre-line;
     }
 }

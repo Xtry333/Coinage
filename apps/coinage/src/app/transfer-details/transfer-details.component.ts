@@ -105,6 +105,19 @@ export class TransferDetailsComponent implements OnInit {
         });
     }
 
+    public onClickDuplicateTransfer(): void {
+        this.coinageData.duplicateTransfer(this.transfer.id).subscribe((result) => {
+            if (result && result.insertedId) {
+                this.notificationService.push({
+                    title: `Transfer Duplicated`,
+                    message: 'Remember to save edited transfer',
+                });
+
+                this.navigator.goTo(NavigatorPages.TransferEdit(result.insertedId));
+            }
+        });
+    }
+
     public onClickEditMode(): void {
         if (this.transfer) {
             this.navigator.goTo(NavigatorPages.TransferEdit(this.transfer.id));

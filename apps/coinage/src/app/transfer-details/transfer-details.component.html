@@ -77,6 +77,7 @@
         <button (click)="onClickEditMode()">Edit</button>
         <button (click)="onToggleShowSplit()">Show Split Transfer</button>
         <button *ngIf="transfer.isRefundable" (click)="onClickRefundTransfer()" type="button">Refund</button>
+        <button (click)="onClickDuplicateTransfer()" type="button">Duplicate</button>
     </div>
     <div *ngIf="shouldShowSplit" class="split-transaction-form">
         <div>

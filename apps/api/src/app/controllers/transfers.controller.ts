@@ -305,6 +305,26 @@ export class TransfersController {
         return { insertedId: inserted.id, message: `Succesfully saved refund of ${transfer.description} #${transfer.id}.` };
     }
 
+    @Post(':id/duplicate')
+    async duplicateTransfer(@Param('id') paramId: string): Promise<BaseResponseDTO> {
+        const id = parseInt(paramId);
+        const transfer = await this.transferDao.getById(id);
+
+        if (!transfer) {
+            throw new Error('Invalid Transfer ID.');
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (transfer as any).id = undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (transfer as any).createdDate = undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (transfer as any).editedDate = undefined;
+
+        const inserted = await this.transferDao.save(transfer);
+        return { insertedId: inserted.id };
+    }
+
     @Delete(':id')
     async removeTransferObject(@Param('id') id: number) {
         // TODO: On remove delete refundedBy metadata from target
