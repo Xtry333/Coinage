@@ -52,7 +52,7 @@ yarn dev
 yarn migration:create <migration_name>
 ```
 
-## Formatting the
+## Formatting the codebase
 
 ```
 yarn format
