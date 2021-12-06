@@ -207,6 +207,11 @@ export class TransfersController {
         console.log(transfer.date);
         let entity: Transfer;
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
+        const account = (await transfer.accountId) ? await this.accountDao.getById(parseInt(transfer.accountId?.toString())) : undefined;
+
+        if (!account) {
+            throw new Error('Account not found');
+        }
         //const account = await this.accc.getById(parseInt(transfer.categoryId?.toString()));
         if (transfer.id) {
             entity = await this.transferDao.getById(transfer.id);
@@ -226,7 +231,7 @@ export class TransfersController {
         } else {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
-        entity.accountId = transfer.accountId;
+        entity.account = account;
         entity.contractor = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         if (entity.category.name === 'Paliwo') {
             try {
@@ -236,6 +241,7 @@ export class TransfersController {
                 console.log(e);
             }
         }
+        console.log(entity);
         const inserted = await this.transferDao.save(entity);
         return { insertedId: inserted.id };
     }
@@ -265,6 +271,7 @@ export class TransfersController {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
         entity.contractor = target.contractor;
+        entity.receiptId = target.receiptId;
         const inserted = await this.transferDao.insert(entity);
         await this.transferDao.save(target);
         return { insertedId: inserted.identifiers[0].id };
