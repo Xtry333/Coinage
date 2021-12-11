@@ -17,6 +17,10 @@ const routes: Routes = [
         pathMatch: 'full',
     },
     {
+        path: 'notFound',
+        component: DashboardComponent,
+    },
+    {
         path: 'dashboard',
         component: DashboardComponent,
     },

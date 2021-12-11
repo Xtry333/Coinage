@@ -10,6 +10,8 @@ export const NavigatorPages = {
     TransferEdit: (id: number) => `/transfer/edit/${id}`,
     ReceiptDetails: (id: number) => `/receipt/details/${id}`,
     Summary: (date: string) => `/summary/${date}`,
+    CategoryDetails: (id: number) => `/category/${id}`,
+    ContractorDetails: (id: number) => `/contractor/${id}`,
 };
 
 @Injectable({

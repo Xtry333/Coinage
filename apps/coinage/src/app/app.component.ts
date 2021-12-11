@@ -51,7 +51,9 @@ export class AppComponent implements OnInit, OnDestroy {
         this.localStorageService.setObject(AppComponent.KEY_LAST_USER_VISIT_DATE, new Date());
         setTimeout(() => {
             if (lastVisit && lastVisit.getTime() < new Date().getTime() - AppComponent.WELCOME_DELAY) {
-                this.notificationService.push({ title: 'Welcome back!', message: `\nLast visit: ${lastVisit.toLocaleString()}` });
+                this.notificationService.push({ title: 'Welcome back!', message: `\nLast visit: ${(lastVisit ?? new Date()).toLocaleString()}` });
+            } else if (!lastVisit) {
+                this.notificationService.push({ title: 'Welcome!', message: `...` });
             }
         }, 1000);
     }

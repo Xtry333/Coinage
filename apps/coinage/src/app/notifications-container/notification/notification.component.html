@@ -1,7 +1,7 @@
 <div class="notification">
     <div class="btn-group">
-        <button class="btn-dismiss" (click)="dismiss()"><fa-icon [icon]="closeIcon"></fa-icon></button>
-        <button *ngIf="displayGoToIcon" class="btn-goto"><fa-icon [icon]="gotoIcon"></fa-icon></button>
+        <button class="btn btn-dismiss" (click)="dismiss()"><fa-icon [icon]="closeIcon"></fa-icon></button>
+        <button class="btn btn-goto" *ngIf="displayGoToIcon" [routerLink]="content.linkTo"><fa-icon [icon]="gotoIcon"></fa-icon></button>
     </div>
     <div class="title">{{ content.title }}</div>
     <div class="text">{{ content.message }}</div>

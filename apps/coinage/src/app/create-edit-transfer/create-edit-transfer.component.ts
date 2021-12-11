@@ -112,7 +112,11 @@ export class CreateEditTransferComponent implements OnInit {
                     type: TransferTypeEnum.OUTCOME,
                     account: this.accounts.find((a) => a.id === newTransfer.accountId)?.name ?? '',
                 });
-                this.notificationService.push({ title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`, message: newTransfer.description });
+                this.notificationService.push({
+                    title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`,
+                    message: newTransfer.description,
+                    linkTo: NavigatorPages.TransferDetails(result.insertedId),
+                });
                 this.clearInputData();
             }
             if (this.redirectAfterSave && result.insertedId) {
@@ -138,13 +142,17 @@ export class CreateEditTransferComponent implements OnInit {
 
     public onAddNewCategory = async (name: string): Promise<CategoryDTO> => {
         const response = await this.coinageData.postCreateCategory({ name }).toPromise();
-        this.notificationService.push({ title: `Category Created`, message: name });
+        if (response.insertedId) {
+            this.notificationService.push({ title: `Category Created`, message: name, linkTo: NavigatorPages.CategoryDetails(response.insertedId) });
+        }
         return { id: response.insertedId ?? 0, name };
     };
 
     public onAddNewContractor = async (name: string): Promise<ContractorDTO> => {
         const response = await this.coinageData.postCreateContractor({ name }).toPromise();
-        this.notificationService.push({ title: `Contractor Created`, message: name });
+        if (response.insertedId) {
+            this.notificationService.push({ title: `Contractor Created`, message: name, linkTo: NavigatorPages.ContractorDetails(response.insertedId) });
+        }
         return { id: response.insertedId ?? 0, name };
     };
 

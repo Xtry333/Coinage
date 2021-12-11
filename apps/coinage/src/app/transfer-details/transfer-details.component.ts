@@ -3,11 +3,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import * as Rx from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { finalize, catchError } from 'rxjs/operators';
 import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 import { NotificationService } from '../services/notification.service';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
+import { Observable } from 'rxjs';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -46,11 +47,19 @@ export class TransferDetailsComponent implements OnInit {
             if (id) {
                 Rx.zip(this.coinageData.getTransferDetails(id), this.coinageData.getCategoryList())
                     .pipe(
+                        catchError(() => {
+                            this.notificationService.push({
+                                title: 'Error',
+                                message: 'Transfer not found',
+                            });
+                            this.navigator.goTo(NavigatorPages.Dashboard());
+                            throw 404;
+                        }),
                         finalize(() => {
                             this.showPage = true;
                         })
                     )
-                    .subscribe(([transfer, categories]) => {
+                    .subscribe(([transfer, categories]: [TransferDetailsDTO, CategoryDTO[]]) => {
                         console.log(transfer);
                         this.transfer = transfer;
                         this.totalPayment =
@@ -91,10 +100,11 @@ export class TransferDetailsComponent implements OnInit {
 
     public onClickRefundTransfer(): void {
         this.coinageData.refundTransfer(this.transfer.id, new Date()).subscribe((result) => {
-            if (result) {
+            if (result && result.insertedId) {
                 this.notificationService.push({
                     title: `Added Refund`,
                     message: result.message ?? 'Refunded succesfully.',
+                    linkTo: NavigatorPages.TransferDetails(result.insertedId),
                 });
 
                 // TODO: Find better way to reload page/data after creating a refund
