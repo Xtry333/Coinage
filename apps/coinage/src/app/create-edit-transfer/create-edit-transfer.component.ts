@@ -59,20 +59,20 @@ export class CreateEditTransferComponent implements OnInit {
     ngOnInit(): void {
         this.showPage = false;
         this.clearInputData();
-        this.route.params.subscribe((r) => {
-            const id = parseInt(r.id);
+        this.route.params.subscribe((params) => {
+            const id = parseInt(params.id);
             if (id) {
                 this.transferId = id;
-                this.coinageData.getTransferDetails(id).then((t) => {
-                    this.transferDTO = t;
+                this.coinageData.getTransferDetails(id).subscribe((transfer) => {
+                    this.transferDTO = transfer;
                     this.editMode = true;
                     this.selectedTransferInputs = {
-                        amount: t.amount,
-                        categoryId: t.categoryId,
-                        date: t.date,
-                        description: t.description,
-                        contractorId: t.contractorId ?? undefined,
-                        accountId: t.account.id,
+                        amount: transfer.amount,
+                        categoryId: transfer.categoryId,
+                        date: transfer.date,
+                        description: transfer.description,
+                        contractorId: transfer.contractorId ?? undefined,
+                        accountId: transfer.account.id,
                     };
                 });
             }
@@ -141,7 +141,7 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     public onAddNewCategory = async (name: string): Promise<CategoryDTO> => {
-        const response = await this.coinageData.postCreateCategory({ name }).toPromise();
+        const response = await Rx.lastValueFrom(this.coinageData.postCreateCategory({ name }));
         if (response.insertedId) {
             this.notificationService.push({ title: `Category Created`, message: name, linkTo: NavigatorPages.CategoryDetails(response.insertedId) });
         }
@@ -149,7 +149,10 @@ export class CreateEditTransferComponent implements OnInit {
     };
 
     public onAddNewContractor = async (name: string): Promise<ContractorDTO> => {
-        const response = await this.coinageData.postCreateContractor({ name }).toPromise();
+        const response = await Rx.lastValueFrom(this.coinageData.postCreateContractor({ name }));
+        if (response === undefined) {
+            return { id: 0, name: '' };
+        }
         if (response.insertedId) {
             this.notificationService.push({ title: `Contractor Created`, message: name, linkTo: NavigatorPages.ContractorDetails(response.insertedId) });
         }

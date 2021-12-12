@@ -70,6 +70,7 @@
                         "tsConfig": "apps/coinage/tsconfig.app.json",
                         "assets": ["apps/coinage/src/favicon.ico", "apps/coinage/src/assets"],
                         "styles": ["apps/coinage/src/styles.scss"],
+                        "inlineStyleLanguage": "scss",
                         "scripts": [],
                         "vendorChunk": true,
                         "extractLicenses": false,
@@ -186,14 +187,6 @@
                         "lintFilePatterns": ["libs/interfaces/**/*.ts"]
                     },
                     "outputs": ["{options.outputFile}"]
-                },
-                "test": {
-                    "builder": "@nrwl/jest:jest",
-                    "outputs": ["coverage/libs/interfaces"],
-                    "options": {
-                        "jestConfig": "libs/interfaces/jest.config.js",
-                        "passWithNoTests": true
-                    }
                 }
             },
             "tags": []

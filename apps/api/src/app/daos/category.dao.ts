@@ -1,12 +1,10 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@nestjs/common';
 import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TotalInMonthByCategory } from '@coinage-app/interfaces';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class CategoryDao {
     async getById(id: number): Promise<Category | undefined> {
         return await getConnection()

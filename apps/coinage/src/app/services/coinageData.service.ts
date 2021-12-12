@@ -41,8 +41,8 @@ export class CoinageDataService {
         return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/recent`);
     }
 
-    public getTransferDetails(id: number): Promise<TransferDetailsDTO> {
-        return this.http.get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/details/${id}`).toPromise();
+    public getTransferDetails(id: number): Observable<TransferDetailsDTO> {
+        return this.http.get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/details/${id}`);
     }
 
     public getReceiptDetails(id: number): Observable<ReceiptDetailsDTO> {

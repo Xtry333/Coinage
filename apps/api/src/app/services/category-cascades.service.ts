@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@nestjs/common';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class CategoryCascadeService {
     // constructor() { }
 }

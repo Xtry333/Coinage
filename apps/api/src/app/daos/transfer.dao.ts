@@ -1,11 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@nestjs/common';
 import { DeleteResult, Equal, getConnection, In, InsertResult } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class TransferDao {
     async getById(id: number): Promise<Transfer> {
         const transfer = await getConnection()

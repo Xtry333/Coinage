@@ -1,13 +1,13 @@
-import { TestBed } from '@angular/core/testing';
+import { Test, TestingModule } from '@nestjs/testing';
 
 import { AccountDao } from './account.dao';
 
 describe('AccountDao', () => {
     let dao: AccountDao;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({});
-        dao = TestBed.inject(AccountDao);
+    beforeEach(async () => {
+        await Test.configureTestingModule({ providers: [AccountDao] });
+        dao = TestingModule.inject(AccountDao);
     });
 
     it('should be created', () => {

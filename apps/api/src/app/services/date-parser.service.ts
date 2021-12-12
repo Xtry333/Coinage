@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@nestjs/common';
 
-@Injectable({ providedIn: 'root' })
+@Injectable()
 export class DateParserService {
     public formatMySql(date: Date) {
         return date.toISOString().slice(0, 10);

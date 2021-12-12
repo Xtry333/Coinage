@@ -8,7 +8,6 @@ import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 import { NotificationService } from '../services/notification.service';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
-import { Observable } from 'rxjs';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -41,7 +40,7 @@ export class TransferDetailsComponent implements OnInit {
 
     ngOnInit(): void {
         this.showPage = false;
-        this.route.paramMap.toPromise();
+        // this.route.paramMap.toPromise();
         this.route.paramMap.subscribe((params) => {
             const id = parseInt(params.get('id') ?? '');
             if (id) {
@@ -138,12 +137,14 @@ export class TransferDetailsComponent implements OnInit {
         if (this.transfer.receipt?.id) {
             return NavigatorPages.ReceiptDetails(this.transfer.receipt?.id);
         }
+        return undefined;
     }
 
     public get refundedByLink(): string | undefined {
         if (this.transfer.refundedBy) {
             return NavigatorPages.TransferDetails(this.transfer.refundedBy);
         }
+        return undefined;
     }
 
     public get transferTypeDisplayName(): string {

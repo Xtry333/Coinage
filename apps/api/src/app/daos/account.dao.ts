@@ -1,13 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@nestjs/common';
 import { BalanceDTO } from '@coinage-app/interfaces';
 import { DeleteResult, Equal, getConnection } from 'typeorm';
 import { Account } from '../entities/Account.entity';
 import { TransferType } from '../entities/Category.entity';
 import { DateParserService } from '../services/date-parser.service';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class AccountDao {
     constructor(private readonly dateParser: DateParserService) {}
 

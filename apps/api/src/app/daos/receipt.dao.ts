@@ -1,10 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable } from '@nestjs/common';
 import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
 import { Receipt } from '../entities/Receipt.entity';
 
-@Injectable({
-    providedIn: 'root',
-})
+@Injectable()
 export class ReceiptDao {
     async getById(id: number): Promise<Receipt> {
         const receipt = await getConnection()

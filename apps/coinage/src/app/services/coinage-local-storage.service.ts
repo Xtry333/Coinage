@@ -34,6 +34,7 @@ export class CoinageLocalStorageService {
         if (n !== null) {
             return Number(n);
         }
+        return undefined;
     }
 
     public setString(key: string, value: string | undefined): void {
@@ -55,6 +56,7 @@ export class CoinageLocalStorageService {
         } else {
             this.localStorage.removeItem(CoinageLocalStorageService.KEY_OBJECT_TEMPLATE(key));
         }
+        return undefined;
     }
 
     public getObject<T>(key: string, constructor?: (v: string) => T): T | undefined {
@@ -65,5 +67,6 @@ export class CoinageLocalStorageService {
             }
             return JSON.parse(objStr);
         }
+        return undefined;
     }
 }

@@ -2,11 +2,6 @@
     "extends": "../../tsconfig.base.json",
     "files": [],
     "include": [],
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "compilerOptions": {
-        "module": "CommonJS"
-    },
     "references": [
         {
             "path": "./tsconfig.app.json"

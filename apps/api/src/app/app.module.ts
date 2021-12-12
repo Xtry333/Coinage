@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import 'reflect-metadata';
 import ormconfig from '../../ormconfig';
 
 import { AppService } from './app.service';
