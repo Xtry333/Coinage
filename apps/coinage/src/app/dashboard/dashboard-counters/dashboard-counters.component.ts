@@ -9,6 +9,7 @@ import { CoinageDataService } from '../../services/coinageData.service';
 })
 export class DashboardCountersComponent implements OnInit {
     balance: BalanceDTO[] = [];
+    todaySpendings = 0;
 
     constructor(private readonly coinageData: CoinageDataService) {}
 
@@ -22,6 +23,7 @@ export class DashboardCountersComponent implements OnInit {
 
     private loadData(): void {
         this.coinageData.getBalanceForActiveAccounts().subscribe((res) => (this.balance = res));
+        this.coinageData.getTodaySpendings().subscribe((res) => (this.todaySpendings = res.reduce((acc, cur) => acc + cur.balance, 0)));
     }
 
     trackByAccountId(index: number, item: BalanceDTO) {

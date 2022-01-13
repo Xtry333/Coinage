@@ -22,13 +22,13 @@ export class AccountDao {
     public getAllActive(): Promise<Account[]> {
         return getConnection()
             .getRepository(Account)
-            .find({ where: { isActive: Equal(true) } });
+            .find({ where: { isActiveBuffer: Equal(true) } });
     }
 
-    public getForAccount(userId: number): Promise<Account[]> {
+    public getForUserId(userId: number): Promise<Account[]> {
         return getConnection()
             .getRepository(Account)
-            .find({ where: { userId: Equal(userId), isActive: Equal(true) } });
+            .find({ where: { userId: Equal(userId), isActiveBuffer: Equal(true) } });
     }
 
     public save(account: Account): Promise<Account> {
@@ -56,6 +56,25 @@ export class AccountDao {
         return result.map((r: { accountId: number; name: string; balance: string }) => {
             return {
                 accountId: r.accountId,
+                name: r.name,
+                balance: parseFloat(r.balance),
+            };
+        });
+    }
+
+    public async getSpendingsAsOfDate(accountIds: number[], asOfDate: Date, userId: number): Promise<BalanceDTO[]> {
+        const result = await getConnection().query(`
+                SELECT a.id, a.name,
+                SUM(CASE WHEN t.type = '${TransferType.Income}' THEN t.amount WHEN t.type = '${TransferType.Outcome}' THEN -t.amount ELSE 0 END) AS balance,
+                COUNT(t.id) AS transfer_count
+                FROM account a
+                LEFT JOIN transfer t
+                ON t.account_id = a.id AND t.date = '${this.dateParser.formatMySql(asOfDate)}' AND t.is_internal = 0
+                WHERE a.id IN (${accountIds.join(',')}) AND a.user_id = ${userId} AND t.type = '${TransferType.Outcome}'
+                GROUP BY a.id;`);
+        return result.map((r: { id: number; name: string; balance: string }) => {
+            return {
+                accountId: r.id,
                 name: r.name,
                 balance: parseFloat(r.balance),
             };

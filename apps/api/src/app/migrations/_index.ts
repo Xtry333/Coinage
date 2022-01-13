@@ -9,6 +9,8 @@ import { AddInternalFlag1634687320599 } from './1634687320599-AddInternalFlag';
 import { SetCreatedDateToCurrent1636045473486 } from './1636045473486-SetCreatedDateToCurrent';
 import { SetMetadataToDefaultEmpty1637152551502 } from './1637152551502-SetMetadataToDefaultEmpty';
 import { AccountNotNullable1637796359852 } from './1637796359852-AccountNotNullable';
+import { AddCategoryTag1641651157712 } from './1641651157712-AddCategoryTag';
+import { AddCreatedDateToAccounts1642036120866 } from './1642036120866-AddCreatedDateToAccounts';
 
 export default [
     InitContractorTable1633906124577,
@@ -22,4 +24,6 @@ export default [
     SetCreatedDateToCurrent1636045473486,
     SetMetadataToDefaultEmpty1637152551502,
     AccountNotNullable1637796359852,
+    AddCategoryTag1641651157712,
+    AddCreatedDateToAccounts1642036120866,
 ];

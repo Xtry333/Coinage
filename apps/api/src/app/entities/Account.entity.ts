@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, CreateDateColumn } from 'typeorm';
 import { User } from './User.entity';
 
 @Entity()
@@ -16,6 +16,17 @@ export class Account {
     @JoinColumn({ name: 'user_id' })
     user!: User;
 
-    @Column('bit', { nullable: false })
-    isActive!: boolean;
+    @Column('bit', { name: 'is_active', nullable: false })
+    private isActiveBuffer!: boolean;
+
+    get isActive(): boolean {
+        return !!this.isActiveBuffer;
+    }
+
+    set isActive(value: boolean) {
+        this.isActiveBuffer = value;
+    }
+
+    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true })
+    createdDate!: Date;
 }

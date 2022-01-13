@@ -40,13 +40,13 @@ export class TransferDao {
             .find({ where: { accountId: In([1, 4, 5, 6]) }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
     }
 
-    async getLimitedTotalMonthlyAmount(accountId: number, type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {
+    async getLimitedTotalMonthlyAmount(accountIds: number[], type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {
         return await getConnection()
             .getRepository(Transfer)
             .query(
                 `SELECT YEAR(DATE) AS \`year\`, MONTH(DATE) AS \`month\`, SUM(amount) AS \`amount\`, COUNT(id) AS \`count\` 
                 FROM transfer 
-                WHERE TYPE = '${type}' AND \`account_id\` = ${accountId} AND \`date\` <= '${this.getToday()}' AND is_internal = 0 
+                WHERE TYPE = '${type}' AND \`account_id\` IN (${accountIds.join(',')}) AND \`date\` <= '${this.getToday()}' AND is_internal = 0 
                 GROUP BY YEAR(date), MONTH(DATE) ORDER BY \`year\` DESC, \`month\` DESC LIMIT 12`
             );
     }

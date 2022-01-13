@@ -12,6 +12,16 @@ export class CategoryDao {
             .findOne({ where: { id: Equal(id) } });
     }
 
+    async getBySystemTag(tag: string): Promise<Category> {
+        const category = await getConnection()
+            .getRepository(Category)
+            .findOne({ where: { tag: Equal(tag) } });
+        if (!category) {
+            throw new Error('System category not found. Something went wrong in the database.');
+        }
+        return category;
+    }
+
     async getAll(): Promise<Category[]> {
         return await getConnection()
             .getRepository(Category)

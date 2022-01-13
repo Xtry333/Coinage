@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -38,6 +38,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     averageAmountLimit = 5;
     balanceMainAccount = 0;
     balanceSecondary = 0;
+    dataOld = false;
 
     @ViewChild(DashboardCountersComponent)
     countersComponent!: DashboardCountersComponent;
@@ -67,6 +68,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
     }
 
+    @HostListener('window:focus')
+    public onWindowFocus() {
+        if (this.dataOld) {
+            this.refreshData();
+        }
+    }
+
     public transferIdTracker(index: number, item: TransferDTO): string {
         return item.id.toString();
     }
@@ -84,6 +92,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
 
     public refreshData() {
+        if (document.hidden) {
+            this.dataOld = true;
+            return;
+        }
+        this.dataOld = false;
         Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth(), this.coinageData.getBalanceForActiveAccounts())
             .pipe(
                 finalize(() => {

@@ -29,4 +29,7 @@ export class Category {
 
     @OneToMany('Category', 'parent', {})
     children!: Promise<Category[]>;
+
+    @Column('text', { nullable: true })
+    tag?: string;
 }

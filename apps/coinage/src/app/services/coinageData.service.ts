@@ -33,6 +33,10 @@ export class CoinageDataService {
         return this.http.get<BalanceDTO[]>(`${CoinageDataService.API_URL}dashboard/balance`);
     }
 
+    public getTodaySpendings(): Observable<BalanceDTO[]> {
+        return this.http.get<BalanceDTO[]>(`${CoinageDataService.API_URL}account/spendings`);
+    }
+
     public getAllTransfers(): Observable<TransferDTO[]> {
         return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/all`);
     }

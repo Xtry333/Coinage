@@ -152,8 +152,9 @@ export class TransfersController {
 
     @Get('/totalOutcomesPerMonth')
     async getLastTotalOutcomesPerMonth(): Promise<TotalAmountPerMonthDTO[]> {
+        const accountIds = (await this.accountDao.getForUserId(1)).map((a) => a.id);
         // TODO: Join queries into one async
-        const outcomes = (await this.transferDao.getLimitedTotalMonthlyAmount(1, TransferType.Outcome)).map((outcome) => {
+        const outcomes = (await this.transferDao.getLimitedTotalMonthlyAmount(accountIds, TransferType.Outcome)).map((outcome) => {
             return {
                 year: outcome.year,
                 month: outcome.month - 1,
@@ -161,7 +162,7 @@ export class TransfersController {
                 transactionsCount: outcome.count,
             };
         });
-        const incomes = (await this.transferDao.getLimitedTotalMonthlyAmount(1, TransferType.Income)).map((income) => {
+        const incomes = (await this.transferDao.getLimitedTotalMonthlyAmount(accountIds, TransferType.Income)).map((income) => {
             return {
                 year: income.year,
                 month: income.month - 1,
@@ -284,11 +285,10 @@ export class TransfersController {
 
         const transfer = await this.transferDao.getById(refundTargetId);
 
-        // TODO: getBySystemTag('refund');
-        const refundCategory = await this.categoryDao.getById(34);
+        const refundCategory = await this.categoryDao.getBySystemTag('system-refund');
 
-        if (!transfer || !refundCategory) {
-            throw new Error('Invalid Transfer or Category ID.');
+        if (!transfer) {
+            throw new Error('Invalid Transfer ID.');
         }
 
         if (transfer.metadata.refundedBy || transfer.metadata.refundTargetId) {
@@ -394,9 +394,9 @@ export class TransfersController {
             throw new Error(`Cannot find target account id ${targetId}`);
         }
 
-        //TODO: Introduce some sort of key to find categories via instead of ids
-        const categoryFrom = (await this.categoryDao.getById(31)) as Category;
-        const categoryTo = (await this.categoryDao.getById(32)) as Category;
+        const categoryFrom = await this.categoryDao.getBySystemTag('system-outcome');
+        const categoryTo = await this.categoryDao.getBySystemTag('system-income');
+
         const entityFrom = new Transfer(),
             entityTo = new Transfer();
 
