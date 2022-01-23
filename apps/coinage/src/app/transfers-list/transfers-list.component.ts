@@ -1,9 +1,15 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { TransferDTO } from '@coinage-app/interfaces';
+import { ActivatedRoute } from '@angular/router';
+import { GetFilteredTransfersRequest, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import { CoinageDataService } from '../services/coinageData.service';
+
+interface TransfersListQueryParams {
+    page: number;
+    rowsPerPage: number;
+}
 
 @Component({
     selector: 'coinage-app-transfers-list',
@@ -17,20 +23,24 @@ export class TransfersListComponent implements OnInit, OnDestroy {
     refreshInterval?: ReturnType<typeof setInterval>;
 
     transfers: TransferDTO[] = [];
+    totalCount = 0;
 
-    constructor(private readonly coinageData: CoinageDataService) {}
+    filterParams: GetFilteredTransfersRequest = {
+        page: 1,
+        rowsPerPage: 100,
+    };
+
+    constructor(private route: ActivatedRoute, private readonly coinageData: CoinageDataService) {}
 
     ngOnInit(): void {
         this.showPage = false;
-        Rx.zip(this.coinageData.getAllTransfers())
-            .pipe(
-                finalize(() => {
-                    this.showPage = true;
-                })
-            )
-            .subscribe((values) => {
-                this.transfers = values[0];
-            });
+        this.route.queryParams.subscribe((params) => {
+            const { page, rowsPerPage } = params as TransfersListQueryParams;
+            this.filterParams.page = page ?? this.filterParams.page;
+            this.filterParams.rowsPerPage = rowsPerPage ?? this.filterParams.rowsPerPage;
+            this.refreshData();
+        });
+
         this.refreshInterval = setInterval(() => this.refreshData(), TransfersListComponent.REFRESH_INTERVAL);
     }
 
@@ -42,8 +52,19 @@ export class TransfersListComponent implements OnInit, OnDestroy {
     }
 
     public refreshData() {
-        Rx.zip(this.coinageData.getAllTransfers(), this.coinageData.getTotalOutcomesPerMonth()).subscribe(([transfers]) => {
-            this.transfers = transfers;
-        });
+        Rx.zip(this.coinageData.getAllTransfers(this.filterParams))
+            .pipe(
+                finalize(() => {
+                    this.showPage = true;
+                })
+            )
+            .subscribe(([response]) => {
+                this.transfers = response.transfers;
+                this.totalCount = response.totalCount;
+            });
+    }
+
+    get lastPageNumber(): number {
+        return Math.ceil(this.totalCount / this.filterParams.rowsPerPage);
     }
 }

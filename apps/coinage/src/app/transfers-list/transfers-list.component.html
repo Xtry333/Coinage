@@ -1,3 +1,9 @@
 <div *ngIf="showPage">
-    <coinage-app-transfers-table [transfers]="transfers" [tableHeader]="'All Transfers'" [showFilters]="true"></coinage-app-transfers-table>
+    <coinage-app-transfers-table
+        [transfers]="transfers"
+        [tableHeader]="'All Transfers'"
+        [showFilters]="true"
+        filterCachePath="transfer.list.filters"
+        [lastPageNumber]="lastPageNumber"
+    ></coinage-app-transfers-table>
 </div>

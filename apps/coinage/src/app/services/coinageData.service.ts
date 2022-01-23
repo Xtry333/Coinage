@@ -18,6 +18,8 @@ import {
     CreateInternalTransferDTOResponse,
     CreateInternalTransferDTO,
     RefundTransferDTO,
+    GetFilteredTransfersRequest,
+    FilteredTransfersDTO,
 } from '@coinage-app/interfaces';
 import { Observable } from 'rxjs';
 
@@ -37,8 +39,8 @@ export class CoinageDataService {
         return this.http.get<BalanceDTO[]>(`${CoinageDataService.API_URL}account/spendings`);
     }
 
-    public getAllTransfers(): Observable<TransferDTO[]> {
-        return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/all`);
+    public getAllTransfers(filterParams?: GetFilteredTransfersRequest): Observable<FilteredTransfersDTO> {
+        return this.http.post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfer/all`, filterParams);
     }
 
     public getRecentTransactions(): Observable<TransferDTO[]> {

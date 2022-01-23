@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { faCaretDown, faEdit, faFilter, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { CoinageLocalStorageService } from '../../services/coinage-local-storage.service';
 
 export enum FilterTypes {
     TextBox = 'textBox',
@@ -51,14 +52,23 @@ export class TableFilterComponent implements OnInit {
     @Input() public filterType = FilterTypes.TextBox;
     @Input() public filterName = '';
     @Input() public datalist: string[] = [];
+    @Input() public cachedFilterPrefix?: string;
+    @Input() public cachedFilterValue?: string;
 
     @Output() public filterEvent = new EventEmitter<OnFilterEvent>();
     @Output() public openEvent = new EventEmitter<void>();
     @Output() public closeEvent = new EventEmitter<void>();
     @Output() public focusEvent = new EventEmitter<boolean>();
 
+    constructor(public readonly localStorage: CoinageLocalStorageService) {}
+
     public ngOnInit(): void {
         this.filterValue.name = this.filterName;
+        if (this.cachedFilterValue && this.cachedFilterValue.length > 0) {
+            this.filterValue.value = this.cachedFilterValue;
+            this.lastFilterValue = { ...this.filterValue };
+            // this.onPerformFilter();
+        }
     }
 
     @HostListener('document:mousedown', ['$event'])
@@ -94,7 +104,7 @@ export class TableFilterComponent implements OnInit {
         this.focusEvent.emit(false);
     }
 
-    public onDoFilter(): void {
+    public onPerformFilter(): void {
         this.filterValue.value = this.filterValue.value?.trim();
         this.lastFilterValue = { ...this.filterValue };
         this.filterEvent.emit(this.filterValue);
@@ -137,5 +147,9 @@ export class TableFilterComponent implements OnInit {
 
     get isFilterAmountRange(): boolean {
         return this.filterType === FilterTypes.AmountRange;
+    }
+
+    get cacheFilterPath(): string {
+        return `${this.cachedFilterPrefix}.${this.filterValue.name}`;
     }
 }

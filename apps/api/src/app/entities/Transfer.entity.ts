@@ -17,8 +17,16 @@ export class Transfer {
     @Column('text', { nullable: false })
     description!: string;
 
-    @Column('decimal', { precision: 20, scale: 2, nullable: false })
+    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false })
     amount!: string; // Decimal returns a string for precision, need to parse later in DTO
+
+    get price(): number {
+        return Number(this.amount);
+    }
+
+    set price(value: number) {
+        this.amount = value.toString();
+    }
 
     @Column({ type: 'date', nullable: false })
     date!: string;
@@ -35,6 +43,9 @@ export class Transfer {
     @ManyToOne('Category', { eager: true, nullable: false })
     @JoinColumn({ name: 'category' })
     category!: Category;
+
+    @Column({ name: 'contractor', type: 'integer', nullable: true })
+    contractorId?: number;
 
     @ManyToOne('Contractor', { eager: true, nullable: true })
     @JoinColumn({ name: 'contractor' })

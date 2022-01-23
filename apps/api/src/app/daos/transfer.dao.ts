@@ -1,7 +1,12 @@
+import { GetFilteredTransfersRequest } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
-import { DeleteResult, Equal, getConnection, In, InsertResult } from 'typeorm';
+import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, Like } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
+
+type KeysOfType<O, T> = {
+    [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;
+}[keyof O];
 
 @Injectable()
 export class TransferDao {
@@ -28,16 +33,60 @@ export class TransferDao {
             .find({ order: { date: 'DESC', id: 'DESC' } });
     }
 
+    getAllFilteredPaged(params: GetFilteredTransfersRequest): Promise<Transfer[]> {
+        const filter: FindConditions<Transfer> = {};
+        this.assignNumericFilterIfExists(filter, 'contractorId', params.contractorIds);
+        this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
+        this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
+        this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
+
+        if (params.description) {
+            filter.description = ILike(`%${params.description}%`);
+        }
+
+        return getConnection()
+            .getRepository(Transfer)
+            .find({ where: filter, order: { date: 'DESC', id: 'DESC' }, take: params.rowsPerPage, skip: params.rowsPerPage * (params.page - 1) });
+    }
+
+    getAllFilteredCount(params: GetFilteredTransfersRequest): Promise<number> {
+        const filter: FindConditions<Transfer> = {};
+        this.assignNumericFilterIfExists(filter, 'contractorId', params.contractorIds);
+        this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
+        this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
+        this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
+
+        if (params.description) {
+            filter.description = ILike(`%${params.description}%`);
+        }
+
+        return getConnection()
+            .getRepository(Transfer)
+            .count({ where: filter, order: { date: 'DESC', id: 'DESC' } });
+    }
+
+    private assignNumericFilterIfExists(filter: FindConditions<Transfer>, key: KeysOfType<Transfer, number>, values?: number[]) {
+        if (values && values.length > 0) {
+            filter[key] = In(values);
+        }
+    }
+
+    // private assignBetweenIfExists(filter: FindConditions<Transfer>, key: keyof Transfer, a?: unknown, b?: unknown) {
+    //     if (a && b) {
+    //         filter[key] = Between(a, b);
+    //     }
+    // }
+
     getAllLimited(count?: number) {
         return getConnection()
             .getRepository(Transfer)
             .find({ where: { accountId: 1 }, order: { date: 'DESC', id: 'DESC' }, take: count });
     }
 
-    getRecent(count?: number) {
+    getRecent(accountIds: number[], count?: number) {
         return getConnection()
             .getRepository(Transfer)
-            .find({ where: { accountId: In([1, 4, 5, 6]) }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
+            .find({ where: { accountId: In(accountIds) }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
     }
 
     async getLimitedTotalMonthlyAmount(accountIds: number[], type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {

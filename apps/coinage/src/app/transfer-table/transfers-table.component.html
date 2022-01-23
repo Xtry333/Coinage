@@ -1,9 +1,12 @@
 <div class="transfers-table-container">
+    <div>
+        <input id="showAllCheckbox" type="checkbox" [ngModel]="filter.showPlanned" (ngModelChange)="showAllChecked($event)" />
+        <label for="showAllCheckbox">Show planned transfers</label>
+    </div>
+    <coinage-app-pagination class="pull-right" *ngIf="showFilters && lastPageNumber" [lastPage]="lastPageNumber"></coinage-app-pagination>
     <table class="transfers-table">
         <caption *ngIf="isHeaderDisplayed">
-            {{
-                tableHeader
-            }}
+            <span>{{ tableHeader }}</span>
         </caption>
         <thead>
             <tr>
@@ -16,6 +19,7 @@
                         [filterType]="FilterTypes.TextBox"
                         [popupSide]="PopupSides.ToRight"
                         [datalist]="categoryNames"
+                        [cachedFilterValue]="filter.category"
                     ></coinage-app-table-filter>
                 </th>
                 <th>
@@ -26,6 +30,7 @@
                         (filterEvent)="onFilter($event)"
                         [filterType]="FilterTypes.TextBox"
                         [popupSide]="PopupSides.ToLeft"
+                        [cachedFilterValue]="filter.description"
                     ></coinage-app-table-filter>
                 </th>
                 <th>
@@ -37,6 +42,7 @@
                         [filterType]="FilterTypes.TextBox"
                         [popupSide]="PopupSides.ToLeft"
                         [datalist]="contractorNames"
+                        [cachedFilterValue]="filter.contractor"
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
@@ -57,6 +63,8 @@
                         (filterEvent)="onFilter($event)"
                         [filterType]="FilterTypes.TextBox"
                         [popupSide]="PopupSides.ToLeft"
+                        [datalist]="accountNames"
+                        [cachedFilterValue]="filter.account"
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
@@ -115,4 +123,5 @@
             </tr>
         </tbody>
     </table>
+    <coinage-app-auto-pagination *ngIf="showFilters" (endOfPage)="onEndOfPage()"></coinage-app-auto-pagination>
 </div>

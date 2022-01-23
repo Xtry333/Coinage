@@ -8,6 +8,7 @@ export class CoinageLocalStorageService {
 
     private readonly localStorage: Storage;
 
+    public static readonly KEY_BOOLEAN_TEMPLATE = (key: string) => `${key}-b`;
     public static readonly KEY_NUMBER_TEMPLATE = (key: string) => `${key}-n`;
     public static readonly KEY_STRING_TEMPLATE = (key: string) => `${key}-s`;
     public static readonly KEY_OBJECT_TEMPLATE = (key: string) => `${key}-o`;
@@ -19,6 +20,22 @@ export class CoinageLocalStorageService {
 
     public attachEventListener(listener: (event: StorageEvent) => void): void {
         window.addEventListener(CoinageLocalStorageService.STORAGE_EVENT, listener);
+    }
+
+    public setBoolean(key: string, value: boolean | undefined): void {
+        if (value !== undefined) {
+            this.localStorage.setItem(CoinageLocalStorageService.KEY_BOOLEAN_TEMPLATE(key), value.toString());
+        } else {
+            this.localStorage.removeItem(CoinageLocalStorageService.KEY_BOOLEAN_TEMPLATE(key));
+        }
+    }
+
+    public getBoolean(key: string): boolean | undefined {
+        const n = this.localStorage.getItem(CoinageLocalStorageService.KEY_BOOLEAN_TEMPLATE(key));
+        if (n !== null) {
+            return Boolean(n);
+        }
+        return undefined;
     }
 
     public setNumber(key: string, value: number | undefined): void {

@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TotalInMonthByCategory, TransferDTO } from '@coinage-app/interfaces';
+import { TransferDTO } from '@coinage-app/interfaces';
 import { CoinageDataService } from '../services/coinageData.service';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
 
@@ -54,11 +54,11 @@ export class SummaryComponent implements OnInit {
             }
             if (this.isDateTargetDay) {
                 this.coinageData.getAllTransfers().subscribe((response) => {
-                    this.transfers = response.filter((t) => t.date === this.selectedDate);
+                    this.transfers = response.transfers.filter((t) => t.date === this.selectedDate);
                 });
             } else if (this.isDateTargetMonth) {
                 this.coinageData.getAllTransfers().subscribe((response) => {
-                    this.transfers = response.filter(
+                    this.transfers = response.transfers.filter(
                         (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
                     );
                 });

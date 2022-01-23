@@ -31,6 +31,8 @@ import { NullTransformPipe } from './pipes/null-transform.pipe';
 import { ReplacePipe } from './pipes/replace.pipe';
 import { ReceiptDetailsComponent } from './receipt-details/receipt-details.component';
 import { MathAbsPipe } from './pipes/math-abs.pipe';
+import { PaginationComponent } from './components/pagination/pagination.component';
+import { AutoPaginationComponent } from './components/auto-pagination/auto-pagination.component';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
@@ -55,6 +57,8 @@ const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
         BigCounterComponent,
         DashboardCountersComponent,
         StatisticsComponent,
+        PaginationComponent,
+        AutoPaginationComponent,
     ],
     imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [

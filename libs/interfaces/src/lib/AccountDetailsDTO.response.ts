@@ -3,6 +3,9 @@ export interface AccountDetailsDTOResponse {
     ownerId: number;
     name: string;
     currentBalance: number;
+    freeBalanceUntilNextMonth: number;
+    plannedSpendingsUntilNextMonth: number;
+    freeBalanceInNext30Days: number;
     currency: string;
     isOpen: boolean;
     openDate: string;

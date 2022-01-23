@@ -1,4 +1,4 @@
-import { TransferDTO } from './interfaces';
+import { TransferDTO } from './FilteredTransferDTO.response';
 
 export interface ReceiptDetailsDTO {
     id: number;

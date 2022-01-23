@@ -1,9 +1,11 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
 
 import {
     BaseResponseDTO,
     CreateInternalTransferDTO,
     CreateInternalTransferDTOResponse,
+    FilteredTransfersDTO,
+    GetFilteredTransfersRequest,
     RefundTransferDTO,
     SaveTransferDTO,
     SplitTransferDTO,
@@ -31,30 +33,40 @@ export class TransfersController {
         private readonly dateParserService: DateParserService
     ) {}
 
-    @Get('all')
-    async getAllTransactions(): Promise<TransferDTO[]> {
-        return (await this.transferDao.getAll()).map((t) => {
-            return {
-                id: t.id,
-                description: t.description,
-                amount: parseFloat(t.amount),
-                type: t.type,
-                categoryId: t.category?.id,
-                category: t.category?.name,
-                contractor: t.contractor?.name,
-                account: t.account.name,
-                accountId: t.accountId,
-                date: t.date,
-                receiptId: t.receiptId,
-            };
-        });
+    @Post('all')
+    async getAllTransactions(@Body() filterParams: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
+        filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
+        filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
+
+        const pagedTransfers = await this.transferDao.getAllFilteredPaged(filterParams);
+        const totalCount = await this.transferDao.getAllFilteredCount(filterParams);
+
+        return {
+            transfers: pagedTransfers.map((t) => {
+                return {
+                    id: t.id,
+                    description: t.description,
+                    amount: parseFloat(t.amount),
+                    type: t.type,
+                    categoryId: t.category?.id,
+                    category: t.category?.name,
+                    contractor: t.contractor?.name,
+                    account: t.account.name,
+                    accountId: t.accountId,
+                    date: t.date,
+                    receiptId: t.receiptId,
+                };
+            }),
+            totalCount: totalCount,
+        };
     }
 
     @Get('recent')
     async getRecentTransactions(): Promise<TransferDTO[]> {
         const recentCount = 10;
+        const accountIds = (await this.accountDao.getForUserId(1)).map((a) => a.id);
         return (
-            (await this.transferDao.getRecent(recentCount))
+            (await this.transferDao.getRecent(accountIds, recentCount))
                 //.sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
                 .map((t) => {
                     return {

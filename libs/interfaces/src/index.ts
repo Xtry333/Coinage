@@ -14,3 +14,5 @@ export * from './lib/CreateInternalTransferDTO.response';
 export * from './lib/RefundTransferDTO.request';
 export * from './lib/ReceiptDetailsDTO.response';
 export * from './lib/AccountDetailsDTO.response';
+export * from './lib/GetFilteredTransfers.request';
+export * from './lib/FilteredTransferDTO.response';

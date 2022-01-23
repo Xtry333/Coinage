@@ -3,7 +3,7 @@
         <fa-icon class="icon" [icon]="filterIcon"></fa-icon>
     </button>
     <div *ngIf="isPopupDisplayed" class="filter-popup" [ngClass]="popupSideClass">
-        <form (ngSubmit)="onDoFilter()">
+        <form (ngSubmit)="onPerformFilter()">
             <span *ngIf="isFilterTextBox">
                 <input
                     #filterInput

@@ -1,4 +1,5 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
@@ -22,7 +23,12 @@ export interface TableFilterFields {
     description?: string;
     contractor?: string;
     account?: string;
-    [key: string]: string | undefined;
+    amountFrom?: number;
+    amountTo?: number;
+    dateFrom?: Date;
+    dateTo?: Date;
+    showPlanned?: boolean;
+    [key: string]: Date | string | boolean | number | undefined;
 }
 
 export type UiTransfer = TransferDTO & { typeSymbol: string; isTodayMarkerRow?: boolean };
@@ -43,7 +49,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     public receiptIcon: IconDefinition = faReceipt;
 
-    private filter: TableFilterFields = { category: '', contractor: '', description: '', account: '' };
+    public filter: TableFilterFields = { category: undefined, contractor: undefined, description: undefined, account: undefined };
     public outcomesSum = 0;
     public outcomesCount = 0;
     public incomesSum = 0;
@@ -52,6 +58,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public transfersForTable: UiTransfer[] = [];
     public categoryNames: string[] = [];
     public contractorNames: string[] = [];
+    public accountNames: string[] = [];
 
     @Input() tableHeader?: string;
     @Input() transfers?: TransferDTO[];
@@ -59,30 +66,37 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     @Input() showSummary?: boolean = true;
     @Input() showReceiptIcon?: boolean = true;
     @Input() showTodayMarker?: boolean = true;
-    @Input() cachingName?: string;
+    @Input() filterCachePath?: string;
+    @Input() lastPageNumber?: number;
 
-    constructor(private readonly dataService: CoinageDataService, private readonly localStorageService: CoinageLocalStorageService) {}
+    constructor(private route: ActivatedRoute, private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
 
     public ngOnInit(): void {
-        this.doFiltering();
-
         if (this.showFilters) {
-            Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList()).subscribe(([categories, contractors]) => {
-                this.categoryNames = categories.map((c) => c.name);
-                this.contractorNames = contractors.map((c) => c.name);
-            });
-            if (this.cachingName) {
-                // this.localStorageService.get(this.cachingName).subscribe((filter) => {
-                //     if (filter) {
-                //         this.filter = filter;
-                //     }
-                // });
+            Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList(), this.dataService.getAllAvailableAccounts()).subscribe(
+                ([categories, contractors, accounts]) => {
+                    this.categoryNames = categories.map((c) => c.name);
+                    this.contractorNames = contractors.map((c) => c.name);
+                    this.accountNames = accounts.map((c) => c.name);
+                }
+            );
+            if (this.filterCachePath) {
+                const cachedFilters = this.localStorage.getObject<TableFilterFields>(this.filterCachePath);
+                if (cachedFilters) {
+                    this.filter = cachedFilters;
+                }
             }
         }
+
+        this.doFiltering();
     }
 
     public ngOnChanges(): void {
         this.doFiltering();
+    }
+
+    public onEndOfPage(): void {
+        console.log('onEndOfPage');
     }
 
     public transferIdTracker(index: number, item: TransferDTO): string {
@@ -90,19 +104,26 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     }
 
     public onFilter(event: OnFilterEvent) {
-        this.filter[event.name] = event.value;
+        // this.filter[event.name] = event.value;
+
         // Replaced by simpler code above
-        // switch (ev.name) {
-        //     case TableColumns.Category:
-        //         this.filter.category = ev.value;
-        //         break;
-        //     case TableColumns.Description:
-        //         this.filter.description = ev.value;
-        //         break;
-        //     case TableColumns.Contractor:
-        //         this.filter.contractor = ev.value;
-        //         break;
-        // }
+        switch (event.name) {
+            case TableColumns.Category:
+                this.filter.category = event.value;
+                break;
+            case TableColumns.Description:
+                this.filter.description = event.value;
+                break;
+            case TableColumns.Contractor:
+                this.filter.contractor = event.value;
+                break;
+            case TableColumns.Account:
+                this.filter.account = event.value;
+                break;
+        }
+        if (this.filterCachePath) {
+            this.localStorage.setObject(this.filterCachePath, this.filter);
+        }
         this.doFiltering();
     }
 
@@ -112,7 +133,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             (this.filter.description === undefined || this.caseInsensitiveIncludes(row.description, this.filter.description)) &&
             (this.filter.account === undefined || this.caseInsensitiveIncludes(row.account, this.filter.account)) &&
             (this.filter.contractor === undefined ||
-                this.caseInsensitiveIncludes(row.contractor ?? TransfersTableComponent.EMPTY_CONTRACTOR, this.filter.contractor))
+                this.caseInsensitiveIncludes(row.contractor ?? TransfersTableComponent.EMPTY_CONTRACTOR, this.filter.contractor)) &&
+            (this.filter.showPlanned || new Date(row.date) < new Date())
         );
     }
 
@@ -170,9 +192,17 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         return this.transfers?.length === 0;
     }
 
+    public showAllChecked(value: boolean) {
+        this.filter.showPlanned = value;
+        if (this.filterCachePath) {
+            this.localStorage.setObject(this.filterCachePath, this.filter);
+        }
+        this.doFiltering();
+    }
+
     get isAnyFilterApplied(): boolean {
         for (const key in this.filter) {
-            if (this.filter[key] != undefined) {
+            if (this.filter[key] !== undefined) {
                 return true;
             }
         }

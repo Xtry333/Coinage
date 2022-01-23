@@ -1,20 +1,8 @@
+import { TransferDTO } from './FilteredTransferDTO.response';
+
 export interface Message {
     message: string;
     millis: number;
-}
-
-export interface TransferDTO {
-    id: number;
-    description: string;
-    contractor?: string;
-    amount: number;
-    type: TransferTypeEnum;
-    category: string;
-    categoryId: number;
-    account: string;
-    accountId: number;
-    receiptId?: number;
-    date: string;
 }
 
 export interface AccountDTO {
