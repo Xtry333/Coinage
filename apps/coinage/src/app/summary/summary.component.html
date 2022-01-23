@@ -28,7 +28,7 @@
         <tbody>
             <tr *ngFor="let outcome of outcomesPerCategory">
                 <td>{{ outcome.categoryName }}</td>
-                <td class="currency">{{ outcome.amount | plnCurrency }}</td>
+                <td class="currency" [title]="outcome.summedAmount">{{ outcome.amount | plnCurrency }}</td>
             </tr>
         </tbody>
     </table>

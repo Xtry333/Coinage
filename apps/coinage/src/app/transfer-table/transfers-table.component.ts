@@ -95,10 +95,6 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         this.doFiltering();
     }
 
-    public onEndOfPage(): void {
-        console.log('onEndOfPage');
-    }
-
     public transferIdTracker(index: number, item: TransferDTO): string {
         return item.id.toString();
     }
@@ -145,7 +141,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         this.incomesCount = 0;
         if (this.transfers) {
             this.transfersForTable = this.transfers
-                .filter((t) => this.isDisplayed(t))
+                .filter((t) => !this.showFilters || this.isDisplayed(t))
                 .map((t) => {
                     if (t.type === 'OUTCOME') {
                         this.outcomesSum += t.amount;

@@ -39,6 +39,7 @@ export class TransferDao {
         this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
         this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
+        this.assignBetweenIfExists(filter, 'date', params.dateFrom, params.dateTo);
 
         if (params.description) {
             filter.description = ILike(`%${params.description}%`);
@@ -55,6 +56,7 @@ export class TransferDao {
         this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
         this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
+        this.assignBetweenIfExists(filter, 'date', params.dateFrom, params.dateTo);
 
         if (params.description) {
             filter.description = ILike(`%${params.description}%`);
@@ -71,11 +73,11 @@ export class TransferDao {
         }
     }
 
-    // private assignBetweenIfExists(filter: FindConditions<Transfer>, key: keyof Transfer, a?: unknown, b?: unknown) {
-    //     if (a && b) {
-    //         filter[key] = Between(a, b);
-    //     }
-    // }
+    private assignBetweenIfExists(filter: FindConditions<Transfer>, key: keyof Transfer, a?: unknown, b?: unknown) {
+        if (a && b) {
+            (filter as any)[key] = Between(a, b);
+        }
+    }
 
     getAllLimited(count?: number) {
         return getConnection()

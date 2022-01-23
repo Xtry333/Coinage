@@ -1,5 +1,5 @@
 <div class="transfers-table-container">
-    <div>
+    <div *ngIf="showFilters">
         <input id="showAllCheckbox" type="checkbox" [ngModel]="filter.showPlanned" (ngModelChange)="showAllChecked($event)" />
         <label for="showAllCheckbox">Show planned transfers</label>
     </div>
@@ -123,5 +123,4 @@
             </tr>
         </tbody>
     </table>
-    <coinage-app-auto-pagination *ngIf="showFilters" (endOfPage)="onEndOfPage()"></coinage-app-auto-pagination>
 </div>

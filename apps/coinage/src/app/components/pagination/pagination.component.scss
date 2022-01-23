@@ -23,7 +23,12 @@
             }
 
             &.spacer {
-                cursor: default;
+                color: #ccc;
+                //cursor: default;
+            }
+
+            &:hover {
+                text-decoration: underline;
             }
         }
     }

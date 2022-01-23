@@ -51,9 +51,9 @@ export class PaginationComponent implements OnInit {
         });
     }
 
-    private calculatePageNumbers() {
+    private calculatePageNumbers(showAll: boolean = false) {
         const pageNumbers = new Set<number>([this.firstPage]);
-        for (let i = 0; i < 2; i++) {
+        for (let i = 0; i < (showAll ? this.lastPage : 2); i++) {
             pageNumbers.add(this.firstPage + i);
             pageNumbers.add(this.currentPage + i);
             pageNumbers.add(this.currentPage - i);
@@ -83,6 +83,8 @@ export class PaginationComponent implements OnInit {
             this.currentPage = pageNumber.value;
             this.goToPage(pageNumber.value);
             this.calculatePageNumbers();
+        } else {
+            this.calculatePageNumbers(true);
         }
     }
 

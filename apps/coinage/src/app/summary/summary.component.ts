@@ -7,6 +7,7 @@ import { DateParserService, PartedDate } from '../services/date-parser.service';
 export interface UiTotalInMonthByCategory {
     categoryName: string;
     amount: number;
+    summedAmount?: number;
 }
 
 @Component({
@@ -45,6 +46,9 @@ export class SummaryComponent implements OnInit {
                         return {
                             categoryName: o.categoryName,
                             amount: parseFloat(o.amount),
+                            summedAmount: response
+                                .filter((r) => o.categoryId === r.categoryParentId)
+                                .reduce((a, b) => a + parseFloat(b.amount), parseFloat(o.amount)),
                         };
                     });
                     this.showPage = true;
@@ -53,15 +57,17 @@ export class SummaryComponent implements OnInit {
                 this.showPage = true;
             }
             if (this.isDateTargetDay) {
-                this.coinageData.getAllTransfers().subscribe((response) => {
+                this.coinageData.getAllTransfers({ page: 1, rowsPerPage: 1000 }).subscribe((response) => {
                     this.transfers = response.transfers.filter((t) => t.date === this.selectedDate);
                 });
             } else if (this.isDateTargetMonth) {
-                this.coinageData.getAllTransfers().subscribe((response) => {
-                    this.transfers = response.transfers.filter(
-                        (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
-                    );
-                });
+                this.coinageData
+                    .getAllTransfers({ page: 1, rowsPerPage: 500, dateFrom: this.monthStartDate.toISOString(), dateTo: this.monthEndDate.toISOString() })
+                    .subscribe((response) => {
+                        this.transfers = response.transfers.filter(
+                            (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
+                        );
+                    });
             }
         });
     }
@@ -72,6 +78,22 @@ export class SummaryComponent implements OnInit {
 
     get isDateTargetMonth(): boolean {
         return this.partedDateService.isDateTargetMonth(this.partedDate);
+    }
+
+    // create a new date with the same month and year as the current date and first day of the month
+    get monthStartDate(): Date {
+        const date = new Date(this.datetime);
+        date.setDate(1);
+        return date;
+    }
+
+    // create a new date with the same month and year as the current date and last day of the month
+    get monthEndDate(): Date {
+        const date = new Date(this.datetime);
+        date.setDate(1);
+        date.setMonth(date.getMonth() + 1);
+        date.setDate(0);
+        return date;
     }
 
     getParentPartedDate(): PartedDate {

@@ -64,6 +64,10 @@ export class TransfersListComponent implements OnInit, OnDestroy {
             });
     }
 
+    public onEndOfPage(): void {
+        console.log('onEndOfPage');
+    }
+
     get lastPageNumber(): number {
         return Math.ceil(this.totalCount / this.filterParams.rowsPerPage);
     }

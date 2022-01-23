@@ -3,7 +3,6 @@
         <button
             *ngFor="let number of pageNumbers"
             [ngClass]="{ active: number.isActive, spacer: number.isSpacer }"
-            [disabled]="number.isSpacer"
             class="page-number-button"
             (click)="onClickChangePage($event, number)"
         >
