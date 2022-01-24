@@ -1,11 +1,10 @@
-import { Body, Controller, Delete, Get, Param, Post, Query } from '@nestjs/common';
-
 import {
     BaseResponseDTO,
     CreateInternalTransferDTO,
     CreateInternalTransferDTOResponse,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
+    ReceiptDTO,
     RefundTransferDTO,
     SaveTransferDTO,
     SplitTransferDTO,
@@ -13,13 +12,15 @@ import {
     TransferDetailsDTO,
     TransferDTO,
 } from '@coinage-app/interfaces';
+import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+
+import { AppService } from '../app.service';
+import { AccountDao } from '../daos/account.dao';
+import { CategoryDao } from '../daos/category.dao';
+import { ContractorDao } from '../daos/contractor.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category, TransferType } from '../entities/Category.entity';
-import { AppService } from '../app.service';
-import { CategoryDao } from '../daos/category.dao';
 import { Transfer } from '../entities/Transfer.entity';
-import { ContractorDao } from '../daos/contractor.dao';
-import { AccountDao } from '../daos/account.dao';
 import { DateParserService } from '../services/date-parser.service';
 
 @Controller('transfer(s)?')
@@ -34,7 +35,7 @@ export class TransfersController {
     ) {}
 
     @Post('all')
-    async getAllTransactions(@Body() filterParams: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
+    async getAllTransfers(@Body() filterParams: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
         filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
         filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
 
@@ -42,22 +43,25 @@ export class TransfersController {
         const totalCount = await this.transferDao.getAllFilteredCount(filterParams);
 
         return {
-            transfers: pagedTransfers.map((t) => {
-                return {
-                    id: t.id,
-                    description: t.description,
-                    amount: parseFloat(t.amount),
-                    type: t.type,
-                    categoryId: t.category?.id,
-                    category: t.category?.name,
-                    contractor: t.contractor?.name,
-                    account: t.account.name,
-                    accountId: t.accountId,
-                    date: t.date,
-                    receiptId: t.receiptId,
-                };
-            }),
+            transfers: pagedTransfers.map((t) => this.toTransferDTO(t)),
             totalCount: totalCount,
+        };
+    }
+
+    private toTransferDTO(transfer: Transfer): TransferDTO {
+        return {
+            id: transfer.id,
+            description: transfer.description,
+            amount: transfer.amount,
+            type: transfer.type,
+            categoryId: transfer.category?.id,
+            categoryName: transfer.category?.name,
+            contractorId: transfer.contractor?.id ?? null,
+            contractorName: transfer.contractor?.name ?? null,
+            accountId: transfer.accountId,
+            accountName: transfer.account.name,
+            date: transfer.date,
+            receiptId: transfer.receiptId ?? null,
         };
     }
 
@@ -65,25 +69,10 @@ export class TransfersController {
     async getRecentTransactions(): Promise<TransferDTO[]> {
         const recentCount = 10;
         const accountIds = (await this.accountDao.getForUserId(1)).map((a) => a.id);
-        return (
-            (await this.transferDao.getRecent(accountIds, recentCount))
-                //.sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
-                .map((t) => {
-                    return {
-                        id: t.id,
-                        description: t.description,
-                        amount: parseFloat(t.amount),
-                        type: t.type,
-                        categoryId: t.category?.id,
-                        category: t.category?.name,
-                        contractor: t.contractor?.name,
-                        account: t.account.name,
-                        accountId: t.account.id,
-                        date: t.date,
-                        receiptId: t.receiptId,
-                    };
-                })
-        );
+        const transfers: TransferDTO[] = (await this.transferDao.getRecent(accountIds, recentCount))
+            //.sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
+            .map((t) => this.toTransferDTO(t));
+        return transfers;
     }
 
     @Get('details/:id')
@@ -116,23 +105,12 @@ export class TransfersController {
 
         const otherTransfers: TransferDTO[] = (await this.transferDao.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
             .filter((t) => t.id !== transfer.id)
-            .map((t) => {
-                return {
-                    id: t.id,
-                    description: t.description,
-                    amount: parseFloat(t.amount),
-                    type: t.type,
-                    category: t.category.name,
-                    accountId: t.account.id,
-                    account: t.account.name,
-                    date: t.date,
-                    categoryId: t.category.id,
-                };
-            });
-        const receipt = {
+            .map((t) => this.toTransferDTO(t));
+
+        const receipt: ReceiptDTO = {
             id: transfer.receipt?.id ?? 0,
             description: transfer.receipt?.description ?? '',
-            amount: parseFloat(transfer.receipt?.amount ?? '0'),
+            amount: transfer.receipt?.amount ?? null,
             date: transfer.receipt?.date,
             contractor: transfer.receipt?.contractor?.name ?? '',
             transferIds: (await transfer.receipt?.transfers)?.map((t) => t.id) ?? [],
@@ -150,7 +128,7 @@ export class TransfersController {
             categoryId: transfer.category.id,
             account: { id: transfer.account?.id ?? 0, name: transfer.account?.name ?? '' },
             otherTransfers: otherTransfers,
-            receipt: receipt.id ? receipt : undefined,
+            receipt: receipt.id ? receipt : null,
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
                 return { id: cat.id, name: cat.name };
@@ -232,7 +210,7 @@ export class TransfersController {
             entity = new Transfer();
         }
         entity.description = transfer.description;
-        entity.amount = transfer.amount.toString();
+        entity.amount = transfer.amount;
         entity.date = transfer.date;
         if (!entity.createdDate) {
             entity.createdDate = new Date();
@@ -245,7 +223,7 @@ export class TransfersController {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
         entity.account = account;
-        delete entity.contractor// = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
+        delete entity.contractor; // = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         entity.contractorId = transfer.contractorId;
         if (entity.category.name === 'Paliwo') {
             try {
@@ -265,12 +243,12 @@ export class TransfersController {
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
         const id = parseInt(transfer.id?.toString());
         const target = await this.transferDao.getById(id);
-        target.amount = (parseFloat(target.amount) - transfer.amount).toString();
+        target.amount = target.amount - transfer.amount;
         const entity = new Transfer();
         entity.description = transfer.description;
-        entity.amount = transfer.amount.toString();
-        if (parseFloat(target.amount) <= 0) {
-            throw new Error('Amount too high!');
+        entity.amount = transfer.amount;
+        if (target.amount <= 0) {
+            throw new Error('Amount too high! Create new transfer instead');
         }
         entity.date = target.date;
         entity.accountId = target.accountId;
@@ -368,12 +346,12 @@ export class TransfersController {
             //const indetifier = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
             const week = weeks.find((w) => w.indetifier === indetifier);
             if (week) {
-                week.outcomes += parseFloat(transfer.amount);
+                week.outcomes += transfer.amount;
             } else {
                 weeks.push({
                     indetifier,
                     week: this.getWeek(date),
-                    outcomes: parseFloat(transfer.amount),
+                    outcomes: transfer.amount,
                 });
             }
         });
@@ -414,7 +392,7 @@ export class TransfersController {
             entityTo = new Transfer();
 
         entityFrom.description = transfer.description;
-        entityFrom.amount = transfer.amount.toString();
+        entityFrom.amount = transfer.amount;
         entityFrom.categoryId = categoryFrom.id;
         entityFrom.accountId = originAccount.id;
         entityFrom.date = transfer.date;
@@ -422,7 +400,7 @@ export class TransfersController {
         entityFrom.isInternal = true;
 
         entityTo.description = transfer.description;
-        entityTo.amount = transfer.amount.toString();
+        entityTo.amount = transfer.amount;
         entityTo.categoryId = categoryTo.id;
         entityTo.accountId = targetAccount.id;
         entityTo.date = transfer.date;

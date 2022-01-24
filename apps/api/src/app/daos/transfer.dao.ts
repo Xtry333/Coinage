@@ -1,6 +1,6 @@
 import { GetFilteredTransfersRequest } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
-import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, Like } from 'typeorm';
+import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 
@@ -39,7 +39,7 @@ export class TransferDao {
         this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
         this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
-        this.assignBetweenIfExists(filter, 'date', params.dateFrom, params.dateTo);
+        this.assignBetweenIfExists(filter, 'date', params.date?.from, params.date?.to);
 
         if (params.description) {
             filter.description = ILike(`%${params.description}%`);
@@ -56,7 +56,7 @@ export class TransferDao {
         this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
         this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
-        this.assignBetweenIfExists(filter, 'date', params.dateFrom, params.dateTo);
+        this.assignBetweenIfExists(filter, 'date', params.date?.from, params.date?.to);
 
         if (params.description) {
             filter.description = ILike(`%${params.description}%`);

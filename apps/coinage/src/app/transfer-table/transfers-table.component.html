@@ -82,7 +82,7 @@
         <tbody>
             <tr *ngFor="let transfer of transfersForTable; trackBy: transferIdTracker" [ngClass]="{ 'today-marker-row': transfer.isTodayMarkerRow }">
                 <ng-container *ngIf="!transfer.isTodayMarkerRow">
-                    <td>{{ transfer.category }}</td>
+                    <td>{{ transfer.categoryName }}</td>
                     <td>
                         <a [routerLink]="NavigatorPages.TransferDetails(transfer.id)">
                             {{ transfer.description }}
@@ -94,10 +94,10 @@
                         </span>
                     </td>
                     <td>
-                        {{ transfer.contractor | undefined }}
+                        {{ transfer.contractorName | undefined }}
                     </td>
                     <td class="currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
-                    <td>{{ transfer.account }}</td>
+                    <td>{{ transfer.accountName }}</td>
                     <td class="align-right nowrap">
                         <a [routerLink]="NavigatorPages.Summary(transfer.date)">{{ transfer.date | date }}</a>
                     </td>

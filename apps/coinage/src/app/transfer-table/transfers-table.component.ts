@@ -3,11 +3,11 @@ import { ActivatedRoute } from '@angular/router';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { CoinageDataService } from '../services/coinageData.service';
 import { NavigatorPages } from '../services/navigator.service';
-import { OnFilterEvent, FilterTypes, PopupSides } from './table-filter/table-filter.component';
+import { FilterTypes, OnFilterEvent, PopupSides } from './table-filter/table-filter.component';
 
 export enum TableColumns {
     Category = 'category',
@@ -127,11 +127,11 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     public isDisplayed(row: TransferDTO): boolean {
         return (
-            (this.filter.category === undefined || this.caseInsensitiveIncludes(row.category, this.filter.category)) &&
+            (this.filter.category === undefined || this.caseInsensitiveIncludes(row.categoryName, this.filter.category)) &&
             (this.filter.description === undefined || this.caseInsensitiveIncludes(row.description, this.filter.description)) &&
-            (this.filter.account === undefined || this.caseInsensitiveIncludes(row.account, this.filter.account)) &&
+            (this.filter.account === undefined || this.caseInsensitiveIncludes(row.accountName, this.filter.account)) &&
             (this.filter.contractor === undefined ||
-                this.caseInsensitiveIncludes(row.contractor ?? TransfersTableComponent.EMPTY_CONTRACTOR, this.filter.contractor)) &&
+                this.caseInsensitiveIncludes(row.contractorName ?? TransfersTableComponent.EMPTY_CONTRACTOR, this.filter.contractor)) &&
             (this.filter.showPlanned || new Date(row.date) < new Date())
         );
     }
@@ -213,12 +213,14 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             date: '',
             type: TransferTypeEnum.OUTCOME,
             accountId: 0,
+            accountName: '',
             categoryId: 0,
+            contractorName: null,
+            contractorId: null,
             amount: 0,
-            category: '',
+            categoryName: '',
             description: '',
-            contractor: '',
-            account: '',
+            receiptId: 0,
             typeSymbol: TransferType.OUTCOME.symbol,
             isTodayMarkerRow: true,
         };

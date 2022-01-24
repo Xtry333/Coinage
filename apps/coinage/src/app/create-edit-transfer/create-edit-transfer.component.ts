@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { AccountDTO, CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetailsDTO, TransferDTO, TransferTypeEnum } from '@coinage-app/interfaces';
+import { AccountDTO, CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -45,7 +45,7 @@ export class CreateEditTransferComponent implements OnInit {
     @Input() redirectAfterSave = true;
     @Input() selectedTransferInputs!: NewTransferObject;
 
-    @Output() saveSuccess: EventEmitter<TransferDTO> = new EventEmitter();
+    @Output() saveSuccess = new EventEmitter<void>();
 
     constructor(
         private readonly route: ActivatedRoute,
@@ -105,13 +105,14 @@ export class CreateEditTransferComponent implements OnInit {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
             if (result.insertedId && cat) {
-                this.saveSuccess.emit({
-                    ...newTransfer,
-                    id: result.insertedId,
-                    category: cat.name,
-                    type: TransferTypeEnum.OUTCOME,
-                    account: this.accounts.find((a) => a.id === newTransfer.accountId)?.name ?? '',
-                });
+                this.saveSuccess.emit();
+                //     {
+                //     ...newTransfer,
+                //     id: result.insertedId,
+                //     categoryName: cat.name,
+                //     type: TransferTypeEnum.OUTCOME,
+                //     accountName: this.accounts.find((a) => a.id === newTransfer.accountId)?.name ?? '',
+                // }
                 this.notificationService.push({
                     title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`,
                     message: newTransfer.description,

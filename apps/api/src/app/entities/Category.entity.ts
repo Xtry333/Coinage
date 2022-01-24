@@ -15,21 +15,21 @@ export class Category {
     name!: string;
 
     @Column('text', { nullable: true })
-    description?: string;
-
-    @Column({ name: 'parent' })
-    parentId!: number;
+    description?: string | null;
 
     @Column('varchar', { length: 50, nullable: false })
     type!: TransferTypeEnum;
 
+    @Column({ name: 'parent', nullable: true })
+    parentId!: number | null;
+
     @ManyToOne('Category', { nullable: true })
     @JoinColumn({ name: 'parent' })
-    parent!: Promise<Category>;
+    parent!: Promise<Category | null>;
 
     @OneToMany('Category', 'parent', {})
-    children!: Promise<Category[]>;
+    children!: Promise<Category[] | null>;
 
     @Column('text', { nullable: true })
-    tag?: string;
+    tag?: string | null;
 }

@@ -29,7 +29,7 @@ export interface TransferDetailsDTO {
     createdDate?: Date;
     editedDate: Date;
     otherTransfers: TransferDTO[];
-    receipt?: ReceiptDTO;
+    receipt: ReceiptDTO | null;
     refundedBy?: number;
     refundedOn?: string;
     isPlanned: boolean;
@@ -64,8 +64,13 @@ export interface TotalAmountPerMonthDTO {
 export interface ReceiptDTO {
     id: number;
     description: string;
-    date?: string;
-    amount: number;
+    date?: string | null;
+    amount: number | null;
     contractor?: string;
     transferIds: number[];
+}
+
+export interface Range<T> {
+    from: T;
+    to: T;
 }

@@ -18,14 +18,14 @@ export class Transfer {
     description!: string;
 
     @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false })
-    amount!: string; // Decimal returns a string for precision, need to parse later in DTO
+    _amount!: string; // Decimal returns a string for precision, need to parse later in DTO
 
-    get price(): number {
-        return Number(this.amount);
+    get amount(): number {
+        return Number(this._amount);
     }
 
-    set price(value: number) {
-        this.amount = value.toString();
+    set amount(value: number) {
+        this._amount = value.toFixed(2);
     }
 
     @Column({ type: 'date', nullable: false })
@@ -52,13 +52,13 @@ export class Transfer {
     contractor?: Contractor | null;
 
     @Column({ name: 'receipt', type: 'numeric', nullable: true })
-    receiptId?: number | undefined;
+    receiptId?: number | null;
 
     @ManyToOne('Receipt', { eager: false, nullable: true })
     @JoinColumn({ name: 'receipt' })
-    receipt?: Receipt | undefined;
+    receipt?: Receipt | null;
 
-    @Column('varchar', { length: 50, nullable: false })
+    @Column({ name: 'type', type: 'varchar', length: 50, nullable: false })
     type!: TransferTypeEnum;
 
     @Column({ type: 'numeric' })
@@ -68,8 +68,16 @@ export class Transfer {
     @JoinColumn({ name: 'account_id' })
     account!: Account;
 
-    @Column('bit', { nullable: false })
-    isInternal!: boolean;
+    @Column({ name: 'is_internal', type: 'bit', nullable: false })
+    isInternalBuffer!: boolean;
+
+    get isInternal(): boolean {
+        return !!this.isInternalBuffer;
+    }
+
+    set isInternal(value: boolean) {
+        this.isInternalBuffer = value;
+    }
 
     @Column({ nullable: true, type: 'json' })
     metadata!: TransferMetadata & { [key: string]: string | number };

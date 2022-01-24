@@ -38,7 +38,7 @@ export class CategoriesController {
                 return {
                     id: c.id,
                     name: c.name,
-                    parentId: c.parentId,
+                    parentId: c.parentId ?? null,
                 };
             })
             .sort((a, b) => a.name.localeCompare(b.name));

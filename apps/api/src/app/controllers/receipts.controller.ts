@@ -1,14 +1,13 @@
+import { ReceiptDetailsDTO, TransferDTO, TransferType } from '@coinage-app/interfaces';
 import { Controller, Get, Param } from '@nestjs/common';
 
-import { ReceiptDetailsDTO, TransferDTO, TransferType } from '@coinage-app/interfaces';
-import { TransferDao } from '../daos/transfer.dao';
-import { CategoryDao } from '../daos/category.dao';
-import { Transfer } from '../entities/Transfer.entity';
-import { ContractorDao } from '../daos/contractor.dao';
 import { AccountDao } from '../daos/account.dao';
-import { DateParserService } from '../services/date-parser.service';
+import { CategoryDao } from '../daos/category.dao';
+import { ContractorDao } from '../daos/contractor.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
-import { Contractor } from '../entities/Contractor.entity';
+import { TransferDao } from '../daos/transfer.dao';
+import { Transfer } from '../entities/Transfer.entity';
+import { DateParserService } from '../services/date-parser.service';
 
 @Controller('receipt(s)?')
 export class ReceiptsController {
@@ -37,21 +36,13 @@ export class ReceiptsController {
             amount: Number(receipt.amount),
             totalAmount: this.calculateTotalAmount(await receipt.transfers, true),
             totalTransferred: this.calculateTotalAmount(await receipt.transfers, false),
-            contractor: this.mapToContractor(receipt.contractor),
+            contractorId: receipt.contractor?.id ?? null,
+            contractorName: receipt.contractor?.name ?? null,
             allTransfers: (await receipt.transfers)
-                .map(this.mapToTransfer)
+                .map(this.toTransferDTO)
                 .sort((a, b) => a.date.localeCompare(b.date))
                 .reverse(),
         };
-    }
-
-    private mapToContractor(contractor?: Contractor) {
-        return contractor
-            ? {
-                  id: contractor.id,
-                  name: contractor.name,
-              }
-            : undefined;
     }
 
     private calculateTotalAmount(transfers: Transfer[], withPlanned: boolean): number {
@@ -62,18 +53,20 @@ export class ReceiptsController {
         );
     }
 
-    private mapToTransfer(transfer: Transfer): TransferDTO {
+    private toTransferDTO(transfer: Transfer): TransferDTO {
         return {
             id: transfer.id,
             date: transfer.date,
             description: transfer.description,
             amount: Number(transfer.amount),
-            categoryId: transfer.category.id,
-            category: transfer.category.name,
-            contractor: transfer.contractor?.name,
-            accountId: transfer.account.id,
-            account: transfer.account.name,
             type: transfer.type,
+            categoryId: transfer.category.id,
+            categoryName: transfer.category.name,
+            contractorId: transfer.contractorId ?? null,
+            contractorName: transfer.contractor?.name ?? null,
+            accountId: transfer.account.id,
+            accountName: transfer.account.name,
+            receiptId: transfer.receiptId ?? null,
         };
     }
 

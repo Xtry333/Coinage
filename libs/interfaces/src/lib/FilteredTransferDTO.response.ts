@@ -8,13 +8,14 @@ export interface FilteredTransfersDTO {
 export interface TransferDTO {
     id: number;
     description: string;
-    contractor?: string;
     amount: number;
     type: TransferTypeEnum;
-    category: string;
     categoryId: number;
-    account: string;
+    categoryName: string;
+    contractorId: number | null;
+    contractorName: string | null;
     accountId: number;
-    receiptId?: number;
+    accountName: string;
+    receiptId: number | null;
     date: string;
 }
