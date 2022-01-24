@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
@@ -49,7 +49,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     public receiptIcon: IconDefinition = faReceipt;
 
-    public filter: TableFilterFields = { category: undefined, contractor: undefined, description: undefined, account: undefined };
+    public filter: TableFilterFields = {};
     public outcomesSum = 0;
     public outcomesCount = 0;
     public incomesSum = 0;
@@ -68,6 +68,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     @Input() showTodayMarker?: boolean = true;
     @Input() filterCachePath?: string;
     @Input() lastPageNumber?: number;
+
+    @Output() public filterEvent = new EventEmitter<OnFilterEvent>();
 
     constructor(private route: ActivatedRoute, private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
 

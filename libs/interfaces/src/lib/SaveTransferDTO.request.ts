@@ -3,7 +3,7 @@ export interface SaveTransferDTO {
     description: string;
     amount: number;
     categoryId: number;
-    contractorId: number;
+    contractorId?: number | null;
     accountId: number;
     date: string;
 }

@@ -15,7 +15,7 @@ export interface NewTransferObject {
     amount: number;
     date: string;
     categoryId?: number;
-    contractorId?: number;
+    contractorId?: number | null;
     accountId?: number;
 }
 
@@ -91,16 +91,16 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     onClickSaveTransfer(): void {
-        console.log(this.selectedTransferInputs);
         const newTransfer: SaveTransferDTO = {
             id: this.transferId,
             description: this.selectedTransferInputs.description,
             amount: parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
             categoryId: this.selectedTransferInputs.categoryId ?? 0,
-            contractorId: this.selectedTransferInputs.contractorId ?? 0,
+            contractorId: this.selectedTransferInputs.contractorId,
             accountId: this.selectedTransferInputs.accountId ?? 0,
             date: this.selectedTransferInputs.date,
         };
+        console.log(newTransfer);
         this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);

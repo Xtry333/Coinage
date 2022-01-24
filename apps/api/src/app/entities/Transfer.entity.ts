@@ -45,11 +45,11 @@ export class Transfer {
     category!: Category;
 
     @Column({ name: 'contractor', type: 'integer', nullable: true })
-    contractorId?: number;
+    contractorId?: number | null;
 
     @ManyToOne('Contractor', { eager: true, nullable: true })
     @JoinColumn({ name: 'contractor' })
-    contractor?: Contractor | undefined;
+    contractor?: Contractor | null;
 
     @Column({ name: 'receipt', type: 'numeric', nullable: true })
     receiptId?: number | undefined;

@@ -67,7 +67,7 @@ export class TransferDao {
             .count({ where: filter, order: { date: 'DESC', id: 'DESC' } });
     }
 
-    private assignNumericFilterIfExists(filter: FindConditions<Transfer>, key: KeysOfType<Transfer, number>, values?: number[]) {
+    private assignNumericFilterIfExists(filter: FindConditions<Transfer>, key: KeysOfType<Transfer, number | null>, values?: number[]) {
         if (values && values.length > 0) {
             filter[key] = In(values);
         }
@@ -106,7 +106,7 @@ export class TransferDao {
         const transfers = await getConnection()
             .getRepository(Transfer)
             .find({
-                where: { date: Equal(date), contractor: Equal(contractorId) },
+                where: { date: Equal(date), contractorId: Equal(contractorId) },
             });
         return transfers;
     }

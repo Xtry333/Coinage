@@ -216,7 +216,7 @@ export class TransfersController {
 
     @Post('save')
     async saveTransferObject(@Body() transfer: SaveTransferDTO): Promise<BaseResponseDTO> {
-        console.log(transfer);
+        console.log('transfer', transfer);
         console.log(transfer.date);
         let entity: Transfer;
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
@@ -245,7 +245,8 @@ export class TransfersController {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
         entity.account = account;
-        entity.contractor = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
+        delete entity.contractor// = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
+        entity.contractorId = transfer.contractorId;
         if (entity.category.name === 'Paliwo') {
             try {
                 entity.metadata = { unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')), location: entity.description.split(' ')[3] };
