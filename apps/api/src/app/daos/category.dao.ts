@@ -3,6 +3,7 @@ import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TotalInMonthByCategory } from '@coinage-app/interfaces';
+import { Account } from '../entities/Account.entity';
 
 @Injectable()
 export class CategoryDao {
@@ -28,18 +29,22 @@ export class CategoryDao {
             .find({ order: { name: 'ASC' } });
     }
 
-    async getTotalByCategoryMonth(year: number, month: number | undefined): Promise<TotalInMonthByCategory[]> {
+    async getTotalByCategoryMonth(year: number, month?: number, day?: number): Promise<TotalInMonthByCategory[]> {
         return await getConnection()
             .createQueryBuilder<TotalInMonthByCategory>(Category, 'Category')
             .select('Category.name', 'categoryName')
             .addSelect('Category.id', 'categoryId')
             .addSelect('Category.parent', 'categoryParentId')
             .addSelect('SUM(Transfer.amount)', 'amount')
+            .addSelect('COUNT(Transfer.id)', 'numberOfTransfers')
             //.from(Category, 'Category')
             .leftJoin(Transfer, 'Transfer', 'Category.id = Transfer.category')
+            .leftJoin(Account, 'Account', 'Account.id = Transfer.account')
             .where("Category.type = 'OUTCOME'")
-            .andWhere('YEAR(Transfer.date) = :year', { year: year })
-            .andWhere('(:month IS NULL OR MONTH(Transfer.date) = :month)', { month: month })
+            .andWhere('YEAR(Transfer.date) = :year', { year })
+            .andWhere('(:month IS NULL OR MONTH(Transfer.date) = :month)', { month })
+            .andWhere('(:day IS NULL OR DAY(Transfer.date) = :day)', { day })
+            .andWhere('Account.userId = :userId', { userId: 1 })
             .groupBy('categoryId')
             .getRawMany();
     }

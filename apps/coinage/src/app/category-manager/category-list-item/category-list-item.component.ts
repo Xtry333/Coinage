@@ -1,5 +1,6 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CategoryDTO } from '@coinage-app/interfaces';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'coinage-app-category-list-item',
@@ -7,6 +8,15 @@ import { CategoryDTO } from '@coinage-app/interfaces';
     styleUrls: ['./category-list-item.component.scss'],
 })
 export class CategoryListItemComponent {
+    public editIcon = faEdit;
+
     @Input()
     category!: CategoryDTO;
+
+    @Output()
+    editCategory = new EventEmitter<CategoryDTO>();
+
+    public onSelectCategoryForEdit(category: CategoryDTO): void {
+        this.editCategory.emit(category);
+    }
 }

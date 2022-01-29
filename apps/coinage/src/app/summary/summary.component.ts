@@ -9,6 +9,7 @@ export interface UiTotalInMonthByCategory {
     categoryName: string;
     amount: number;
     summedAmount?: number;
+    numberOfTransfers: number;
 }
 
 @Component({
@@ -42,7 +43,7 @@ export class SummaryComponent implements OnInit {
             this.datetime = this.partedDateService.toDate(this.partedDate);
             this.selectedDate = this.partedDateService.toDate(this.partedDate).toISOString().slice(0, 10);
             if (this.partedDate.month) {
-                this.coinageData.getTotalPerCategory(this.partedDate.year, this.partedDate.month).subscribe((response) => {
+                this.coinageData.getTotalPerCategory(this.partedDate.year, this.partedDate.month, this.partedDate.day).subscribe((response) => {
                     this.outcomesPerCategory = response.map((o) => {
                         return {
                             categoryName: o.categoryName,
@@ -50,6 +51,7 @@ export class SummaryComponent implements OnInit {
                             summedAmount: response
                                 .filter((r) => o.categoryId === r.categoryParentId)
                                 .reduce((a, b) => a + parseFloat(b.amount), parseFloat(o.amount)),
+                            numberOfTransfers: o.numberOfTransfers,
                         };
                     });
                     this.showPage = true;
@@ -58,9 +60,15 @@ export class SummaryComponent implements OnInit {
                 this.showPage = true;
             }
             if (this.isDateTargetDay) {
-                this.coinageData.getAllTransfers({ page: 1, rowsPerPage: 1000 }).subscribe((response) => {
-                    this.transfers = response.transfers.filter((t) => t.date === this.selectedDate);
-                });
+                this.coinageData
+                    .getAllTransfers({
+                        page: 1,
+                        rowsPerPage: 1000,
+                        date: { from: this.datetime.toISOString().slice(0, 10), to: this.datetime.toISOString().slice(0, 10) },
+                    })
+                    .subscribe((response) => {
+                        this.transfers = response.transfers.filter((t) => t.date === this.selectedDate);
+                    });
             } else if (this.isDateTargetMonth) {
                 this.coinageData
                     .getAllTransfers({ page: 1, rowsPerPage: 500, date: { from: this.monthStartDate.toISOString(), to: this.monthEndDate.toISOString() } })

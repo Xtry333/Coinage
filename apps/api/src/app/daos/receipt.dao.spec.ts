@@ -1,15 +1,15 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TransferDao } from './transfer.dao';
+import { ReceiptDao } from './receipt.dao';
 
-describe('TransferDao', () => {
-    let dao: TransferDao;
+describe('ReceiptDao', () => {
+    let dao: ReceiptDao;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [TransferDao],
+            providers: [ReceiptDao],
         }).compile();
 
-        dao = module.get(TransferDao);
+        dao = module.get(ReceiptDao);
     });
 
     it('should be created', async () => {

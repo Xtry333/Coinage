@@ -13,6 +13,8 @@ export class CategoryManagerComponent implements OnInit {
     categories = [];
     parentCategory!: CategoryDTO;
 
+    selectedCategoryForEdit?: CategoryDTO;
+
     constructor(private readonly coinageDataService: CoinageDataService) {}
 
     public ngOnInit(): void {
@@ -35,5 +37,10 @@ export class CategoryManagerComponent implements OnInit {
             name: 'Root',
             children: c,
         };
+    }
+
+    public onSelectCategoryForEdit(category: CategoryDTO): void {
+        console.log(category);
+        this.selectedCategoryForEdit = category;
     }
 }

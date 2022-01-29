@@ -28,7 +28,7 @@ export class Category {
     parent!: Promise<Category | null>;
 
     @OneToMany('Category', 'parent', {})
-    children!: Promise<Category[] | null>;
+    children!: Promise<Category[]>;
 
     @Column('text', { nullable: true })
     tag?: string | null;

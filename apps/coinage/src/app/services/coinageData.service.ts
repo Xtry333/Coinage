@@ -114,7 +114,7 @@ export class CoinageDataService {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/split`, request);
     }
 
-    public getTotalPerCategory(year: number, month: number): Observable<TotalInMonthByCategory[]> {
-        return this.http.get<TotalInMonthByCategory[]>(`${CoinageDataService.API_URL}category/totalPerCategory/${year}/${month}`);
+    public getTotalPerCategory(year: number, month: number, day?: number): Observable<TotalInMonthByCategory[]> {
+        return this.http.get<TotalInMonthByCategory[]>(`${CoinageDataService.API_URL}category/totalPerCategory/${year}/${month}${day ? '/' + day : ''}`);
     }
 }

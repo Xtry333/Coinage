@@ -6,11 +6,11 @@ import { ContractorDao } from '../daos/contractor.dao';
 
 @Controller('contractor')
 export class ContractorController {
-    constructor(private readonly contractorService: ContractorDao) {}
+    constructor(private readonly contractorDao: ContractorDao) {}
 
-    @Get('/list')
+    @Get('list')
     async getCategoryList(): Promise<ContractorDTO[]> {
-        const contractors = (await this.contractorService.getAll()).map((c) => {
+        const contractors = (await this.contractorDao.getAll()).map((c) => {
             return {
                 id: c.id,
                 name: c.name,
@@ -25,7 +25,7 @@ export class ContractorController {
         let entity: Contractor;
 
         if (contractor.id) {
-            const result = await this.contractorService.getById(contractor.id);
+            const result = await this.contractorDao.getById(contractor.id);
             if (result) {
                 entity = result;
             } else {
@@ -37,7 +37,7 @@ export class ContractorController {
 
         entity.name = contractor.name;
 
-        const inserted = await this.contractorService.save(entity);
+        const inserted = await this.contractorDao.save(entity);
 
         return { insertedId: inserted.id };
     }

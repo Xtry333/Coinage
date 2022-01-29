@@ -1,0 +1,8 @@
+<div *ngIf="selectedCategory && editedCategory">
+    <form (ngSubmit)="onSaveCategory()">
+        <input name="category-name" type="text" [(ngModel)]="editedCategory.name" />
+        <textarea name="category-description" type="text" [(ngModel)]="editedCategory.description"></textarea>
+        <input name="category-tag" type="text" [disabled]="true" [ngModel]="selectedCategory.systemTag" />
+        <button type="submit">Save</button>
+    </form>
+</div>

@@ -23,12 +23,14 @@
             <tr>
                 <th>Category</th>
                 <th>Amount</th>
+                <th>Count</th>
             </tr>
         </thead>
         <tbody>
             <tr *ngFor="let outcome of outcomesPerCategory">
                 <td>{{ outcome.categoryName }}</td>
                 <td class="currency" [title]="outcome.summedAmount">{{ outcome.amount | plnCurrency }}</td>
+                <td>{{ outcome.numberOfTransfers }}</td>
             </tr>
         </tbody>
     </table>

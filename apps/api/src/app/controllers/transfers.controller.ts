@@ -14,22 +14,20 @@ import {
 } from '@coinage-app/interfaces';
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
-import { AppService } from '../app.service';
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
-import { ContractorDao } from '../daos/contractor.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category, TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { DateParserService } from '../services/date-parser.service';
+import { TransfersService } from '../services/transfers.service';
 
 @Controller('transfer(s)?')
 export class TransfersController {
     constructor(
         private readonly transferDao: TransferDao,
-        private readonly appService: AppService,
+        private readonly transfersService: TransfersService,
         private readonly categoryDao: CategoryDao,
-        private readonly contractorDao: ContractorDao,
         private readonly accountDao: AccountDao,
         private readonly dateParserService: DateParserService
     ) {}
@@ -39,11 +37,11 @@ export class TransfersController {
         filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
         filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
 
-        const pagedTransfers = await this.transferDao.getAllFilteredPaged(filterParams);
-        const totalCount = await this.transferDao.getAllFilteredCount(filterParams);
+        const pagedTransfersDTOs = await this.transfersService.getAllFilteredPagedDTO(filterParams);
+        const totalCount = await this.transfersService.getAllFilteredCount(filterParams);
 
         return {
-            transfers: pagedTransfers.map((t) => this.toTransferDTO(t)),
+            transfers: pagedTransfersDTOs,
             totalCount: totalCount,
         };
     }
@@ -66,13 +64,10 @@ export class TransfersController {
     }
 
     @Get('recent')
-    async getRecentTransactions(): Promise<TransferDTO[]> {
+    public getRecentTransactions(): Promise<TransferDTO[]> {
         const recentCount = 10;
-        const accountIds = (await this.accountDao.getForUserId(1)).map((a) => a.id);
-        const transfers: TransferDTO[] = (await this.transferDao.getRecent(accountIds, recentCount))
-            //.sort((a, b) => b.editedDate.getTime() - a.editedDate.getTime())
-            .map((t) => this.toTransferDTO(t));
-        return transfers;
+        const userId = 1;
+        return this.transfersService.getRecentTransfersForUserDTO(userId, recentCount);
     }
 
     @Get('details/:id')

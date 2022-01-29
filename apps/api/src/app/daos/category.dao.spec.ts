@@ -1,21 +1,18 @@
-import { TestBed } from '@angular/core/testing';
-
+import { Test, TestingModule } from '@nestjs/testing';
 import { CategoryDao } from './category.dao';
 
 describe('CategoryDao', () => {
     let dao: CategoryDao;
 
-    beforeEach(() => {
-        TestBed.configureTestingModule({});
-        dao = TestBed.inject(CategoryDao);
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            providers: [CategoryDao],
+        }).compile();
+
+        dao = module.get(CategoryDao);
     });
 
-    it('should be created', () => {
+    it('should be created', async () => {
         expect(dao).toBeTruthy();
-    });
-
-    it('should return by id', async () => {
-        const category = await dao.getById(1);
-        expect(category).toBeDefined();
     });
 });

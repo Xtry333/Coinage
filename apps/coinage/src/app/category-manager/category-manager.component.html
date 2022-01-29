@@ -1,5 +1,9 @@
-<p>Categories Tree</p>
+<div>
+    <p>Categories Tree</p>
 
-<ul *ngIf="parentCategory">
-    <coinage-app-category-list-item [category]="parentCategory"></coinage-app-category-list-item>
-</ul>
+    <ul *ngIf="parentCategory">
+        <coinage-app-category-list-item [category]="parentCategory" (editCategory)="onSelectCategoryForEdit($event)"></coinage-app-category-list-item>
+    </ul>
+
+    <coinage-app-create-edit-category [selectedCategory]="selectedCategoryForEdit"></coinage-app-create-edit-category>
+</div>

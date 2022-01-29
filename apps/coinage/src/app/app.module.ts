@@ -33,6 +33,7 @@ import { TransferDetailsComponent } from './transfer-details/transfer-details.co
 import { TableFilterComponent } from './transfer-table/table-filter/table-filter.component';
 import { TransfersTableComponent } from './transfer-table/transfers-table.component';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
+import { CreateEditCategoryComponent } from './category-manager/create-edit-category/create-edit-category.component';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
@@ -59,6 +60,7 @@ const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
         StatisticsComponent,
         PaginationComponent,
         AutoPaginationComponent,
+        CreateEditCategoryComponent,
     ],
     imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
     providers: [

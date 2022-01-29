@@ -3,4 +3,5 @@ export interface TotalInMonthByCategory {
     categoryName: string;
     categoryParentId: number;
     amount: string;
+    numberOfTransfers: number;
 }

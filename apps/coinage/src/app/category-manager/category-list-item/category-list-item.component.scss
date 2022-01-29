@@ -1,0 +1,18 @@
+:host {
+    .category-name {
+        .edit-icon {
+            display: none;
+            margin-left: 5px;
+        }
+
+        &:hover {
+            .edit-icon {
+                display: inline;
+
+                &:hover {
+                    cursor: pointer;
+                }
+            }
+        }
+    }
+}

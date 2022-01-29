@@ -24,13 +24,14 @@ export class CategoriesController {
         }
 
         entity.name = category.name;
+        entity.description = category.description;
 
         const inserted = await this.categoryDao.save(entity);
 
         return { insertedId: inserted.id };
     }
 
-    @Get('/list')
+    @Get('list')
     async getCategoryList(): Promise<CategoryDTO[]> {
         const categories = await this.categoryDao.getAll();
         return categories
@@ -56,16 +57,19 @@ export class CategoriesController {
             id: c.id,
             name: c.name,
             children: allCategories.filter((child) => child.parentId == c.id).map((cat) => this.mapToTree(cat, allCategories)),
+            description: c.description,
             parentId: c.parentId,
+            systemTag: c.tag,
         };
     }
 
-    @Get('/totalPerCategory/:year/:month')
-    async getTotalPerCategory(@Param('year') year: string, @Param('month') month: string): Promise<TotalInMonthByCategory[]> {
+    @Get('/totalPerCategory/:year/:month/:day?')
+    async getTotalPerCategory(@Param('year') year: string, @Param('month') month: string, @Param('day') day: string): Promise<TotalInMonthByCategory[]> {
         const yearNum = parseInt(year),
-            monthNum = parseInt(month);
+            monthNum = parseInt(month),
+            dayNum = parseInt(day);
         if (yearNum) {
-            return await this.categoryDao.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : undefined);
+            return await this.categoryDao.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : undefined, dayNum ? dayNum : undefined);
         } else {
             return [];
         }

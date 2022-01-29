@@ -1,4 +1,4 @@
-import { GetFilteredTransfersRequest } from '@coinage-app/interfaces';
+import { GetFilteredTransfersRequest, Range } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
 import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
@@ -27,68 +27,75 @@ export class TransferDao {
         return transfer;
     }
 
-    getAll() {
+    public getAll() {
         return getConnection()
             .getRepository(Transfer)
             .find({ order: { date: 'DESC', id: 'DESC' } });
     }
 
-    getAllFilteredPaged(params: GetFilteredTransfersRequest): Promise<Transfer[]> {
-        const filter: FindConditions<Transfer> = {};
-        this.assignNumericFilterIfExists(filter, 'contractorId', params.contractorIds);
-        this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
-        this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
-        this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
-        this.assignBetweenIfExists(filter, 'date', params.date?.from, params.date?.to);
-
-        if (params.description) {
-            filter.description = ILike(`%${params.description}%`);
-        }
+    public getAllFilteredPaged(params: GetFilteredTransfersRequest): Promise<Transfer[]> {
+        const filter = this.createFilteredFindConditions(params);
 
         return getConnection()
             .getRepository(Transfer)
             .find({ where: filter, order: { date: 'DESC', id: 'DESC' }, take: params.rowsPerPage, skip: params.rowsPerPage * (params.page - 1) });
     }
 
-    getAllFilteredCount(params: GetFilteredTransfersRequest): Promise<number> {
-        const filter: FindConditions<Transfer> = {};
-        this.assignNumericFilterIfExists(filter, 'contractorId', params.contractorIds);
-        this.assignNumericFilterIfExists(filter, 'accountId', params.accountIds);
-        this.assignNumericFilterIfExists(filter, 'categoryId', params.categoryIds);
-        this.assignNumericFilterIfExists(filter, 'id', params.transferIds);
-        this.assignBetweenIfExists(filter, 'date', params.date?.from, params.date?.to);
-
-        if (params.description) {
-            filter.description = ILike(`%${params.description}%`);
-        }
+    public getAllFilteredCount(params: GetFilteredTransfersRequest): Promise<number> {
+        const filter = this.createFilteredFindConditions(params);
 
         return getConnection()
             .getRepository(Transfer)
             .count({ where: filter, order: { date: 'DESC', id: 'DESC' } });
     }
 
-    private assignNumericFilterIfExists(filter: FindConditions<Transfer>, key: KeysOfType<Transfer, number | null>, values?: number[]) {
+    private createFilteredFindConditions(params: GetFilteredTransfersRequest): FindConditions<Transfer> {
+        const filter: FindConditions<Transfer> = {};
+
+        this.assignInFilterIfExists(filter, 'contractorId', params.contractorIds);
+        this.assignInFilterIfExists(filter, 'accountId', params.accountIds);
+        this.assignInFilterIfExists(filter, 'categoryId', params.categoryIds);
+        this.assignInFilterIfExists(filter, 'id', params.transferIds);
+        this.assignBetweenFilterIfExists(filter, 'date', params.date);
+        this.assignBetweenFilterIfExists(filter, 'amount', params.amount);
+
+        if (params.description) {
+            filter.description = ILike(`%${params.description}%`);
+        }
+
+        return filter;
+    }
+
+    private assignInFilterIfExists(filter: FindConditions<Transfer>, key: KeysOfType<Transfer, number | null>, values?: number[]) {
         if (values && values.length > 0) {
             filter[key] = In(values);
         }
     }
 
-    private assignBetweenIfExists(filter: FindConditions<Transfer>, key: keyof Transfer, a?: unknown, b?: unknown) {
-        if (a && b) {
-            (filter as any)[key] = Between(a, b);
+    private assignBetweenFilterIfExists(
+        filter: FindConditions<Transfer>,
+        key: KeysOfType<Transfer, string | number | null>,
+        range?: Range<string | number | null>
+    ) {
+        if (range && range.from && range.to) {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (filter as any)[key] = Between(range.from, range.to);
         }
     }
 
-    getAllLimited(count?: number) {
+    public getRecentlyEditedTransfersForUser(userId: number, count?: number): Promise<Transfer[]> {
         return getConnection()
-            .getRepository(Transfer)
-            .find({ where: { accountId: 1 }, order: { date: 'DESC', id: 'DESC' }, take: count });
-    }
-
-    getRecent(accountIds: number[], count?: number) {
-        return getConnection()
-            .getRepository(Transfer)
-            .find({ where: { accountId: In(accountIds) }, order: { editedDate: 'DESC', id: 'DESC' }, take: count });
+            .createQueryBuilder(Transfer, 'transfer')
+            .select()
+            .leftJoinAndSelect('transfer.account', 'account')
+            .leftJoinAndSelect('transfer.category', 'category')
+            .leftJoinAndSelect('transfer.contractor', 'contractor')
+            .leftJoinAndSelect('account.user', 'user')
+            .orderBy('transfer.editedDate', 'DESC')
+            .addOrderBy('transfer.id', 'DESC')
+            .where('user.id = :userId', { userId })
+            .take(count)
+            .getMany();
     }
 
     async getLimitedTotalMonthlyAmount(accountIds: number[], type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {

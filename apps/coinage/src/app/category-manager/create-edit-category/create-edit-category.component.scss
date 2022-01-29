@@ -1,0 +1,21 @@
+:host {
+    float: right;
+    display: block;
+
+    input,
+    textarea,
+    button {
+        padding: 10px;
+        margin: 10px;
+        display: block;
+        height: 40px;
+        width: 300px;
+        max-width: 300px;
+        min-width: 300px;
+    }
+
+    textarea {
+        min-height: 80px;
+        font: 13.3333px Arial;
+    }
+}
