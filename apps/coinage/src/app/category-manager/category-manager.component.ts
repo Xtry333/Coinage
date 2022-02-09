@@ -19,6 +19,11 @@ export class CategoryManagerComponent implements OnInit {
 
     public ngOnInit(): void {
         this.showPage = false;
+        this.loadData();
+        //this.parentCategory = this.createRootCategory();
+    }
+
+    private loadData(): void {
         this.coinageDataService
             .getCategoryTree()
             .pipe(
@@ -28,7 +33,6 @@ export class CategoryManagerComponent implements OnInit {
                 })
             )
             .subscribe((c) => (this.parentCategory = this.createRootCategory(c)));
-        //this.parentCategory = this.createRootCategory();
     }
 
     private createRootCategory(c: CategoryDTO[]): CategoryDTO {
@@ -42,5 +46,10 @@ export class CategoryManagerComponent implements OnInit {
     public onSelectCategoryForEdit(category: CategoryDTO): void {
         console.log(category);
         this.selectedCategoryForEdit = category;
+    }
+
+    public onCategorySaved(category: CategoryDTO): void {
+        console.log(category);
+        this.loadData();
     }
 }

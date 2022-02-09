@@ -13,11 +13,12 @@ import { CategoryDao } from './daos/category.dao';
 import { ContractorDao } from './daos/contractor.dao';
 import { ReceiptDao } from './daos/receipt.dao';
 import { TransferDao } from './daos/transfer.dao';
+import { CategoryCascadeService } from './services/category-cascades.service';
 import { DateParserService } from './services/date-parser.service';
 import { TransfersService } from './services/transfers.service';
 
 const controllers = [AccountsController, CategoriesController, ContractorController, DashboardComponent, ReceiptsController, TransfersController];
-const services = [TransfersService, DateParserService];
+const services = [TransfersService, DateParserService, CategoryCascadeService];
 const daos = [AccountDao, CategoryDao, ContractorDao, ReceiptDao, TransferDao];
 
 @Module({

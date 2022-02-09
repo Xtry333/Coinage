@@ -3,10 +3,11 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { Category } from '../entities/Category.entity';
 
 import { CategoryDao as CategoryDao } from '../daos/category.dao';
+import { CategoryCascadeService } from '../services/category-cascades.service';
 
 @Controller('category')
 export class CategoriesController {
-    constructor(private readonly categoryDao: CategoryDao) {}
+    constructor(private readonly categoryDao: CategoryDao, private readonly categoryCascadeService: CategoryCascadeService) {}
 
     @Post('save')
     async saveCategory(@Body() category: CreateEditCategoryDTO): Promise<BaseResponseDTO> {
@@ -26,7 +27,14 @@ export class CategoriesController {
         entity.name = category.name;
         entity.description = category.description;
 
-        const inserted = await this.categoryDao.save(entity);
+        let inserted = await this.categoryDao.save(entity);
+
+        if (category.parentId !== undefined) {
+            if (await this.categoryCascadeService.canSetCategoryParentById(inserted.id, category.parentId)) {
+                entity.parentId = category.parentId;
+                inserted = await this.categoryDao.save(entity);
+            }
+        }
 
         return { insertedId: inserted.id };
     }

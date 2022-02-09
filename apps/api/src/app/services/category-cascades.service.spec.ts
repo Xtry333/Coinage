@@ -26,34 +26,34 @@ describe('CategoryCascadeService', () => {
         expect(service).toBeTruthy();
     });
 
-    describe('setCategoryParentById', () => {
+    describe('canSetCategoryParentById', () => {
         it('should throw an error when category does not exist', () => {
-            expect(service.setCategoryParentById(999, null)).rejects.toThrowError();
+            expect(service.canSetCategoryParentById(999, null)).rejects.toThrowError();
         });
 
         it('should allow setting parent to null', () => {
-            expect(service.setCategoryParentById(2, null)).resolves.toBeTruthy();
+            expect(service.canSetCategoryParentById(2, null)).resolves.toBeTruthy();
         });
 
         it('should allow setting correct parent for category in simple case', () => {
-            expect(service.setCategoryParentById(7, 5)).resolves.toBeTruthy();
+            expect(service.canSetCategoryParentById(7, 5)).resolves.toBeTruthy();
         });
 
         it('should allow setting correct parent for category in advanced case', () => {
-            expect(service.setCategoryParentById(4, 2)).resolves.toBeTruthy();
+            expect(service.canSetCategoryParentById(4, 2)).resolves.toBeTruthy();
         });
 
         it('should not allow setting parent to itself', () => {
-            expect(service.setCategoryParentById(1, 1)).resolves.toBeFalsy();
+            expect(service.canSetCategoryParentById(1, 1)).resolves.toBeFalsy();
         });
 
         it('should not allow setting circular parent to category in simple case', () => {
-            expect(service.setCategoryParentById(1, 2)).resolves.toBeFalsy();
+            expect(service.canSetCategoryParentById(1, 2)).resolves.toBeFalsy();
         });
 
         it('should not allow setting circular parent to category in advanced case', () => {
-            expect(service.setCategoryParentById(4, 3)).resolves.toBeTruthy();
-            expect(service.setCategoryParentById(3, 7)).resolves.toBeFalsy();
+            expect(service.canSetCategoryParentById(4, 3)).resolves.toBeTruthy();
+            expect(service.canSetCategoryParentById(3, 7)).resolves.toBeFalsy();
         });
     });
 

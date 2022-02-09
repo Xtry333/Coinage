@@ -21,11 +21,11 @@ export class Category {
     type!: TransferTypeEnum;
 
     @Column({ name: 'parent', nullable: true })
-    parentId!: number | null;
+    parentId?: number | null;
 
     @ManyToOne('Category', { nullable: true })
     @JoinColumn({ name: 'parent' })
-    parent!: Promise<Category | null>;
+    parent?: Promise<Category | null>;
 
     @OneToMany('Category', 'parent', {})
     children!: Promise<Category[]>;
