@@ -21,8 +21,8 @@ export class TransfersService {
     }
 
     public async saveTransfer(transfer: Transfer): Promise<Transfer> {
-        const category = await this.categoryDao.getById(transfer.categoryId);
-        if (category == undefined) {
+        const category = await this.categoryDao.getById(transfer.categoryId ?? transfer.category.id);
+        if (category === undefined) {
             throw new Error('Category not found');
         }
 
