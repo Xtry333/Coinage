@@ -205,7 +205,6 @@ export class TransfersController {
         } else {
             entity = new Transfer();
         }
-        entity.description = transfer.description;
         entity.amount = transfer.amount;
         entity.date = transfer.date;
         if (!entity.createdDate) {
@@ -218,6 +217,7 @@ export class TransfersController {
         } else {
             throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
+        entity.description = transfer.description === undefined ? category?.name : transfer.description;
         entity.account = account;
         delete entity.contractor; // = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         entity.contractorId = transfer.contractorId;
@@ -230,7 +230,7 @@ export class TransfersController {
             }
         }
         console.log(entity);
-        const inserted = await this.transferDao.save(entity);
+        const inserted = await this.transfersService.saveTransfer(entity);
         return { insertedId: inserted.id };
     }
 
