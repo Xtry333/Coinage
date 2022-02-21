@@ -4,7 +4,7 @@
     </button>
     <div *ngIf="isPopupDisplayed" class="filter-popup" [ngClass]="popupSideClass">
         <form (ngSubmit)="onPerformFilter()">
-            <span *ngIf="isFilterTextBox">
+            <div *ngIf="filterValue.filterType === FilterType.TextBox">
                 <input
                     #filterInput
                     list="filterInputValues"
@@ -15,12 +15,63 @@
                 <datalist *ngIf="filterDataProvided" id="filterInputValues">
                     <option *ngFor="let opt of datalist" [value]="opt"></option>
                 </datalist>
-            </span>
-            <span *ngIf="isFilterDateRange || isFilterAmountRange">
+            </div>
+            <div *ngIf="filterValue.filterType === FilterType.NumericRange" class="numeric-range">
+                <input
+                    #filterInputFrom
+                    name="filterRangeFrom"
+                    type="number"
+                    min="0"
+                    [max]="filterValue.range.to ?? 0"
+                    [(ngModel)]="filterValue.range.from"
+                    autocomplete="off"
+                />
+                <input
+                    #filterInputTo
+                    name="filterRangeTo"
+                    type="number"
+                    [min]="filterValue.range.from ?? 0"
+                    [(ngModel)]="filterValue.range.to"
+                    autocomplete="off"
+                />
+            </div>
+            <div *ngIf="isFilterDateRange">
                 <span>Not implemented!</span>
-            </span>
-            <button type="submit">Apply</button>
-            <button type="reset" (click)="onClear()">Clear</button>
+            </div>
+            <div *ngIf="filterValue.filterType === FilterType.MultiCheckbox" class="multi-checkbox-filter-container">
+                <div *ngIf="shouldDisplaySearchBox" class="filter-option-search-container">
+                    <input
+                        name="optionSearch"
+                        class="filter-option-search-value"
+                        [ngModel]="optionSearchValue"
+                        (ngModelChange)="onChangeOptionSearchValue($event)"
+                        autocomplete="off"
+                        placeholder="Search..."
+                    />
+                    <button type="button" class="clear-button" (click)="onClearOptionsSearchValue()">X</button>
+                </div>
+
+                <div class="filter-options">
+                    <div *ngIf="noOptionDisplayed">
+                        <span>No options found</span>
+                    </div>
+                    <div *ngFor="let option of filterOptions" class="filter-option">
+                        <div *ngIf="option.isDisplayed">
+                            <input
+                                [id]="'filter-option-checkbox-' + option.id"
+                                [name]="'filter-option-checkbox-' + option.id"
+                                type="checkbox"
+                                [(ngModel)]="option.isSelected"
+                            />
+                            <label [for]="'filter-option-checkbox-' + option.id">{{ option.uiText }}</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="filter-buttons">
+                <button type="submit">Apply</button>
+                <button type="reset" (click)="onClear()">Clear</button>
+            </div>
         </form>
     </div>
 </div>

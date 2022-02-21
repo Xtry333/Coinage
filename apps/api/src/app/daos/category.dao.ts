@@ -37,7 +37,7 @@ export class CategoryDao {
             .addSelect('Category.parent', 'categoryParentId')
             .addSelect('SUM(Transfer.amount)', 'amount')
             .addSelect('COUNT(Transfer.id)', 'numberOfTransfers')
-            //.from(Category, 'Category')
+            // .from(Category, 'Category')
             .leftJoin(Transfer, 'Transfer', 'Category.id = Transfer.category')
             .leftJoin(Account, 'Account', 'Account.id = Transfer.account')
             .where("Category.type = 'OUTCOME'")
@@ -45,6 +45,7 @@ export class CategoryDao {
             .andWhere('(:month IS NULL OR MONTH(Transfer.date) = :month)', { month })
             .andWhere('(:day IS NULL OR DAY(Transfer.date) = :day)', { day })
             .andWhere('Account.userId = :userId', { userId: 1 })
+            // .andWhere('Transfer.isInternalBuffer = false')
             .groupBy('categoryId')
             .getRawMany();
     }

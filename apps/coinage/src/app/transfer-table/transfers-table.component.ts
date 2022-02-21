@@ -7,18 +7,45 @@ import * as Rx from 'rxjs';
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { CoinageDataService } from '../services/coinageData.service';
 import { NavigatorPages } from '../services/navigator.service';
-import { FilterTypes, OnFilterEvent, PopupSides } from './table-filter/table-filter.component';
+import {
+    FilterOption,
+    FilterType,
+    OnDateRangeFilterEvent,
+    OnFilterEvent,
+    OnMultiCheckboxFilterEvent,
+    OnNumericRangeFilterEvent,
+    OnTextBoxFilterEvent,
+    PopupSide as PopupSide,
+    TableFilterComponent,
+} from './table-filter/table-filter.component';
 
-export enum TableColumns {
-    Category = 'category',
-    Description = 'description',
-    Contractor = 'contractor',
-    Amount = 'amount',
-    Date = 'date',
-    Account = 'account',
+export enum TableColumn {
+    Category = 'Category',
+    Description = 'Description',
+    Contractor = 'Contractor',
+    Amount = 'Amount',
+    Date = 'Date',
+    Account = 'Account',
 }
 
+export const TableColumnsFilterTypes: Record<TableColumn, FilterType> & { [key: string]: FilterType } = {
+    Category: FilterType.MultiCheckbox,
+    Description: FilterType.TextBox,
+    Contractor: FilterType.MultiCheckbox,
+    Account: FilterType.MultiCheckbox,
+    Amount: FilterType.NumericRange,
+    Date: FilterType.DateRange,
+};
+
+export type OptionsForCheckboxFilters = {
+    categories: FilterOption[];
+    contractors: FilterOption[];
+    accounts: FilterOption[];
+};
+
 export interface TableFilterFields {
+    categoryIds?: number[];
+    contractorIds?: number[];
     category?: string;
     description?: string;
     contractor?: string;
@@ -28,7 +55,7 @@ export interface TableFilterFields {
     dateFrom?: Date;
     dateTo?: Date;
     showPlanned?: boolean;
-    [key: string]: Date | string | boolean | number | undefined;
+    [key: string]: Date | string | boolean | number | number[] | undefined;
 }
 
 export type UiTransfer = TransferDTO & { typeSymbol: string; isTodayMarkerRow?: boolean };
@@ -42,10 +69,10 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public static EMPTY_CONTRACTOR = '-';
     public static EMPTY_DESCRIPTION = '-';
 
-    public FilterTypes = FilterTypes;
-    public PopupSides = PopupSides;
-    public TableColumns = TableColumns;
-    public NavigatorPages = NavigatorPages;
+    public readonly FilterType = FilterType;
+    public readonly PopupSide = PopupSide;
+    public readonly TableColumn = TableColumn;
+    public readonly NavigatorPages = NavigatorPages;
 
     public receiptIcon: IconDefinition = faReceipt;
 
@@ -56,9 +83,13 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public incomesCount = 0;
 
     public transfersForTable: UiTransfer[] = [];
-    public categoryNames: string[] = [];
-    public contractorNames: string[] = [];
-    public accountNames: string[] = [];
+    public optionsForCheckboxFilters: OptionsForCheckboxFilters = {
+        categories: [],
+        accounts: [],
+        contractors: [],
+    };
+
+    currentPage = 1;
 
     @Input() tableHeader?: string;
     @Input() transfers?: TransferDTO[];
@@ -69,7 +100,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     @Input() filterCachePath?: string;
     @Input() lastPageNumber?: number;
 
-    @Output() public filterEvent = new EventEmitter<OnFilterEvent>();
+    @Output() public tableFilterEvent = new EventEmitter<TableFilterFields>();
 
     constructor(private route: ActivatedRoute, private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
 
@@ -77,9 +108,9 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         if (this.showFilters) {
             Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList(), this.dataService.getAllAvailableAccounts()).subscribe(
                 ([categories, contractors, accounts]) => {
-                    this.categoryNames = categories.map((c) => c.name);
-                    this.contractorNames = contractors.map((c) => c.name);
-                    this.accountNames = accounts.map((c) => c.name);
+                    this.optionsForCheckboxFilters.categories = categories.map((c) => TableFilterComponent.mapToFilterOptions(c.id, c.name));
+                    this.optionsForCheckboxFilters.contractors = contractors.map((c) => TableFilterComponent.mapToFilterOptions(c.id, c.name));
+                    this.optionsForCheckboxFilters.accounts = accounts.map((a) => TableFilterComponent.mapToFilterOptions(a.id, a.name));
                 }
             );
             if (this.filterCachePath) {
@@ -101,28 +132,35 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         return item.id.toString();
     }
 
-    public onFilter(event: OnFilterEvent) {
-        // this.filter[event.name] = event.value;
-
-        // Replaced by simpler code above
-        switch (event.name) {
-            case TableColumns.Category:
-                this.filter.category = event.value;
-                break;
-            case TableColumns.Description:
-                this.filter.description = event.value;
-                break;
-            case TableColumns.Contractor:
-                this.filter.contractor = event.value;
-                break;
-            case TableColumns.Account:
-                this.filter.account = event.value;
-                break;
+    public onPerformFilter(event: OnFilterEvent) {
+        if (this.checkFilterEventColumnName<OnTextBoxFilterEvent>(event, TableColumn.Description)) {
+            this.filter.description = event.value;
+        } else if (this.checkFilterEventColumnName<OnMultiCheckboxFilterEvent>(event, TableColumn.Category)) {
+            this.filter.categoryIds = event.selectedIds;
+        } else if (this.checkFilterEventColumnName<OnMultiCheckboxFilterEvent>(event, TableColumn.Contractor)) {
+            this.filter.contractorIds = event.selectedIds;
+        } else if (this.checkFilterEventColumnName<OnMultiCheckboxFilterEvent>(event, TableColumn.Account)) {
+            this.filter.accountIds = event.selectedIds;
+        } else if (this.checkFilterEventColumnName<OnNumericRangeFilterEvent>(event, TableColumn.Amount)) {
+            this.filter.amountFrom = event.range.from;
+            this.filter.amountTo = event.range.to;
+        } else if (this.checkFilterEventColumnName<OnDateRangeFilterEvent>(event, TableColumn.Date)) {
+            this.filter.dateFrom = event.range.from;
+            this.filter.dateTo = event.range.to;
+        } else {
+            throw new Error(`Expected ${TableColumnsFilterTypes[event.name]} for ${event.name} column but received ${event.filterType} OnFilterEvent. `);
         }
+
         if (this.filterCachePath) {
             this.localStorage.setObject(this.filterCachePath, this.filter);
         }
+        this.currentPage = 1;
+        this.tableFilterEvent.emit(this.filter);
         this.doFiltering();
+    }
+
+    private checkFilterEventColumnName<T extends OnFilterEvent>(event: OnFilterEvent, tableColumn: TableColumn): event is T & boolean {
+        return event.filterType === TableColumnsFilterTypes[tableColumn] && event.name === tableColumn;
     }
 
     public isDisplayed(row: TransferDTO): boolean {
@@ -143,7 +181,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         this.incomesCount = 0;
         if (this.transfers) {
             this.transfersForTable = this.transfers
-                .filter((t) => !this.showFilters || this.isDisplayed(t))
+                //.filter((t) => !this.showFilters || this.isDisplayed(t))
                 .map((t) => {
                     if (t.type === 'OUTCOME') {
                         this.outcomesSum += t.amount;
@@ -195,6 +233,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         if (this.filterCachePath) {
             this.localStorage.setObject(this.filterCachePath, this.filter);
         }
+        this.tableFilterEvent.emit(this.filter);
         this.doFiltering();
     }
 

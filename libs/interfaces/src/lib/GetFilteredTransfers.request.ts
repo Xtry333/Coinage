@@ -10,5 +10,5 @@ export interface GetFilteredTransfersRequest extends PagedRequest {
     accountIds?: number[];
     type?: TransferTypeEnum;
     date?: Range<string>;
-    isPlanned?: boolean;
+    showPlanned?: boolean;
 }

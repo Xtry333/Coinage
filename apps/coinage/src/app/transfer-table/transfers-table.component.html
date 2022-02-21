@@ -14,11 +14,11 @@
                     Category
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumns.Category"
-                        (filterEvent)="onFilter($event)"
-                        [filterType]="FilterTypes.TextBox"
-                        [popupSide]="PopupSides.ToRight"
-                        [datalist]="categoryNames"
+                        [filterName]="TableColumn.Category"
+                        (filterEvent)="onPerformFilter($event)"
+                        [filterType]="FilterType.MultiCheckbox"
+                        [filterOptions]="optionsForCheckboxFilters.categories"
+                        [popupSide]="PopupSide.ToRight"
                         [cachedFilterValue]="filter.category"
                     ></coinage-app-table-filter>
                 </th>
@@ -26,10 +26,10 @@
                     Description
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumns.Description"
-                        (filterEvent)="onFilter($event)"
-                        [filterType]="FilterTypes.TextBox"
-                        [popupSide]="PopupSides.ToLeft"
+                        [filterName]="TableColumn.Description"
+                        (filterEvent)="onPerformFilter($event)"
+                        [filterType]="FilterType.TextBox"
+                        [popupSide]="PopupSide.ToLeft"
                         [cachedFilterValue]="filter.description"
                     ></coinage-app-table-filter>
                 </th>
@@ -37,11 +37,11 @@
                     Contractor
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumns.Contractor"
-                        (filterEvent)="onFilter($event)"
-                        [filterType]="FilterTypes.TextBox"
-                        [popupSide]="PopupSides.ToLeft"
-                        [datalist]="contractorNames"
+                        [filterName]="TableColumn.Contractor"
+                        (filterEvent)="onPerformFilter($event)"
+                        [filterType]="FilterType.MultiCheckbox"
+                        [filterOptions]="optionsForCheckboxFilters.contractors"
+                        [popupSide]="PopupSide.ToLeft"
                         [cachedFilterValue]="filter.contractor"
                     ></coinage-app-table-filter>
                 </th>
@@ -49,21 +49,21 @@
                     Amount
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumns.Amount"
-                        (filterEvent)="onFilter($event)"
-                        [filterType]="FilterTypes.AmountRange"
-                        [popupSide]="PopupSides.ToLeft"
+                        [filterName]="TableColumn.Amount"
+                        (filterEvent)="onPerformFilter($event)"
+                        [filterType]="FilterType.NumericRange"
+                        [popupSide]="PopupSide.ToLeft"
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
                     Account
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumns.Account"
-                        (filterEvent)="onFilter($event)"
-                        [filterType]="FilterTypes.TextBox"
-                        [popupSide]="PopupSides.ToLeft"
-                        [datalist]="accountNames"
+                        [filterName]="TableColumn.Account"
+                        (filterEvent)="onPerformFilter($event)"
+                        [filterType]="FilterType.MultiCheckbox"
+                        [filterOptions]="optionsForCheckboxFilters.accounts"
+                        [popupSide]="PopupSide.ToLeft"
                         [cachedFilterValue]="filter.account"
                     ></coinage-app-table-filter>
                 </th>
@@ -71,10 +71,10 @@
                     Date
                     <coinage-app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumns.Date"
-                        (filterEvent)="onFilter($event)"
-                        [filterType]="FilterTypes.DateRange"
-                        [popupSide]="PopupSides.ToLeft"
+                        [filterName]="TableColumn.Date"
+                        (filterEvent)="onPerformFilter($event)"
+                        [filterType]="FilterType.DateRange"
+                        [popupSide]="PopupSide.ToLeft"
                     ></coinage-app-table-filter>
                 </th>
             </tr>
@@ -123,5 +123,10 @@
             </tr>
         </tbody>
     </table>
-    <coinage-app-pagination class="pull-right mt-1" *ngIf="showFilters && lastPageNumber" [lastPage]="lastPageNumber"></coinage-app-pagination>
+    <coinage-app-pagination
+        class="pull-right mt-1"
+        *ngIf="showFilters && lastPageNumber"
+        [lastPage]="lastPageNumber"
+        [currentPage]="currentPage"
+    ></coinage-app-pagination>
 </div>

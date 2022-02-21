@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChange } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 // interface PageNumber {
@@ -28,7 +28,7 @@ type PageNumber =
     templateUrl: './pagination.component.html',
     styleUrls: ['./pagination.component.scss'],
 })
-export class PaginationComponent implements OnInit {
+export class PaginationComponent implements OnInit, OnChanges {
     @Input() firstPage = 1;
     @Input() currentPage = 1;
     @Input() lastPage = 1;
@@ -51,9 +51,15 @@ export class PaginationComponent implements OnInit {
         });
     }
 
+    ngOnChanges(changes: { lastPage: SimpleChange }): void {
+        if (changes.lastPage.currentValue !== changes.lastPage.previousValue) {
+            this.calculatePageNumbers();
+        }
+    }
+
     private calculatePageNumbers(showAll: boolean = false) {
         const pageNumbers = new Set<number>([this.firstPage]);
-        for (let i = 0; i < (showAll ? this.lastPage : 2); i++) {
+        for (let i = 0; i < (showAll ? this.lastPage : 3); i++) {
             pageNumbers.add(this.firstPage + i);
             pageNumbers.add(this.currentPage + i);
             pageNumbers.add(this.currentPage - i);

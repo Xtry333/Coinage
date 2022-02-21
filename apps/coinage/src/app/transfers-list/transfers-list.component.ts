@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { GetFilteredTransfersRequest, TransferDTO } from '@coinage-app/interfaces';
+import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import { CoinageDataService } from '../services/coinageData.service';
+import { TableFilterFields } from '../transfer-table/transfers-table.component';
 
 interface TransfersListQueryParams {
     page: number;
@@ -64,11 +65,31 @@ export class TransfersListComponent implements OnInit, OnDestroy {
             });
     }
 
+    public onPerformFilter(filterParams: TableFilterFields): void {
+        this.filterParams = {
+            ...this.filterParams,
+            ...filterParams,
+            amount: this.mapRangeFilterParams(filterParams),
+        };
+        this.refreshData();
+    }
+
     public onEndOfPage(): void {
         console.log('onEndOfPage');
     }
 
     get lastPageNumber(): number {
         return Math.ceil(this.totalCount / this.filterParams.rowsPerPage);
+    }
+
+    private mapRangeFilterParams(filterParams: TableFilterFields): Range<number> | undefined {
+        if (filterParams.amountFrom && filterParams.amountTo) {
+            return {
+                from: filterParams.amountFrom,
+                to: filterParams.amountTo,
+            };
+        }
+
+        return undefined;
     }
 }

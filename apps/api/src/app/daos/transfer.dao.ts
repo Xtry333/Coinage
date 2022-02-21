@@ -1,6 +1,6 @@
 import { GetFilteredTransfersRequest, Range } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
-import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult } from 'typeorm';
+import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, LessThanOrEqual } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 
@@ -57,10 +57,14 @@ export class TransferDao {
         this.assignInFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignInFilterIfExists(filter, 'id', params.transferIds);
         this.assignBetweenFilterIfExists(filter, 'date', params.date);
-        this.assignBetweenFilterIfExists(filter, 'amount', params.amount);
+        this.assignBetweenFilterIfExists(filter, '_amount', params.amount);
 
         if (params.description) {
             filter.description = ILike(`%${params.description}%`);
+        }
+
+        if (!params.showPlanned) {
+            filter.date = LessThanOrEqual(this.getToday());
         }
 
         return filter;
@@ -77,7 +81,7 @@ export class TransferDao {
         key: KeysOfType<Transfer, string | number | null>,
         range?: Range<string | number | null>
     ) {
-        if (range && range.from && range.to) {
+        if (range !== undefined && range.from !== undefined && range.to !== undefined) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (filter as any)[key] = Between(range.from, range.to);
         }

@@ -5,6 +5,7 @@
         [showFilters]="true"
         filterCachePath="transfer.list.filters"
         [lastPageNumber]="lastPageNumber"
+        (tableFilterEvent)="onPerformFilter($event)"
     ></coinage-app-transfers-table>
     <coinage-app-auto-pagination (endOfPage)="onEndOfPage()"></coinage-app-auto-pagination>
 </div>

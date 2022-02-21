@@ -37,14 +37,66 @@
             padding: 10px;
         }
 
-        button {
-            padding: 10px;
-            background-color: rgb(225, 225, 225);
-            border: gray 2px solid;
-            cursor: pointer;
-            margin-left: 2px;
-            &:hover {
-                background-color: lightgray;
+        .multi-checkbox-filter-container {
+            min-width: 200px;
+
+            .filter-option-search-container {
+                width: 100%;
+                margin-bottom: 5px;
+
+                .filter-option-search-value {
+                    padding: 2px;
+                }
+
+                .clear-button {
+                    padding: 2px 5px;
+                }
+            }
+
+            .filter-options {
+                font-weight: normal;
+                margin-bottom: 5px;
+                min-height: 100px;
+                max-height: 500px;
+                overflow-y: auto;
+
+                .filter-option {
+                    margin-bottom: 2px;
+                    margin-right: 5px;
+
+                    input {
+                        margin-left: 0;
+                    }
+                }
+            }
+        }
+
+        .numeric-range {
+            input {
+                padding-right: 0;
+                width: 75px;
+            }
+        }
+
+        .filter-buttons {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            margin-top: 5px;
+
+            button {
+                flex: 1;
+                padding: 10px;
+                background-color: rgb(225, 225, 225);
+                border: gray 2px solid;
+                cursor: pointer;
+                //margin-left: 2px;
+                &:hover {
+                    background-color: lightgray;
+                }
+                & + button {
+                    border-left: none;
+                }
             }
         }
     }

@@ -36,6 +36,7 @@ export class TransfersController {
     async getAllTransfers(@Body() filterParams: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
         filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
         filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
+        console.log(filterParams);
 
         const pagedTransfersDTOs = await this.transfersService.getAllFilteredPagedDTO(filterParams);
         const totalCount = await this.transfersService.getAllFilteredCount(filterParams);
@@ -79,11 +80,11 @@ export class TransfersController {
         const transfer = await this.transferDao.getById(id);
         const categoryPath: Category[] = [];
         categoryPath.push(transfer.category);
-        let parentCat = await transfer.category.parent;
+        let parentCat = (await transfer.category.parent) ?? null;
         while (parentCat !== null) {
             if (!categoryPath.find((cat) => cat.id === parentCat?.id)) {
                 categoryPath.push(parentCat);
-                parentCat = await categoryPath[categoryPath.length - 1]?.parent;
+                parentCat = (await categoryPath[categoryPath.length - 1]?.parent) ?? null;
             } else {
                 break;
             }
