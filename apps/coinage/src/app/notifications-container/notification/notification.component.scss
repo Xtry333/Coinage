@@ -70,4 +70,14 @@ div.notification {
         width: 300px;
         white-space: pre-line;
     }
+
+    .error {
+        pre {
+            color: red;
+            background: #dbdbdb;
+            padding: 5px;
+            border-radius: 5px;
+            margin-bottom: 0;
+        }
+    }
 }

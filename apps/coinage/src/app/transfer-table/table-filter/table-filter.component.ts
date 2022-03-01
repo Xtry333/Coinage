@@ -47,6 +47,7 @@ export interface FilterOption {
     uiText: string;
     isDisplayed?: boolean;
     isSelected?: boolean;
+    searchValues: string[];
 }
 
 @Component({
@@ -66,8 +67,8 @@ export class TableFilterComponent implements OnInit {
 
     public optionSearchValue = '';
 
-    @ViewChildren('filterInput')
-    private filterInput!: QueryList<ElementRef<HTMLInputElement>>;
+    @ViewChildren('autofocusedFilterInput')
+    private autofocusedFilterInput!: QueryList<ElementRef<HTMLInputElement>>;
 
     @ViewChild('tableFilterElement')
     private tableFilterElement!: ElementRef<HTMLInputElement>;
@@ -124,16 +125,13 @@ export class TableFilterComponent implements OnInit {
         }
     }
 
-    public static isFilterTypeOf<T extends OnFilterEvent>(filterEvent: OnFilterEvent, filterType: FilterType): filterEvent is T {
-        return filterEvent.filterType === filterType;
-    }
-
-    public static mapToFilterOptions(id: number, uiText: string): FilterOption {
+    public static mapToFilterOptions(id: number, uiText: string, selectedIds?: number[]): FilterOption {
         return {
             id,
             uiText,
             isDisplayed: true,
-            isSelected: false,
+            isSelected: selectedIds?.includes(id) ?? false,
+            searchValues: [uiText.toLowerCase(), id.toString()],
         };
     }
 
@@ -144,7 +142,6 @@ export class TableFilterComponent implements OnInit {
         this.filterValue.name = this.filterName;
         if (this.cachedFilterValue && this.cachedFilterValue.length > 0 && this.filterValue.filterType === FilterType.TextBox) {
             this.filterValue.value = this.cachedFilterValue;
-            // this.onPerformFilter();
         }
         this.lastFilterValue = { ...this.filterValue };
 
@@ -166,16 +163,16 @@ export class TableFilterComponent implements OnInit {
     public onToggleOpenHide(): void {
         this.isPopupDisplayed = !this.isPopupDisplayed;
         if (this.isPopupDisplayed) {
-            this.focus();
+            this.autofocus();
             this.openEvent.emit();
         } else {
             this.closeEvent.emit();
         }
     }
 
-    private focus(): void {
+    private autofocus(): void {
         setTimeout(() => {
-            this.filterInput.first?.nativeElement.focus();
+            this.autofocusedFilterInput.first?.nativeElement.focus();
         }, 0);
     }
 
@@ -215,7 +212,9 @@ export class TableFilterComponent implements OnInit {
 
     public onChangeOptionSearchValue(value: string) {
         this.optionSearchValue = value;
-        this.filterOptions?.forEach((option) => (option.isDisplayed = value.length === 0 || option.uiText.toLowerCase().includes(value.toLowerCase())));
+        this.filterOptions?.forEach(
+            (option) => (option.isDisplayed = value.length === 0 || option.searchValues.some((values) => values.includes(value.toLowerCase())))
+        );
     }
 
     get isFilterApplied(): boolean {

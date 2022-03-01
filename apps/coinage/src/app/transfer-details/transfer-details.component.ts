@@ -158,4 +158,8 @@ export class TransferDetailsComponent implements OnInit {
     public get isOutcome(): boolean {
         return this.transfer.type === TransferTypeEnum.OUTCOME;
     }
+
+    public get isSplittable(): boolean {
+        return this.transfer.amount > 0;
+    }
 }

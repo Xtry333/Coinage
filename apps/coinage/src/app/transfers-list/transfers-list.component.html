@@ -3,7 +3,7 @@
         [transfers]="transfers"
         [tableHeader]="'All Transfers'"
         [showFilters]="true"
-        filterCachePath="transfer.list.filters"
+        [filterCachePath]="TRANSFERS_FILTER_CACHE_PATH"
         [lastPageNumber]="lastPageNumber"
         (tableFilterEvent)="onPerformFilter($event)"
     ></coinage-app-transfers-table>

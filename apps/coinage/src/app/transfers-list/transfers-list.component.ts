@@ -3,6 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 
 import { CoinageDataService } from '../services/coinageData.service';
 import { TableFilterFields } from '../transfer-table/transfers-table.component';
@@ -19,6 +20,9 @@ interface TransfersListQueryParams {
 })
 export class TransfersListComponent implements OnInit, OnDestroy {
     public static REFRESH_INTERVAL = 10000;
+
+    public readonly TRANSFERS_FILTER_CACHE_PATH = 'transfers.list.filters';
+
     showPage = false;
 
     refreshInterval?: ReturnType<typeof setInterval>;
@@ -31,15 +35,21 @@ export class TransfersListComponent implements OnInit, OnDestroy {
         rowsPerPage: 100,
     };
 
-    constructor(private route: ActivatedRoute, private readonly coinageData: CoinageDataService) {}
+    constructor(private route: ActivatedRoute, private readonly coinageData: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
 
     ngOnInit(): void {
         this.showPage = false;
         this.route.queryParams.subscribe((params) => {
             const { page, rowsPerPage } = params as TransfersListQueryParams;
-            this.filterParams.page = page ?? this.filterParams.page;
-            this.filterParams.rowsPerPage = rowsPerPage ?? this.filterParams.rowsPerPage;
-            this.refreshData();
+            this.filterParams.page = Number(page ?? this.filterParams.page);
+            this.filterParams.rowsPerPage = Number(rowsPerPage ?? this.filterParams.rowsPerPage);
+
+            const cachedFilters = this.localStorage.getObject<TableFilterFields>(this.TRANSFERS_FILTER_CACHE_PATH);
+            if (cachedFilters) {
+                this.onPerformFilter(cachedFilters);
+            } else {
+                this.refreshData();
+            }
         });
 
         this.refreshInterval = setInterval(() => this.refreshData(), TransfersListComponent.REFRESH_INTERVAL);
@@ -83,7 +93,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
     }
 
     private mapRangeFilterParams(filterParams: TableFilterFields): Range<number> | undefined {
-        if (filterParams.amountFrom && filterParams.amountTo) {
+        if (filterParams.amountFrom !== undefined && filterParams.amountTo !== undefined) {
             return {
                 from: filterParams.amountFrom,
                 to: filterParams.amountTo,

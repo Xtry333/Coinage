@@ -104,6 +104,9 @@ export class CreateEditTransferComponent implements OnInit {
         this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
+            if (result.error) {
+                this.notificationService.error(`Error saving transfer:\n${result.error}`);
+            }
             if (result.insertedId && cat) {
                 this.saveSuccess.emit();
                 //     {

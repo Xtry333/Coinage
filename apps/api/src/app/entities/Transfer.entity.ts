@@ -80,7 +80,7 @@ export class Transfer {
     }
 
     @Column({ nullable: true, type: 'json' })
-    metadata!: TransferMetadata & { [key: string]: string | number };
+    metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 }
 
 interface TransferMetadata {

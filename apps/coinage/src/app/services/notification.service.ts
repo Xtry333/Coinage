@@ -2,12 +2,19 @@ import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
 import { CoinageLocalStorageService } from './coinage-local-storage.service';
 
+export enum NotificationLevel {
+    Info,
+    Warning,
+    Error,
+}
+
 export interface CoinageNotification {
     id: number;
     title: string;
     message: string;
     autoCloseDelay?: number;
     linkTo?: string;
+    level?: NotificationLevel;
 }
 
 export type NewNotification = Omit<CoinageNotification, 'id'>;
@@ -38,16 +45,21 @@ export class NotificationService {
         console.log(this);
     }
 
-    push(newNotification: NewNotification): number {
+    public push(newNotification: NewNotification): number {
         const notification = this.buildNotification(newNotification);
         this.incomingNotifications.next(notification);
         this.localStorageService.setObject(NotificationService.NOTIFICATION_KEY, notification);
         return notification.id;
     }
 
+    public error(message: string, autoCloseDelay?: number): number {
+        return this.push({ title: 'Error', message, autoCloseDelay, level: NotificationLevel.Error });
+    }
+
     private buildNotification(notification: NewNotification, id?: number): CoinageNotification {
         return {
             ...notification,
+            level: notification.level ?? NotificationLevel.Info,
             id: id ? id : this.newNotificationId,
             autoCloseDelay: notification.autoCloseDelay ?? NotificationService.DEFAULT_AUTOCLOSE_DELAY_MS,
         };

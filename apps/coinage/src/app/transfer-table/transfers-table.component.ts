@@ -1,5 +1,4 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
@@ -46,6 +45,7 @@ export type OptionsForCheckboxFilters = {
 export interface TableFilterFields {
     categoryIds?: number[];
     contractorIds?: number[];
+    accountIds?: number[];
     category?: string;
     description?: string;
     contractor?: string;
@@ -66,9 +66,10 @@ export type UiTransfer = TransferDTO & { typeSymbol: string; isTodayMarkerRow?: 
     styleUrls: ['./transfers-table.component.scss'],
 })
 export class TransfersTableComponent implements OnInit, OnChanges {
-    public static EMPTY_CONTRACTOR = '-';
-    public static EMPTY_DESCRIPTION = '-';
+    public static readonly EMPTY_CONTRACTOR = '−';
+    public static readonly EMPTY_DESCRIPTION = '−';
 
+    public readonly EMPTY_CONTRACTOR = TransfersTableComponent.EMPTY_CONTRACTOR;
     public readonly FilterType = FilterType;
     public readonly PopupSide = PopupSide;
     public readonly TableColumn = TableColumn;
@@ -102,23 +103,29 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     @Output() public tableFilterEvent = new EventEmitter<TableFilterFields>();
 
-    constructor(private route: ActivatedRoute, private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
+    constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
 
     public ngOnInit(): void {
         if (this.showFilters) {
-            Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList(), this.dataService.getAllAvailableAccounts()).subscribe(
-                ([categories, contractors, accounts]) => {
-                    this.optionsForCheckboxFilters.categories = categories.map((c) => TableFilterComponent.mapToFilterOptions(c.id, c.name));
-                    this.optionsForCheckboxFilters.contractors = contractors.map((c) => TableFilterComponent.mapToFilterOptions(c.id, c.name));
-                    this.optionsForCheckboxFilters.accounts = accounts.map((a) => TableFilterComponent.mapToFilterOptions(a.id, a.name));
-                }
-            );
             if (this.filterCachePath) {
                 const cachedFilters = this.localStorage.getObject<TableFilterFields>(this.filterCachePath);
                 if (cachedFilters) {
                     this.filter = cachedFilters;
                 }
             }
+            Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList(), this.dataService.getAllAvailableAccounts()).subscribe(
+                ([categories, contractors, accounts]) => {
+                    this.optionsForCheckboxFilters.categories = categories.map((c) =>
+                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.categoryIds)
+                    );
+                    this.optionsForCheckboxFilters.contractors = contractors.map((c) =>
+                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.contractorIds)
+                    );
+                    this.optionsForCheckboxFilters.accounts = accounts.map((a) =>
+                        TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds)
+                    );
+                }
+            );
         }
 
         this.doFiltering();
@@ -128,7 +135,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         this.doFiltering();
     }
 
-    public transferIdTracker(index: number, item: TransferDTO): string {
+    public transferIdTracker(_index: number, item: TransferDTO): string {
         return item.id.toString();
     }
 

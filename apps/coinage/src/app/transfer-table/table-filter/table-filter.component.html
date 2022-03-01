@@ -6,7 +6,7 @@
         <form (ngSubmit)="onPerformFilter()">
             <div *ngIf="filterValue.filterType === FilterType.TextBox">
                 <input
-                    #filterInput
+                    #autofocusedFilterInput
                     list="filterInputValues"
                     name="filterValue"
                     [(ngModel)]="filterValue.value"
@@ -18,7 +18,7 @@
             </div>
             <div *ngIf="filterValue.filterType === FilterType.NumericRange" class="numeric-range">
                 <input
-                    #filterInputFrom
+                    #autofocusedFilterInput
                     name="filterRangeFrom"
                     type="number"
                     min="0"
@@ -26,14 +26,7 @@
                     [(ngModel)]="filterValue.range.from"
                     autocomplete="off"
                 />
-                <input
-                    #filterInputTo
-                    name="filterRangeTo"
-                    type="number"
-                    [min]="filterValue.range.from ?? 0"
-                    [(ngModel)]="filterValue.range.to"
-                    autocomplete="off"
-                />
+                <input name="filterRangeTo" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
             </div>
             <div *ngIf="isFilterDateRange">
                 <span>Not implemented!</span>
@@ -41,6 +34,7 @@
             <div *ngIf="filterValue.filterType === FilterType.MultiCheckbox" class="multi-checkbox-filter-container">
                 <div *ngIf="shouldDisplaySearchBox" class="filter-option-search-container">
                     <input
+                        #autofocusedFilterInput
                         name="optionSearch"
                         class="filter-option-search-value"
                         [ngModel]="optionSearchValue"

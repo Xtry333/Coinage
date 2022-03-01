@@ -215,7 +215,10 @@ export class TransfersController {
             entity.category = category;
             entity.type = category.type;
         } else {
-            throw new Error(`Cannot find category ${transfer.categoryId}`);
+            return {
+                error: `Cannot find category ${transfer.categoryId}`,
+            };
+            // throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
         entity.description = transfer.description === undefined ? category?.name : transfer.description;
         entity.account = account;
@@ -290,6 +293,7 @@ export class TransfersController {
         refundTransferEntity.accountId = transfer.accountId;
         refundTransferEntity.metadata.refundTargetId = refundTargetId;
         refundTransferEntity.contractor = transfer.contractor;
+        refundTransferEntity.receipt = transfer.receipt;
 
         const inserted = await this.transferDao.save(refundTransferEntity);
 
@@ -314,6 +318,7 @@ export class TransfersController {
         (transfer as any).createdDate = undefined;
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (transfer as any).editedDate = undefined;
+        transfer.metadata.refundedBy = undefined;
 
         const inserted = await this.transferDao.save(transfer);
         return { insertedId: inserted.id };

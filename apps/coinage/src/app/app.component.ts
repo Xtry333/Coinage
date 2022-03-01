@@ -14,6 +14,7 @@ import { TransfersListComponent } from './transfers-list/transfers-list.componen
 })
 export class AppComponent implements OnInit, OnDestroy {
     public static readonly KEY_LAST_USER_VISIT_DATE = 'last-visit-date';
+    public static readonly KEY_FORCE_MOCK_USER = 'debug-user-id';
     public static readonly WELCOME_DELAY = 1000 * 60 * 60 * 12;
 
     public NavigatorPages = NavigatorPages;
@@ -56,6 +57,9 @@ export class AppComponent implements OnInit, OnDestroy {
                 this.notificationService.push({ title: 'Welcome!', message: `...` });
             }
         }, 1000);
+
+        const mockUser = this.localStorageService.getNumber(AppComponent.KEY_FORCE_MOCK_USER);
+        this.localStorageService.setNumber(AppComponent.KEY_FORCE_MOCK_USER, mockUser ?? 1);
     }
 
     onActivateRoute(component: Component): void {

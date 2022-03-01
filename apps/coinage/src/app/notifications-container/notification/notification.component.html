@@ -4,5 +4,8 @@
         <button class="btn btn-goto" *ngIf="displayGoToIcon" [routerLink]="content.linkTo"><fa-icon [icon]="gotoIcon"></fa-icon></button>
     </div>
     <div class="title">{{ content.title }}</div>
-    <div class="text">{{ content.message }}</div>
+    <div *ngIf="!isError" class="text">{{ content.message }}</div>
+    <div *ngIf="isError" class="error">
+        <pre>{{ content.message }}</pre>
+    </div>
 </div>
