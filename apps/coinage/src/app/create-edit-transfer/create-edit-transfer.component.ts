@@ -6,7 +6,7 @@ import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 import { NotificationService } from '../services/notification.service';
 

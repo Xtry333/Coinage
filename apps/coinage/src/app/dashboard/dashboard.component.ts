@@ -3,7 +3,7 @@ import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
 import { NavigatorPages } from '../services/navigator.service';
 import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';

@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 import * as Rx from 'rxjs';
 import { finalize, catchError } from 'rxjs/operators';
 import { IconDefinition } from '@fortawesome/fontawesome-common-types';

@@ -4,7 +4,7 @@ import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
 
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 import { NavigatorPages } from '../services/navigator.service';
 import {
     FilterOption,

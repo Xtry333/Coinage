@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TransferDTO } from '@coinage-app/interfaces';
 
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
 
 export interface UiTotalInMonthByCategory {

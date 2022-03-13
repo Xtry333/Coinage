@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { AppRoutingModule } from '../app-routing/app-routing.module';
 
 import { TransferDetailsComponent } from './transfer-details.component';
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';

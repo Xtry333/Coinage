@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CategoryDTO } from '@coinage-app/interfaces';
 import { finalize } from 'rxjs/operators';
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 
 @Component({
     selector: 'coinage-app-category-manager',

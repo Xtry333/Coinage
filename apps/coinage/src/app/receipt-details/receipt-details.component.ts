@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ReceiptDetailsDTO, TransferType } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 
-import { CoinageDataService } from '../services/coinageData.service';
+import { CoinageDataService } from '../services/coinage.dataService';
 import { NavigatorService } from '../services/navigator.service';
 
 @Component({
