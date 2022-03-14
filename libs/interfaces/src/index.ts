@@ -16,3 +16,5 @@ export * from './lib/ReceiptDetailsDTO.response';
 export * from './lib/AccountDetailsDTO.response';
 export * from './lib/GetFilteredTransfers.request';
 export * from './lib/FilteredTransferDTO.response';
+
+export * from './utils/Expand';

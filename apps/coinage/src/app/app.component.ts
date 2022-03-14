@@ -6,6 +6,7 @@ import { CoinageLocalStorageService } from './services/coinage-local-storage.ser
 import { NavigatorPages } from './services/navigator.service';
 import { NotificationService } from './services/notification.service';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
+import { Socket } from 'ngx-socket-io';
 
 @Component({
     selector: 'coinage-app-root',
@@ -36,10 +37,26 @@ export class AppComponent implements OnInit, OnDestroy {
     constructor(
         private readonly loader: LoadingService,
         private readonly localStorageService: CoinageLocalStorageService,
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
+        private readonly socket: Socket
     ) {}
 
     ngOnInit(): void {
+        this.socket.on('connect', () => {
+            this.notificationService.push({ message: 'Connection estabilished.', title: 'Server' });
+
+            this.socket.emit('events', { test: 'test' });
+            this.socket.emit('identity', 0, (response: any) => console.log('Identity:', response));
+        });
+
+        this.socket.on('disconnect', () => {
+            this.notificationService.push({ message: 'Disconnected. Server is down.', title: 'Server' });
+        });
+
+        this.socket.on('debug', (msg: any) => {
+            console.log(msg);
+        });
+
         this.loader.loading$.subscribe((loading) => {
             this.isPageLoading = loading;
         });

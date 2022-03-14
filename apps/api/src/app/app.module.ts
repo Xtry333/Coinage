@@ -13,6 +13,7 @@ import { CategoryDao } from './daos/category.dao';
 import { ContractorDao } from './daos/contractor.dao';
 import { ReceiptDao } from './daos/receipt.dao';
 import { TransferDao } from './daos/transfer.dao';
+import { EventsGateway } from './events/events.gateway';
 import { CategoryCascadeService } from './services/category-cascades.service';
 import { DateParserService } from './services/date-parser.service';
 import { TransfersService } from './services/transfers.service';
@@ -24,6 +25,6 @@ const daos = [AccountDao, CategoryDao, ContractorDao, ReceiptDao, TransferDao];
 @Module({
     imports: [TypeOrmModule.forRoot(ormconfig)],
     controllers: controllers,
-    providers: [...services, ...daos],
+    providers: [...services, ...daos, EventsGateway],
 })
 export class AppModule {}

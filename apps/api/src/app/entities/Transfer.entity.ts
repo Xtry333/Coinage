@@ -89,4 +89,5 @@ interface TransferMetadata {
     redundedBy?: number;
     refundTargetId?: number;
     subject?: string;
+    subjectDate?: string;
 }

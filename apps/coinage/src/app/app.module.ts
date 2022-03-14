@@ -6,6 +6,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
 
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { AppComponent } from './app.component';
@@ -37,6 +38,8 @@ import { CreateEditCategoryComponent } from './category-manager/create-edit-cate
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
+const socketIoConfig: SocketIoConfig = { url: '/', options: {} };
+
 @NgModule({
     declarations: [
         ...pipes,
@@ -62,7 +65,17 @@ const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
         AutoPaginationComponent,
         CreateEditCategoryComponent,
     ],
-    imports: [BrowserModule, BrowserAnimationsModule, HttpClientModule, RouterModule, AppRoutingModule, NgSelectModule, FormsModule, FontAwesomeModule],
+    imports: [
+        BrowserModule,
+        BrowserAnimationsModule,
+        HttpClientModule,
+        RouterModule,
+        AppRoutingModule,
+        NgSelectModule,
+        FormsModule,
+        FontAwesomeModule,
+        SocketIoModule.forRoot(socketIoConfig),
+    ],
     providers: [
         ...pipes,
         {
