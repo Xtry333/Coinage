@@ -1,4 +1,6 @@
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Socket } from 'ngx-socket-io';
+
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
@@ -6,7 +8,6 @@ import { CoinageLocalStorageService } from './services/coinage-local-storage.ser
 import { NavigatorPages } from './services/navigator.service';
 import { NotificationService } from './services/notification.service';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
-import { Socket } from 'ngx-socket-io';
 
 @Component({
     selector: 'coinage-app-root',

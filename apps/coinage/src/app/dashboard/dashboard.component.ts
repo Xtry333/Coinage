@@ -1,5 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
+import { ChartDataset, ChartOptions, ChartType, PointElement } from 'chart.js';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
@@ -28,6 +29,19 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public static readonly REFRESH_INTERVAL = 10000;
 
     public NavigatorPages = NavigatorPages;
+
+    public accountStatsChartData: ChartDataset[] = [
+        { data: [], label: 'Outcomes' },
+        { data: [], label: 'Incomes' },
+        { data: [], label: 'Balance' },
+    ];
+
+    public accountStatsChartLabels: string[] = [];
+
+    public lineChartOptions: ChartOptions = {
+        responsive: true,
+        onClick: (event, activeElements) => console.log(activeElements[0]?.datasetIndex, activeElements[0]?.index),
+    };
 
     message = '';
     transactionId = 0;
@@ -108,6 +122,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 this.totalAmountPerMonth = this.mapToUiOutcome(outcomes);
                 this.balanceMainAccount = balance[0].balance;
                 this.balanceSecondary = balance[1].balance;
+                this.accountStatsChartData[0].data = this.totalAmountPerMonth.map((item) => item.outcomes).reverse();
+                this.accountStatsChartData[1].data = this.totalAmountPerMonth.map((item) => item.incomes).reverse();
+                this.accountStatsChartLabels = this.totalAmountPerMonth.map((item) => `${item.monthName} ${item.year}`).reverse();
             });
         if (this.countersComponent) {
             this.countersComponent.refreshData();

@@ -7,6 +7,7 @@ import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { SocketIoModule, SocketIoConfig } from 'ngx-socket-io';
+import { NgChartsModule } from 'ng2-charts';
 
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { AppComponent } from './app.component';
@@ -74,6 +75,7 @@ const socketIoConfig: SocketIoConfig = { url: '/', options: {} };
         NgSelectModule,
         FormsModule,
         FontAwesomeModule,
+        NgChartsModule,
         SocketIoModule.forRoot(socketIoConfig),
     ],
     providers: [
