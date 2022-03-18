@@ -176,6 +176,29 @@
             "tags": [],
             "implicitDependencies": ["coinage"]
         },
+        "common": {
+            "root": "libs/common",
+            "projectType": "library",
+            "sourceRoot": "libs/common/src",
+            "prefix": "coinage-app",
+            "architect": {
+                "test": {
+                    "builder": "@nrwl/jest:jest",
+                    "outputs": ["coverage/libs/common"],
+                    "options": {
+                        "jestConfig": "libs/common/jest.config.js",
+                        "passWithNoTests": true
+                    }
+                },
+                "lint": {
+                    "builder": "@nrwl/linter:eslint",
+                    "options": {
+                        "lintFilePatterns": ["libs/common/src/**/*.ts", "libs/common/src/**/*.html"]
+                    }
+                }
+            },
+            "tags": []
+        },
         "interfaces": {
             "root": "libs/interfaces",
             "sourceRoot": "libs/interfaces/src",
