@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
-import { ChartDataset, ChartOptions, ChartType, PointElement } from 'chart.js';
+import { ChartDataset, ChartOptions } from 'chart.js';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
