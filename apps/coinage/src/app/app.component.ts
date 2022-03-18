@@ -54,6 +54,10 @@ export class AppComponent implements OnInit, OnDestroy {
             this.notificationService.push({ message: 'Disconnected. Server is down.', title: 'Server' });
         });
 
+        this.socket.on('ping', (msg: any) => {
+            console.log(msg);
+        });
+
         this.socket.on('debug', (msg: any) => {
             console.log(msg);
         });

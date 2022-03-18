@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import ormconfig from '../../ormconfig';
@@ -23,7 +24,7 @@ const services = [TransfersService, DateParserService, CategoryCascadeService];
 const daos = [AccountDao, CategoryDao, ContractorDao, ReceiptDao, TransferDao];
 
 @Module({
-    imports: [TypeOrmModule.forRoot(ormconfig)],
+    imports: [TypeOrmModule.forRoot(ormconfig), ScheduleModule.forRoot()],
     controllers: controllers,
     providers: [...services, ...daos, EventsGateway],
 })

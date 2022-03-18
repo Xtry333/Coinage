@@ -38,9 +38,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     public accountStatsChartLabels: string[] = [];
 
-    public lineChartOptions: ChartOptions = {
+    public accountStatsChartOptions: ChartOptions = {
         responsive: true,
         onClick: (event, activeElements) => console.log(activeElements[0]?.datasetIndex, activeElements[0]?.index),
+        elements: {
+            line: {
+                tension: 0.3,
+            },
+        },
     };
 
     message = '';
