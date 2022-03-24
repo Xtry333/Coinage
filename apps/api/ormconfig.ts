@@ -8,7 +8,7 @@ export default {
     name: 'default',
     type: 'mysql',
     host: process.env.MYSQL_HOST || 'localhost',
-    port: 3306,
+    port: 33060,
     username: 'root',
     password: process.env.MYSQL_ROOT_PASSWORD,
     database: 'coinage-db',
