@@ -39,6 +39,6 @@
     <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="onDateChange()" />
     <button *ngIf="shouldShowGoUpButton()" (click)="goUp()">Go Up</button>
     <div *ngIf="isDateTargetDay || isDateTargetMonth">
-        <coinage-app-transfers-table [transfers]="transfers" [tableHeader]="tableHeader" [showFilters]="isDateTargetMonth"></coinage-app-transfers-table>
+        <coinage-app-transfers-table [transfers]="transfers" [tableHeader]="tableHeader" [showFilters]="false"></coinage-app-transfers-table>
     </div>
 </div>

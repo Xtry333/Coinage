@@ -1,22 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { CategoryDao } from '../daos/category.dao';
+
 import { Category } from '../entities/Category.entity';
 import { CategoryCascadeService } from './category-cascades.service';
+import { CategoryDao } from '../daos/category.dao';
+import { PartialProvider } from '../test/partial-provider';
+import { Provider } from '@nestjs/common';
 
 describe('CategoryCascadeService', () => {
     let service: CategoryCascadeService;
 
+    const categoryDaoProvider: PartialProvider<CategoryDao> = {
+        provide: CategoryDao,
+        useValue: {
+            getAll: jest.fn().mockResolvedValue(createCategoryTree()),
+        },
+    };
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                CategoryCascadeService,
-                {
-                    provide: CategoryDao,
-                    useValue: {
-                        getAll: jest.fn().mockResolvedValue(createCategoryTree()),
-                    },
-                },
-            ],
+            providers: [CategoryCascadeService, categoryDaoProvider],
         }).compile();
 
         service = module.get<CategoryCascadeService>(CategoryCascadeService);

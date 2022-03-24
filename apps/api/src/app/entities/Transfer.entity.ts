@@ -79,6 +79,17 @@ export class Transfer {
         this.isInternalBuffer = value;
     }
 
+    @Column({ name: 'is_ethereal', type: 'bit', nullable: false })
+    isEtherealBuffer!: boolean;
+
+    get isEthereal(): boolean {
+        return !!this.isEtherealBuffer;
+    }
+
+    set isEthereal(value: boolean) {
+        this.isEtherealBuffer = value;
+    }
+
     @Column({ nullable: true, type: 'json' })
     metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 }

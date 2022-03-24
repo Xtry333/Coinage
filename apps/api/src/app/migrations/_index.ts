@@ -11,6 +11,7 @@ import { SetMetadataToDefaultEmpty1637152551502 } from './1637152551502-SetMetad
 import { AccountNotNullable1637796359852 } from './1637796359852-AccountNotNullable';
 import { AddCategoryTag1641651157712 } from './1641651157712-AddCategoryTag';
 import { AddCreatedDateToAccounts1642036120866 } from './1642036120866-AddCreatedDateToAccounts';
+import { AddEtherealTransfer1648138472040 } from './1648138472040-AddEtherealTransfer';
 
 export default [
     InitContractorTable1633906124577,
@@ -26,4 +27,5 @@ export default [
     AccountNotNullable1637796359852,
     AddCategoryTag1641651157712,
     AddCreatedDateToAccounts1642036120866,
+    AddEtherealTransfer1648138472040,
 ];

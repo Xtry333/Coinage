@@ -71,7 +71,12 @@ export class SummaryComponent implements OnInit {
                     });
             } else if (this.isDateTargetMonth) {
                 this.coinageData
-                    .getAllTransfers({ page: 1, rowsPerPage: 500, date: { from: this.monthStartDate.toISOString(), to: this.monthEndDate.toISOString() } })
+                    .getAllTransfers({
+                        page: 1,
+                        rowsPerPage: 500,
+                        date: { from: this.monthStartDate.toISOString(), to: this.monthEndDate.toISOString() },
+                        showPlanned: true,
+                    })
                     .subscribe((response) => {
                         this.transfers = response.transfers.filter(
                             (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year

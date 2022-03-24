@@ -1,6 +1,7 @@
 import { GetFilteredTransfersRequest, Range } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
-import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, LessThanOrEqual } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, LessThanOrEqual, Repository } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 
@@ -10,6 +11,11 @@ type KeysOfType<O, T> = {
 
 @Injectable()
 export class TransferDao {
+    constructor(
+        @InjectRepository(Transfer)
+        private readonly transferRepository: Repository<Transfer>
+    ) {}
+
     async getById(id: number): Promise<Transfer> {
         const transfer = await getConnection()
             .getRepository(Transfer)
@@ -143,6 +149,10 @@ export class TransferDao {
         return await getConnection()
             .getRepository(Transfer)
             .delete({ id: Equal(id) });
+    }
+
+    public async deleteEthereals(): Promise<number> {
+        return (await this.transferRepository.delete({ isEthereal: Equal(true) })).affected ?? 0;
     }
 
     private getToday(): string {
