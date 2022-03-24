@@ -12,7 +12,7 @@ import {
     TransferDetailsDTO,
     TransferDTO,
 } from '@coinage-app/interfaces';
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -20,6 +20,7 @@ import { TransferDao } from '../daos/transfer.dao';
 import { Category, TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { DateParserService } from '../services/date-parser.service';
+import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { TransfersService } from '../services/transfers.service';
 
 @Controller('transfer(s)?')
@@ -27,6 +28,7 @@ export class TransfersController {
     constructor(
         private readonly transferDao: TransferDao,
         private readonly transfersService: TransfersService,
+        private readonly etherealTransferService: EtherealTransferService,
         private readonly categoryDao: CategoryDao,
         private readonly accountDao: AccountDao,
         private readonly dateParserService: DateParserService
@@ -133,6 +135,36 @@ export class TransfersController {
             refundedBy: refundTransfer?.id,
             refundedOn: refundTransfer?.date,
             isRefundable: !transfer.metadata.refundedBy && !transfer.metadata.refundTargetId,
+        };
+    }
+
+    @Post(':id/commit')
+    async commitTransfer(@Param('id') paramId: string): Promise<BaseResponseDTO> {
+        const id = parseInt(paramId);
+        if (!id) {
+            throw new Error('Invalid ID provided');
+        }
+        const transfer = await this.etherealTransferService.commit(id);
+        if (!transfer) {
+            throw new Error('Transfer not found');
+        }
+        return {
+            message: 'Transfer committed',
+        };
+    }
+
+    @Post(':id/etherialize')
+    async stageTransfer(@Param('id') paramId: string): Promise<BaseResponseDTO> {
+        const id = parseInt(paramId);
+        if (!id) {
+            throw new Error('Invalid ID provided');
+        }
+        const transfer = await this.etherealTransferService.stage(id);
+        if (!transfer) {
+            throw new Error('Transfer not found');
+        }
+        return {
+            message: 'Transfer committed',
         };
     }
 

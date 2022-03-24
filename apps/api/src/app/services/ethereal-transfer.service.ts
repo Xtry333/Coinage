@@ -6,21 +6,21 @@ import { TransferDao } from '../daos/transfer.dao';
 export class EtherealTransferService {
     constructor(private readonly transferDao: TransferDao) {}
 
-    public async convertToEthereal(id: number): Promise<Transfer> {
+    public async stage(id: number): Promise<Transfer> {
         const target = await this.transferDao.getById(id);
         target.isEthereal = true;
         this.transferDao.save(target);
         return target;
     }
 
-    public async commitTransfer(id: number): Promise<Transfer> {
+    public async commit(id: number): Promise<Transfer> {
         const target = await this.transferDao.getById(id);
         target.isEthereal = false;
         this.transferDao.save(target);
         return target;
     }
 
-    public cleanupEtherealTransfers(): Promise<number> {
+    public cleanup(): Promise<number> {
         return this.transferDao.deleteEthereals();
     }
 }

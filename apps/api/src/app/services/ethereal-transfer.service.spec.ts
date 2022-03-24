@@ -31,23 +31,24 @@ describe('EtherealTransferService', () => {
     });
 
     it('should call remove all ethereals', () => {
-        service.cleanupEtherealTransfers();
+        service.cleanup();
 
         expect(transferDao.deleteEthereals).toHaveBeenCalled();
     });
 
     it('should commit transfer and remove ethereal tag', async () => {
-        const result = await service.commitTransfer(1);
+        const result = await service.commit(1);
 
         expect(transferDao.getById).toHaveBeenCalledWith(1);
-        expect(transferDao.save).toHaveBeenCalledWith(mockTransfer());
+        expect(transferDao.save).toHaveBeenCalledWith({ id: 1, isEthereal: false });
         expect(result.isEthereal).toBe(false);
     });
 
     it('should revert transfer to temporary state', async () => {
-        const result = await service.convertToEthereal(1);
+        const result = await service.stage(1);
 
         expect(transferDao.getById).toHaveBeenCalledWith(1);
+        expect(transferDao.save).toHaveBeenCalledWith({ id: 1, isEthereal: true });
         expect(result.isEthereal).toBe(true);
     });
 
