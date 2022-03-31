@@ -55,7 +55,7 @@
         </tr>
         <tr>
             <th>Total {{ totalPayment < 0 ? 'payed to' : 'received from' }} {{ transfer?.contractor }}</th>
-            <td>{{ transfer?.date }}: {{ totalPayment | mathAbs | plnCurrency }}</td>
+            <td>{{ transfer?.date | date }}: {{ totalPayment | mathAbs | plnCurrency }}</td>
         </tr>
         <tr>
             <th>Category</th>

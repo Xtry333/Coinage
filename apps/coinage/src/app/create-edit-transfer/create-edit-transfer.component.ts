@@ -1,14 +1,15 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { AccountDTO, CategoryDTO, ContractorDTO, SaveTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
-import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
-import { finalize } from 'rxjs/operators';
 
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
-import { CoinageDataService } from '../services/coinage.dataService';
+import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, SaveTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
+
+import { CoinageDataService } from '../services/coinage.data-service';
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import { NotificationService } from '../services/notification.service';
+import { finalize } from 'rxjs/operators';
 
 export interface NewTransferObject {
     description: string;
@@ -69,7 +70,7 @@ export class CreateEditTransferComponent implements OnInit {
                     this.selectedTransferInputs = {
                         amount: transfer.amount,
                         categoryId: transfer.categoryId,
-                        date: transfer.date,
+                        date: transfer.date.toISOString().slice(0, 10),
                         description: transfer.description,
                         contractorId: transfer.contractorId ?? undefined,
                         accountId: transfer.account.id,
@@ -91,14 +92,14 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     onClickSaveTransfer(): void {
-        const newTransfer: SaveTransferDTO = {
+        const newTransfer: CreateEditTransferModelDTO = {
             id: this.transferId,
             description: this.selectedTransferInputs.description,
             amount: parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
             categoryId: this.selectedTransferInputs.categoryId ?? 0,
-            contractorId: this.selectedTransferInputs.contractorId,
+            contractorId: this.selectedTransferInputs.contractorId ?? null,
             accountId: this.selectedTransferInputs.accountId ?? 0,
-            date: this.selectedTransferInputs.date,
+            date: new Date(this.selectedTransferInputs.date) as any,
         };
         console.log(newTransfer);
         this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
@@ -118,7 +119,7 @@ export class CreateEditTransferComponent implements OnInit {
                 // }
                 this.notificationService.push({
                     title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`,
-                    message: newTransfer.description,
+                    message: newTransfer.description ?? this.categories.find((c) => c.id === newTransfer.categoryId)!.name,
                     linkTo: NavigatorPages.TransferDetails(result.insertedId),
                 });
                 this.clearInputData();

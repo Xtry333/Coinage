@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { PartialDate } from '@coinage-app/interfaces';
 import { Router } from '@angular/router';
 
 export const NavigatorPages = {
@@ -9,7 +10,8 @@ export const NavigatorPages = {
     TransferDetails: (id: number) => `/transfer/details/${id}`,
     TransferEdit: (id: number) => `/transfer/edit/${id}`,
     ReceiptDetails: (id: number) => `/receipt/details/${id}`,
-    Summary: (date: string) => `/summary/${date}`,
+    Summary: (date: PartialDate) => `/summary/${date.toString()}`,
+    SummaryFullDate: (date: Date) => `/summary/${PartialDate.fromDate(date).toString()}`,
     CategoryDetails: (id: number) => `/category/${id}`,
     ContractorDetails: (id: number) => `/contractor/${id}`,
 };
@@ -42,5 +44,9 @@ export class NavigatorService {
 
     public goToDashboardPage(): Promise<boolean> {
         return this.router.navigateByUrl(NavigatorPages.Dashboard());
+    }
+
+    public goToSummaryPage(date: Date): Promise<boolean> {
+        return this.router.navigateByUrl(NavigatorPages.Summary(PartialDate.fromDate(date)));
     }
 }

@@ -1,27 +1,30 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import {
+    AccountDTO,
+    BalanceDTO,
     BaseResponseDTO,
     CategoryDTO,
     ContractorDTO,
+    CreateEditCategoryDTO,
+    CreateEditContractorDTO,
+    CreateEditTransferModelDTO,
+    CreateInternalTransferDTO,
+    CreateInternalTransferDTOResponse,
+    FilteredTransfersDTO,
+    GetFilteredTransfersRequest,
+    MonthlyUserStatsDTO,
+    ReceiptDetailsDTO,
+    RefundTransferDTO,
     SaveTransferDTO,
     SplitTransferDTO,
     TotalInMonthByCategory,
-    TotalAmountPerMonthDTO,
-    TransferDetailsDTO,
-    ReceiptDetailsDTO,
     TransferDTO,
-    CreateEditCategoryDTO,
-    CreateEditContractorDTO,
-    AccountDTO,
-    BalanceDTO,
-    CreateInternalTransferDTOResponse,
-    CreateInternalTransferDTO,
-    RefundTransferDTO,
-    GetFilteredTransfersRequest,
-    FilteredTransfersDTO,
+    TransferDetailsDTO,
 } from '@coinage-app/interfaces';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
+import { plainToClass, plainToInstance } from 'class-transformer';
+
+import { Injectable } from '@angular/core';
 
 @Injectable({
     providedIn: 'root',
@@ -31,20 +34,32 @@ export class CoinageDataService {
 
     constructor(private http: HttpClient) {}
 
-    public getBalanceForActiveAccounts(): Observable<BalanceDTO[]> {
-        return this.http.get<BalanceDTO[]>(`${CoinageDataService.API_URL}dashboard/balance`);
+    public getBalanceForActiveAccounts(date: Date): Observable<BalanceDTO[]> {
+        return this.http.get<BalanceDTO[]>(
+            `${CoinageDataService.API_URL}dashboard/balance/${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date
+                .getDate()
+                .toString()
+                .padStart(2, '0')}`
+        );
     }
 
-    public getTodaySpendings(): Observable<BalanceDTO[]> {
-        return this.http.get<BalanceDTO[]>(`${CoinageDataService.API_URL}account/spendings`);
+    public getTodaySpendings(date: Date): Observable<BalanceDTO[]> {
+        return this.http.get<BalanceDTO[]>(
+            `${CoinageDataService.API_URL}accounts/spendings/${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date
+                .getDate()
+                .toString()
+                .padStart(2, '0')}`
+        );
     }
 
     public getAllTransfers(filterParams?: GetFilteredTransfersRequest): Observable<FilteredTransfersDTO> {
-        return this.http.post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfer/all`, filterParams);
+        return this.http
+            .post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfer/all`, filterParams)
+            .pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)));
     }
 
     public getRecentTransactions(): Observable<TransferDTO[]> {
-        return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/recent`);
+        return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/recent`).pipe(map((t) => plainToInstance(TransferDTO, t)));
     }
 
     public getTransferDetails(id: number): Observable<TransferDetailsDTO> {
@@ -55,8 +70,10 @@ export class CoinageDataService {
         return this.http.get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/details/${id}`);
     }
 
-    public getTotalOutcomesPerMonth(): Observable<TotalAmountPerMonthDTO[]> {
-        return this.http.get<TotalAmountPerMonthDTO[]>(`${CoinageDataService.API_URL}transfer/totalOutcomesPerMonth`);
+    public getAccountMonthlyStats(): Observable<MonthlyUserStatsDTO[]> {
+        return this.http.get<MonthlyUserStatsDTO[]>(`${CoinageDataService.API_URL}account/lastYearMonthlyStats`, {
+            // params: { accountIds: [1] },
+        });
     }
 
     public getCategoryTree(): Observable<CategoryDTO[]> {
@@ -75,7 +92,7 @@ export class CoinageDataService {
         return this.http.get<AccountDTO[]>(`${CoinageDataService.API_URL}account/all`);
     }
 
-    public postCreateSaveTransaction(request: SaveTransferDTO): Observable<BaseResponseDTO> {
+    public postCreateSaveTransaction(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
@@ -84,7 +101,7 @@ export class CoinageDataService {
             refundTargetId: transferId,
             refundDate: arg1.toISOString().slice(0, 10),
         };
-        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/refund`, request);
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/refund`, request);
     }
 
     public duplicateTransfer(transferId: number) {

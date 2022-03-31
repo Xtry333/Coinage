@@ -1,5 +1,5 @@
 import { GetFilteredTransfersRequest, Range } from '@coinage-app/interfaces';
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, LessThanOrEqual, Repository } from 'typeorm';
 import { TransferType } from '../entities/Category.entity';
@@ -29,6 +29,9 @@ export class TransferDao {
         if (!transfer) {
             throw new Error('Transfer not found');
         }
+
+        console.debug('Time', await getConnection().query('SELECT @@GLOBAL.time_zone, @@SESSION.time_zone, NOW()'));
+
         await transfer.category.parent;
         return transfer;
     }
@@ -84,8 +87,8 @@ export class TransferDao {
 
     private assignBetweenFilterIfExists(
         filter: FindConditions<Transfer>,
-        key: KeysOfType<Transfer, string | number | null>,
-        range?: Range<string | number | null>
+        key: KeysOfType<Transfer, string | number | null | Date>,
+        range?: Range<string | number | null | Date>
     ) {
         if (range !== undefined && range.from !== undefined && range.to !== undefined) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -108,18 +111,7 @@ export class TransferDao {
             .getMany();
     }
 
-    async getLimitedTotalMonthlyAmount(accountIds: number[], type: TransferType): Promise<{ year: number; month: number; amount: string; count: number }[]> {
-        return await getConnection()
-            .getRepository(Transfer)
-            .query(
-                `SELECT YEAR(DATE) AS \`year\`, MONTH(DATE) AS \`month\`, SUM(amount) AS \`amount\`, COUNT(id) AS \`count\` 
-                FROM transfer 
-                WHERE TYPE = '${type}' AND \`account_id\` IN (${accountIds.join(',')}) AND \`date\` <= '${this.getToday()}' AND is_internal = 0 
-                GROUP BY YEAR(date), MONTH(DATE) ORDER BY \`year\` DESC, \`month\` DESC LIMIT 12`
-            );
-    }
-
-    async getTransferByDateContractor(date: string, contractorId: number): Promise<Transfer[]> {
+    async getTransferByDateContractor(date: Date, contractorId: number): Promise<Transfer[]> {
         const transfers = await getConnection()
             .getRepository(Transfer)
             .find({

@@ -1,8 +1,8 @@
-import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { ConnectionOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import migrations from './src/app/migrations/_index';
+import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import entities from './src/app/entities/_index';
+import migrations from './src/app/migrations/_index';
 
 export default {
     name: 'default',
@@ -18,6 +18,7 @@ export default {
     migrations: migrations,
     migrationsTransactionMode: 'all',
     entities: entities,
+    timezone: 'UTC',
     namingStrategy: new SnakeNamingStrategy(),
     cli: {
         migrationsDir: 'migrations',

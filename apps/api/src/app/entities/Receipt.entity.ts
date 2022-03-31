@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn, ManyToOne } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
+
 import { Contractor } from './Contractor.entity';
 import { Transfer } from './Transfer.entity';
 
@@ -21,8 +23,8 @@ export class Receipt {
         this._amount = value.toFixed(2);
     }
 
-    @Column({ type: 'date', nullable: true })
-    date!: string | null;
+    @Column({ type: 'date', nullable: true, transformer: new DateTransformer(DateTransformerType.DATE) })
+    date!: Date | null;
 
     @ManyToOne('Contractor', { eager: true, nullable: true })
     @JoinColumn({ name: 'contractor' })

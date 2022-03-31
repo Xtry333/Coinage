@@ -25,7 +25,7 @@ export interface TransferDetailsDTO {
     categoryId: number;
     contractor?: string;
     contractorId?: number;
-    date: string;
+    date: Date;
     createdDate?: Date;
     editedDate: Date;
     otherTransfers: TransferDTO[];
@@ -53,18 +53,10 @@ export class TransferType {
     ) {}
 }
 
-export interface TotalAmountPerMonthDTO {
-    year: number;
-    month: number;
-    outcomes: number;
-    incomes: number;
-    transactionsCount: number;
-}
-
 export interface ReceiptDTO {
     id: number;
     description: string;
-    date?: string | null;
+    date?: Date | null;
     amount: number | null;
     contractor?: string;
     transferIds: number[];

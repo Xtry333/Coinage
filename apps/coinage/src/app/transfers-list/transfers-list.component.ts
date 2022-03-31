@@ -1,12 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
-import { finalize } from 'rxjs/operators';
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 
-import { CoinageDataService } from '../services/coinage.dataService';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
+
+import { ActivatedRoute } from '@angular/router';
+import { CoinageDataService } from '../services/coinage.data-service';
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { TableFilterFields } from '../transfer-table/transfers-table.component';
+import { finalize } from 'rxjs/operators';
 
 interface TransfersListQueryParams {
     page: number;

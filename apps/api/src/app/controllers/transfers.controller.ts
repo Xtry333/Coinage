@@ -8,11 +8,13 @@ import {
     RefundTransferDTO,
     SaveTransferDTO,
     SplitTransferDTO,
-    TotalAmountPerMonthDTO,
+    MonthlyUserStatsDTO,
     TransferDetailsDTO,
     TransferDTO,
+    CreateEditTransferModelDTO,
 } from '@coinage-app/interfaces';
 import { Body, Controller, Delete, Get, Param, Post, Put } from '@nestjs/common';
+import { ClassTransformer, plainToClass, plainToInstance, TransformPlainToInstance } from 'class-transformer';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -38,7 +40,6 @@ export class TransfersController {
     async getAllTransfers(@Body() filterParams: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
         filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
         filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
-        console.log(filterParams);
 
         const pagedTransfersDTOs = await this.transfersService.getAllFilteredPagedDTO(filterParams);
         const totalCount = await this.transfersService.getAllFilteredCount(filterParams);
@@ -80,6 +81,8 @@ export class TransfersController {
             throw new Error('Invalid ID provided');
         }
         const transfer = await this.transferDao.getById(id);
+        console.log((transfer.date as any).toISOString());
+
         const categoryPath: Category[] = [];
         categoryPath.push(transfer.category);
         let parentCat = (await transfer.category.parent) ?? null;
@@ -133,7 +136,7 @@ export class TransfersController {
             }),
             isPlanned: new Date(transfer.date) > new Date(),
             refundedBy: refundTransfer?.id,
-            refundedOn: refundTransfer?.date,
+            refundedOn: refundTransfer?.date.toJSON(),
             isRefundable: !transfer.metadata.refundedBy && !transfer.metadata.refundTargetId,
         };
     }
@@ -168,62 +171,8 @@ export class TransfersController {
         };
     }
 
-    @Get('/totalOutcomesPerMonth')
-    async getLastTotalOutcomesPerMonth(): Promise<TotalAmountPerMonthDTO[]> {
-        const accountIds = (await this.accountDao.getForUserId(1)).map((a) => a.id);
-        // TODO: Join queries into one async
-        const outcomes = (await this.transferDao.getLimitedTotalMonthlyAmount(accountIds, TransferType.Outcome)).map((outcome) => {
-            return {
-                year: outcome.year,
-                month: outcome.month - 1,
-                amount: parseFloat(outcome.amount),
-                transactionsCount: outcome.count,
-            };
-        });
-        const incomes = (await this.transferDao.getLimitedTotalMonthlyAmount(accountIds, TransferType.Income)).map((income) => {
-            return {
-                year: income.year,
-                month: income.month - 1,
-                amount: parseFloat(income.amount),
-                transactionsCount: income.count,
-            };
-        });
-
-        const today = new Date();
-        let year = today.getFullYear();
-        let month = today.getMonth();
-
-        for (let i = 0; i < 12; i++) {
-            if (!outcomes.find((o) => o.year === year && o.month === month)) {
-                outcomes.push({
-                    year: year,
-                    month: month,
-                    amount: 0,
-                    transactionsCount: 0,
-                });
-            }
-            month--;
-            if (month < 0) {
-                year--;
-                month = 11;
-            }
-        }
-        return outcomes
-            .sort((a, b) => new Date(b.year, b.month).getTime() - new Date(a.year, a.month).getTime())
-            .slice(0, 12)
-            .map((o) => {
-                return {
-                    ...o,
-                    outcomes: o.amount,
-                    incomes: incomes.find((i) => i.year === o.year && i.month === o.month)?.amount ?? 0,
-                };
-            });
-    }
-
     @Post('save')
-    async saveTransferObject(@Body() transfer: SaveTransferDTO): Promise<BaseResponseDTO> {
-        console.log('transfer', transfer);
-        console.log(transfer.date);
+    async saveTransferObject(@Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
         let entity: Transfer;
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
         const account = (await transfer.accountId) ? await this.accountDao.getById(parseInt(transfer.accountId?.toString())) : undefined;
@@ -232,13 +181,13 @@ export class TransfersController {
             throw new Error('Account not found');
         }
         //const account = await this.accc.getById(parseInt(transfer.categoryId?.toString()));
-        if (transfer.id) {
+        if (transfer.id !== undefined) {
             entity = await this.transferDao.getById(transfer.id);
         } else {
             entity = new Transfer();
         }
         entity.amount = transfer.amount;
-        entity.date = transfer.date;
+        entity.date = transfer.date as any; // TODO: Fix date string
         if (!entity.createdDate) {
             entity.createdDate = new Date();
         }
@@ -264,7 +213,7 @@ export class TransfersController {
                 console.log(e);
             }
         }
-        console.log(entity);
+        entity.isEthereal = true;
         const inserted = await this.transfersService.saveTransfer(entity);
         return { insertedId: inserted.id };
     }
@@ -300,12 +249,12 @@ export class TransfersController {
         return { insertedId: inserted.identifiers[0].id };
     }
 
-    @Post('refund')
-    async refundTransfer(@Body() refundDTO: RefundTransferDTO): Promise<BaseResponseDTO> {
+    @Post(':id/refund')
+    async refundTransfer(@Param('id') id: number, @Body() refundDTO: RefundTransferDTO): Promise<BaseResponseDTO> {
         const refundTargetId = Math.floor(Number(refundDTO.refundTargetId));
         const refundDate = new Date(refundDTO.refundDate);
 
-        const transfer = await this.transferDao.getById(refundTargetId);
+        const transfer = await this.transferDao.getById(id);
 
         const refundCategory = await this.categoryDao.getBySystemTag('system-refund');
 
@@ -321,7 +270,7 @@ export class TransfersController {
         refundTransferEntity.amount = transfer.amount;
         refundTransferEntity.type = refundCategory.type;
         refundTransferEntity.categoryId = refundCategory.id;
-        refundTransferEntity.date = this.dateParserService.formatMySql(refundDate);
+        refundTransferEntity.date = refundDate;
         refundTransferEntity.accountId = transfer.accountId;
         refundTransferEntity.metadata.refundTargetId = refundTargetId;
         refundTransferEntity.contractor = transfer.contractor;

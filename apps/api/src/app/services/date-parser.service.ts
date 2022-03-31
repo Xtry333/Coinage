@@ -18,4 +18,16 @@ export class DateParserService {
         date.setDate(date.getDate() - 1);
         return date;
     }
+
+    public getEndOfMonth(year: number, month: number): Date {
+        const date = new Date(year, month, 1);
+        date.setMonth(date.getMonth() + 1);
+        date.setDate(0);
+        return date;
+    }
+
+    public getToday(): string {
+        const date = new Date();
+        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+    }
 }

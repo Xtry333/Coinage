@@ -20,9 +20,8 @@ export class ReceiptsController {
         private readonly dateParserService: DateParserService
     ) {}
 
-    @Get('details/:id')
-    async getReceiptDetails(@Param('id') paramId: string): Promise<ReceiptDetailsDTO> {
-        const id = parseInt(paramId);
+    @Get(':id/details')
+    async getReceiptDetails(@Param('id') id: number): Promise<ReceiptDetailsDTO> {
         if (!id) {
             throw new Error('Invalid ID provided.');
         }
@@ -40,7 +39,7 @@ export class ReceiptsController {
             contractorName: receipt.contractor?.name ?? null,
             allTransfers: (await receipt.transfers)
                 .map(this.toTransferDTO)
-                .sort((a, b) => a.date.localeCompare(b.date))
+                .sort((a, b) => a.date.getTime() - b.date.getTime())
                 .reverse(),
         };
     }
@@ -70,9 +69,9 @@ export class ReceiptsController {
         };
     }
 
-    private getNextTransferDate(transfers: Transfer[]): string | undefined {
+    private getNextTransferDate(transfers: Transfer[]): Date | undefined {
         const todayStr = new Date().toISOString().substring(0, 10);
-        const todayTransfersIndex = transfers.find((t) => t.date.localeCompare(todayStr) > 0);
+        const todayTransfersIndex = transfers.find((t) => t.date.getTime() > new Date().getTime());
         if (todayTransfersIndex) {
             return todayTransfersIndex.date;
         }

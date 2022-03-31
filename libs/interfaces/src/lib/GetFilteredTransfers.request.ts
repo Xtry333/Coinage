@@ -1,7 +1,8 @@
-import { PagedRequest } from '../partial/Paged.request';
-import { TransferTypeEnum, Range } from './interfaces';
+import { Range, TransferTypeEnum } from './interfaces';
 
-export interface GetFilteredTransfersRequest extends PagedRequest {
+import { PagedRequest } from '../partial/Paged.request';
+
+export class GetFilteredTransfersRequest extends PagedRequest {
     transferIds?: number[];
     description?: string;
     amount?: Range<number>;
@@ -9,6 +10,6 @@ export interface GetFilteredTransfersRequest extends PagedRequest {
     categoryIds?: number[];
     accountIds?: number[];
     type?: TransferTypeEnum;
-    date?: Range<string>;
+    date?: Range<Date>;
     showPlanned?: boolean;
 }

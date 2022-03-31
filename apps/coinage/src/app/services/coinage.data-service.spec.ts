@@ -1,7 +1,6 @@
+import { CoinageDataService } from './coinage.data-service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-
-import { CoinageDataService } from './coinage.dataService';
 
 describe('CoinageDataService', () => {
     let service: CoinageDataService;

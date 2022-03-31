@@ -32,7 +32,7 @@
             <tbody>
                 <tr *ngFor="let outcome of totalAmountPerMonth; trackBy: totalOutcomesTracker">
                     <td class="month-name">
-                        <a [routerLink]="NavigatorPages.Summary(getTotalPerMonthDate(outcome))">{{ outcome.monthName }} {{ outcome.year }}</a>
+                        <a [routerLink]="NavigatorPages.Summary(outcome.partedDate)">{{ outcome.monthName }} {{ outcome.year }}</a>
                     </td>
                     <td class="currency">{{ outcome.outcomes | plnCurrency }}</td>
                     <td class="currency">{{ outcome.incomes | plnCurrency }}</td>

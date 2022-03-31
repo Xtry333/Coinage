@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { ReceiptDetailsDTO, TransferType } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
 
-import { CoinageDataService } from '../services/coinage.dataService';
+import { Component, OnInit } from '@angular/core';
+import { ReceiptDetailsDTO, TransferType } from '@coinage-app/interfaces';
+
+import { ActivatedRoute } from '@angular/router';
+import { CoinageDataService } from '../services/coinage.data-service';
 import { NavigatorService } from '../services/navigator.service';
 
 @Component({
@@ -35,5 +36,9 @@ export class ReceiptDetailsComponent implements OnInit {
 
     get receiptDirectionDisplaySymbol(): string {
         return TransferType.OUTCOME.symbol;
+    }
+
+    get remainingAmount(): number {
+        return Math.abs(this.receiptDetails.totalTransferred - (this.receiptDetails.amount ?? 0));
     }
 }

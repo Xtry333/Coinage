@@ -99,7 +99,7 @@
                     <td class="currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
                     <td>{{ transfer.accountName }}</td>
                     <td class="align-right nowrap">
-                        <a [routerLink]="NavigatorPages.Summary(transfer.date)">{{ transfer.date | date }}</a>
+                        <a [routerLink]="NavigatorPages.SummaryFullDate(transfer.date)">{{ transfer.date | date }}</a>
                     </td>
                 </ng-container>
             </tr>

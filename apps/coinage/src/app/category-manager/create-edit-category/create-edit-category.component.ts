@@ -1,7 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { CategoryDTO, CreateEditCategoryDTO } from '@coinage-app/interfaces';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
-import { CoinageDataService } from '../../services/coinage.dataService';
+import { CoinageDataService } from '../../services/coinage.data-service';
 
 @Component({
     selector: 'coinage-app-create-edit-category',
