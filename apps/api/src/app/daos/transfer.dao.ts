@@ -2,7 +2,6 @@ import { GetFilteredTransfersRequest, Range } from '@coinage-app/interfaces';
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, LessThanOrEqual, Repository } from 'typeorm';
-import { TransferType } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 
 type KeysOfType<O, T> = {
@@ -29,9 +28,7 @@ export class TransferDao {
         if (!transfer) {
             throw new Error('Transfer not found');
         }
-
-        console.debug('Time', await getConnection().query('SELECT @@GLOBAL.time_zone, @@SESSION.time_zone, NOW()'));
-
+        
         await transfer.category.parent;
         return transfer;
     }
