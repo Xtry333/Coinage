@@ -1,34 +1,39 @@
-import { Injectable } from '@nestjs/common';
-import { BalanceDTO } from '@coinage-app/interfaces';
-import { DeleteResult, Equal, getConnection } from 'typeorm';
+import { DeleteResult, Equal, Repository, getConnection } from 'typeorm';
+
 import { Account } from '../entities/Account.entity';
-import { TransferType } from '../entities/Category.entity';
+import { BalanceDTO } from '@coinage-app/interfaces';
 import { DateParserService } from '../services/date-parser.service';
+import { Injectable } from '@nestjs/common';
+import { TransferType } from '../entities/Category.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Transfer } from '../entities/Transfer.entity';
 
 @Injectable()
 export class AccountDao {
-    constructor(private readonly dateParser: DateParserService) {}
+    constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {}
 
     public async getById(id: number): Promise<Account> {
-        const account = await getConnection()
-            .getRepository(Account)
-            .findOne({ where: { id: Equal(id) } });
-        if (!account) {
+        const accounts = await this.getByIds([id]);
+        if (accounts.length === 0) {
             throw new Error(`Account with id ${id} not found.`);
         }
-        return account;
+        return accounts[0];
+    }
+
+    public async getByIds(ids: number[]): Promise<Account[]> {
+        return await this.accountRepository.findByIds(ids);
     }
 
     public getAllActive(): Promise<Account[]> {
-        return getConnection()
-            .getRepository(Account)
-            .find({ where: { isActiveBuffer: Equal(true) } });
+        return this.accountRepository.find({ where: { isActiveBuffer: Equal(true) } });
     }
 
     public getForUserId(userId: number): Promise<Account[]> {
-        return getConnection()
-            .getRepository(Account)
-            .find({ where: { userId: Equal(userId), isActiveBuffer: Equal(true) } });
+        return this.accountRepository.find({ where: { userId: Equal(userId) } });
+    }
+
+    public getCurrentlyActiveForUserId(userId: number): Promise<Account[]> {
+        return this.accountRepository.find({ where: { userId: Equal(userId), isActiveBuffer: Equal(true) } });
     }
 
     public save(account: Account): Promise<Account> {
@@ -79,6 +84,28 @@ export class AccountDao {
                 balance: parseFloat(r.balance),
             };
         });
+    }
+
+    async getLast12MonthStats(
+        accountIds: number[],
+        sumOnlyInternalTransfers: boolean = true
+    ): Promise<{ year: number; month: number; income: string; outcome: string; count: string }[]> {
+        return await getConnection()
+            .getRepository(Transfer)
+            .query(
+                `SELECT
+                    YEAR(t.date) AS 'year',
+                    MONTH(t.date) AS 'month',
+                    SUM(CASE WHEN t.type = '${TransferType.Income}' THEN t.amount ELSE 0 END) AS 'income',
+                    SUM(CASE WHEN t.type = '${TransferType.Outcome}' THEN t.amount ELSE 0 END) AS 'outcome',
+                    COUNT(t.id) AS 'count'
+                FROM transfer AS t
+                WHERE t.account_id IN (${accountIds.join(',')})
+                    AND t.date <= '${this.dateParser.formatMySql(new Date())}' ${sumOnlyInternalTransfers ? `AND t.is_internal = 0` : ``}
+                GROUP BY YEAR(t.date), MONTH(t.date)
+                ORDER BY year DESC, month DESC
+                LIMIT 12`
+            );
     }
 
     public async getLastTransferDate(accountId: number): Promise<string> {

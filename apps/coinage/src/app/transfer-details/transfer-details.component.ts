@@ -1,13 +1,15 @@
-import { Component, Input, OnInit } from '@angular/core';
+import * as Rx from 'rxjs';
+
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
-import { CoinageDataService } from '../services/coinage.dataService';
-import * as Rx from 'rxjs';
-import { finalize, catchError } from 'rxjs/operators';
-import { IconDefinition } from '@fortawesome/fontawesome-common-types';
-import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
-import { NotificationService } from '../services/notification.service';
+import { Component, Input, OnInit } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
+import { catchError, finalize } from 'rxjs/operators';
+import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
+
+import { CoinageDataService } from '../services/coinage.data-service';
+import { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
     selector: 'coinage-app-transfer-details',
@@ -61,6 +63,7 @@ export class TransferDetailsComponent implements OnInit {
                     .subscribe(([transfer, categories]: [TransferDetailsDTO, CategoryDTO[]]) => {
                         console.log(transfer);
                         this.transfer = transfer;
+                        //(this.transfer.date as any) = new Date(transfer.date)
                         this.totalPayment =
                             transfer.amount * TransferType[transfer.type].mathSymbol +
                             transfer.otherTransfers.reduce((a, t) => a + t.amount * TransferType[t.type].mathSymbol, 0);
@@ -83,13 +86,13 @@ export class TransferDetailsComponent implements OnInit {
     public onClickSplitTransfer(): void {
         if (this.transfer)
             this.coinageData
-                .postSplitTransaction({
+                .postSplitTransaction(this.transfer.id, {
                     id: this.transfer.id,
                     description: this.splitTransfer.description,
                     amount: parseFloat(this.splitTransfer.amount?.toString()) ?? null,
                     categoryId: this.splitTransfer.categoryId,
                 })
-                .subscribe((result) => {
+                .then((result) => {
                     this.shouldShowSplit = false;
                     if (result.insertedId) {
                         this.navigator.goTo(NavigatorPages.TransferDetails(result.insertedId));
@@ -98,7 +101,7 @@ export class TransferDetailsComponent implements OnInit {
     }
 
     public onClickRefundTransfer(): void {
-        this.coinageData.refundTransfer(this.transfer.id, new Date()).subscribe((result) => {
+        this.coinageData.postRefundTransfer(this.transfer.id, new Date()).subscribe((result) => {
             if (result && result.insertedId) {
                 this.notificationService.push({
                     title: `Added Refund`,
@@ -115,7 +118,7 @@ export class TransferDetailsComponent implements OnInit {
     }
 
     public onClickDuplicateTransfer(): void {
-        this.coinageData.duplicateTransfer(this.transfer.id).subscribe((result) => {
+        this.coinageData.postDuplicateTransfer(this.transfer.id).subscribe((result) => {
             if (result && result.insertedId) {
                 this.notificationService.push({
                     title: `Transfer Duplicated`,

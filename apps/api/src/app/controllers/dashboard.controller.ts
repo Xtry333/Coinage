@@ -1,16 +1,16 @@
-import { BalanceDTO } from '@coinage-app/interfaces';
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Param } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
+import { BalanceDTO } from '@coinage-app/interfaces';
 
 @Controller('dashboard')
 export class DashboardComponent {
     constructor(private readonly accountDao: AccountDao) {}
 
-    @Get('/balance')
-    async getBalance(): Promise<BalanceDTO[]> {
+    @Get('/balance/:date')
+    async getBalance(@Param('date') date: Date): Promise<BalanceDTO[]> {
         const accountIds = [1, 5, 6];
-        const balance = await this.accountDao.getAccountBalance(accountIds);
+        const balance = await this.accountDao.getAccountBalanceForAccountAsOfDate(accountIds, date);
         return balance;
     }
 }

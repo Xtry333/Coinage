@@ -1,11 +1,6 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
-import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
-import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
 
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
-import { CoinageDataService } from '../services/coinage.dataService';
-import { NavigatorPages } from '../services/navigator.service';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import {
     FilterOption,
     FilterType,
@@ -14,9 +9,15 @@ import {
     OnMultiCheckboxFilterEvent,
     OnNumericRangeFilterEvent,
     OnTextBoxFilterEvent,
-    PopupSide as PopupSide,
+    PopupSide,
     TableFilterComponent,
 } from './table-filter/table-filter.component';
+import { IconDefinition, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
+
+import { CoinageDataService } from '../services/coinage.data-service';
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
+import { NavigatorPages } from '../services/navigator.service';
 
 export enum TableColumn {
     Category = 'Category',
@@ -210,8 +211,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     }
 
     private placeTodayMarkerRow(): void {
-        const todayStr = new Date().toISOString().substring(0, 10);
-        const todayTransfersIndex = this.transfersForTable.findIndex((t) => t.date.localeCompare(todayStr) <= 0);
+        const todayTransfersIndex = this.transfersForTable.findIndex((t) => t.date.getTime() <= new Date().getTime());
         if (todayTransfersIndex != -1) {
             this.transfersForTable.splice(todayTransfersIndex, 0, this.dummyTransfer, this.dummyTransfer);
         } else {
@@ -256,7 +256,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     get dummyTransfer(): UiTransfer {
         return {
             id: -1,
-            date: '',
+            date: new Date(),
             type: TransferTypeEnum.OUTCOME,
             accountId: 0,
             accountName: '',

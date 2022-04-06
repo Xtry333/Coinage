@@ -1,9 +1,12 @@
-import { TransferTypeEnum } from '@coinage-app/interfaces';
-import { Entity, JoinColumn, Column, PrimaryGeneratedColumn, ManyToOne, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
+
 import { Account } from './Account.entity';
+import { BooleanTransformer } from '@anchan828/typeorm-transformers';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
 import { Receipt } from './Receipt.entity';
+import { TransferTypeEnum } from '@coinage-app/interfaces';
 
 @Entity()
 export class Transfer {
@@ -28,13 +31,17 @@ export class Transfer {
         this._amount = value.toFixed(2);
     }
 
-    @Column({ type: 'date', nullable: false })
-    date!: string;
+    @Column({
+        type: 'date',
+        nullable: false,
+        transformer: new DateTransformer(DateTransformerType.DATE),
+    })
+    date!: Date;
 
-    @UpdateDateColumn({ name: 'edited_date', type: 'timestamp', nullable: false })
+    @UpdateDateColumn({ name: 'edited_date', type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
     editedDate!: Date;
 
-    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true })
+    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true, transformer: new DateTransformer(DateTransformerType.DATETIME) })
     createdDate!: Date;
 
     @Column({ name: 'category', type: 'integer', nullable: false })
@@ -68,29 +75,13 @@ export class Transfer {
     @JoinColumn({ name: 'account_id' })
     account!: Account;
 
-    @Column({ name: 'is_internal', type: 'bit', nullable: false })
-    isInternalBuffer!: boolean;
+    @Column({ name: 'is_internal', type: 'bit', nullable: false, transformer: new BooleanTransformer() })
+    isInternal!: boolean;
 
-    get isInternal(): boolean {
-        return !!this.isInternalBuffer;
-    }
+    @Column({ name: 'is_ethereal', type: 'bit', nullable: false, transformer: new BooleanTransformer() })
+    isEthereal!: boolean;
 
-    set isInternal(value: boolean) {
-        this.isInternalBuffer = value;
-    }
-
-    @Column({ name: 'is_ethereal', type: 'bit', nullable: false })
-    isEtherealBuffer!: boolean;
-
-    get isEthereal(): boolean {
-        return !!this.isEtherealBuffer;
-    }
-
-    set isEthereal(value: boolean) {
-        this.isEtherealBuffer = value;
-    }
-
-    @Column({ nullable: true, type: 'json' })
+    @Column({ nullable: true, type: 'json', default: {} })
     metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 }
 

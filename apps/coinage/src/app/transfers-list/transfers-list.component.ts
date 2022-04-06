@@ -1,12 +1,13 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
 import * as Rx from 'rxjs';
-import { finalize } from 'rxjs/operators';
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 
-import { CoinageDataService } from '../services/coinage.dataService';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
+
+import { ActivatedRoute } from '@angular/router';
+import { CoinageDataService } from '../services/coinage.data-service';
+import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { TableFilterFields } from '../transfer-table/transfers-table.component';
+import { finalize } from 'rxjs/operators';
 
 interface TransfersListQueryParams {
     page: number;
@@ -50,6 +51,12 @@ export class TransfersListComponent implements OnInit, OnDestroy {
             } else {
                 this.refreshData();
             }
+
+            window.scroll({
+                top: 0,
+                left: 0,
+                behavior: 'smooth',
+            });
         });
 
         this.refreshInterval = setInterval(() => this.refreshData(), TransfersListComponent.REFRESH_INTERVAL);
@@ -63,15 +70,14 @@ export class TransfersListComponent implements OnInit, OnDestroy {
     }
 
     public refreshData() {
-        Rx.zip(this.coinageData.getAllTransfers(this.filterParams))
-            .pipe(
-                finalize(() => {
-                    this.showPage = true;
-                })
-            )
-            .subscribe(([response]) => {
+        this.coinageData
+            .getAllFilteredTransfers(this.filterParams)
+            .then((response) => {
                 this.transfers = response.transfers;
                 this.totalCount = response.totalCount;
+            })
+            .finally(() => {
+                this.showPage = true;
             });
     }
 

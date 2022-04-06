@@ -1,12 +1,16 @@
-import { Injectable } from '@nestjs/common';
-import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
-import { Category } from '../entities/Category.entity';
-import { Transfer } from '../entities/Transfer.entity';
-import { TotalInMonthByCategory } from '@coinage-app/interfaces';
+import { DeleteResult, Equal, InsertResult, getConnection, Repository } from 'typeorm';
+
 import { Account } from '../entities/Account.entity';
+import { Category } from '../entities/Category.entity';
+import { Injectable } from '@nestjs/common';
+import { TotalInMonthByCategory } from '@coinage-app/interfaces';
+import { Transfer } from '../entities/Transfer.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CategoryDao {
+    constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>) {}
+
     async getById(id: number): Promise<Category | undefined> {
         return await getConnection()
             .getRepository(Category)
@@ -59,8 +63,13 @@ export class CategoryDao {
     }
 
     async deleteById(id: number): Promise<DeleteResult> {
-        return await getConnection()
-            .getRepository(Category)
-            .delete({ id: Equal(id) });
+        const category = await this.categoryRepository.findOne({ where: { id: Equal(id) } });
+        if (category) {
+            if (category.tag) {
+                throw new Error('Cannot delete system category');
+            }
+            return this.categoryRepository.delete({ id: Equal(id) });
+        }
+        throw new Error('Category not found');
     }
 }

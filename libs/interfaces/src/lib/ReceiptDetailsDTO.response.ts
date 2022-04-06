@@ -8,7 +8,7 @@ export interface ReceiptDetailsDTO {
     totalTransferred: number;
     contractorId?: number | null;
     contractorName?: string | null;
-    date?: string | null;
-    nextTransferDate?: string;
+    date?: Date | null;
+    nextTransferDate?: Date;
     allTransfers: TransferDTO[];
 }

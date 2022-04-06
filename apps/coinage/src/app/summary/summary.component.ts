@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TransferDTO } from '@coinage-app/interfaces';
-
-import { CoinageDataService } from '../services/coinage.dataService';
+import { Component, OnInit } from '@angular/core';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
+
+import { CoinageDataService } from '../services/coinage.data-service';
+import { TransferDTO } from '@coinage-app/interfaces';
 
 export interface UiTotalInMonthByCategory {
     categoryName: string;
@@ -44,16 +44,18 @@ export class SummaryComponent implements OnInit {
             this.selectedDate = this.partedDateService.toDate(this.partedDate).toISOString().slice(0, 10);
             if (this.partedDate.month) {
                 this.coinageData.getTotalPerCategory(this.partedDate.year, this.partedDate.month, this.partedDate.day).subscribe((response) => {
-                    this.outcomesPerCategory = response.map((o) => {
-                        return {
-                            categoryName: o.categoryName,
-                            amount: parseFloat(o.amount),
-                            summedAmount: response
-                                .filter((r) => o.categoryId === r.categoryParentId)
-                                .reduce((a, b) => a + parseFloat(b.amount), parseFloat(o.amount)),
-                            numberOfTransfers: o.numberOfTransfers,
-                        };
-                    });
+                    this.outcomesPerCategory = response
+                        .map((o) => {
+                            return {
+                                categoryName: o.categoryName,
+                                amount: parseFloat(o.amount),
+                                summedAmount: response
+                                    .filter((r) => o.categoryId === r.categoryParentId)
+                                    .reduce((a, b) => a + parseFloat(b.amount), parseFloat(o.amount)),
+                                numberOfTransfers: o.numberOfTransfers,
+                            };
+                        })
+                        .sort((a, b) => a.categoryName.localeCompare(b.categoryName));
                     this.showPage = true;
                 });
             } else {
@@ -61,23 +63,23 @@ export class SummaryComponent implements OnInit {
             }
             if (this.isDateTargetDay) {
                 this.coinageData
-                    .getAllTransfers({
+                    .getAllFilteredTransfers({
                         page: 1,
                         rowsPerPage: 1000,
-                        date: { from: this.datetime.toISOString().slice(0, 10), to: this.datetime.toISOString().slice(0, 10) },
+                        date: { from: this.datetime, to: this.datetime },
                     })
-                    .subscribe((response) => {
-                        this.transfers = response.transfers.filter((t) => t.date === this.selectedDate);
+                    .then((response) => {
+                        this.transfers = response.transfers.filter((t) => t.date.getTime() === new Date(this.selectedDate).getTime());
                     });
             } else if (this.isDateTargetMonth) {
                 this.coinageData
-                    .getAllTransfers({
+                    .getAllFilteredTransfers({
                         page: 1,
                         rowsPerPage: 500,
-                        date: { from: this.monthStartDate.toISOString(), to: this.monthEndDate.toISOString() },
+                        date: { from: this.monthStartDate, to: this.monthEndDate },
                         showPlanned: true,
                     })
-                    .subscribe((response) => {
+                    .then((response) => {
                         this.transfers = response.transfers.filter(
                             (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
                         );

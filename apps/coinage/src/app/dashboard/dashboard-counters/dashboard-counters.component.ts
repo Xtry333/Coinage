@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+
 import { BalanceDTO } from '@coinage-app/interfaces';
-import { CoinageDataService } from '../../services/coinage.dataService';
+import { CoinageDataService } from '../../services/coinage.data-service';
 
 @Component({
     selector: 'coinage-app-dashboard-counters',
@@ -22,8 +23,9 @@ export class DashboardCountersComponent implements OnInit {
     }
 
     private loadData(): void {
-        this.coinageData.getBalanceForActiveAccounts().subscribe((res) => (this.balance = res));
-        this.coinageData.getTodaySpendings().subscribe((res) => (this.todaySpendings = res.reduce((acc, cur) => acc + cur.balance, 0)));
+        const date = new Date();
+        this.coinageData.getBalanceForActiveAccounts(date).subscribe((res) => (this.balance = res));
+        this.coinageData.getTodaySpendings(date).subscribe((res) => (this.todaySpendings = res.reduce((acc, cur) => acc + cur.balance, 0)));
     }
 
     trackByAccountId(index: number, item: BalanceDTO) {

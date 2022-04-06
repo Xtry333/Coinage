@@ -12,7 +12,10 @@
         </tr>
         <tr>
             <th>Total Transferred</th>
-            <td>{{ receiptDetails.totalTransferred | plnCurrency }} / {{ receiptDetails.totalAmount | plnCurrency }}</td>
+            <td>
+                <span>{{ receiptDetails.totalTransferred | plnCurrency }} / {{ receiptDetails.totalAmount | plnCurrency }}</span>
+                <span> ({{ remainingAmount | plnCurrency }})</span>
+            </td>
         </tr>
         <tr>
             <th>Date</th>

@@ -1,21 +1,23 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { TotalAmountPerMonthDTO, TransferDTO } from '@coinage-app/interfaces';
-import { ChartDataset, ChartOptions } from 'chart.js';
 import * as Rx from 'rxjs';
-import { finalize } from 'rxjs/operators';
 
-import { CoinageDataService } from '../services/coinage.dataService';
-import { DateParserService, PartedDate } from '../services/date-parser.service';
-import { NavigatorPages } from '../services/navigator.service';
+import { ChartDataset, ChartOptions } from 'chart.js';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MonthlyUserStatsDTO, PartialDate, TransferDTO } from '@coinage-app/interfaces';
+
+import { CoinageDataService } from '../services/coinage.data-service';
 import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
+import { DateParserService } from '../services/date-parser.service';
+import { NavigatorPages } from '../services/navigator.service';
+import { finalize } from 'rxjs/operators';
 
 interface UiTotalAmountPerMonth {
     date: string;
     year: number;
     monthName: string;
-    partedDate: PartedDate;
+    partedDate: PartialDate;
     incomes: number;
     outcomes: number;
+    balance: number;
     transactionsCount: number;
     costPerDay: number;
 }
@@ -45,6 +47,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
             line: {
                 tension: 0.3,
             },
+        },
+        plugins: {
+            // zoom: {
+            //     pan: {
+            //         enabled: true,
+            //         mode: 'xy',
+            //     },
+            //     zoom: {
+            //         wheel: {
+            //             enabled: true,
+            //         },
+            //         overScaleMode: 'y',
+            //     },
+            //     limits: {
+            //         x: { min: 0, max: 2, minRange: 50 },
+            //         y: { min: 0, max: 50000, minRange: 50 },
+            //     },
+            // },
         },
     };
 
@@ -78,6 +98,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
         //     this.totalAmountPerMonth = this.mapToUiOutcome(values[1]);
         // });
         this.refreshInterval = setInterval(() => this.refreshData(), DashboardComponent.REFRESH_INTERVAL);
+
+        console.log('tests');
+        console.log(new Date());
+        console.log(PartialDate.fromDate(new Date()));
     }
 
     ngOnDestroy(): void {
@@ -116,19 +140,20 @@ export class DashboardComponent implements OnInit, OnDestroy {
             return;
         }
         this.dataOld = false;
-        Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getTotalOutcomesPerMonth(), this.coinageData.getBalanceForActiveAccounts())
+        Rx.zip(this.coinageData.getRecentTransactions(), this.coinageData.getAccountMonthlyStats(), this.coinageData.getBalanceForActiveAccounts(new Date()))
             .pipe(
                 finalize(() => {
                     this.showPage = true;
                 })
             )
-            .subscribe(([transactions, outcomes, balance]) => {
-                this.lastTransactions = transactions;
-                this.totalAmountPerMonth = this.mapToUiOutcome(outcomes);
-                this.balanceMainAccount = balance[0].balance;
-                this.balanceSecondary = balance[1].balance;
+            .subscribe(([recentlyEditedTransfers, stats, balance]) => {
+                this.lastTransactions = recentlyEditedTransfers;
+                this.totalAmountPerMonth = this.mapToUiOutcome(stats);
+                // this.balanceMainAccount = balance[0].balance;
+                // this.balanceSecondary = balance[1].balance;
                 this.accountStatsChartData[0].data = this.totalAmountPerMonth.map((item) => item.outcomes).reverse();
                 this.accountStatsChartData[1].data = this.totalAmountPerMonth.map((item) => item.incomes).reverse();
+                this.accountStatsChartData[2].data = this.totalAmountPerMonth.map((item) => item.balance).reverse();
                 this.accountStatsChartLabels = this.totalAmountPerMonth.map((item) => `${item.monthName} ${item.year}`).reverse();
             });
         if (this.countersComponent) {
@@ -136,15 +161,16 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
     }
 
-    private mapToUiOutcome(totalOutcomes: TotalAmountPerMonthDTO[]): UiTotalAmountPerMonth[] {
+    private mapToUiOutcome(totalOutcomes: MonthlyUserStatsDTO[]): UiTotalAmountPerMonth[] {
         return totalOutcomes.map((total) => {
             return {
                 year: total.year,
                 date: total.year + '-' + (total.month + 1),
-                monthName: new Date(total.year, total.month).toLocaleString('pl', { month: 'long' }),
-                partedDate: { year: total.year, month: total.month + 1 },
+                monthName: new Date(total.year, total.month).toLocaleString(undefined, { month: 'long' }),
+                partedDate: new PartialDate(total.year, total.month + 1),
                 outcomes: total.outcomes,
                 incomes: total.incomes,
+                balance: total.balance,
                 transactionsCount: total.transactionsCount,
                 costPerDay: total.outcomes / this.daysInMonth(total.year, total.month),
             };
@@ -163,10 +189,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return this.partedDateService.formatDate(new Date(date));
     }
 
-    public getTotalPerMonthDate(uiRow: UiTotalAmountPerMonth): string {
-        return this.partedDateService.joinPartedDate(uiRow.partedDate);
-    }
-
     get rollingAverageIncomes() {
         return this.totalAmountPerMonth.slice(0, this.averageAmountLimit).reduce((a, i) => a + i.incomes, 0) / this.averageAmountLimit;
     }
@@ -179,7 +201,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return this.totalAmountPerMonth.reduce((a, t) => a + t.incomes - t.outcomes, 0);
     }
 
-    public createInternalTransfer(desc: string, amount: number, date: string, id1: number, id2: number) {
+    public createInternalTransfer(desc: string, amount: number, date: Date, id1: number, id2: number) {
         this.coinageData
             .postCreateInternalTransfer(
                 {

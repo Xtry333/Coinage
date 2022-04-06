@@ -6,7 +6,7 @@ services:
         env_file:
             - ./.env
         ports:
-            - 33060:3306
+            - 3306:3306
     coinage-api:
         build:
             context: .
