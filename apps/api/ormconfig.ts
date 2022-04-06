@@ -8,7 +8,7 @@ export default {
     name: 'default',
     type: 'mysql',
     host: process.env.MYSQL_HOST || 'localhost',
-    port: 3306,
+    port: process.env.COINAGE_MYSQL_PORT || 3306,
     username: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
@@ -18,7 +18,7 @@ export default {
     migrations: migrations,
     migrationsTransactionMode: 'all',
     entities: entities,
-    timezone: 'UTC',
+    timezone: 'Z',
     namingStrategy: new SnakeNamingStrategy(),
     cli: {
         migrationsDir: 'migrations',

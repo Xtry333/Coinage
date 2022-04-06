@@ -51,6 +51,12 @@ export class TransfersListComponent implements OnInit, OnDestroy {
             } else {
                 this.refreshData();
             }
+
+            window.scroll({
+                top: 0,
+                left: 0,
+                behavior: 'smooth',
+            });
         });
 
         this.refreshInterval = setInterval(() => this.refreshData(), TransfersListComponent.REFRESH_INTERVAL);
@@ -64,15 +70,14 @@ export class TransfersListComponent implements OnInit, OnDestroy {
     }
 
     public refreshData() {
-        Rx.zip(this.coinageData.getAllTransfers(this.filterParams))
-            .pipe(
-                finalize(() => {
-                    this.showPage = true;
-                })
-            )
-            .subscribe(([response]) => {
+        this.coinageData
+            .getAllFilteredTransfers(this.filterParams)
+            .then((response) => {
                 this.transfers = response.transfers;
                 this.totalCount = response.totalCount;
+            })
+            .finally(() => {
+                this.showPage = true;
             });
     }
 

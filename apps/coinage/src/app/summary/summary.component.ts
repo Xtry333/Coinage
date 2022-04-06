@@ -63,23 +63,23 @@ export class SummaryComponent implements OnInit {
             }
             if (this.isDateTargetDay) {
                 this.coinageData
-                    .getAllTransfers({
+                    .getAllFilteredTransfers({
                         page: 1,
                         rowsPerPage: 1000,
                         date: { from: this.datetime, to: this.datetime },
                     })
-                    .subscribe((response) => {
+                    .then((response) => {
                         this.transfers = response.transfers.filter((t) => t.date.getTime() === new Date(this.selectedDate).getTime());
                     });
             } else if (this.isDateTargetMonth) {
                 this.coinageData
-                    .getAllTransfers({
+                    .getAllFilteredTransfers({
                         page: 1,
                         rowsPerPage: 500,
                         date: { from: this.monthStartDate, to: this.monthEndDate },
                         showPlanned: true,
                     })
-                    .subscribe((response) => {
+                    .then((response) => {
                         this.transfers = response.transfers.filter(
                             (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
                         );

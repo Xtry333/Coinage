@@ -16,6 +16,10 @@ export class PartialDate {
         return new PartialDate(date.getFullYear(), date.getMonth() + 1, date.getDate());
     }
 
+    public static fromUTCDate(date: Date): PartialDate {
+        return new PartialDate(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate());
+    }
+
     /**
      * Full year (4 digits).
      */

@@ -21,7 +21,7 @@ import {
     TransferDetailsDTO,
 } from '@coinage-app/interfaces';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, lastValueFrom, map } from 'rxjs';
 import { plainToClass, plainToInstance } from 'class-transformer';
 
 import { Injectable } from '@angular/core';
@@ -52,22 +52,24 @@ export class CoinageDataService {
         );
     }
 
-    public getAllTransfers(filterParams?: GetFilteredTransfersRequest): Observable<FilteredTransfersDTO> {
-        return this.http
-            .post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfer/all`, filterParams)
-            .pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)));
+    public getAllFilteredTransfers(filterParams?: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
+        return lastValueFrom(
+            this.http
+                .post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfers/all`, filterParams)
+                .pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)))
+        );
     }
 
     public getRecentTransactions(): Observable<TransferDTO[]> {
-        return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfer/recent`).pipe(map((t) => plainToInstance(TransferDTO, t)));
+        return this.http.get<TransferDTO[]>(`${CoinageDataService.API_URL}transfers/recent`).pipe(map((t) => plainToInstance(TransferDTO, t)));
     }
 
-    public getTransferDetails(id: number): Observable<TransferDetailsDTO> {
-        return this.http.get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/details/${id}`);
+    public getTransferDetails(transferId: number): Promise<TransferDetailsDTO> {
+        return lastValueFrom(this.http.get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/details`).pipe(map((t) => plainToInstance(TransferDetailsDTO, t))));
     }
 
-    public getReceiptDetails(id: number): Observable<ReceiptDetailsDTO> {
-        return this.http.get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/details/${id}`);
+    public getReceiptDetails(transferId: number): Observable<ReceiptDetailsDTO> {
+        return this.http.get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/${transferId}/details`);
     }
 
     public getAccountMonthlyStats(): Observable<MonthlyUserStatsDTO[]> {
@@ -93,18 +95,18 @@ export class CoinageDataService {
     }
 
     public postCreateSaveTransaction(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {
-        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfers/save`, request);
     }
 
-    public refundTransfer(transferId: number, arg1: Date) {
+    public postRefundTransfer(transferId: number, date: Date) {
         const request: RefundTransferDTO = {
             refundTargetId: transferId,
-            refundDate: arg1.toISOString().slice(0, 10),
+            refundDate: date.toISOString().slice(0, 10),
         };
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/refund`, request);
     }
 
-    public duplicateTransfer(transferId: number) {
+    public postDuplicateTransfer(transferId: number) {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/duplicate`, {});
     }
 
@@ -123,12 +125,12 @@ export class CoinageDataService {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}contractor/save`, request);
     }
 
-    public deleteTransfer(id: number): Observable<boolean> {
-        return this.http.delete<boolean>(`${CoinageDataService.API_URL}transfer/${id}`);
+    public deleteTransfer(transferId: number): Observable<boolean> {
+        return this.http.delete<boolean>(`${CoinageDataService.API_URL}transfer/${transferId}`);
     }
 
-    public postSplitTransaction(request: SplitTransferDTO): Observable<BaseResponseDTO> {
-        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/split`, request);
+    public postSplitTransaction(transferId: number, request: SplitTransferDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/split`, request));
     }
 
     public getTotalPerCategory(year: number, month: number, day?: number): Observable<TotalInMonthByCategory[]> {

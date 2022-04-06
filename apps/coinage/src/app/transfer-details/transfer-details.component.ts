@@ -86,13 +86,13 @@ export class TransferDetailsComponent implements OnInit {
     public onClickSplitTransfer(): void {
         if (this.transfer)
             this.coinageData
-                .postSplitTransaction({
+                .postSplitTransaction(this.transfer.id, {
                     id: this.transfer.id,
                     description: this.splitTransfer.description,
                     amount: parseFloat(this.splitTransfer.amount?.toString()) ?? null,
                     categoryId: this.splitTransfer.categoryId,
                 })
-                .subscribe((result) => {
+                .then((result) => {
                     this.shouldShowSplit = false;
                     if (result.insertedId) {
                         this.navigator.goTo(NavigatorPages.TransferDetails(result.insertedId));
@@ -101,7 +101,7 @@ export class TransferDetailsComponent implements OnInit {
     }
 
     public onClickRefundTransfer(): void {
-        this.coinageData.refundTransfer(this.transfer.id, new Date()).subscribe((result) => {
+        this.coinageData.postRefundTransfer(this.transfer.id, new Date()).subscribe((result) => {
             if (result && result.insertedId) {
                 this.notificationService.push({
                     title: `Added Refund`,
@@ -118,7 +118,7 @@ export class TransferDetailsComponent implements OnInit {
     }
 
     public onClickDuplicateTransfer(): void {
-        this.coinageData.duplicateTransfer(this.transfer.id).subscribe((result) => {
+        this.coinageData.postDuplicateTransfer(this.transfer.id).subscribe((result) => {
             if (result && result.insertedId) {
                 this.notificationService.push({
                     title: `Transfer Duplicated`,

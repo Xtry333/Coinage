@@ -1,4 +1,4 @@
-import { TransferTypeEnum } from './interfaces';
+import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
 import { Type } from 'class-transformer';
 
 export class FilteredTransfersDTO {

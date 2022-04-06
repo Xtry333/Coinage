@@ -23,8 +23,8 @@ import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
-@Controller('transfers')
-export class TransfersController {
+@Controller('transfer')
+export class TransferController {
     constructor(
         private readonly transferDao: TransferDao,
         private readonly transfersService: TransfersService,
@@ -35,25 +35,118 @@ export class TransfersController {
         private readonly saveTransfersService: SaveTransfersService
     ) {}
 
-    @Post('all')
-    async getAllFilteredTransfers(@Body() filterParams: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
-        filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
-        filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
+    @Get(':transferId/details')
+    async getTransferDetails(@Param('transferId') transferId: number): Promise<TransferDetailsDTO> {
+        if (!transferId || transferId < 1) {
+            throw new Error('Invalid ID provided.');
+        }
 
-        const pagedTransfersDTOs = await this.transfersService.getAllFilteredPagedDTO(filterParams);
-        const totalCount = await this.transfersService.getAllFilteredCount(filterParams);
+        const transfer = await this.transferDao.getById(transferId);
+        console.log((transfer.date as any).toISOString());
+
+        const categoryPath: Category[] = [];
+        categoryPath.push(transfer.category);
+        let parentCat = (await transfer.category.parent) ?? null;
+        while (parentCat !== null) {
+            if (!categoryPath.find((cat) => cat.id === parentCat?.id)) {
+                categoryPath.push(parentCat);
+                parentCat = (await categoryPath[categoryPath.length - 1]?.parent) ?? null;
+            } else {
+                break;
+            }
+        }
+
+        let refundTransfer: Transfer | undefined;
+        try {
+            refundTransfer = transfer.metadata.refundedBy ? await this.transferDao.getById(Number(transfer.metadata.refundedBy)) : undefined;
+        } catch (e) {
+            console.log(e);
+            delete transfer.metadata.refundedBy;
+            this.transferDao.save(transfer);
+        }
+
+        const otherTransfers: TransferDTO[] = (await this.transferDao.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
+            .filter((t) => t.id !== transfer.id)
+            .map((t) => this.toTransferDTO(t));
+
+        const receipt: ReceiptDTO = {
+            id: transfer.receipt?.id ?? 0,
+            description: transfer.receipt?.description ?? '',
+            amount: transfer.receipt?.amount ?? null,
+            date: transfer.receipt?.date,
+            contractor: transfer.receipt?.contractor?.name ?? '',
+            transferIds: (await transfer.receipt?.transfers)?.map((t) => t.id) ?? [],
+        };
 
         return {
-            transfers: pagedTransfersDTOs,
-            totalCount: totalCount,
+            id: transfer.id,
+            description: transfer.description,
+            amount: Number(transfer.amount),
+            type: transfer.category.type,
+            createdDate: transfer.createdDate,
+            editedDate: transfer.editedDate,
+            contractor: transfer.contractor?.name,
+            contractorId: transfer.contractor?.id,
+            categoryId: transfer.category.id,
+            account: { id: transfer.account?.id ?? 0, name: transfer.account?.name ?? '' },
+            otherTransfers: otherTransfers,
+            receipt: receipt.id ? receipt : null,
+            date: transfer.date,
+            categoryPath: categoryPath.reverse().map((cat) => {
+                return { id: cat.id, name: cat.name };
+            }),
+            isPlanned: new Date(transfer.date) > new Date(),
+            refundedBy: refundTransfer?.id,
+            refundedOn: refundTransfer?.date.toJSON(),
+            isRefundable: !transfer.metadata.refundedBy && !transfer.metadata.refundTargetId,
         };
     }
 
-    @Get('recent')
-    public getRecentTransactions(): Promise<TransferDTO[]> {
-        const recentCount = 10;
-        const userId = 1;
-        return this.transfersService.getRecentTransfersForUserDTO(userId, recentCount);
+    private toTransferDTO(transfer: Transfer): TransferDTO {
+        return {
+            id: transfer.id,
+            description: transfer.description,
+            amount: transfer.amount,
+            type: transfer.type,
+            categoryId: transfer.category?.id,
+            categoryName: transfer.category?.name,
+            contractorId: transfer.contractor?.id ?? null,
+            contractorName: transfer.contractor?.name ?? null,
+            accountId: transfer.accountId,
+            accountName: transfer.account.name,
+            date: transfer.date,
+            receiptId: transfer.receiptId ?? null,
+        };
+    }
+
+    @Post(':transferId/commit')
+    async commitTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
+        if (!transferId || transferId < 1) {
+            throw new Error('Invalid ID provided.');
+        }
+
+        const transfer = await this.etherealTransferService.commit(transferId);
+        if (!transfer) {
+            throw new Error('Transfer not found');
+        }
+        return {
+            message: 'Transfer committed.',
+        };
+    }
+
+    @Post(':transferId/etherialize')
+    async stageTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
+        if (!transferId || transferId < 1) {
+            throw new Error('Invalid ID provided.');
+        }
+
+        const transfer = await this.etherealTransferService.stage(transferId);
+        if (!transfer) {
+            throw new Error('Transfer not found');
+        }
+        return {
+            message: 'Transfer committed.',
+        };
     }
 
     @Post('save')
@@ -102,11 +195,15 @@ export class TransfersController {
         return { insertedId: inserted.id };
     }
 
-    @Post('split')
-    async splitTransferObject(@Body() transfer: SplitTransferDTO): Promise<BaseResponseDTO> {
+    @Post(':transferId/split')
+    async splitTransferObject(@Param('transferId') transferId: number, @Body() transfer: SplitTransferDTO): Promise<BaseResponseDTO> {
+        if (!transferId || transferId < 1) {
+            throw new Error('Invalid ID provided.');
+        }
+
+        const target = await this.transferDao.getById(transferId);
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
-        const id = parseInt(transfer.id?.toString());
-        const target = await this.transferDao.getById(id);
+        
         target.amount = target.amount - transfer.amount;
         const entity = new Transfer();
         entity.description = transfer.description;
@@ -131,6 +228,76 @@ export class TransfersController {
         const inserted = await this.transferDao.insert(entity);
         await this.transferDao.save(target);
         return { insertedId: inserted.identifiers[0].id };
+    }
+
+    @Post(':transferId/refund')
+    async refundTransfer(@Param('transferId') transferId: number, @Body() refundDTO: RefundTransferDTO): Promise<BaseResponseDTO> {
+        if (!transferId || transferId < 1) {
+            throw new Error('Invalid ID provided.');
+        }
+
+        const refundTargetId = Math.floor(Number(refundDTO.refundTargetId));
+        const refundDate = new Date(refundDTO.refundDate);
+
+        const transfer = await this.transferDao.getById(transferId);
+
+        const refundCategory = await this.categoryDao.getBySystemTag('system-refund');
+
+        if (!transfer) {
+            throw new Error('Invalid Transfer ID.');
+        }
+
+        if (transfer.metadata.refundedBy || transfer.metadata.refundTargetId) {
+            throw new Error('Cannot refund a refund or a refund target.');
+        }
+        const refundTransferEntity = new Transfer();
+        refundTransferEntity.description = `Refund: ${transfer.description}`;
+        refundTransferEntity.amount = transfer.amount;
+        refundTransferEntity.type = refundCategory.type;
+        refundTransferEntity.categoryId = refundCategory.id;
+        refundTransferEntity.date = refundDate;
+        refundTransferEntity.accountId = transfer.accountId;
+        refundTransferEntity.metadata.refundTargetId = refundTargetId;
+        refundTransferEntity.contractor = transfer.contractor;
+        refundTransferEntity.receipt = transfer.receipt;
+
+        const inserted = await this.transferDao.save(refundTransferEntity);
+
+        transfer.metadata.refundedBy = inserted.id;
+
+        await this.transferDao.save(transfer);
+        return { insertedId: inserted.id, message: `Succesfully saved refund of ${transfer.description} #${transfer.id}.` };
+    }
+
+    @Post(':transferId/duplicate')
+    async duplicateTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
+        if (!transferId || transferId < 1) {
+            throw new Error('Invalid ID provided.');
+        }
+
+        const transfer = await this.transferDao.getById(transferId);
+
+        if (!transfer) {
+            throw new Error('Invalid Transfer ID.');
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (transfer as any).id = undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (transfer as any).createdDate = undefined;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (transfer as any).editedDate = undefined;
+        transfer.metadata.refundedBy = undefined;
+
+        const inserted = await this.transferDao.save(transfer);
+        return { insertedId: inserted.id };
+    }
+
+    @Delete(':id')
+    async removeTransferObject(@Param('id') id: number) {
+        // TODO: On remove delete refundedBy metadata from target
+        //const refundTransfer = transfer.metadata.refundedBy ? await this.transferDao.getById(Number(transfer.metadata.refundedBy)) : undefined;
+        return (await this.transferDao.deleteById(id)).affected == 1;
     }
 
     @Get('/weekly/:id')

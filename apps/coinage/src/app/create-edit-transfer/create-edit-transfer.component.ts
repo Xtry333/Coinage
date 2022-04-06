@@ -64,9 +64,10 @@ export class CreateEditTransferComponent implements OnInit {
             const id = parseInt(params.id);
             if (id) {
                 this.transferId = id;
-                this.coinageData.getTransferDetails(id).subscribe((transfer) => {
+                this.coinageData.getTransferDetails(id).then((transfer) => {
                     this.transferDTO = transfer;
                     this.editMode = true;
+                    console.log(transfer);
                     this.selectedTransferInputs = {
                         amount: transfer.amount,
                         categoryId: transfer.categoryId,

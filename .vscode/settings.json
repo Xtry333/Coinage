@@ -8,5 +8,6 @@
         "**/Thumbs.db": true,
         "**/node_modules": true
     },
-    "editor.fontSize": 12
+    "editor.fontSize": 11,
+    "files.autoSave": "afterDelay"
 }
