@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGenerat
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 
 import { Account } from './Account.entity';
-import { BooleanTransformer } from '@anchan828/typeorm-transformers';
+import { BooleanTransformer } from './transformers/boolean.transformer';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
 import { Receipt } from './Receipt.entity';

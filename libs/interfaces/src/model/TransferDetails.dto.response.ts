@@ -22,6 +22,7 @@ export class TransferDetailsDTO {
     refundedOn?: string;
     isPlanned!: boolean;
     isRefundable!: boolean;
+    isEthereal!: boolean;
 }
 
 export enum TransferTypeEnum {

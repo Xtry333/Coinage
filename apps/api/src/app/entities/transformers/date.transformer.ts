@@ -3,6 +3,7 @@ import { FindOperator, ValueTransformer } from 'typeorm';
 export const enum DateTransformerType {
     DATETIME = 'datetime',
     DATE = 'date',
+    // TIMESTAMP = 'timestamp',
 }
 
 export class DateTransformer implements ValueTransformer {

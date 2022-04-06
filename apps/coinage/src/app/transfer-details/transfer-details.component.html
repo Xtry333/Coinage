@@ -10,7 +10,12 @@
     <table class="transfer-details-table">
         <tr>
             <th>Description</th>
-            <td>{{ transfer?.description }}</td>
+            <td>
+                <span>{{ transfer?.description }}</span>
+                <span *ngIf="transfer.isEthereal" (click)="onClickCommit()" class="planned-icon btn">
+                    <fa-icon [icon]="etherealIcon" [fixedWidth]="true" title="Transfer has not been commited"></fa-icon>
+                </span>
+            </td>
         </tr>
         <tr *ngIf="transfer.receipt">
             <th>Receipt</th>

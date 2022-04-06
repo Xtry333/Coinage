@@ -5,7 +5,7 @@ import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, Transf
 import { Component, Input, OnInit } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 import { catchError, finalize } from 'rxjs/operators';
-import { faClock, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faFeatherAlt, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 
 import { CoinageDataService } from '../services/coinage.data-service';
 import { IconDefinition } from '@fortawesome/fontawesome-common-types';
@@ -20,6 +20,7 @@ export class TransferDetailsComponent implements OnInit {
     plannedIcon: IconDefinition = faClock;
     receiptIcon: IconDefinition = faReceipt;
     refundedIcon: IconDefinition = faReply;
+    etherealIcon: IconDefinition = faFeatherAlt;
     showPage = false;
     transfer!: TransferDetailsDTO;
 
@@ -133,6 +134,16 @@ export class TransferDetailsComponent implements OnInit {
     public onClickEditMode(): void {
         if (this.transfer) {
             this.navigator.goTo(NavigatorPages.TransferEdit(this.transfer.id));
+        }
+    }
+
+    public onClickCommit(): void {
+        if (this.transfer) {
+            this.coinageData.postCommitTransfer(this.transfer.id).finally(() => {
+                this.router
+                    .navigateByUrl(`/`, { skipLocationChange: true })
+                    .then(() => this.router.navigateByUrl(NavigatorPages.TransferDetails(this.transfer.id), { skipLocationChange: true }));
+            });
         }
     }
 

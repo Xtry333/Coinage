@@ -42,7 +42,6 @@ export class TransferController {
         }
 
         const transfer = await this.transferDao.getById(transferId);
-        console.log((transfer.date as any).toISOString());
 
         const categoryPath: Category[] = [];
         categoryPath.push(transfer.category);
@@ -95,10 +94,11 @@ export class TransferController {
             categoryPath: categoryPath.reverse().map((cat) => {
                 return { id: cat.id, name: cat.name };
             }),
-            isPlanned: new Date(transfer.date) > new Date(),
+            isPlanned: transfer.date > new Date(),
             refundedBy: refundTransfer?.id,
             refundedOn: refundTransfer?.date.toJSON(),
             isRefundable: !transfer.metadata.refundedBy && !transfer.metadata.refundTargetId,
+            isEthereal: transfer.isEthereal,
         };
     }
 
@@ -134,7 +134,7 @@ export class TransferController {
         };
     }
 
-    @Post(':transferId/etherialize')
+    @Post(':transferId/stage')
     async stageTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
         if (!transferId || transferId < 1) {
             throw new Error('Invalid ID provided.');
@@ -203,7 +203,7 @@ export class TransferController {
 
         const target = await this.transferDao.getById(transferId);
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
-        
+
         target.amount = target.amount - transfer.amount;
         const entity = new Transfer();
         entity.description = transfer.description;

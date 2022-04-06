@@ -14,17 +14,16 @@ import {
     MonthlyUserStatsDTO,
     ReceiptDetailsDTO,
     RefundTransferDTO,
-    SaveTransferDTO,
     SplitTransferDTO,
     TotalInMonthByCategory,
     TransferDTO,
     TransferDetailsDTO,
 } from '@coinage-app/interfaces';
-import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, lastValueFrom, map } from 'rxjs';
-import { plainToClass, plainToInstance } from 'class-transformer';
 
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable({
     providedIn: 'root',
@@ -65,7 +64,19 @@ export class CoinageDataService {
     }
 
     public getTransferDetails(transferId: number): Promise<TransferDetailsDTO> {
-        return lastValueFrom(this.http.get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/details`).pipe(map((t) => plainToInstance(TransferDetailsDTO, t))));
+        return lastValueFrom(
+            this.http
+                .get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/details`)
+                .pipe(map((t) => plainToInstance(TransferDetailsDTO, t)))
+        );
+    }
+
+    public postCommitTransfer(transferId: number): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/commit`, {}));
+    }
+
+    public postStageTransfer(transferId: number): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/stage`, {}));
     }
 
     public getReceiptDetails(transferId: number): Observable<ReceiptDetailsDTO> {

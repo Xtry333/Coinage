@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Timestamp } from 'typeorm';
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 
-import { BooleanTransformer } from '@anchan828/typeorm-transformers';
+import { BooleanTransformer } from './transformers/boolean.transformer';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
 import { User } from './User.entity';
 
