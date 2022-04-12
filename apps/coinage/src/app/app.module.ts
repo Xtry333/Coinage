@@ -73,8 +73,8 @@ Chart.register(zoomPlugin);
     ],
     imports: [
         BrowserModule,
-        BrowserAnimationsModule,
         HttpClientModule,
+        BrowserAnimationsModule,
         RouterModule,
         AppRoutingModule,
         NgSelectModule,
