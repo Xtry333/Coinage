@@ -6,12 +6,12 @@
     <coinage-app-pagination class="pull-right" *ngIf="showFilters && lastPageNumber" [lastPage]="lastPageNumber"></coinage-app-pagination>
     <table class="transfers-table">
         <caption *ngIf="isHeaderDisplayed">
-            <span>{{ tableHeader }}</span>
+            <span>{{ header }}</span>
         </caption>
         <thead>
             <tr>
                 <th class="align-left">
-                    Category
+                    <span>Category</span>
                     <coinage-app-table-filter
                         *ngIf="showFilters"
                         [filterName]="TableColumn.Category"
@@ -23,7 +23,7 @@
                     ></coinage-app-table-filter>
                 </th>
                 <th>
-                    Description
+                    <span>Description</span>
                     <coinage-app-table-filter
                         *ngIf="showFilters"
                         [filterName]="TableColumn.Description"
@@ -34,7 +34,7 @@
                     ></coinage-app-table-filter>
                 </th>
                 <th>
-                    Contractor
+                    <span>Contractor</span>
                     <coinage-app-table-filter
                         *ngIf="showFilters"
                         [filterName]="TableColumn.Contractor"
@@ -46,7 +46,7 @@
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
-                    Amount
+                    <span>Amount</span>
                     <coinage-app-table-filter
                         *ngIf="showFilters"
                         [filterName]="TableColumn.Amount"
@@ -56,7 +56,7 @@
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
-                    Account
+                    <span>Account</span>
                     <coinage-app-table-filter
                         *ngIf="showFilters"
                         [filterName]="TableColumn.Account"
@@ -68,7 +68,7 @@
                     ></coinage-app-table-filter>
                 </th>
                 <th class="align-right">
-                    Date
+                    <span>Date</span>
                     <coinage-app-table-filter
                         *ngIf="showFilters"
                         [filterName]="TableColumn.Date"
@@ -96,9 +96,9 @@
                     <td>
                         {{ transfer.contractorName | undefined: EMPTY_CONTRACTOR }}
                     </td>
-                    <td class="currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
+                    <td class="nowrap currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
                     <td>{{ transfer.accountName }}</td>
-                    <td class="align-right nowrap">
+                    <td class="nowrap align-right">
                         <a [routerLink]="NavigatorPages.SummaryFullDate(transfer.date)">{{ transfer.date | date }}</a>
                     </td>
                 </ng-container>

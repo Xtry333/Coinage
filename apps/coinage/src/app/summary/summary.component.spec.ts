@@ -5,18 +5,18 @@ import { ApiPathsModule } from '@coinage-app/router';
 import { AppRoutingModule } from '../app-routing/app-routing.module';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { MonthSummaryComponent } from './summary.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { SummaryComponent } from './summary.component';
 import { of } from 'rxjs';
 
 describe('Summary Component', () => {
-    let component: SummaryComponent;
-    let fixture: ComponentFixture<SummaryComponent>;
+    let component: MonthSummaryComponent;
+    let fixture: ComponentFixture<MonthSummaryComponent>;
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
             imports: [RouterTestingModule, HttpClientTestingModule],
-            declarations: [SummaryComponent],
+            declarations: [MonthSummaryComponent],
             providers: [
                 AppRoutingModule,
                 ApiPathsModule,
@@ -51,7 +51,7 @@ describe('Summary Component', () => {
                     });
                 })
         );
-        fixture = TestBed.createComponent(SummaryComponent);
+        fixture = TestBed.createComponent(MonthSummaryComponent);
         component = fixture.componentInstance;
         fixture.detectChanges();
     });

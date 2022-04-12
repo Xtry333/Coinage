@@ -79,8 +79,12 @@ export class CoinageDataService {
         return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/stage`, {}));
     }
 
-    public getReceiptDetails(transferId: number): Observable<ReceiptDetailsDTO> {
-        return this.http.get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/${transferId}/details`);
+    public getReceiptDetails(transferId: number): Promise<ReceiptDetailsDTO> {
+        return lastValueFrom(
+            this.http
+                .get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/${transferId}/details`)
+                .pipe(map((t) => plainToInstance(ReceiptDetailsDTO, t)))
+        );
     }
 
     public getAccountMonthlyStats(): Observable<MonthlyUserStatsDTO[]> {

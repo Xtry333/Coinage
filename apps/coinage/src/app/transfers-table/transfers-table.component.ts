@@ -62,7 +62,7 @@ export interface TableFilterFields {
 export type UiTransfer = TransferDTO & { typeSymbol: string; isTodayMarkerRow?: boolean };
 
 @Component({
-    selector: 'coinage-app-transfers-table',
+    selector: 'coinage-app-transfers-table[transfers]',
     templateUrl: './transfers-table.component.html',
     styleUrls: ['./transfers-table.component.scss'],
 })
@@ -93,8 +93,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     currentPage = 1;
 
-    @Input() tableHeader?: string;
-    @Input() transfers?: TransferDTO[];
+    @Input() header?: string;
+    @Input() transfers!: TransferDTO[];
     @Input() showFilters?: boolean = false;
     @Input() showSummary?: boolean = true;
     @Input() showReceiptIcon?: boolean = true;
@@ -102,7 +102,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     @Input() filterCachePath?: string;
     @Input() lastPageNumber?: number;
 
-    @Output() public tableFilterEvent = new EventEmitter<TableFilterFields>();
+    @Output() public tableFilter = new EventEmitter<TableFilterFields>();
 
     constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
 
@@ -163,7 +163,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             this.localStorage.setObject(this.filterCachePath, this.filter);
         }
         this.currentPage = 1;
-        this.tableFilterEvent.emit(this.filter);
+        this.tableFilter.emit(this.filter);
         this.doFiltering();
     }
 
@@ -224,7 +224,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     }
 
     get isHeaderDisplayed(): boolean {
-        return this.tableHeader !== undefined;
+        return this.header !== undefined;
     }
 
     get noRowsFound(): boolean {
@@ -240,7 +240,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         if (this.filterCachePath) {
             this.localStorage.setObject(this.filterCachePath, this.filter);
         }
-        this.tableFilterEvent.emit(this.filter);
+        this.tableFilter.emit(this.filter);
         this.doFiltering();
     }
 

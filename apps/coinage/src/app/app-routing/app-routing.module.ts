@@ -1,14 +1,15 @@
-import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
 import { RouterModule, Routes } from '@angular/router';
-import { DashboardComponent } from '../dashboard/dashboard.component';
+
 import { BrowserModule } from '@angular/platform-browser';
-import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
-import { SummaryComponent } from '../summary/summary.component';
+import { CommonModule } from '@angular/common';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
-import { TransfersListComponent } from '../transfers-list/transfers-list.component';
+import { DashboardComponent } from '../dashboard/dashboard.component';
+import { MonthSummaryComponent } from '../summary/summary.component';
+import { NgModule } from '@angular/core';
 import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
+import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
+import { TransfersListComponent } from '../transfers-list/transfers-list.component';
 
 const routes: Routes = [
     {
@@ -45,8 +46,8 @@ const routes: Routes = [
         component: CreateEditTransferComponent,
     },
     {
-        path: 'summary/:partialDate',
-        component: SummaryComponent,
+        path: 'summary/:month',
+        component: MonthSummaryComponent,
     },
     {
         path: 'manage/categories',

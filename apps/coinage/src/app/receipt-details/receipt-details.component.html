@@ -4,7 +4,7 @@
             <th>Description</th>
             <td>{{ receiptDetails?.description }}</td>
         </tr>
-        <tr>
+        <tr *ngIf="receiptDetails.amount">
             <th>Amount</th>
             <td>
                 <span>{{ receiptDirectionDisplaySymbol }} {{ receiptDetails.amount | plnCurrency }}</span>
@@ -35,7 +35,7 @@
         </tr>
     </table>
     <coinage-app-transfers-table
-        [tableHeader]="'Transfers in receipt'"
+        [header]="'Transfers in receipt'"
         [transfers]="receiptDetails.allTransfers"
         [showFilters]="false"
         [showSummary]="false"

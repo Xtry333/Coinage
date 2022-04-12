@@ -1,8 +1,8 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { Range } from '@coinage-app/interfaces';
-import { faCaretDown, faEdit, faFilter, IconDefinition } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faCaretDown, faEdit, faFilter } from '@fortawesome/free-solid-svg-icons';
 
 import { CoinageLocalStorageService } from '../../services/coinage-local-storage.service';
+import { Range } from '@coinage-app/interfaces';
 
 export enum FilterType {
     TextBox = 'TextBox',
@@ -51,7 +51,7 @@ export interface FilterOption {
 }
 
 @Component({
-    selector: 'coinage-app-table-filter',
+    selector: 'coinage-app-table-filter[filterName]',
     templateUrl: './table-filter.component.html',
     styleUrls: ['./table-filter.component.scss'],
 })
@@ -75,7 +75,7 @@ export class TableFilterComponent implements OnInit {
 
     @Input() public popupSide = PopupSide.ToRight;
     @Input() public filterType = FilterType.TextBox;
-    @Input() public filterName = '';
+    @Input() public filterName!: string;
     @Input() public datalist: string[] = [];
     @Input() public cachedFilterPrefix?: string;
     @Input() public cachedFilterValue?: string;

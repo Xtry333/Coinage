@@ -8,13 +8,14 @@
 
         <coinage-app-transfers-table
             [transfers]="lastTransactions"
-            [tableHeader]="'Recently Edited Transfers'"
+            [header]="'Recently Edited Transfers'"
             [showTodayMarker]="false"
         ></coinage-app-transfers-table>
         <div>
             <p>Average Income ({{ this.averageAmountLimit }} months): {{ rollingAverageIncomes | plnCurrency }}</p>
             <p>Average Outcome ({{ this.averageAmountLimit }}) months): {{ rollingAverageOutcomes | plnCurrency }}</p>
         </div>
+        <coinage-app-chart [datasets]="accountStatsChartData" [labels]="accountStatsChartLabels"></coinage-app-chart>
         <table class="last-transactions-table">
             <caption>
                 Total In/Outcomes per Month
@@ -46,13 +47,5 @@
                 </tr>
             </tbody>
         </table>
-        <canvas
-            baseChart
-            [datasets]="accountStatsChartData"
-            [labels]="accountStatsChartLabels"
-            [options]="accountStatsChartOptions"
-            [legend]="true"
-            [type]="'line'"
-        ></canvas>
     </div>
 </div>

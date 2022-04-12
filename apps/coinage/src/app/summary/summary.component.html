@@ -18,6 +18,22 @@
         </dd>
     </dl> -->
 
+    <br />
+    <div class="summary-chart-container">
+        <coinage-app-chart [header]="monthName" [datasets]="summaryChartData" [labels]="summaryChartLabels" [options]="summaryChartOptions"></coinage-app-chart>
+    </div>
+    <div>
+        <input type="month" [(ngModel)]="selectedMonth" (ngModelChange)="onMonthChange()" />
+    </div>
+    <button *ngIf="shouldShowGoUpButton()" (click)="goUp()">Go Up</button>
+    <div *ngIf="isDateTargetDay || isDateTargetMonth">
+        <coinage-app-transfers-table
+            [transfers]="transfers"
+            [header]="tableHeader"
+            [showFilters]="true"
+            (tableFilter)="onTableFilter($event)"
+        ></coinage-app-transfers-table>
+    </div>
     <table class="last-transactions-table">
         <thead>
             <tr>
@@ -34,11 +50,4 @@
             </tr>
         </tbody>
     </table>
-    <br />
-    {{ datetime.toLocaleString('pl', { month: '2-digit', day: 'numeric', year: 'numeric' }) }}
-    <input type="date" [(ngModel)]="selectedDate" (ngModelChange)="onDateChange()" />
-    <button *ngIf="shouldShowGoUpButton()" (click)="goUp()">Go Up</button>
-    <div *ngIf="isDateTargetDay || isDateTargetMonth">
-        <coinage-app-transfers-table [transfers]="transfers" [tableHeader]="tableHeader" [showFilters]="false"></coinage-app-transfers-table>
-    </div>
 </div>

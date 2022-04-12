@@ -33,40 +33,40 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public NavigatorPages = NavigatorPages;
 
     public accountStatsChartData: ChartDataset[] = [
-        { data: [], label: 'Outcomes' },
-        { data: [], label: 'Incomes' },
-        { data: [], label: 'Balance' },
+        { data: [], label: 'Outcomes', type: 'bar', stack: 'change', barPercentage: 0.33, inflateAmount: 0.33 },
+        { data: [], label: 'Incomes', type: 'bar', stack: 'change', barPercentage: 0.33, inflateAmount: 0.33 },
+        { data: [], label: 'Balance', type: 'line', order: -1 },
     ];
 
     public accountStatsChartLabels: string[] = [];
 
-    public accountStatsChartOptions: ChartOptions = {
-        responsive: true,
-        onClick: (event, activeElements) => console.log(activeElements[0]?.datasetIndex, activeElements[0]?.index),
-        elements: {
-            line: {
-                tension: 0.3,
-            },
-        },
-        plugins: {
-            // zoom: {
-            //     pan: {
-            //         enabled: true,
-            //         mode: 'xy',
-            //     },
-            //     zoom: {
-            //         wheel: {
-            //             enabled: true,
-            //         },
-            //         overScaleMode: 'y',
-            //     },
-            //     limits: {
-            //         x: { min: 0, max: 2, minRange: 50 },
-            //         y: { min: 0, max: 50000, minRange: 50 },
-            //     },
-            // },
-        },
-    };
+    // public accountStatsChartOptions: ChartOptions = {
+    //     responsive: true,
+    //     onClick: (event, activeElements) => console.log(activeElements[0]?.datasetIndex, activeElements[0]?.index),
+    //     elements: {
+    //         line: {
+    //             tension: 0.3,
+    //         },
+    //     },
+    //     plugins: {
+    //         // zoom: {
+    //         //     pan: {
+    //         //         enabled: true,
+    //         //         mode: 'xy',
+    //         //     },
+    //         //     zoom: {
+    //         //         wheel: {
+    //         //             enabled: true,
+    //         //         },
+    //         //         overScaleMode: 'y',
+    //         //     },
+    //         //     limits: {
+    //         //         x: { min: 0, max: 2, minRange: 50 },
+    //         //         y: { min: 0, max: 50000, minRange: 50 },
+    //         //     },
+    //         // },
+    //     },
+    // };
 
     message = '';
     transactionId = 0;
@@ -151,7 +151,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 this.totalAmountPerMonth = this.mapToUiOutcome(stats);
                 // this.balanceMainAccount = balance[0].balance;
                 // this.balanceSecondary = balance[1].balance;
-                this.accountStatsChartData[0].data = this.totalAmountPerMonth.map((item) => item.outcomes).reverse();
+                this.accountStatsChartData[0].data = this.totalAmountPerMonth.map((item) => -item.outcomes).reverse();
                 this.accountStatsChartData[1].data = this.totalAmountPerMonth.map((item) => item.incomes).reverse();
                 this.accountStatsChartData[2].data = this.totalAmountPerMonth.map((item) => item.balance).reverse();
                 this.accountStatsChartLabels = this.totalAmountPerMonth.map((item) => `${item.monthName} ${item.year}`).reverse();

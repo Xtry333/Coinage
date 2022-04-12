@@ -1,11 +1,11 @@
 <div *ngIf="showPage">
     <coinage-app-transfers-table
         [transfers]="transfers"
-        [tableHeader]="'All Transfers'"
+        [header]="'All Transfers'"
         [showFilters]="true"
         [filterCachePath]="TRANSFERS_FILTER_CACHE_PATH"
         [lastPageNumber]="lastPageNumber"
-        (tableFilterEvent)="onPerformFilter($event)"
+        (tableFilter)="onPerformFilter($event)"
     ></coinage-app-transfers-table>
     <coinage-app-auto-pagination (endOfPage)="onEndOfPage()"></coinage-app-auto-pagination>
 </div>

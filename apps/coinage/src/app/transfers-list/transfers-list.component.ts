@@ -6,7 +6,7 @@ import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/in
 import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
-import { TableFilterFields } from '../transfer-table/transfers-table.component';
+import { TableFilterFields } from '../transfers-table/transfers-table.component';
 import { finalize } from 'rxjs/operators';
 
 interface TransfersListQueryParams {

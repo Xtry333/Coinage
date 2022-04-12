@@ -86,7 +86,7 @@ export class TransfersController {
             };
             // throw new Error(`Cannot find category ${transfer.categoryId}`);
         }
-        entity.description = transfer.description === undefined ? category?.name : transfer.description;
+        entity.description = transfer.description === undefined || transfer.description.length === 0 ? category?.name : transfer.description;
         entity.account = account;
         delete entity.contractor; // = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
         entity.contractorId = transfer.contractorId;

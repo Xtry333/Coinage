@@ -26,8 +26,8 @@ export class NavigatorService {
         this.router.navigateByUrl(url);
     }
 
-    public goTo(url: string): Promise<boolean> {
-        return this.router.navigateByUrl(url);
+    public goTo(url: string, skipLocationChange = false): Promise<boolean> {
+        return this.router.navigateByUrl(url, { skipLocationChange });
     }
 
     public goToNotFoundPage(): Promise<boolean> {

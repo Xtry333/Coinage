@@ -2,7 +2,7 @@ import * as Rx from 'rxjs';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 import { catchError, finalize } from 'rxjs/operators';
 import { faClock, faFeatherAlt, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
@@ -16,20 +16,21 @@ import { NotificationService } from '../services/notification.service';
     templateUrl: './transfer-details.component.html',
     styleUrls: ['./transfer-details.component.scss'],
 })
-export class TransferDetailsComponent implements OnInit {
+export class TransferDetailsComponent implements OnInit, OnDestroy {
     plannedIcon: IconDefinition = faClock;
     receiptIcon: IconDefinition = faReceipt;
     refundedIcon: IconDefinition = faReply;
     etherealIcon: IconDefinition = faFeatherAlt;
+
     showPage = false;
     transfer!: TransferDetailsDTO;
 
     public NavigatorPages = NavigatorPages;
 
-    @Input()
     splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
     totalPayment = 0;
     shouldShowSplit = false;
+    routeSubscription!: Rx.Subscription;
 
     categories: CategoryDTO[] = [];
 
@@ -41,47 +42,56 @@ export class TransferDetailsComponent implements OnInit {
         private readonly notificationService: NotificationService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.showPage = false;
-        // this.route.paramMap.toPromise();
-        this.route.paramMap.subscribe((params) => {
+        this.routeSubscription = this.route.paramMap.subscribe((params) => {
             const id = parseInt(params.get('id') ?? '');
             if (id) {
-                Rx.zip(this.coinageData.getTransferDetails(id), this.coinageData.getCategoryList())
-                    .pipe(
-                        catchError(() => {
-                            this.notificationService.push({
-                                title: 'Error',
-                                message: 'Transfer not found',
-                            });
-                            this.navigator.goTo(NavigatorPages.Dashboard());
-                            throw 404;
-                        }),
-                        finalize(() => {
-                            this.showPage = true;
-                        })
-                    )
-                    .subscribe(([transfer, categories]: [TransferDetailsDTO, CategoryDTO[]]) => {
-                        console.log(transfer);
-                        this.transfer = transfer;
-                        //(this.transfer.date as any) = new Date(transfer.date)
-                        this.totalPayment =
-                            transfer.amount * TransferType[transfer.type].mathSymbol +
-                            transfer.otherTransfers.reduce((a, t) => a + t.amount * TransferType[t.type].mathSymbol, 0);
-                        this.categories = categories;
-                        this.splitTransfer.amount = +(transfer.amount / 2).toFixed(2);
-                        this.splitTransfer.categoryId = transfer.categoryPath[transfer.categoryPath.length - 1].id;
-                        this.splitTransfer.description = transfer.description;
-                        console.log(this.transfer.otherTransfers);
-                    });
+                this.loadTransferDetails(id);
             } else {
                 this.navigator.goToNotFoundPage();
             }
         });
     }
 
+    public ngOnDestroy(): void {
+        this.routeSubscription.unsubscribe();
+    }
+
+    private loadTransferDetails(id: number): void {
+        this.coinageData
+            .getTransferDetails(id)
+            .then((transfer) => {
+                this.transfer = transfer;
+                this.totalPayment =
+                    transfer.amount * TransferType[transfer.type].mathSymbol +
+                    transfer.otherTransfers.reduce((a, t) => a + t.amount * TransferType[t.type].mathSymbol, 0);
+
+                console.log(this.transfer.otherTransfers);
+            })
+            .catch(() => {
+                this.notificationService.push({
+                    title: 'Error',
+                    message: 'Transfer not found',
+                });
+                this.navigator.goTo(NavigatorPages.Dashboard());
+                throw 404;
+            })
+            .finally(() => {
+                this.showPage = true;
+            });
+    }
+
     public onToggleShowSplit(): void {
         this.shouldShowSplit = !this.shouldShowSplit;
+        if (this.shouldShowSplit) {
+            this.splitTransfer.amount = +(this.transfer.amount / 2).toFixed(2);
+            this.splitTransfer.categoryId = this.transfer.categoryPath[this.transfer.categoryPath.length - 1].id;
+            this.splitTransfer.description = this.transfer.description;
+            Rx.lastValueFrom(this.coinageData.getCategoryList()).then((categories) => {
+                this.categories = categories;
+            });
+        }
     }
 
     public onClickSplitTransfer(): void {
@@ -110,10 +120,7 @@ export class TransferDetailsComponent implements OnInit {
                     linkTo: NavigatorPages.TransferDetails(result.insertedId),
                 });
 
-                // TODO: Find better way to reload page/data after creating a refund
-                this.router
-                    .navigateByUrl(`/`, { skipLocationChange: true })
-                    .then(() => this.router.navigateByUrl(NavigatorPages.TransferDetails(this.transfer.id), { skipLocationChange: true }));
+                this.loadTransferDetails(this.transfer.id);
             }
         });
     }
@@ -126,14 +133,14 @@ export class TransferDetailsComponent implements OnInit {
                     message: 'Remember to save edited transfer',
                 });
 
-                this.navigator.goTo(NavigatorPages.TransferEdit(result.insertedId));
+                this.navigator.goTo(NavigatorPages.TransferEdit(result.insertedId), true);
             }
         });
     }
 
     public onClickEditMode(): void {
         if (this.transfer) {
-            this.navigator.goTo(NavigatorPages.TransferEdit(this.transfer.id));
+            this.navigator.goTo(NavigatorPages.TransferEdit(this.transfer.id), true);
         }
     }
 

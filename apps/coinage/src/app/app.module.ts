@@ -10,6 +10,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
 import { CategoryManagerComponent } from './category-manager/category-manager.component';
 import { Chart } from 'chart.js';
+import { ChartComponent } from './components/chart/chart.component';
 import { CreateEditCategoryComponent } from './category-manager/create-edit-category/create-edit-category.component';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
@@ -18,6 +19,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { MathAbsPipe } from './pipes/math-abs.pipe';
 import { ModalComponent } from './components/modal/modal.component';
+import { MonthSummaryComponent } from './summary/summary.component';
 import { NetworkInterceptor } from './loaderGadget/network.interceptor';
 import { NgChartsModule } from 'ng2-charts';
 import { NgModule } from '@angular/core';
@@ -32,11 +34,10 @@ import { ReplacePipe } from './pipes/replace.pipe';
 import { RouterModule } from '@angular/router';
 import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
 import { StatisticsComponent } from './statistics/statistics.component';
-import { SummaryComponent } from './summary/summary.component';
-import { TableFilterComponent } from './transfer-table/table-filter/table-filter.component';
+import { TableFilterComponent } from './transfers-table/table-filter/table-filter.component';
 import { TransferDetailsComponent } from './transfer-details/transfer-details.component';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
-import { TransfersTableComponent } from './transfer-table/transfers-table.component';
+import { TransfersTableComponent } from './transfers-table/transfers-table.component';
 import zoomPlugin from 'chartjs-plugin-zoom';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
@@ -49,7 +50,7 @@ Chart.register(zoomPlugin);
         ...pipes,
         AppComponent,
         DashboardComponent,
-        SummaryComponent,
+        MonthSummaryComponent,
         TransferDetailsComponent,
         ReceiptDetailsComponent,
         SpinnerComponent,
@@ -68,6 +69,7 @@ Chart.register(zoomPlugin);
         PaginationComponent,
         AutoPaginationComponent,
         CreateEditCategoryComponent,
+        ChartComponent,
     ],
     imports: [
         BrowserModule,

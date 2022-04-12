@@ -1,9 +1,12 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
+import { BalanceDTO, TransferDTO, TransferTypeEnum } from '@coinage-app/interfaces';
+import { ChartDataset, ChartOptions } from 'chart.js';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
+import { Subscription, lastValueFrom } from 'rxjs';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { TransferDTO } from '@coinage-app/interfaces';
+import { TableFilterFields } from '../transfers-table/transfers-table.component';
 
 export interface UiTotalInMonthByCategory {
     categoryName: string;
@@ -17,27 +20,43 @@ export interface UiTotalInMonthByCategory {
     templateUrl: './summary.component.html',
     styleUrls: ['./summary.component.scss'],
 })
-export class SummaryComponent implements OnInit {
+export class MonthSummaryComponent implements OnInit, OnDestroy {
     showPage = false;
     partedDate!: PartedDate;
     datetime!: Date;
     datePartsArray!: string[];
     selectedDate!: string;
+    selectedMonth!: string;
     outcomesPerCategory: UiTotalInMonthByCategory[] = [];
     transfers: TransferDTO[] = [];
+    tableFilterParams: TableFilterFields = {};
+
+    routeSubscription?: Subscription;
+
+    public summaryChartData: ChartDataset[] = [];
+    public summaryChartLabels: string[] = [];
+    public summaryChartOptions: ChartOptions = {
+        animation: false,
+    };
 
     constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly coinageData: CoinageDataService,
         private readonly partedDateService: DateParserService
-    ) {}
+    ) {
+        console.log(this);
+    }
 
     ngOnInit(): void {
-        this.showPage = false;
-        this.route.paramMap.subscribe((params) => {
-            this.showPage = false;
-            this.datePartsArray = params.get('partialDate')?.split('-') ?? [];
+        this.routeSubscription = this.route.paramMap.subscribe((params) => {
+            // this.showPage = false;
+            this.selectedMonth = params.get('month') ?? '';
+            const selectedMonthParts = this.selectedMonth.split('-');
+            const year = parseInt(selectedMonthParts[0]);
+            const month = parseInt(selectedMonthParts[1]);
+
+            this.datePartsArray = params.get('month')?.split('-') ?? [];
             const partialDate = this.datePartsArray.map((p) => parseInt(p));
             this.partedDate = { year: partialDate[0], month: partialDate[1], day: partialDate[2] };
             this.datetime = this.partedDateService.toDate(this.partedDate);
@@ -61,31 +80,89 @@ export class SummaryComponent implements OnInit {
             } else {
                 this.showPage = true;
             }
-            if (this.isDateTargetDay) {
-                this.coinageData
-                    .getAllFilteredTransfers({
-                        page: 1,
-                        rowsPerPage: 1000,
-                        date: { from: this.datetime, to: this.datetime },
-                    })
-                    .then((response) => {
-                        this.transfers = response.transfers.filter((t) => t.date.getTime() === new Date(this.selectedDate).getTime());
-                    });
-            } else if (this.isDateTargetMonth) {
-                this.coinageData
-                    .getAllFilteredTransfers({
-                        page: 1,
-                        rowsPerPage: 500,
-                        date: { from: this.monthStartDate, to: this.monthEndDate },
-                        showPlanned: true,
-                    })
-                    .then((response) => {
-                        this.transfers = response.transfers.filter(
-                            (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
-                        );
-                    });
-            }
+            this.loadData();
         });
+    }
+
+    public ngOnDestroy(): void {
+        if (this.routeSubscription !== undefined) {
+            this.routeSubscription.unsubscribe();
+        }
+    }
+
+    private loadData(): void {
+        const requestDateBalance = new Date(this.selectedMonth);
+        requestDateBalance.setDate(0);
+        if (this.isDateTargetMonth) {
+            Promise.all([
+                this.coinageData.getAllFilteredTransfers({
+                    page: 1,
+                    rowsPerPage: 500,
+                    ...this.tableFilterParams,
+                    date: { from: this.monthStartDate, to: this.monthEndDate },
+                    showPlanned: true,
+                }),
+                lastValueFrom(this.coinageData.getBalanceForActiveAccounts(requestDateBalance)),
+            ])
+                .then(([allFilteredTransfers, balance]) => {
+                    this.transfers = allFilteredTransfers.transfers.filter(
+                        (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
+                    );
+                    this.initializeChartLabels();
+                    this.populateChartDataset(balance);
+                })
+                .catch((e) => console.error(e));
+        }
+    }
+
+    private initializeChartLabels(): void {
+        this.summaryChartLabels = [];
+        for (let i = 1; i <= this.getThisMonthsLastDay(); i++) {
+            this.summaryChartLabels.push(`${i}`);
+        }
+    }
+
+    private populateChartDataset(initialBalances: BalanceDTO[]): void {
+        console.log(initialBalances);
+        console.log(this.tableFilterParams);
+        const dailyChange: number[] = new Array(this.summaryChartLabels.length).fill(0);
+        const incrementalSum: number[] = new Array(this.summaryChartLabels.length).fill(0);
+        const incrementalSumHidden = !!(
+            this.tableFilterParams.description ||
+            (this.tableFilterParams.categoryIds?.length ?? 0) ||
+            (this.tableFilterParams.contractorIds?.length ?? 0) > 0
+        );
+
+        for (let i = 0; i < this.transfers.length; i++) {
+            const transfer = this.transfers[i];
+            const day = transfer.date.getDate();
+            if (transfer.type === TransferTypeEnum.OUTCOME) {
+                dailyChange[day - 1] -= transfer.amount;
+            } else {
+                dailyChange[day - 1] += transfer.amount;
+            }
+        }
+
+        let sum = initialBalances
+            .filter(
+                (acc) =>
+                    this.tableFilterParams.accountIds === undefined ||
+                    this.tableFilterParams.accountIds.length === 0 ||
+                    this.tableFilterParams.accountIds.includes(acc.accountId)
+            )
+            .reduce((a, b) => a + b.balance, 0);
+        for (let i = 0; i < dailyChange.length; i++) {
+            const amount = dailyChange[i];
+            if (typeof amount === 'number') {
+                sum += amount;
+                incrementalSum[i] = sum;
+            }
+        }
+        this.summaryChartData = [
+            { data: dailyChange, label: 'Daily Change', type: 'bar', barPercentage: 0.5, order: 1, inflateAmount: 0.33 },
+            { data: incrementalSum, label: 'Total Balance', tension: 0.3, hidden: incrementalSumHidden },
+        ];
+        console.log(this);
     }
 
     get isDateTargetDay(): boolean {
@@ -96,20 +173,28 @@ export class SummaryComponent implements OnInit {
         return this.partedDateService.isDateTargetMonth(this.partedDate);
     }
 
-    // create a new date with the same month and year as the current date and first day of the month
     get monthStartDate(): Date {
         const date = new Date(this.datetime);
-        date.setDate(1);
+        date.setUTCDate(1);
         return date;
     }
 
-    // create a new date with the same month and year as the current date and last day of the month
     get monthEndDate(): Date {
-        const date = new Date(this.datetime);
-        date.setDate(1);
-        date.setMonth(date.getMonth() + 1);
-        date.setDate(0);
+        const date = new Date(this.selectedMonth);
+        // date.setUTCDate(1);
+        date.setUTCMonth(date.getUTCMonth() + 1);
+        date.setUTCDate(0);
         return date;
+    }
+
+    public onTableFilter(filterParams: TableFilterFields): void {
+        this.tableFilterParams = filterParams;
+        this.loadData();
+    }
+
+    public get monthName(): string {
+        const monthName = this.datetime.toLocaleString(undefined, { month: 'long' });
+        return monthName.charAt(0).toUpperCase() + monthName.slice(1);
     }
 
     getParentPartedDate(): PartedDate {
@@ -142,11 +227,23 @@ export class SummaryComponent implements OnInit {
         this.router.navigate(['summary', target]);
     }
 
+    onMonthChange() {
+        console.log(this.selectedMonth);
+        this.router.navigate(['summary', this.selectedMonth]);
+    }
+
     goUp() {
         this.router.navigate(['summary', this.partedDateService.joinPartedDate(this.getParentPartedDate())]);
     }
 
     shouldShowGoUpButton(): boolean {
         return !!this.partedDate.month;
+    }
+
+    private getThisMonthsLastDay(): number {
+        const date = new Date(this.datetime);
+        date.setMonth(date.getMonth() + 1);
+        date.setDate(0);
+        return date.getDate();
     }
 }
