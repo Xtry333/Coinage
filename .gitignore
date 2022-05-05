@@ -36,6 +36,7 @@ yarn-error.log
 .yarnrc.yml
 testem.log
 /typings
+migrations.json
 
 # System Files
 .DS_Store
