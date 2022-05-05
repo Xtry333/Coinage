@@ -33,6 +33,7 @@
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log
+.yarnrc.yml
 testem.log
 /typings
 
