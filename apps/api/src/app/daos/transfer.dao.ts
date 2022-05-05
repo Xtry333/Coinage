@@ -28,7 +28,7 @@ export class TransferDao {
         if (!transfer) {
             throw new Error('Transfer not found');
         }
-        
+
         await transfer.category.parent;
         return transfer;
     }
@@ -63,7 +63,7 @@ export class TransferDao {
         this.assignInFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignInFilterIfExists(filter, 'id', params.transferIds);
         this.assignBetweenFilterIfExists(filter, 'date', params.date);
-        this.assignBetweenFilterIfExists(filter, '_amount', params.amount);
+        this.assignBetweenFilterIfExists(filter, 'amount', params.amount);
 
         if (params.description) {
             filter.description = ILike(`%${params.description}%`);

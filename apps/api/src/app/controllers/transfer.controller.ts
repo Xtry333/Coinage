@@ -42,6 +42,9 @@ export class TransferController {
         }
 
         const transfer = await this.transferDao.getById(transferId);
+        transfer.transferItems.forEach((item) => {
+            console.log(`${item.units}x ${item.item.name} (${item.unitPrice * item.units} PLN)`);
+        });
 
         const categoryPath: Category[] = [];
         categoryPath.push(transfer.category);
@@ -68,14 +71,18 @@ export class TransferController {
             .filter((t) => t.id !== transfer.id)
             .map((t) => this.toTransferDTO(t));
 
-        const receipt: ReceiptDTO = {
-            id: transfer.receipt?.id ?? 0,
-            description: transfer.receipt?.description ?? '',
-            amount: transfer.receipt?.amount ?? null,
-            date: transfer.receipt?.date,
-            contractor: transfer.receipt?.contractor?.name ?? '',
-            transferIds: (await transfer.receipt?.transfers)?.map((t) => t.id) ?? [],
-        };
+        const receipt = await transfer.receipt;
+
+        const receiptDto: ReceiptDTO | null = receipt
+            ? {
+                  id: receipt.id ?? 0,
+                  description: receipt.description ?? '',
+                  amount: receipt.amount ?? null,
+                  date: receipt.date,
+                  contractor: receipt.contractor?.name ?? '',
+                  transferIds: receipt.transfers.map((t) => t.id) ?? [],
+              }
+            : null;
 
         return {
             id: transfer.id,
@@ -89,7 +96,7 @@ export class TransferController {
             categoryId: transfer.category.id,
             account: { id: transfer.account?.id ?? 0, name: transfer.account?.name ?? '' },
             otherTransfers: otherTransfers,
-            receipt: receipt.id ? receipt : null,
+            receipt: receiptDto,
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
                 return { id: cat.id, name: cat.name };
@@ -153,7 +160,7 @@ export class TransferController {
     async saveTransferObject(@Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
         let entity: Transfer;
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
-        const account = (await transfer.accountId) ? await this.accountDao.getById(parseInt(transfer.accountId?.toString())) : undefined;
+        const account = transfer.accountId ? await this.accountDao.getById(parseInt(transfer.accountId?.toString())) : undefined;
 
         if (!account) {
             throw new Error('Account not found');
@@ -201,12 +208,19 @@ export class TransferController {
             throw new Error('Invalid ID provided.');
         }
 
+        const entity = new Transfer();
         const target = await this.transferDao.getById(transferId);
         const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
 
+        if (category) {
+            entity.category = category;
+            entity.type = category.type;
+        } else {
+            throw new Error(`Cannot find category ${transfer.categoryId}`);
+        }
+
         target.amount = target.amount - transfer.amount;
-        const entity = new Transfer();
-        entity.description = transfer.description;
+        entity.description = transfer.description.length > 0 ? transfer.description : category.name;
         entity.amount = transfer.amount;
         if (target.amount <= 0) {
             throw new Error('Amount too high! Create new transfer instead');
@@ -217,12 +231,7 @@ export class TransferController {
             entity.createdDate = new Date();
         }
         entity.editedDate = new Date();
-        if (category) {
-            entity.category = category;
-            entity.type = category.type;
-        } else {
-            throw new Error(`Cannot find category ${transfer.categoryId}`);
-        }
+
         entity.contractor = target.contractor;
         entity.receiptId = target.receiptId;
         const inserted = await this.transferDao.insert(entity);
@@ -307,7 +316,7 @@ export class TransferController {
             return {};
         }
 
-        const transfers = await (await this.transferDao.getAll()).filter((t) => t.type === 'OUTCOME' && t.categoryId === idNum); //getByCategory(idNum);
+        const transfers = (await this.transferDao.getAll()).filter((t) => t.type === 'OUTCOME' && t.categoryId === idNum); //getByCategory(idNum);
 
         const weeks: { week: number; indetifier: string; outcomes: number }[] = [];
         transfers.forEach((transfer) => {

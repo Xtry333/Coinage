@@ -4,19 +4,15 @@ import {
     CreateInternalTransferDTOResponse,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
-    ReceiptDTO,
-    RefundTransferDTO,
     SplitTransferDTO,
-    TransferDetailsDTO,
     TransferDTO,
     CreateEditTransferModelDTO,
 } from '@coinage-app/interfaces';
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
-import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';

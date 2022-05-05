@@ -101,4 +101,11 @@
         </div>
         <button (click)="onClickSplitTransfer()">Split</button>
     </div>
+
+    <coinage-app-transfers-table
+        *ngIf="transfer.otherTransfers.length > 0"
+        [header]="'Other Transfers This Day'"
+        [transfers]="transfer.otherTransfers"
+        [showTodayMarker]="false"
+    ></coinage-app-transfers-table>
 </div>

@@ -25,7 +25,7 @@ export class CategoriesController {
         }
 
         entity.name = category.name;
-        entity.description = category.description;
+        if (category.description) entity.description = category.description;
 
         let inserted = await this.categoryDao.save(entity);
 

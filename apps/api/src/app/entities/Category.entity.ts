@@ -1,5 +1,7 @@
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+
 import { TransferTypeEnum } from '@coinage-app/interfaces';
-import { Entity, Column, PrimaryGeneratedColumn, JoinColumn, ManyToOne, OneToMany } from 'typeorm';
+import { User } from './User.entity';
 
 export enum TransferType {
     Income = 'INCOME',
@@ -15,21 +17,25 @@ export class Category {
     name!: string;
 
     @Column('text', { nullable: true })
-    description?: string | null;
+    description!: string | null;
 
     @Column('varchar', { length: 50, nullable: false })
     type!: TransferTypeEnum;
 
-    @Column({ name: 'parent', nullable: true })
+    @Column({ nullable: true })
     parentId?: number | null;
 
-    @ManyToOne('Category', { nullable: true })
-    @JoinColumn({ name: 'parent' })
-    parent?: Promise<Category | null>;
+    @ManyToOne(() => Category, { nullable: true })
+    @JoinColumn({ name: 'parent_id' })
+    parent!: Promise<Category | null>;
 
-    @OneToMany('Category', 'parent', {})
+    @ManyToOne(() => User, { nullable: true })
+    @JoinColumn({ name: 'user_id' })
+    user!: Promise<User | null>;
+
+    @OneToMany(() => Category, (category) => category.parent, {})
     children!: Promise<Category[]>;
 
     @Column('text', { nullable: true })
-    tag?: string | null;
+    tag!: string | null;
 }

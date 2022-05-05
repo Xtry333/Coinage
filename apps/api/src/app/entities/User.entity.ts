@@ -1,4 +1,5 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { Account } from './Account.entity';
 
 @Entity()
 export class User {
@@ -7,4 +8,7 @@ export class User {
 
     @Column('text', { nullable: false })
     name!: string;
+
+    @OneToMany(() => Account, (account) => account.user, { eager: false, cascade: true })
+    accounts!: Promise<Account[]>;
 }

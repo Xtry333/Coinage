@@ -16,7 +16,7 @@ export class TransferDetailsDTO {
     @Type(() => Date) date!: Date;
     @Type(() => Date) createdDate!: Date;
     @Type(() => Date) editedDate!: Date;
-    otherTransfers!: TransferDTO[];
+    @Type(() => TransferDTO) otherTransfers!: TransferDTO[];
     receipt!: ReceiptDTO | null;
     refundedBy?: number;
     refundedOn?: string;

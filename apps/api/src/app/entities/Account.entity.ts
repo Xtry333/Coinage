@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Timestamp } from 'typeorm';
-import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { BooleanTransformer } from './transformers/boolean.transformer';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
@@ -16,13 +15,13 @@ export class Account {
     @Column('number', { nullable: false })
     userId!: number;
 
-    @ManyToOne('User', { eager: true, nullable: false })
+    @ManyToOne(() => User, { eager: true, nullable: false })
     @JoinColumn({ name: 'user_id' })
     user!: User;
 
     @Column('bit', { name: 'is_active', nullable: false, transformer: new BooleanTransformer() })
     isActive!: boolean;
 
-    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true, transformer: new TimestampTransformer() })
-    createdDate!: Date;
+    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })
+    readonly createdDate!: Date;
 }
