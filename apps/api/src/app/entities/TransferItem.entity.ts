@@ -7,19 +7,19 @@ import { Transfer } from './Transfer.entity';
 @Entity()
 export class TransferItem {
     @PrimaryGeneratedColumn()
-    id!: number;
+    public id!: number;
 
-    @Column({ name: 'unit_price', type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
-    unitPrice!: number;
+    @Column({ name: 'unit_price', type: 'decimal', default: 0, precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    public unitPrice!: number;
 
-    @Column({ name: 'units', type: 'integer', nullable: false })
-    units!: number;
+    @Column({ name: 'units', type: 'float', nullable: false, default: 1 })
+    public units!: number;
 
     @ManyToOne(() => Transfer, (transfer) => transfer.transferItems, { eager: false, nullable: false })
     @JoinColumn({ name: 'transfer_id' })
-    transfer!: Promise<Transfer>;
+    public transfer!: Promise<Transfer>;
 
     @ManyToOne(() => Item, { eager: true, nullable: false })
     @JoinColumn({ name: 'item_id' })
-    item!: Item;
+    public item!: Item;
 }

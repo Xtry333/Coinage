@@ -10,13 +10,13 @@ import { finalize } from 'rxjs/operators';
     styleUrls: ['./category-manager.component.scss'],
 })
 export class CategoryManagerComponent implements OnInit {
-    showPage = false;
-    categories = [];
-    parentCategory!: CategoryDTO;
+    public showPage = false;
+    public categories = [];
+    public parentCategory!: CategoryDTO;
 
-    selectedCategoryForEdit?: CategoryDTO;
+    public selectedCategoryForEdit?: CategoryDTO;
 
-    constructor(private readonly coinageDataService: CoinageDataService) {}
+    public constructor(private readonly coinageDataService: CoinageDataService) {}
 
     public ngOnInit(): void {
         this.showPage = false;

@@ -4,21 +4,21 @@ import { Contractor } from '../entities/Contractor.entity';
 
 @Injectable()
 export class ContractorDao {
-    async getById(id: number): Promise<Contractor | undefined> {
+    public async getById(id: number): Promise<Contractor | null> {
         return await getConnection()
             .getRepository(Contractor)
             .findOne({ where: { id: Equal(id) } });
     }
 
-    async getAll(): Promise<Contractor[]> {
+    public async getAll(): Promise<Contractor[]> {
         return await getConnection().getRepository(Contractor).find();
     }
 
-    async save(contractor: Contractor): Promise<Contractor> {
+    public async save(contractor: Contractor): Promise<Contractor> {
         return getConnection().getRepository(Contractor).save(contractor);
     }
 
-    async deleteById(id: number): Promise<DeleteResult> {
+    public async deleteById(id: number): Promise<DeleteResult> {
         return await getConnection()
             .getRepository(Contractor)
             .delete({ id: Equal(id) });

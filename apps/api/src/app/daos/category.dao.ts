@@ -2,38 +2,39 @@ import { DeleteResult, Equal, InsertResult, getConnection, Repository } from 'ty
 
 import { Account } from '../entities/Account.entity';
 import { Category } from '../entities/Category.entity';
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { TotalInMonthByCategory } from '@coinage-app/interfaces';
 import { Transfer } from '../entities/Transfer.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class CategoryDao {
-    constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>) {}
+    public static CATEGORY_NOT_FOUND_MESSAGE = (id: number) => `Category with ID '${id}' not found.`;
+    public static SYSTEM_CATEGORY_NOT_FOUND_MESSAGE = (tag: string) => `System category '${tag}' not found. Something went wrong in the database.`;
 
-    async getById(id: number): Promise<Category | undefined> {
-        return await getConnection()
-            .getRepository(Category)
-            .findOne({ where: { id: Equal(id) } });
-    }
+    public constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>) {}
 
-    async getBySystemTag(tag: string): Promise<Category> {
-        const category = await getConnection()
-            .getRepository(Category)
-            .findOne({ where: { tag: Equal(tag) } });
-        if (!category) {
-            throw new Error('System category not found. Something went wrong in the database.');
+    public async getById(id: number): Promise<Category> {
+        const category = await this.categoryRepository.findOneBy({ id: Equal(id) });
+        if (category === null) {
+            throw new NotFoundException(CategoryDao.CATEGORY_NOT_FOUND_MESSAGE(id));
         }
         return category;
     }
 
-    async getAll(): Promise<Category[]> {
-        return await getConnection()
-            .getRepository(Category)
-            .find({ order: { name: 'ASC' } });
+    public async getBySystemTag(tag: string): Promise<Category> {
+        const category = await this.categoryRepository.findOne({ where: { tag: Equal(tag) } });
+        if (!category) {
+            throw new NotFoundException(CategoryDao.SYSTEM_CATEGORY_NOT_FOUND_MESSAGE(tag));
+        }
+        return category;
     }
 
-    async getTotalByCategoryMonth(year: number, month?: number, day?: number): Promise<TotalInMonthByCategory[]> {
+    public async getAll(): Promise<Category[]> {
+        return await this.categoryRepository.find({ order: { name: 'ASC' } });
+    }
+
+    public async getTotalByCategoryMonth(year: number, month?: number, day?: number): Promise<TotalInMonthByCategory[]> {
         return await getConnection()
             .createQueryBuilder<TotalInMonthByCategory>(Category, 'Category')
             .select('Category.name', 'categoryName')
@@ -54,22 +55,21 @@ export class CategoryDao {
             .getRawMany();
     }
 
-    async insert(category: Category): Promise<InsertResult> {
-        return getConnection().getRepository(Category).insert(category);
+    public async insert(category: Category): Promise<InsertResult> {
+        return this.categoryRepository.insert(category);
     }
 
-    async save(category: Category): Promise<Category> {
-        return getConnection().getRepository(Category).save(category);
+    public async save(category: Category): Promise<Category> {
+        return this.categoryRepository.save(category);
     }
 
-    async deleteById(id: number): Promise<DeleteResult> {
-        const category = await this.categoryRepository.findOne({ where: { id: Equal(id) } });
-        if (category) {
-            if (category.tag) {
-                throw new Error('Cannot delete system category');
-            }
-            return this.categoryRepository.delete({ id: Equal(id) });
+    public async deleteById(id: number): Promise<DeleteResult> {
+        const category = await this.getById(id);
+
+        if (category.tag) {
+            throw new Error('Cannot delete system category');
         }
-        throw new Error('Category not found');
+
+        return this.categoryRepository.delete({ id: Equal(id) });
     }
 }

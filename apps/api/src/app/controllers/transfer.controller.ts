@@ -2,8 +2,6 @@ import {
     BaseResponseDTO,
     CreateInternalTransferDTO,
     CreateInternalTransferDTOResponse,
-    FilteredTransfersDTO,
-    GetFilteredTransfersRequest,
     ReceiptDTO,
     RefundTransferDTO,
     SplitTransferDTO,
@@ -11,10 +9,11 @@ import {
     TransferDTO,
     CreateEditTransferModelDTO,
 } from '@coinage-app/interfaces';
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
+import { ContractorDao } from '../daos/contractor.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
@@ -25,23 +24,27 @@ import { SaveTransfersService } from '../services/transfers/save-transfers.servi
 
 @Controller('transfer')
 export class TransferController {
-    constructor(
+    private static INVALID_ID_MESSAGE = 'Invalid ID provided.';
+
+    public constructor(
         private readonly transferDao: TransferDao,
         private readonly transfersService: TransfersService,
         private readonly etherealTransferService: EtherealTransferService,
         private readonly categoryDao: CategoryDao,
+        private readonly contractorDao: ContractorDao,
         private readonly accountDao: AccountDao,
         private readonly dateParserService: DateParserService,
         private readonly saveTransfersService: SaveTransfersService
     ) {}
 
     @Get(':transferId/details')
-    async getTransferDetails(@Param('transferId') transferId: number): Promise<TransferDetailsDTO> {
+    public async getTransferDetails(@Param('transferId') transferId: number): Promise<TransferDetailsDTO> {
         if (!transferId || transferId < 1) {
-            throw new Error('Invalid ID provided.');
+            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
         }
 
         const transfer = await this.transferDao.getById(transferId);
+
         transfer.transferItems.forEach((item) => {
             console.log(`${item.units}x ${item.item.name} (${item.unitPrice * item.units} PLN)`);
         });
@@ -87,7 +90,7 @@ export class TransferController {
         return {
             id: transfer.id,
             description: transfer.description,
-            amount: Number(transfer.amount),
+            amount: transfer.amount,
             type: transfer.category.type,
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
@@ -100,6 +103,15 @@ export class TransferController {
             date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
                 return { id: cat.id, name: cat.name };
+            }),
+            items: transfer.transferItems.map((item) => {
+                return {
+                    id: item.id,
+                    itemName: item.item.name,
+                    unit: 'Units',
+                    amount: item.units,
+                    unitPrice: item.unitPrice,
+                };
             }),
             isPlanned: transfer.date > new Date(),
             refundedBy: refundTransfer?.id,
@@ -127,9 +139,9 @@ export class TransferController {
     }
 
     @Post(':transferId/commit')
-    async commitTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
+    public async commitTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
         if (!transferId || transferId < 1) {
-            throw new Error('Invalid ID provided.');
+            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
         }
 
         const transfer = await this.etherealTransferService.commit(transferId);
@@ -142,9 +154,9 @@ export class TransferController {
     }
 
     @Post(':transferId/stage')
-    async stageTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
+    public async stageTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
         if (!transferId || transferId < 1) {
-            throw new Error('Invalid ID provided.');
+            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
         }
 
         const transfer = await this.etherealTransferService.stage(transferId);
@@ -157,55 +169,52 @@ export class TransferController {
     }
 
     @Post('save')
-    async saveTransferObject(@Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
+    public async saveTransferObject(@Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
         let entity: Transfer;
-        const category = await this.categoryDao.getById(parseInt(transfer.categoryId?.toString()));
-        const account = transfer.accountId ? await this.accountDao.getById(parseInt(transfer.accountId?.toString())) : undefined;
+        const category = await this.categoryDao.getById(transfer.categoryId);
+        const account = await this.accountDao.getById(transfer.accountId);
+        const contractor = transfer.contractorId !== null ? await this.contractorDao.getById(transfer.contractorId) : null;
 
-        if (!account) {
-            throw new Error('Account not found');
-        }
-        //const account = await this.accc.getById(parseInt(transfer.categoryId?.toString()));
         if (transfer.id !== undefined) {
             entity = await this.transferDao.getById(transfer.id);
         } else {
             entity = new Transfer();
         }
-        entity.amount = transfer.amount;
-        entity.date = transfer.date as any; // TODO: Fix date string
-        if (!entity.createdDate) {
-            entity.createdDate = new Date();
-        }
-        entity.editedDate = new Date();
-        if (category) {
-            entity.category = category;
-            entity.type = category.type;
-        } else {
-            return {
-                error: `Cannot find category ${transfer.categoryId}`,
-            };
-            // throw new Error(`Cannot find category ${transfer.categoryId}`);
-        }
+
         entity.description = transfer.description === undefined ? category?.name : transfer.description;
+        entity.amount = transfer.amount;
+        entity.date = transfer.date;
+        entity.category = category;
+        entity.categoryId = category.id;
+        entity.type = category.type;
+
         entity.account = account;
-        delete entity.contractor; // = transfer.contractorId ? await this.contractorDao.getById(parseInt(transfer.contractorId?.toString())) : undefined;
-        entity.contractorId = transfer.contractorId;
+        entity.accountId = account.id;
+
+        entity.contractor = contractor;
+        entity.contractorId = contractor?.id ?? null;
+
+        entity.receipt = Promise.resolve(null);
+        entity.receiptId = transfer.receiptId;
+
         if (entity.category.name === 'Paliwo') {
             try {
                 entity.metadata = { unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')), location: entity.description.split(' ')[3] };
             } catch (e) {
-                console.log('Could not set metadata for transfer on', entity.date);
-                console.log(e);
+                console.error('Could not set metadata for transfer on', entity.date);
+                console.error(e);
             }
         }
+
         const inserted = await this.transfersService.saveTransfer(entity);
+
         return { insertedId: inserted.id };
     }
 
     @Post(':transferId/split')
-    async splitTransferObject(@Param('transferId') transferId: number, @Body() transfer: SplitTransferDTO): Promise<BaseResponseDTO> {
+    public async splitTransferObject(@Param('transferId') transferId: number, @Body() transfer: SplitTransferDTO): Promise<BaseResponseDTO> {
         if (!transferId || transferId < 1) {
-            throw new Error('Invalid ID provided.');
+            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
         }
 
         const entity = new Transfer();
@@ -227,10 +236,6 @@ export class TransferController {
         }
         entity.date = target.date;
         entity.accountId = target.accountId;
-        if (!entity.createdDate) {
-            entity.createdDate = new Date();
-        }
-        entity.editedDate = new Date();
 
         entity.contractor = target.contractor;
         entity.receiptId = target.receiptId;
@@ -240,9 +245,9 @@ export class TransferController {
     }
 
     @Post(':transferId/refund')
-    async refundTransfer(@Param('transferId') transferId: number, @Body() refundDTO: RefundTransferDTO): Promise<BaseResponseDTO> {
+    public async refundTransfer(@Param('transferId') transferId: number, @Body() refundDTO: RefundTransferDTO): Promise<BaseResponseDTO> {
         if (!transferId || transferId < 1) {
-            throw new Error('Invalid ID provided.');
+            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
         }
 
         const refundTargetId = Math.floor(Number(refundDTO.refundTargetId));
@@ -251,10 +256,6 @@ export class TransferController {
         const transfer = await this.transferDao.getById(transferId);
 
         const refundCategory = await this.categoryDao.getBySystemTag('system-refund');
-
-        if (!transfer) {
-            throw new Error('Invalid Transfer ID.');
-        }
 
         if (transfer.metadata.refundedBy || transfer.metadata.refundTargetId) {
             throw new Error('Cannot refund a refund or a refund target.');
@@ -279,16 +280,12 @@ export class TransferController {
     }
 
     @Post(':transferId/duplicate')
-    async duplicateTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
+    public async duplicateTransfer(@Param('transferId') transferId: number): Promise<BaseResponseDTO> {
         if (!transferId || transferId < 1) {
-            throw new Error('Invalid ID provided.');
+            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
         }
 
         const transfer = await this.transferDao.getById(transferId);
-
-        if (!transfer) {
-            throw new Error('Invalid Transfer ID.');
-        }
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (transfer as any).id = undefined;
@@ -303,59 +300,28 @@ export class TransferController {
     }
 
     @Delete(':id')
-    async removeTransferObject(@Param('id') id: number) {
+    public async removeTransferObject(@Param('id') id: number) {
         // TODO: On remove delete refundedBy metadata from target
         //const refundTransfer = transfer.metadata.refundedBy ? await this.transferDao.getById(Number(transfer.metadata.refundedBy)) : undefined;
         return (await this.transferDao.deleteById(id)).affected == 1;
     }
 
-    @Get('/weekly/:id')
-    async getWeeklySpendings(@Param('id') id: string): Promise<any> {
-        const idNum = parseInt(id);
-        if (!idNum) {
-            return {};
+    @Post('create/internal/:originId/:targetId')
+    public async createInternalTransfer(
+        @Body() transfer: CreateInternalTransferDTO,
+        @Param('originId') originId: number,
+        @Param('targetId') targetId: number
+    ): Promise<CreateInternalTransferDTOResponse> {
+        if (!originId || originId < 1 || !targetId || targetId < 1) {
+            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
         }
 
-        const transfers = (await this.transferDao.getAll()).filter((t) => t.type === 'OUTCOME' && t.categoryId === idNum); //getByCategory(idNum);
-
-        const weeks: { week: number; indetifier: string; outcomes: number }[] = [];
-        transfers.forEach((transfer) => {
-            const date = new Date(transfer.date);
-            const indetifier = `${date.getFullYear()}.${this.getWeek(date).toString().padStart(2, '0')}`;
-            //const indetifier = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
-            const week = weeks.find((w) => w.indetifier === indetifier);
-            if (week) {
-                week.outcomes += transfer.amount;
-            } else {
-                weeks.push({
-                    indetifier,
-                    week: this.getWeek(date),
-                    outcomes: transfer.amount,
-                });
-            }
-        });
-
-        return weeks.sort((a, b) => b.indetifier.localeCompare(a.indetifier));
-    }
-
-    getWeek = function (date: Date) {
-        const onejan = new Date(date.getFullYear(), 0, 1);
-        const millisecsInDay = 86400000;
-        return Math.ceil((((date as any) - (onejan as any)) / millisecsInDay + onejan.getDay() + 1) / 7);
-    };
-
-    @Post('create/internal/:originId/:targetId')
-    async createInternalTransfer(
-        @Body() transfer: CreateInternalTransferDTO,
-        @Param('originId') originId: string,
-        @Param('targetId') targetId: string
-    ): Promise<CreateInternalTransferDTOResponse> {
         console.log(transfer);
         console.log(transfer.date);
         console.log(originId, targetId);
 
-        const originAccount = await this.accountDao.getById(parseInt(originId));
-        const targetAccount = await this.accountDao.getById(parseInt(targetId));
+        const originAccount = await this.accountDao.getById(originId);
+        const targetAccount = await this.accountDao.getById(targetId);
 
         if (!originAccount) {
             throw new Error(`Cannot find origin account id ${originId}`);

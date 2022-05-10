@@ -27,6 +27,6 @@ export interface ReceiptDTO {
 }
 
 export class Range<T> {
-    from!: T;
-    to!: T;
+    public from!: T;
+    public to!: T;
 }

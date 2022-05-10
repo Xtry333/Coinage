@@ -5,10 +5,10 @@ import { BalanceDTO } from '@coinage-app/interfaces';
 
 @Controller('dashboard')
 export class DashboardComponent {
-    constructor(private readonly accountDao: AccountDao) {}
+    public constructor(private readonly accountDao: AccountDao) {}
 
     @Get('/balance/:date')
-    async getBalance(@Param('date') date: Date): Promise<BalanceDTO[]> {
+    public async getBalance(@Param('date') date: Date): Promise<BalanceDTO[]> {
         const accountIds = [1, 5, 6];
         const balance = await this.accountDao.getAccountBalanceForAccountAsOfDate(accountIds, date);
         return balance;

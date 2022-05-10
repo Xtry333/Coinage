@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EtherealTransferService } from './ethereal-transfer.service';
 import { PartialProvider } from '../test/partial-provider';
 import { TransferDao } from '../daos/transfer.dao';
+import { AccountDao } from '../daos/account.dao';
 
 describe('EtherealTransferService', () => {
     let service: EtherealTransferService;
@@ -17,9 +18,18 @@ describe('EtherealTransferService', () => {
         },
     };
 
+    const accountDaoProvider: PartialProvider<AccountDao> = {
+        provide: AccountDao,
+        useValue: {
+            getCurrentlyActiveForUserId: () => {
+                throw new Error('Test not implemented.');
+            },
+        },
+    };
+
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [EtherealTransferService, transferDaoProvider],
+            providers: [EtherealTransferService, transferDaoProvider, accountDaoProvider],
         }).compile();
 
         service = module.get<EtherealTransferService>(EtherealTransferService);

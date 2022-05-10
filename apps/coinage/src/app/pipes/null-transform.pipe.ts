@@ -6,7 +6,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class NullTransformPipe implements PipeTransform {
     public static readonly DEFAULT_SYMBOL = '−';
 
-    transform(value?: unknown, valueIfNull: string = NullTransformPipe.DEFAULT_SYMBOL): unknown {
+    public transform(value?: unknown, valueIfNull: string = NullTransformPipe.DEFAULT_SYMBOL): unknown {
         return value ? value : valueIfNull;
     }
 }

@@ -4,6 +4,18 @@
     margin-right: auto;
 }
 
+.transfers-items-table {
+    display: flex;
+
+    .flex-item {
+        width: 50%;
+    }
+}
+
+.divider {
+    border: 1px solid #ccc;
+}
+
 .category-path-list {
     padding: 0;
     margin: 0;
@@ -56,7 +68,13 @@ table.transfer-details-table {
     border-collapse: collapse;
     border-spacing: 0;
     table-layout: fixed;
-    margin-top: 20px;
+    border: 1px solid #ccc;
+    // margin-top: 20px;
+    caption {
+        font-weight: bold;
+        font-size: 15px;
+        padding: 5px;
+    }
     tr {
         border-bottom: 1px solid #ccc;
     }
@@ -65,7 +83,6 @@ table.transfer-details-table {
         padding: 10px;
         text-align: left;
     }
-    border: 1px solid #ccc;
     td {
         .planned-icon {
             margin-left: 5px;

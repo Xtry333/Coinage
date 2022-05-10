@@ -10,14 +10,14 @@ import { Transfer } from '../entities/Transfer.entity';
 
 @Injectable()
 export class AccountDao {
-    constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {}
+    public constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {}
 
     public async getById(id: number): Promise<Account> {
-        const accounts = await this.getByIds([id]);
-        if (accounts.length === 0) {
-            throw new Error(`Account with id ${id} not found.`);
-        }
-        return accounts[0];
+        const account = await this.accountRepository.findOneByOrFail({ id: Equal(id) });
+        // if (accounts.length === 0) {
+        //     throw new Error(`Account with id ${id} not found.`);
+        // }
+        return account;
     }
 
     public async getByIds(ids: number[]): Promise<Account[]> {
@@ -25,7 +25,7 @@ export class AccountDao {
     }
 
     public getAllActive(): Promise<Account[]> {
-        return this.accountRepository.find({ where: { isActiveBuffer: Equal(true) } });
+        return this.accountRepository.find({ where: { isActive: Equal(true) } });
     }
 
     public getForUserId(userId: number): Promise<Account[]> {
@@ -33,7 +33,7 @@ export class AccountDao {
     }
 
     public getCurrentlyActiveForUserId(userId: number): Promise<Account[]> {
-        return this.accountRepository.find({ where: { userId: Equal(userId), isActiveBuffer: Equal(true) } });
+        return this.accountRepository.find({ where: { userId: Equal(userId), isActive: Equal(true) } });
     }
 
     public save(account: Account): Promise<Account> {
@@ -86,9 +86,9 @@ export class AccountDao {
         });
     }
 
-    async getLast12MonthStats(
+    public async getLast12MonthStats(
         accountIds: number[],
-        sumOnlyInternalTransfers: boolean = true
+        sumOnlyInternalTransfers = true
     ): Promise<{ year: number; month: number; income: string; outcome: string; count: string }[]> {
         return await getConnection()
             .getRepository(Transfer)

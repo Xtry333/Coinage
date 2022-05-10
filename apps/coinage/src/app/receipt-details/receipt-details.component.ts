@@ -13,13 +13,17 @@ import { NavigatorService } from '../services/navigator.service';
     styleUrls: ['./receipt-details.component.scss'],
 })
 export class ReceiptDetailsComponent implements OnInit {
-    showPage = false;
+    public showPage = false;
 
-    receiptDetails!: ReceiptDetailsDTO;
+    public receiptDetails!: ReceiptDetailsDTO;
 
-    constructor(private readonly route: ActivatedRoute, private readonly navigator: NavigatorService, private readonly coinageData: CoinageDataService) {}
+    public constructor(
+        private readonly route: ActivatedRoute,
+        private readonly navigator: NavigatorService,
+        private readonly coinageData: CoinageDataService
+    ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.showPage = false;
         this.route.paramMap.subscribe((params) => {
             const id = parseInt(params.get('id') ?? '') ?? undefined;
@@ -34,11 +38,11 @@ export class ReceiptDetailsComponent implements OnInit {
         });
     }
 
-    get receiptDirectionDisplaySymbol(): string {
+    public get receiptDirectionDisplaySymbol(): string {
         return TransferType.OUTCOME.symbol;
     }
 
-    get remainingAmount(): number {
+    public get remainingAmount(): number {
         return Math.abs(this.receiptDetails.totalTransferred - (this.receiptDetails.amount ?? 0));
     }
 }

@@ -14,7 +14,7 @@ export class CoinageLocalStorageService {
     public static readonly KEY_OBJECT_TEMPLATE = (key: string) => `${key}-o`;
     public static readonly KEY_ARRAY_TEMPLATE = (key: string) => `${key}-a`;
 
-    constructor() {
+    public constructor() {
         this.localStorage = window.localStorage;
     }
 

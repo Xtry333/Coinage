@@ -4,22 +4,22 @@ import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
 import { Type } from 'class-transformer';
 
 export class FilteredTransfersDTO {
-    @Type(() => TransferDTO) transfers!: TransferDTO[];
+    @Type(() => TransferDTO) public transfers!: TransferDTO[];
 
-    totalCount!: number;
+    public totalCount!: number;
 }
 
 export class TransferDTO {
-    @IsNumber() id!: number;
-    @IsString() description!: string;
-    @IsNumber() amount!: number;
-    @IsEnum(TransferTypeEnum) type!: TransferTypeEnum;
-    @IsNumber() categoryId!: number;
-    @IsString() categoryName!: string;
-    @IsNumber() @IsOptional() contractorId!: number | null;
-    @IsString() @IsOptional() contractorName!: string | null;
-    @IsNumber() accountId!: number;
-    @IsString() accountName!: string;
-    @IsNumber() receiptId!: number | null;
-    @Type(() => Date) date!: Date;
+    @IsNumber() public id!: number;
+    @IsString() public description!: string;
+    @IsNumber() public amount!: number;
+    @IsEnum(TransferTypeEnum) public type!: TransferTypeEnum;
+    @IsNumber() public categoryId!: number;
+    @IsString() public categoryName!: string;
+    @IsNumber() @IsOptional() public contractorId!: number | null;
+    @IsString() @IsOptional() public contractorName!: string | null;
+    @IsNumber() public accountId!: number;
+    @IsString() public accountName!: string;
+    @IsNumber() public receiptId!: number | null;
+    @Type(() => Date) public date!: Date;
 }

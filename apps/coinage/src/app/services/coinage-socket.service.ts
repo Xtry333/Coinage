@@ -6,7 +6,7 @@ import { Socket } from 'ngx-socket-io';
     providedIn: 'root',
 })
 export class CoinageSocketService {
-    constructor(private readonly socket: Socket) {}
+    public constructor(private readonly socket: Socket) {}
 
     public send(namespace: CoinageSocketNamespace): boolean {
         this.socket.emit(namespace, 'Hello world!');

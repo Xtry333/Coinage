@@ -6,10 +6,10 @@ import { Component, EventEmitter, HostListener, Output } from '@angular/core';
     styleUrls: ['./auto-pagination.component.scss'],
 })
 export class AutoPaginationComponent {
-    @Output() endOfPage = new EventEmitter<void>();
+    @Output() public endOfPage = new EventEmitter<void>();
 
     @HostListener('window:scroll', ['$event'])
-    isScrolledIntoView() {
+    public isScrolledIntoView() {
         const scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
         const max = document.documentElement.scrollHeight - window.innerHeight;
 

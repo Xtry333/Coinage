@@ -9,16 +9,16 @@ import { CoinageNotification, NotificationService } from '../services/notificati
 export class NotificationsContainerComponent implements OnInit {
     public notificationsList: CoinageNotification[] = [];
 
-    constructor(private readonly notificationService: NotificationService) {}
+    public constructor(private readonly notificationService: NotificationService) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.notificationService.notifications$.subscribe((notification) => {
             this.notificationsList.push(notification);
         });
         // this.notificationService.push({ title: 'Test', message: 'Test Notification. Quite long message added to the notification for testing purposes.', autoCloseDelay: 0 });
     }
 
-    onNotificationDismiss(id: number) {
+    public onNotificationDismiss(id: number) {
         const index = this.notificationsList.findIndex((n) => n.id === id);
         if (index >= 0) {
             this.notificationsList.splice(index, 1);

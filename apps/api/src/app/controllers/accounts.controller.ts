@@ -7,20 +7,20 @@ import { EtherealTransferService } from '../services/ethereal-transfer.service';
 
 @Controller('account(s)?')
 export class AccountsController {
-    constructor(
+    public constructor(
         private readonly accountDao: AccountDao,
         private readonly etherealTransferService: EtherealTransferService,
         private readonly dateParser: DateParserService
     ) {}
 
     @Get('all')
-    async getAllTransactions(): Promise<AccountDTO[]> {
+    public async getAllTransactions(): Promise<AccountDTO[]> {
         const currentUserId = 1;
         return await this.accountDao.getForUserId(currentUserId);
     }
 
     @Get('balance/:accountId/:asOfDate')
-    async getAccountBalanceAsOfDate(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
+    public async getAccountBalanceAsOfDate(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
         const accountIds = params.accountId.split(',').map((id) => parseInt(id, 10));
         const asOfDate = new Date(params.asOfDate);
         if (!accountIds || !asOfDate || asOfDate.toString() === 'Invalid Date') {
@@ -35,19 +35,19 @@ export class AccountsController {
     }
 
     @Get('spendings/:date')
-    async getTotalSpendingsAsOfToday(@Param('date') date: Date): Promise<BalanceDTO[]> {
+    public async getTotalSpendingsAsOfToday(@Param('date') date: Date): Promise<BalanceDTO[]> {
         const accountIds = await this.accountDao.getForUserId(1);
         return this.getAccountSpendingsAsOfDate({ accountIds: accountIds.map((a) => a.id).join(','), asOfDate: date.toISOString() });
     }
 
     @Get(':accountIds/spendings')
-    async getAccountSpendingsAsOfToday(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
+    public async getAccountSpendingsAsOfToday(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
         const asOfDate = new Date().toISOString().split('T')[0];
         return this.getAccountSpendingsAsOfDate({ accountIds: params.accountIds, asOfDate: asOfDate });
     }
 
     @Get(':accountIds/spendings/:asOfDate')
-    async getAccountSpendingsAsOfDate(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
+    public async getAccountSpendingsAsOfDate(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
         const accountIds = params.accountIds.split(',').map((id) => parseInt(id, 10));
         const asOfDate = new Date(params.asOfDate);
         const userId = 1;
@@ -70,7 +70,7 @@ export class AccountsController {
     }
 
     @Get('/lastYearMonthlyStats')
-    async getMongthlyStats(
+    public async getMongthlyStats(
         @Query('accountIds', new ParseArrayPipe({ expectedType: Number, items: Number, optional: true })) accountIds?: number[]
     ): Promise<MonthlyUserStatsDTO[]> {
         let accounts = await this.accountDao.getForUserId(1);
@@ -141,7 +141,7 @@ export class AccountsController {
     }
 
     @Delete(':id/ethereals')
-    async stageTransfer(@Param('id') paramId: number): Promise<BaseResponseDTO> {
+    public async stageTransfer(@Param('id') paramId: number): Promise<BaseResponseDTO> {
         const count = await this.etherealTransferService.cleanupUser(paramId);
         // TODO: fix endpoint
 
@@ -151,7 +151,7 @@ export class AccountsController {
     }
 
     @Get('details/:accountId')
-    async getAccountDetailedStatistics(@Param() params: { [key: string]: string }): Promise<AccountDetailsDTOResponse> {
+    public async getAccountDetailedStatistics(@Param() params: { [key: string]: string }): Promise<AccountDetailsDTOResponse> {
         const accountId = Number(params.accountId);
 
         if (!accountId) {

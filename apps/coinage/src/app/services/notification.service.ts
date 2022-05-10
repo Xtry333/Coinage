@@ -32,7 +32,7 @@ export class NotificationService {
 
     public readonly notifications$ = this.incomingNotifications.asObservable();
 
-    constructor(private readonly localStorageService: CoinageLocalStorageService) {
+    public constructor(private readonly localStorageService: CoinageLocalStorageService) {
         localStorageService.attachEventListener((event) => {
             if (event.key === CoinageLocalStorageService.KEY_OBJECT_TEMPLATE(NotificationService.NOTIFICATION_KEY)) {
                 const sharedNofitication = this.localStorageService.getObject<CoinageNotification>(NotificationService.NOTIFICATION_KEY);

@@ -20,7 +20,7 @@ export const NavigatorPages = {
     providedIn: 'root',
 })
 export class NavigatorService {
-    constructor(private readonly router: Router) {}
+    public constructor(private readonly router: Router) {}
 
     public navigateTo(url: string): void {
         this.router.navigateByUrl(url);

@@ -7,10 +7,10 @@ import { CategoryCascadeService } from '../services/category-cascades.service';
 
 @Controller('category')
 export class CategoriesController {
-    constructor(private readonly categoryDao: CategoryDao, private readonly categoryCascadeService: CategoryCascadeService) {}
+    public constructor(private readonly categoryDao: CategoryDao, private readonly categoryCascadeService: CategoryCascadeService) {}
 
     @Post('save')
-    async saveCategory(@Body() category: CreateEditCategoryDTO): Promise<BaseResponseDTO> {
+    public async saveCategory(@Body() category: CreateEditCategoryDTO): Promise<BaseResponseDTO> {
         let entity: Category;
 
         if (category.id) {
@@ -40,7 +40,7 @@ export class CategoriesController {
     }
 
     @Get('list')
-    async getCategoryList(): Promise<CategoryDTO[]> {
+    public async getCategoryList(): Promise<CategoryDTO[]> {
         const categories = await this.categoryDao.getAll();
         return categories
             .map((c) => {
@@ -54,7 +54,7 @@ export class CategoriesController {
     }
 
     @Get('/tree')
-    async getCategoryTree(): Promise<CategoryDTO[]> {
+    public async getCategoryTree(): Promise<CategoryDTO[]> {
         const categories = await this.categoryDao.getAll();
         const roots = categories.filter((c) => c.parentId == null).map((c) => this.mapToTree(c, categories));
         return roots;
@@ -72,7 +72,7 @@ export class CategoriesController {
     }
 
     @Get('/totalPerCategory/:year/:month/:day?')
-    async getTotalPerCategory(@Param('year') year: string, @Param('month') month: string, @Param('day') day: string): Promise<TotalInMonthByCategory[]> {
+    public async getTotalPerCategory(@Param('year') year: string, @Param('month') month: string, @Param('day') day: string): Promise<TotalInMonthByCategory[]> {
         const yearNum = parseInt(year),
             monthNum = parseInt(month),
             dayNum = parseInt(day);
@@ -83,7 +83,7 @@ export class CategoriesController {
         }
     }
 
-    async traverse(categories: Category[]): Promise<void> {
+    public async traverse(categories: Category[]): Promise<void> {
         for (const category of categories) {
             await this.traverse((await category.children) ?? []);
         }

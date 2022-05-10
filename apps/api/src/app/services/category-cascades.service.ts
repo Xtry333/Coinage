@@ -4,7 +4,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CategoryCascadeService {
-    constructor(private readonly categoryDao: CategoryDao) {}
+    public constructor(private readonly categoryDao: CategoryDao) {}
 
     public async canSetCategoryParentById(categoryId: number, newParentId: number | null): Promise<boolean> {
         const categories = await this.categoryDao.getAll();

@@ -31,7 +31,7 @@ import { plainToInstance } from 'class-transformer';
 export class CoinageDataService {
     public static readonly API_URL = '/api/';
 
-    constructor(private http: HttpClient) {}
+    public constructor(private http: HttpClient) {}
 
     public getBalanceForActiveAccounts(date: Date): Observable<BalanceDTO[]> {
         return this.http.get<BalanceDTO[]>(
@@ -110,7 +110,7 @@ export class CoinageDataService {
     }
 
     public postCreateSaveTransaction(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {
-        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfers/save`, request);
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
     public postRefundTransfer(transferId: number, date: Date) {

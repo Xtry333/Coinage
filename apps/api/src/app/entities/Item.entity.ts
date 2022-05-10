@@ -3,15 +3,20 @@ import { DateTransformer, DateTransformerType } from './transformers/date.transf
 
 @Entity()
 export class Item {
+    public constructor() {
+        this.editedDate = new Date();
+        this.createdDate = new Date();
+    }
+
     @PrimaryGeneratedColumn()
-    id!: number;
+    public id!: number;
 
     @Column('text', { nullable: false })
-    name!: string;
+    public name!: string;
 
     @UpdateDateColumn({ name: 'edited_date', type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
-    editedDate!: Date;
+    public readonly editedDate!: Date;
 
     @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
-    readonly createdDate!: Date;
+    public readonly createdDate!: Date;
 }

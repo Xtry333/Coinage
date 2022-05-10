@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs';
 
-import { ChartDataset, ChartOptions } from 'chart.js';
+import { ChartDataset } from 'chart.js';
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MonthlyUserStatsDTO, PartialDate, TransferDTO } from '@coinage-app/interfaces';
 
@@ -68,23 +68,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     //     },
     // };
 
-    message = '';
-    transactionId = 0;
-    lastTransactions: TransferDTO[] = [];
-    totalAmountPerMonth: UiTotalAmountPerMonth[] = [];
-    showPage = false;
-    refreshInterval?: ReturnType<typeof setInterval>;
-    averageAmountLimit = 5;
-    balanceMainAccount = 0;
-    balanceSecondary = 0;
-    dataOld = false;
+    public message = '';
+    public transactionId = 0;
+    public lastTransactions: TransferDTO[] = [];
+    public totalAmountPerMonth: UiTotalAmountPerMonth[] = [];
+    public showPage = false;
+    public refreshInterval?: ReturnType<typeof setInterval>;
+    public averageAmountLimit = 5;
+    public balanceMainAccount = 0;
+    public balanceSecondary = 0;
+    public dataOld = false;
 
     @ViewChild(DashboardCountersComponent)
-    countersComponent!: DashboardCountersComponent;
+    public countersComponent!: DashboardCountersComponent;
 
-    constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
+    public constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         console.log(this);
         this.showPage = false;
         this.refreshData();
@@ -104,7 +104,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
         console.log(PartialDate.fromDate(new Date()));
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         if (this.refreshInterval) {
             clearInterval(this.refreshInterval);
             this.refreshInterval = undefined;
@@ -189,15 +189,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
         return this.partedDateService.formatDate(new Date(date));
     }
 
-    get rollingAverageIncomes() {
+    public get rollingAverageIncomes() {
         return this.totalAmountPerMonth.slice(0, this.averageAmountLimit).reduce((a, i) => a + i.incomes, 0) / this.averageAmountLimit;
     }
 
-    get rollingAverageOutcomes() {
+    public get rollingAverageOutcomes() {
         return this.totalAmountPerMonth.slice(0, this.averageAmountLimit).reduce((a, i) => a + i.outcomes, 0) / this.averageAmountLimit;
     }
 
-    get totalChange() {
+    public get totalChange() {
         return this.totalAmountPerMonth.reduce((a, t) => a + t.incomes - t.outcomes, 0);
     }
 

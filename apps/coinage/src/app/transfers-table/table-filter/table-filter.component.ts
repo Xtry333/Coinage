@@ -135,7 +135,7 @@ export class TableFilterComponent implements OnInit {
         };
     }
 
-    constructor(public readonly localStorage: CoinageLocalStorageService) {}
+    public constructor(public readonly localStorage: CoinageLocalStorageService) {}
 
     public ngOnInit(): void {
         this.filterValue = TableFilterComponent.createEmptyFilterValue(this.filterType, this.filterName);
@@ -151,7 +151,7 @@ export class TableFilterComponent implements OnInit {
     }
 
     @HostListener('document:mousedown', ['$event'])
-    handleMousedown($event: MouseEvent) {
+    public handleMousedown($event: MouseEvent) {
         if (this.isPopupDisplayed) {
             const target = $event.target as HTMLElement;
             if (!this.tableFilterElement.nativeElement.contains(target)) {
@@ -217,7 +217,7 @@ export class TableFilterComponent implements OnInit {
         );
     }
 
-    get isFilterApplied(): boolean {
+    public get isFilterApplied(): boolean {
         switch (this.lastFilterValue?.filterType) {
             case FilterType.TextBox:
                 return (this.lastFilterValue?.value?.length ?? 0) > 0;
@@ -233,46 +233,46 @@ export class TableFilterComponent implements OnInit {
         return false;
     }
 
-    get filterIcon(): IconDefinition {
+    public get filterIcon(): IconDefinition {
         if (this.isPopupDisplayed) {
             return this.filterOpenIcon;
         }
         return this.isFilterApplied ? this.filterAppliedIcon : this.filterDefaultIcon;
     }
 
-    get shouldDisplaySearchBox(): boolean {
+    public get shouldDisplaySearchBox(): boolean {
         return (this.filterOptions?.length ?? 0) > 5;
     }
 
-    get noOptionDisplayed(): boolean {
+    public get noOptionDisplayed(): boolean {
         return this.filterOptions?.every((o) => !o.isDisplayed) ?? false;
     }
 
-    get popupSideClass(): string {
+    public get popupSideClass(): string {
         return this.popupSide === PopupSide.ToLeft ? 'right' : 'left';
     }
 
-    get filterDataProvided(): boolean {
+    public get filterDataProvided(): boolean {
         return this.datalist.length > 0;
     }
 
-    get isFilterTextBox(): boolean {
+    public get isFilterTextBox(): boolean {
         return this.filterValue.filterType === FilterType.TextBox;
     }
 
-    get isFilterDateRange(): boolean {
+    public get isFilterDateRange(): boolean {
         return this.filterValue.filterType === FilterType.DateRange;
     }
 
-    get isFilterNumericRange(): boolean {
+    public get isFilterNumericRange(): boolean {
         return this.filterValue.filterType === FilterType.NumericRange;
     }
 
-    get isFilterMultiCheckbox(): boolean {
+    public get isFilterMultiCheckbox(): boolean {
         return this.filterValue.filterType === FilterType.MultiCheckbox;
     }
 
-    get cacheFilterPath(): string {
+    public get cacheFilterPath(): string {
         return `${this.cachedFilterPrefix}.${this.filterValue.name}`;
     }
 }

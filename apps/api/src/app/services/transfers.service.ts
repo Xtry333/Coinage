@@ -6,7 +6,7 @@ import { Transfer } from '../entities/Transfer.entity';
 
 @Injectable()
 export class TransfersService {
-    constructor(private readonly transferDao: TransferDao, private readonly categoryDao: CategoryDao) {}
+    public constructor(private readonly transferDao: TransferDao, private readonly categoryDao: CategoryDao) {}
 
     public async getAllFilteredPagedDTO(filter: GetFilteredTransfersRequest): Promise<TransferDTO[]> {
         return (await this.transferDao.getAllFilteredPaged(filter)).map((t) => this.toTransferDTO(t));
@@ -22,11 +22,11 @@ export class TransfersService {
 
     public async saveTransfer(transfer: Transfer): Promise<Transfer> {
         const category = await this.categoryDao.getById(transfer.categoryId ?? transfer.category.id);
-        if (category === undefined) {
+        if (category === null) {
             throw new Error('Category not found');
         }
 
-        if (transfer.description == undefined) {
+        if (!transfer.description) {
             transfer.description = category.name;
         }
 

@@ -39,6 +39,7 @@ import { TransferDetailsComponent } from './transfer-details/transfer-details.co
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 import { TransfersTableComponent } from './transfers-table/transfers-table.component';
 import zoomPlugin from 'chartjs-plugin-zoom';
+import { ItemsTableComponent } from './transfer-details/items-table/items-table.component';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
@@ -70,6 +71,7 @@ Chart.register(zoomPlugin);
         AutoPaginationComponent,
         CreateEditCategoryComponent,
         ChartComponent,
+        ItemsTableComponent,
     ],
     imports: [
         BrowserModule,

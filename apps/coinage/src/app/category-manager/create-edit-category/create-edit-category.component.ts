@@ -11,13 +11,13 @@ import { CoinageDataService } from '../../services/coinage.data-service';
 export class CreateEditCategoryComponent implements OnInit, OnChanges {
     public categories: CategoryDTO[] = [];
 
-    @Input() selectedCategory?: CategoryDTO;
+    @Input() public selectedCategory?: CategoryDTO;
 
-    @Output() categorySaved = new EventEmitter<CategoryDTO>();
+    @Output() public categorySaved = new EventEmitter<CategoryDTO>();
 
     public editedCategory: CreateEditCategoryDTO = { name: '', description: '' };
 
-    constructor(private readonly coinageDataService: CoinageDataService) {}
+    public constructor(private readonly coinageDataService: CoinageDataService) {}
 
     public ngOnInit(): void {
         this.coinageDataService.getCategoryList().subscribe((categories) => {

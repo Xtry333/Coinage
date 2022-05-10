@@ -8,21 +8,21 @@ import { DecimalToNumberTransformer } from './transformers/decimal-to-number.tra
 @Entity()
 export class Receipt {
     @PrimaryGeneratedColumn()
-    id!: number;
+    public id!: number;
 
     @Column('text', { nullable: false })
-    description!: string;
+    public description!: string;
 
     @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer(2) })
-    amount!: number;
+    public amount!: number;
 
     @Column({ type: 'date', nullable: true, transformer: new DateTransformer(DateTransformerType.DATE) })
-    date!: Date | null;
+    public date!: Date | null;
 
     @ManyToOne(() => Contractor, { eager: true, nullable: true })
     @JoinColumn({ name: 'contractor_id' })
-    contractor?: Contractor | null;
+    public contractor?: Contractor | null;
 
     @OneToMany(() => Transfer, (transfer) => transfer.receipt, { eager: true })
-    transfers!: Transfer[];
+    public transfers!: Transfer[];
 }

@@ -6,16 +6,16 @@ import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/
     styleUrls: ['./big-counter.component.scss'],
 })
 export class BigCounterComponent implements OnChanges, OnDestroy {
-    @Input() value = 0;
-    @Input() topHeader = '';
-    @Input() botHeader = '';
-    @Input() animate = true;
+    @Input() public value = 0;
+    @Input() public topHeader = '';
+    @Input() public botHeader = '';
+    @Input() public animate = true;
 
-    internalValue = 0;
+    public internalValue = 0;
 
-    animateInterval?: ReturnType<typeof setInterval>;
+    public animateInterval?: ReturnType<typeof setInterval>;
 
-    ngOnChanges(changes: SimpleChanges): void {
+    public ngOnChanges(changes: SimpleChanges): void {
         const targetValue = parseFloat(changes.value.currentValue);
         if (!this.animate) {
             this.internalValue = targetValue;
@@ -28,11 +28,11 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
         }
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.tryClearAnimateInterval();
     }
 
-    animateCounterValue(targetValue: number) {
+    public animateCounterValue(targetValue: number) {
         const delta = Math.abs(targetValue - this.internalValue) / 25;
         if (this.internalValue + delta < targetValue && this.internalValue <= targetValue && delta > 0.0001) {
             this.internalValue += delta;
@@ -44,14 +44,14 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
         }
     }
 
-    tryClearAnimateInterval() {
+    public tryClearAnimateInterval() {
         if (this.animateInterval) {
             clearInterval(this.animateInterval);
             this.animateInterval = undefined;
         }
     }
 
-    get displayValue() {
+    public get displayValue() {
         return this.internalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 }
