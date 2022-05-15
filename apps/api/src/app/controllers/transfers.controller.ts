@@ -8,18 +8,20 @@ import {
     TransferDTO,
     CreateEditTransferModelDTO,
 } from '@coinage-app/interfaces';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, createParamDecorator, ExecutionContext, Get, Param, Post, SetMetadata, UseGuards } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
 import { Transfer } from '../entities/Transfer.entity';
+import { AuthGuard } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
+@UseGuards(AuthGuard)
 @Controller('transfers')
 export class TransfersController {
     public constructor(
@@ -142,3 +144,4 @@ export class TransfersController {
         return { originTransferId: insertedFrom.id, targetTransferId: insertedTo.id };
     }
 }
+

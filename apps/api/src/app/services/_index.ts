@@ -5,8 +5,10 @@ import { EtherealTransferService } from './ethereal-transfer.service';
 import { SaveTransfersService } from './transfers/save-transfers.service';
 import { TransfersService } from './transfers.service';
 import { TemplateNameMapperService } from './template-name-mapper.service';
+import { AuthGuard } from './auth.guard';
 
 export default [
+    AuthGuard,
     AccountBalanceService,
     TransfersService,
     SaveTransfersService,

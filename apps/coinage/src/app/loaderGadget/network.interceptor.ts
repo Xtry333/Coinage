@@ -10,6 +10,11 @@ export class NetworkInterceptor implements HttpInterceptor {
 
     public intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         this.loader.show();
+        request = request.clone({
+            setHeaders: {
+                authorization: `Bearer ${'TOKEN_TEST_!@#_123'}`,
+            },
+        });
         return next.handle(request).pipe(
             finalize(() => {
                 this.loader.hide();

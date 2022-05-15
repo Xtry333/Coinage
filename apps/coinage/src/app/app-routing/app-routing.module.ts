@@ -5,7 +5,7 @@ import { CategoryManagerComponent } from '../category-manager/category-manager.c
 import { CommonModule } from '@angular/common';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
-import { MonthSummaryComponent } from '../summary/summary.component';
+import { MonthSummaryComponent } from '../month-summary/month-summary.component';
 import { NgModule } from '@angular/core';
 import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';

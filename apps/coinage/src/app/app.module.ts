@@ -19,7 +19,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { MathAbsPipe } from './pipes/math-abs.pipe';
 import { ModalComponent } from './components/modal/modal.component';
-import { MonthSummaryComponent } from './summary/summary.component';
+import { MonthSummaryComponent } from './month-summary/month-summary.component';
 import { NetworkInterceptor } from './loaderGadget/network.interceptor';
 import { NgChartsModule } from 'ng2-charts';
 import { NgModule } from '@angular/core';
