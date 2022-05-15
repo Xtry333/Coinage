@@ -18,6 +18,7 @@ import {
     TotalInMonthByCategory,
     TransferDTO,
     TransferDetailsDTO,
+    ItemDTO,
 } from '@coinage-app/interfaces';
 import { Observable, lastValueFrom, map } from 'rxjs';
 
@@ -109,7 +110,7 @@ export class CoinageDataService {
         return this.http.get<AccountDTO[]>(`${CoinageDataService.API_URL}account/all`);
     }
 
-    public postCreateSaveTransaction(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {
+    public postCreateSaveTransfer(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
@@ -150,5 +151,9 @@ export class CoinageDataService {
 
     public getTotalPerCategory(year: number, month: number, day?: number): Observable<TotalInMonthByCategory[]> {
         return this.http.get<TotalInMonthByCategory[]>(`${CoinageDataService.API_URL}category/totalPerCategory/${year}/${month}${day ? '/' + day : ''}`);
+    }
+
+    public getAllItems(): Promise<ItemDTO[]> {
+        return lastValueFrom(this.http.get<ItemDTO[]>(`${CoinageDataService.API_URL}items/all`));
     }
 }

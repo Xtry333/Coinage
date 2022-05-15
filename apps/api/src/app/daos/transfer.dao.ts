@@ -1,22 +1,10 @@
 import { GetFilteredTransfersRequest, Range } from '@coinage-app/interfaces';
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-    Between,
-    DeleteResult,
-    Equal,
-    FindOperator,
-    FindOptionsWhere,
-    getConnection,
-    ILike,
-    In,
-    InsertResult,
-    IsNull,
-    LessThanOrEqual,
-    Repository,
-} from 'typeorm';
+import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, IsNull, LessThanOrEqual, Repository } from 'typeorm';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+import { BaseDao } from './base.bao';
 
 type KeysOfType<O, T> = {
     [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;
@@ -25,32 +13,20 @@ type KeysOfType<O, T> = {
 type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 @Injectable()
-export class TransferDao {
+export class TransferDao extends BaseDao {
     public constructor(
-        @InjectRepository(Transfer)
-        private readonly transferRepository: Repository<Transfer>,
+        @InjectRepository(Transfer) private readonly transferRepository: Repository<Transfer>,
         private readonly templateNameMapperService: TemplateNameMapperService
-    ) {}
+    ) {
+        super();
+    }
 
     public async getById(id: number): Promise<Transfer> {
-        try {
-            const transfer = await this.transferRepository.findOneByOrFail({
-                id: Equal(id),
-                // join: {
-                //     alias: 'transfer',
-                //     leftJoinAndSelect: { receipt: 'transfer.receipt', contractor: 'receipt.contractor', transfers: 'receipt.transfers' },
-                // },
-            });
-            // if (!transfer) {
-            //     throw new NotFoundException('Transfer not found.');
-            // }
-
-            await transfer.category.parent;
-            this.templateNameMapperService.mapTransfersTemplateNames([transfer]);
-            return transfer;
-        } catch (e) {
-            throw new NotFoundException('Transfer not found');
-        }
+        let transfer = await this.transferRepository.findOneBy({ id: Equal(id) });
+        transfer = this.validateNotNullById(Transfer.name, id, transfer);
+        await transfer.category.parent;
+        this.templateNameMapperService.mapTransfersTemplateNames([transfer]);
+        return transfer;
     }
 
     public async getAll() {

@@ -62,7 +62,7 @@
                 </tr>
                 <tr>
                     <th>Contractor</th>
-                    <td>{{ transfer.contractor | undefined }}</td>
+                    <td>{{ transfer.contractor | ifNull }}</td>
                 </tr>
                 <tr>
                     <th>Total {{ totalPayment < 0 ? 'payed to' : 'received from' }} {{ transfer?.contractor }}</th>

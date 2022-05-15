@@ -100,6 +100,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
                     rowsPerPage: 500,
                     ...this.tableFilterParams,
                     date: { from: this.monthStartDate, to: this.monthEndDate },
+                    userId: 1,
                     showPlanned: true,
                 }),
                 lastValueFrom(this.coinageData.getBalanceForActiveAccounts(requestDateBalance)),

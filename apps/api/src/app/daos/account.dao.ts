@@ -7,21 +7,32 @@ import { Injectable } from '@nestjs/common';
 import { TransferType } from '../entities/Category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transfer } from '../entities/Transfer.entity';
+import { BaseDao } from './base.bao';
 
 @Injectable()
-export class AccountDao {
-    public constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {}
+export class AccountDao extends BaseDao {
+    public constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {
+        super();
+    }
 
     public async getById(id: number): Promise<Account> {
-        const account = await this.accountRepository.findOneByOrFail({ id: Equal(id) });
-        // if (accounts.length === 0) {
-        //     throw new Error(`Account with id ${id} not found.`);
-        // }
-        return account;
+        const account = await this.accountRepository.findOneBy({ id: Equal(id) });
+
+        return this.validateNotNullById(Account.name, id, account);
     }
 
     public async getByIds(ids: number[]): Promise<Account[]> {
         return await this.accountRepository.findByIds(ids);
+    }
+
+    public async countAllTransfersForAccount(id: number): Promise<number> {
+        const result = await this.accountRepository
+            .createQueryBuilder()
+            .select('COUNT(t.id)', 'count')
+            .from(Transfer, 't')
+            .where({ accountId: Equal(id) })
+            .getRawOne();
+        return parseInt(result[0].count, 10);
     }
 
     public getAllActive(): Promise<Account[]> {

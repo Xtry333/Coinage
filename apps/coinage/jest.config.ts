@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     displayName: 'coinage',
 
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
@@ -17,5 +17,5 @@ module.exports = {
         'jest-preset-angular/build/AngularSnapshotSerializer.js',
         'jest-preset-angular/build/HTMLCommentSerializer.js',
     ],
-    preset: '../../jest.preset.ts',
+    preset: '../../jest.preset.js',
 };

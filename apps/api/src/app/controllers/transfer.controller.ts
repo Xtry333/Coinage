@@ -17,6 +17,7 @@ import { ContractorDao } from '../daos/contractor.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
+import { TransferItem } from '../entities/TransferItem.entity';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { TransfersService } from '../services/transfers.service';
@@ -207,6 +208,21 @@ export class TransferController {
         }
 
         const inserted = await this.transfersService.saveTransfer(entity);
+
+        const transferItems: TransferItem[] = [];
+        transfer.items.forEach((item) => {
+            if (item.id !== undefined) {
+                const transferItem = new TransferItem();
+                transferItem.itemId = item.id;
+                transferItem.units = item.amount;
+                transferItem.transferId = inserted.id;
+                transferItem.unitPrice = item.price;
+                transferItems.push(transferItem);
+            }
+        });
+        entity.transferItems = transferItems;
+
+        await this.transfersService.saveTransfer(entity);
 
         return { insertedId: inserted.id };
     }

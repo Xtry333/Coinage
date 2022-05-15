@@ -87,6 +87,7 @@ export class AccountsController {
                 month: stats.month - 1,
                 income: parseFloat(stats.income),
                 outcome: parseFloat(stats.outcome),
+                change: parseFloat(stats.income) - parseFloat(stats.outcome),
                 transactionsCount: parseInt(stats.count),
             };
         });
@@ -102,6 +103,7 @@ export class AccountsController {
                     month: month,
                     income: 0,
                     outcome: 0,
+                    change: 0,
                     transactionsCount: 0,
                 });
             }

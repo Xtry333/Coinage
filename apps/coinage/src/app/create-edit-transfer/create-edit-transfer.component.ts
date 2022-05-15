@@ -10,6 +10,7 @@ import { CoinageLocalStorageService } from '../services/coinage-local-storage.se
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NotificationService } from '../services/notification.service';
 import { finalize } from 'rxjs/operators';
+import { ShoppingListItem } from './item-shopping-list/editable-shop-list-item/editable-shop-list-item.component';
 
 export interface NewTransferObject {
     description: string;
@@ -36,6 +37,10 @@ export class CreateEditTransferComponent implements OnInit {
     public editMode = false;
     public transferDTO!: TransferDetailsDTO;
     public transferId!: number;
+
+    public itemsInTransfer: ShoppingListItem[] = [];
+
+    public shouldDisplayShoppingList = false;
 
     @ViewChildren('categorySelect')
     private categorySelect?: QueryList<NgSelectComponent>;
@@ -101,10 +106,11 @@ export class CreateEditTransferComponent implements OnInit {
             this.selectedTransferInputs.contractorId ?? null,
             this.selectedTransferInputs.accountId ?? 0,
             new Date(this.selectedTransferInputs.date),
-            null
+            null,
+            this.itemsInTransfer
         );
         console.log(newTransfer);
-        this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
+        this.coinageData.postCreateSaveTransfer(newTransfer).subscribe((result) => {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
             if (result.error) {
@@ -191,5 +197,18 @@ export class CreateEditTransferComponent implements OnInit {
         };
         this.categorySelect?.first.handleClearClick();
         this.contractorSelect?.first.handleClearClick();
+        this.shouldDisplayShoppingList = false;
+    }
+
+    public openShoppingList(): void {
+        this.shouldDisplayShoppingList = true;
+    }
+
+    public onTotalCostChanged(cost: number): void {
+        this.selectedTransferInputs.amount = cost;
+    }
+
+    public onItemListChanged(items: ShoppingListItem[]): void {
+        this.itemsInTransfer = items;
     }
 }

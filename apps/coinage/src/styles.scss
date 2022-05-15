@@ -24,24 +24,32 @@ a:visited {
     float: right;
 }
 
-.mt-1 {
-    margin-top: 2px;
-}
+@for $i from 1 through 5 {
+    .ml-#{$i} {
+        margin-left: #{$i * 2}px;
+    }
 
-.ml-1 {
-    margin-left: 2px;
-}
+    .mr-#{$i} {
+        margin-right: #{$i * 2}px;
+    }
 
-.ml-2 {
-    margin-left: 4px;
-}
+    .mt-#{$i} {
+        margin-top: #{$i * 2}px;
+    }
 
-.mr-1 {
-    margin-right: 2px;
-}
+    .mb-#{$i} {
+        margin-bottom: #{$i * 2}px;
+    }
 
-.mr-2 {
-    margin-right: 4px;
+    .mv-#{$i} {
+        margin-top: #{$i * 2}px;
+        margin-bottom: #{$i * 2}px;
+    }
+
+    .mh-#{$i} {
+        margin-left: #{$i * 2}px;
+        margin-right: #{$i * 2}px;
+    }
 }
 
 .nowrap {
@@ -54,4 +62,8 @@ a:visited {
 
 .align-right {
     text-align: right;
+}
+
+.d-block {
+    display: block;
 }

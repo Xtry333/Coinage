@@ -31,7 +31,7 @@
         </tr>
         <tr>
             <th>Contractor</th>
-            <td>{{ receiptDetails.contractorName | undefined }}</td>
+            <td>{{ receiptDetails.contractorName | ifNull }}</td>
         </tr>
     </table>
     <coinage-app-transfers-table

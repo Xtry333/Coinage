@@ -1,25 +1,24 @@
-import { DeleteResult, Equal, InsertResult, getConnection, Repository } from 'typeorm';
-
+import { TotalInMonthByCategory } from '@coinage-app/interfaces';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Equal, getConnection, InsertResult, Repository } from 'typeorm';
 import { Account } from '../entities/Account.entity';
 import { Category } from '../entities/Category.entity';
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { TotalInMonthByCategory } from '@coinage-app/interfaces';
 import { Transfer } from '../entities/Transfer.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { BaseDao } from './base.bao';
 
 @Injectable()
-export class CategoryDao {
-    public static CATEGORY_NOT_FOUND_MESSAGE = (id: number) => `Category with ID '${id}' not found.`;
+export class CategoryDao extends BaseDao {
     public static SYSTEM_CATEGORY_NOT_FOUND_MESSAGE = (tag: string) => `System category '${tag}' not found. Something went wrong in the database.`;
 
-    public constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>) {}
+    public constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>) {
+        super();
+    }
 
     public async getById(id: number): Promise<Category> {
         const category = await this.categoryRepository.findOneBy({ id: Equal(id) });
-        if (category === null) {
-            throw new NotFoundException(CategoryDao.CATEGORY_NOT_FOUND_MESSAGE(id));
-        }
-        return category;
+
+        return this.validateNotNullById(Category.name, id, category);
     }
 
     public async getBySystemTag(tag: string): Promise<Category> {

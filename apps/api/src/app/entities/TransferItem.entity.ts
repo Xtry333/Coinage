@@ -15,9 +15,15 @@ export class TransferItem {
     @Column({ name: 'units', type: 'float', nullable: false, default: 1 })
     public units!: number;
 
+    @Column({ type: 'integer' })
+    public transferId!: number;
+
     @ManyToOne(() => Transfer, (transfer) => transfer.transferItems, { eager: false, nullable: false })
     @JoinColumn({ name: 'transfer_id' })
     public transfer!: Promise<Transfer>;
+
+    @Column({ type: 'integer' })
+    public itemId!: number;
 
     @ManyToOne(() => Item, { eager: true, nullable: false })
     @JoinColumn({ name: 'item_id' })

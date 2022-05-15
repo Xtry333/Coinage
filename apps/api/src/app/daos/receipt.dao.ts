@@ -1,19 +1,22 @@
 import { Injectable } from '@nestjs/common';
-import { DeleteResult, Equal, getConnection, InsertResult } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Equal, getConnection, InsertResult, Repository } from 'typeorm';
 import { Receipt } from '../entities/Receipt.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+import { BaseDao } from './base.bao';
 
 @Injectable()
-export class ReceiptDao {
-    public constructor(private readonly templateNameMapperService: TemplateNameMapperService) {}
+export class ReceiptDao extends BaseDao {
+    public constructor(
+        @InjectRepository(Receipt) private readonly receiptRepository: Repository<Receipt>,
+        private readonly templateNameMapperService: TemplateNameMapperService
+    ) {
+        super();
+    }
 
     public async getById(id: number): Promise<Receipt> {
-        const receipt = await getConnection()
-            .getRepository(Receipt)
-            .findOne({ where: { id: Equal(id) } });
-        if (!receipt) {
-            throw new Error('Receipt not found');
-        }
+        let receipt = await this.receiptRepository.findOneBy({ id: Equal(id) });
+        receipt = this.validateNotNullById(Receipt.name, id, receipt);
 
         this.templateNameMapperService.mapTransfersTemplateNames(receipt.transfers);
         return receipt;

@@ -1,6 +1,10 @@
 import { IsDate, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
 
+export class ShoppingListItem {
+    public constructor(public id: number | undefined, public name: string, public amount: number, public price: number) {}
+}
+
 export class CreateEditTransferModelDTO {
     public constructor(
         id: number | undefined,
@@ -10,7 +14,8 @@ export class CreateEditTransferModelDTO {
         contractorId: number | null,
         accountId: number,
         date: Date,
-        receiptId: number | null
+        receiptId: number | null,
+        items: ShoppingListItem[] | undefined
     ) {
         this.id = id;
         this.description = description;
@@ -20,6 +25,7 @@ export class CreateEditTransferModelDTO {
         this.accountId = accountId;
         this.date = date;
         this.receiptId = receiptId;
+        this.items = items ?? [];
     }
 
     @IsOptional()
@@ -62,4 +68,7 @@ export class CreateEditTransferModelDTO {
     @IsDate()
     @Type(() => Date)
     public date: Date;
+
+    @Type(() => ShoppingListItem)
+    public items: ShoppingListItem[];
 }

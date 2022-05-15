@@ -1,3 +1,5 @@
+$borderColor: #5d5d5d;
+
 .category-path-list {
     padding: 0;
     display: flex;
@@ -11,8 +13,17 @@
     }
 }
 
+.edit-transfer-container {
+    display: flex;
+
+    .v-divider {
+        border-left: 1px solid $borderColor;
+    }
+}
+
 .transaction-form {
     margin-top: 5px;
+
     input,
     button,
     select {
@@ -24,7 +35,6 @@
     }
 
     .ng-select ::ng-deep {
-        $borderColor: #5d5d5d;
         height: 40px;
         width: 300px;
         margin: 10px;
