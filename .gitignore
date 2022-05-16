@@ -8,6 +8,7 @@
 # dependencies
 /node_modules
 /.yarn
+.yarnrc.yml
 
 # IDEs and editors
 /.idea
@@ -26,6 +27,7 @@
 !.vscode/extensions.json
 
 # misc
+.angular
 /.angular/cache
 /.sass-cache
 /connect.lock
@@ -33,7 +35,6 @@
 /libpeerconnection.log
 npm-debug.log
 yarn-error.log
-.yarnrc.yml
 testem.log
 /typings
 migrations.json
@@ -48,4 +49,3 @@ coinage-data.sql
 # Environment
 .env
 
-.angular
