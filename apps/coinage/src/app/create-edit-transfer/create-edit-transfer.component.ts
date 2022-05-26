@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs';
 
-import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
+import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, TransferDetailsDTO, TransferItemDTO } from '@coinage-app/interfaces';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
@@ -35,7 +35,7 @@ export class CreateEditTransferComponent implements OnInit {
     public contractors: ContractorDTO[] = [];
     public accounts: AccountDTO[] = [];
     public editMode = false;
-    public transferDTO!: TransferDetailsDTO;
+    public transferDTO?: TransferDetailsDTO;
     public transferId!: number;
 
     public itemsInTransfer: ShoppingListItem[] = [];
@@ -71,6 +71,8 @@ export class CreateEditTransferComponent implements OnInit {
                 this.transferId = id;
                 this.coinageData.getTransferDetails(id).then((transfer) => {
                     this.transferDTO = transfer;
+                    this.itemsInTransfer = this.mapToTransferItems(transfer.items);
+                    this.shouldDisplayShoppingList = transfer.items.length > 0;
                     this.editMode = true;
                     console.log(transfer);
                     this.selectedTransferInputs = {
@@ -106,7 +108,7 @@ export class CreateEditTransferComponent implements OnInit {
             this.selectedTransferInputs.contractorId ?? null,
             this.selectedTransferInputs.accountId ?? 0,
             new Date(this.selectedTransferInputs.date),
-            null,
+            this.transferDTO?.receipt?.id ?? null,
             this.itemsInTransfer
         );
         console.log(newTransfer);
@@ -153,16 +155,19 @@ export class CreateEditTransferComponent implements OnInit {
         }
     }
 
-    public onAddNewCategory = async (name: string): Promise<CategoryDTO> => {
+    public async onAddNewCategory(name: string): Promise<CategoryDTO> {
         const response = await Rx.lastValueFrom(this.coinageData.postCreateCategory({ name }));
         if (response.insertedId) {
             this.notificationService.push({ title: `Category Created`, message: name, linkTo: NavigatorPages.CategoryDetails(response.insertedId) });
         }
         return { id: response.insertedId ?? 0, name };
-    };
+    }
 
-    public onAddNewContractor = async (name: string): Promise<ContractorDTO> => {
-        const response = await Rx.lastValueFrom(this.coinageData.postCreateContractor({ name }));
+    public async onAddNewContractor(name: string): Promise<ContractorDTO> {
+        console.log(name);
+        console.log(this);
+        const response = await this.coinageData.postCreateContractor({ name });
+        console.log(response);
         if (response === undefined) {
             return { id: 0, name: '' };
         }
@@ -170,7 +175,7 @@ export class CreateEditTransferComponent implements OnInit {
             this.notificationService.push({ title: `Contractor Created`, message: name, linkTo: NavigatorPages.ContractorDetails(response.insertedId) });
         }
         return { id: response.insertedId ?? 0, name };
-    };
+    }
 
     public onChangeCategory(): void {
         if (this.selectedTransferInputs.categoryId === 1 && this.selectedTransferInputs.description === '') {
@@ -210,5 +215,17 @@ export class CreateEditTransferComponent implements OnInit {
 
     public onItemListChanged(items: ShoppingListItem[]): void {
         this.itemsInTransfer = items;
+    }
+
+    private mapToTransferItems(items: TransferItemDTO[]): ShoppingListItem[] {
+        return items.map((item) => {
+            return {
+                amount: item.amount,
+                id: item.id,
+                name: item.itemName,
+                quantity: item.amount,
+                price: item.unitPrice,
+            };
+        });
     }
 }

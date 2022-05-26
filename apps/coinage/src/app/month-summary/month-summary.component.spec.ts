@@ -41,7 +41,7 @@ describe('Summary Component', () => {
                         amount: 123.1,
                         categoryPath: [],
                         contractor: 'Abc',
-                        date: new Date(2021-05-16),
+                        date: new Date(2021 - 05 - 16),
                         otherTransfers: [],
                         description: '',
                         createdDate: new Date('2021-05-16'),

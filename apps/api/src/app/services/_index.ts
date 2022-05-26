@@ -6,6 +6,7 @@ import { SaveTransfersService } from './transfers/save-transfers.service';
 import { TransfersService } from './transfers.service';
 import { TemplateNameMapperService } from './template-name-mapper.service';
 import { AuthGuard } from './auth.guard';
+import { TransferItemsService } from './transfer-items.service';
 
 export default [
     AuthGuard,
@@ -16,4 +17,5 @@ export default [
     CategoryCascadeService,
     EtherealTransferService,
     TemplateNameMapperService,
+    TransferItemsService,
 ];

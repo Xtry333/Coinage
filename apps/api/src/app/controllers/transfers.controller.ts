@@ -1,21 +1,17 @@
 import {
-    BaseResponseDTO,
     CreateInternalTransferDTO,
     CreateInternalTransferDTOResponse,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
-    SplitTransferDTO,
     TransferDTO,
-    CreateEditTransferModelDTO,
 } from '@coinage-app/interfaces';
-import { Body, Controller, createParamDecorator, ExecutionContext, Get, Param, Post, SetMetadata, UseGuards } from '@nestjs/common';
-
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
 import { Transfer } from '../entities/Transfer.entity';
-import { AuthGuard } from '../services/auth.guard';
+import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { TransfersService } from '../services/transfers.service';
@@ -36,12 +32,15 @@ export class TransfersController {
     ) {}
 
     @Post('all')
-    public async getAllFilteredTransfers(@Body() filterParams: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
+    public async getAllFilteredTransfers(
+        @RequestingUser('id') userId: number,
+        @Body() filterParams: GetFilteredTransfersRequest
+    ): Promise<FilteredTransfersDTO> {
         filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
         filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
 
         if (filterParams.userId) {
-            const user = await this.userDao.getById(filterParams.userId);
+            const user = await this.userDao.getById(userId);
             const userAccountIds = (await user.accounts).map((a) => a.id);
             filterParams.accountIds = filterParams.accountIds !== undefined ? [...filterParams.accountIds, ...userAccountIds] : userAccountIds;
         }
@@ -56,9 +55,8 @@ export class TransfersController {
     }
 
     @Get('recent')
-    public getRecentTransactions(): Promise<TransferDTO[]> {
+    public getRecentTransactions(@RequestingUser('id') userId: number): Promise<TransferDTO[]> {
         const recentCount = 10;
-        const userId = 1;
         return this.transfersService.getRecentTransfersForUserDTO(userId, recentCount);
     }
 
@@ -144,4 +142,3 @@ export class TransfersController {
         return { originTransferId: insertedFrom.id, targetTransferId: insertedTo.id };
     }
 }
-

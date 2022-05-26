@@ -90,3 +90,20 @@ select {
 .add-item-button {
     margin-top: 10px;
 }
+
+.shopping-item {
+    .remove-icon {
+        display: none;
+        margin-left: 5px;
+    }
+
+    &:hover {
+        .remove-icon {
+            display: inline;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}

@@ -28,7 +28,7 @@ export class ItemsTableComponent implements OnChanges {
     public totalSum = 0;
 
     public ngOnChanges(): void {
-        this.tableItems.splice(0, this.items.length);
+        this.tableItems = [];
         this.items.forEach((item) => {
             this.tableItems.push(new UiTransferItemDTO(item));
             this.totalSum = this.totalSum + item.amount * item.unitPrice;

@@ -4,13 +4,12 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, IsNull, LessThanOrEqual, Repository } from 'typeorm';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+import { Writeable } from '../types/Writeable.type';
 import { BaseDao } from './base.bao';
 
 type KeysOfType<O, T> = {
     [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;
 }[keyof O];
-
-type Writeable<T> = { -readonly [P in keyof T]: T[P] };
 
 @Injectable()
 export class TransferDao extends BaseDao {

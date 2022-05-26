@@ -9,7 +9,7 @@ import {
     TransferDTO,
     CreateEditTransferModelDTO,
 } from '@coinage-app/interfaces';
-import { BadRequestException, Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -20,6 +20,7 @@ import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
+import { TransferItemsService } from '../services/transfer-items.service';
 import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
@@ -35,7 +36,8 @@ export class TransferController {
         private readonly contractorDao: ContractorDao,
         private readonly accountDao: AccountDao,
         private readonly dateParserService: DateParserService,
-        private readonly saveTransfersService: SaveTransfersService
+        private readonly saveTransfersService: SaveTransfersService,
+        private readonly transferItemsService: TransferItemsService
     ) {}
 
     @Get(':transferId/details')
@@ -47,7 +49,7 @@ export class TransferController {
         const transfer = await this.transferDao.getById(transferId);
 
         transfer.transferItems.forEach((item) => {
-            console.log(`${item.units}x ${item.item.name} (${item.unitPrice * item.units} PLN)`);
+            console.log(`${item.quantity}x ${item.item.name} (${item.unitPrice * item.quantity} PLN)`);
         });
 
         const categoryPath: Category[] = [];
@@ -107,10 +109,10 @@ export class TransferController {
             }),
             items: transfer.transferItems.map((item) => {
                 return {
-                    id: item.id,
+                    id: item.itemId,
                     itemName: item.item.name,
                     unit: 'Units',
-                    amount: item.units,
+                    amount: item.quantity,
                     unitPrice: item.unitPrice,
                 };
             }),
@@ -209,20 +211,19 @@ export class TransferController {
 
         const inserted = await this.transfersService.saveTransfer(entity);
 
+        // This will save items async in case of any issues with items not appearing in the transfer details
         const transferItems: TransferItem[] = [];
-        transfer.items.forEach((item) => {
+        transfer.items.forEach(async (item) => {
             if (item.id !== undefined) {
                 const transferItem = new TransferItem();
                 transferItem.itemId = item.id;
-                transferItem.units = item.amount;
+                transferItem.quantity = item.amount;
                 transferItem.transferId = inserted.id;
                 transferItem.unitPrice = item.price;
                 transferItems.push(transferItem);
+                await this.transferItemsService.save(transferItem);
             }
         });
-        entity.transferItems = transferItems;
-
-        await this.transfersService.saveTransfer(entity);
 
         return { insertedId: inserted.id };
     }
@@ -241,14 +242,14 @@ export class TransferController {
             entity.category = category;
             entity.type = category.type;
         } else {
-            throw new Error(`Cannot find category ${transfer.categoryId}`);
+            throw new NotFoundException(`Cannot find category ${transfer.categoryId}`);
         }
 
         target.amount = target.amount - transfer.amount;
         entity.description = transfer.description.length > 0 ? transfer.description : category.name;
         entity.amount = transfer.amount;
         if (target.amount <= 0) {
-            throw new Error('Amount too high! Create new transfer instead');
+            throw new BadRequestException('Amount too high! Create new transfer instead.');
         }
         entity.date = target.date;
         entity.accountId = target.accountId;

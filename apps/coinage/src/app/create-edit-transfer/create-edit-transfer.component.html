@@ -21,9 +21,9 @@
                         [required]="true"
                         [editableSearchTerm]="true"
                         [items]="categories"
-                        bindLabel="name"
                         bindValue="id"
-                        [addTag]="onAddNewCategory"
+                        bindLabel="name"
+                        [addTag]="onAddNewCategory.bind(this)"
                         addTagText="Add category"
                         (change)="onChangeCategory()"
                     >
@@ -39,9 +39,9 @@
                         [clearable]="true"
                         [editableSearchTerm]="true"
                         [items]="contractors"
-                        bindLabel="name"
                         bindValue="id"
-                        [addTag]="onAddNewContractor"
+                        bindLabel="name"
+                        [addTag]="onAddNewContractor.bind(this)"
                         addTagText="Add contractor"
                     >
                     </ng-select>
@@ -55,8 +55,8 @@
                         [clearable]="false"
                         [editableSearchTerm]="true"
                         [items]="accounts"
-                        bindLabel="name"
                         bindValue="id"
+                        bindLabel="name"
                     >
                     </ng-select>
                 </div>
@@ -80,6 +80,7 @@
             <coinage-app-item-shopping-list
                 (totalCostChanged)="onTotalCostChanged($event)"
                 (itemListChanged)="onItemListChanged($event)"
+                [preselectedItems]="itemsInTransfer"
             ></coinage-app-item-shopping-list>
         </div>
     </div>

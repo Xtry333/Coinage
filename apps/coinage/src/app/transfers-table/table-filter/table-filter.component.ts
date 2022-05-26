@@ -56,6 +56,9 @@ export interface FilterOption {
     styleUrls: ['./table-filter.component.scss'],
 })
 export class TableFilterComponent implements OnInit {
+    public static readonly ITEMS_TO_DISPLAY_SEARCH_BOX = 5;
+    public static readonly ITEMS_TO_DISPLAY_CHECK_ALL_BUTTON = 7;
+
     public PopupSides = PopupSide;
 
     public filterDefaultIcon = faCaretDown;
@@ -206,6 +209,14 @@ export class TableFilterComponent implements OnInit {
         this.filterOptions?.forEach((option) => (option.isSelected = false));
     }
 
+    public onCheckVisibleOptions(): void {
+        this.filterOptions?.forEach((option) => {
+            if (option.isDisplayed) {
+                option.isSelected = true;
+            }
+        });
+    }
+
     public onClearOptionsSearchValue(): void {
         this.onChangeOptionSearchValue('');
     }
@@ -215,6 +226,22 @@ export class TableFilterComponent implements OnInit {
         this.filterOptions?.forEach(
             (option) => (option.isDisplayed = value.length === 0 || option.searchValues.some((values) => values.includes(value.toLowerCase())))
         );
+    }
+
+    public onChangeFilterRangeFrom(): void {
+        if (this.filterValue.filterType === FilterType.NumericRange && this.filterValue.range.from !== undefined) {
+            if (this.filterValue.range.to === undefined || this.filterValue.range.to < this.filterValue.range.from) {
+                this.filterValue.range.to = this.filterValue.range.from ?? 0;
+            }
+        }
+    }
+
+    public onChangeFilterRangeTo(): void {
+        if (this.filterValue.filterType === FilterType.NumericRange && this.filterValue.range.to !== undefined) {
+            if (this.filterValue.range.from === undefined || this.filterValue.range.from > this.filterValue.range.to) {
+                this.filterValue.range.from = this.filterValue.range.to ?? 0;
+            }
+        }
     }
 
     public get isFilterApplied(): boolean {
@@ -230,7 +257,6 @@ export class TableFilterComponent implements OnInit {
             default:
                 throw new Error(`IsFilterApplied not implemented for one or more of FilterTypes.`);
         }
-        return false;
     }
 
     public get filterIcon(): IconDefinition {
@@ -241,7 +267,11 @@ export class TableFilterComponent implements OnInit {
     }
 
     public get shouldDisplaySearchBox(): boolean {
-        return (this.filterOptions?.length ?? 0) > 5;
+        return (this.filterOptions?.length ?? 0) > TableFilterComponent.ITEMS_TO_DISPLAY_SEARCH_BOX;
+    }
+
+    public get shouldShowCheckVisibleButton(): boolean {
+        return (this.filterOptions?.length ?? 0) > TableFilterComponent.ITEMS_TO_DISPLAY_CHECK_ALL_BUTTON;
     }
 
     public get noOptionDisplayed(): boolean {

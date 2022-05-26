@@ -112,7 +112,7 @@ export class AccountDao extends BaseDao {
                     COUNT(t.id) AS 'count'
                 FROM transfer AS t
                 WHERE t.account_id IN (${accountIds.join(',')})
-                    AND t.date <= '${this.dateParser.formatMySql(new Date())}' ${sumOnlyInternalTransfers ? `AND t.is_internal = 0` : ``}
+                    AND t.date <= '${this.dateParser.getToday()}' ${sumOnlyInternalTransfers ? `AND t.is_internal = 0` : ``}
                 GROUP BY YEAR(t.date), MONTH(t.date)
                 ORDER BY year DESC, month DESC
                 LIMIT 12`

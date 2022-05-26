@@ -80,7 +80,7 @@ export class Transfer {
     @Column({ nullable: true, type: 'json', default: {} })
     public metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 
-    @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: true })
+    @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: false })
     public transferItems!: TransferItem[];
 }
 

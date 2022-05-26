@@ -1,10 +1,13 @@
-import { Controller, Delete, Get, Param, ParseArrayPipe, Query } from '@nestjs/common';
+import { Controller, Delete, Get, Param, ParseArrayPipe, Query, UseGuards } from '@nestjs/common';
 
 import { AccountDetailsDTOResponse, AccountDTO, BalanceDTO, BaseResponseDTO, MonthlyUserStatsDTO } from '@coinage-app/interfaces';
 import { AccountDao } from '../daos/account.dao';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
+import { AuthGuard, RequestingUser } from '../services/auth.guard';
+import { User } from '../entities/User.entity';
 
+@UseGuards(AuthGuard)
 @Controller('account(s)?')
 export class AccountsController {
     public constructor(
@@ -14,9 +17,8 @@ export class AccountsController {
     ) {}
 
     @Get('all')
-    public async getAllTransactions(): Promise<AccountDTO[]> {
-        const currentUserId = 1;
-        return await this.accountDao.getForUserId(currentUserId);
+    public async getAllTransactions(@RequestingUser('id') userId: number): Promise<AccountDTO[]> {
+        return await this.accountDao.getForUserId(userId);
     }
 
     @Get('balance/:accountId/:asOfDate')
@@ -71,9 +73,10 @@ export class AccountsController {
 
     @Get('/lastYearMonthlyStats')
     public async getMongthlyStats(
+        @RequestingUser() user: User,
         @Query('accountIds', new ParseArrayPipe({ expectedType: Number, items: Number, optional: true })) accountIds?: number[]
     ): Promise<MonthlyUserStatsDTO[]> {
-        let accounts = await this.accountDao.getForUserId(1);
+        let accounts = await this.accountDao.getForUserId(user.id);
         let shouldUseAllAccounts = true;
         if (accountIds !== undefined) {
             accounts = await this.accountDao.getByIds(accountIds);
@@ -81,16 +84,19 @@ export class AccountsController {
         } else {
             accountIds = accounts.map((a) => a.id);
         }
-        const monthlyStats = (await this.accountDao.getLast12MonthStats(accountIds, shouldUseAllAccounts)).map((stats) => {
-            return {
-                year: stats.year,
-                month: stats.month - 1,
-                income: parseFloat(stats.income),
-                outcome: parseFloat(stats.outcome),
-                change: parseFloat(stats.income) - parseFloat(stats.outcome),
-                transactionsCount: parseInt(stats.count),
-            };
-        });
+        const monthlyStats =
+            accountIds.length > 0
+                ? (await this.accountDao.getLast12MonthStats(accountIds, shouldUseAllAccounts)).map((stats) => {
+                      return {
+                          year: stats.year,
+                          month: stats.month - 1,
+                          income: parseFloat(stats.income),
+                          outcome: parseFloat(stats.outcome),
+                          change: parseFloat(stats.income) - parseFloat(stats.outcome),
+                          transactionsCount: parseInt(stats.count),
+                      };
+                  })
+                : [];
 
         const today = new Date();
         let year = today.getFullYear();

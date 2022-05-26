@@ -14,8 +14,8 @@
                 [required]="false"
                 [editableSearchTerm]="true"
                 [items]="allItems"
-                bindLabel="name"
                 bindValue="id"
+                bindLabel="name"
             >
             </ng-select>
         </div>
@@ -31,7 +31,10 @@
     <button class="add-item-button" (click)="onClickAddNewItemToList()">+</button>
     <div class="shopping-list">
         <ol>
-            <li *ngFor="let item of itemList">{{ item.name | ifNull: 'Unnamed' }} x {{ item.amount }} | {{ item.amount * item.price | plnCurrency }}</li>
+            <li class="shopping-item" *ngFor="let item of itemList">
+                <span>{{ item.name | ifNull: 'Unnamed' }} x {{ item.amount }} | {{ item.amount * item.price | plnCurrency }}</span>
+                <span (click)="onRemoveItem(item)"><fa-icon class="remove-icon" [icon]="removeIcon" [fixedWidth]="true"></fa-icon></span>
+            </li>
         </ol>
     </div>
 </div>

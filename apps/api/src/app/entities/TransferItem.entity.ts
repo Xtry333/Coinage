@@ -13,7 +13,7 @@ export class TransferItem {
     public unitPrice!: number;
 
     @Column({ name: 'units', type: 'float', nullable: false, default: 1 })
-    public units!: number;
+    public quantity!: number;
 
     @Column({ type: 'integer' })
     public transferId!: number;

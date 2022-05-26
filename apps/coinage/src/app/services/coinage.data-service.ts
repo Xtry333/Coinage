@@ -138,7 +138,8 @@ export class CoinageDataService {
     }
 
     public postCreateContractor(request: CreateEditContractorDTO) {
-        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}contractor/save`, request);
+        console.log(request);
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}contractor/save`, request));
     }
 
     public deleteTransfer(transferId: number): Observable<boolean> {
