@@ -1,89 +1,88 @@
 import { GetFilteredTransfersRequest, Range } from '@coinage-app/interfaces';
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, DeleteResult, Equal, FindConditions, getConnection, ILike, In, InsertResult, LessThanOrEqual, Repository } from 'typeorm';
+import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, IsNull, LessThanOrEqual, Repository } from 'typeorm';
 import { Transfer } from '../entities/Transfer.entity';
+import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+import { Writeable } from '../types/Writeable.type';
+import { BaseDao } from './base.bao';
 
 type KeysOfType<O, T> = {
     [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;
 }[keyof O];
 
 @Injectable()
-export class TransferDao {
-    constructor(
-        @InjectRepository(Transfer)
-        private readonly transferRepository: Repository<Transfer>
-    ) {}
+export class TransferDao extends BaseDao {
+    public constructor(
+        @InjectRepository(Transfer) private readonly transferRepository: Repository<Transfer>,
+        private readonly templateNameMapperService: TemplateNameMapperService
+    ) {
+        super();
+    }
 
-    async getById(id: number): Promise<Transfer> {
-        const transfer = await getConnection()
-            .getRepository(Transfer)
-            .findOne({
-                where: { id: Equal(id) },
-                join: {
-                    alias: 'transfer',
-                    leftJoinAndSelect: { receipt: 'transfer.receipt', contractor: 'receipt.contractor', transfers: 'receipt.transfers' },
-                },
-            });
-        if (!transfer) {
-            throw new Error('Transfer not found');
-        }
-        
+    public async getById(id: number): Promise<Transfer> {
+        let transfer = await this.transferRepository.findOneBy({ id: Equal(id) });
+        transfer = this.validateNotNullById(Transfer.name, id, transfer);
         await transfer.category.parent;
+        this.templateNameMapperService.mapTransfersTemplateNames([transfer]);
         return transfer;
     }
 
-    public getAll() {
-        return getConnection()
-            .getRepository(Transfer)
-            .find({ order: { date: 'DESC', id: 'DESC' } });
+    public async getAll() {
+        const transfers = await this.transferRepository.find({ order: { date: 'DESC', id: 'DESC' } });
+        this.templateNameMapperService.mapTransfersTemplateNames(transfers);
+        return transfers;
     }
 
-    public getAllFilteredPaged(params: GetFilteredTransfersRequest): Promise<Transfer[]> {
+    public async getAllFilteredPaged(params: GetFilteredTransfersRequest): Promise<Transfer[]> {
         const filter = this.createFilteredFindConditions(params);
 
-        return getConnection()
-            .getRepository(Transfer)
-            .find({ where: filter, order: { date: 'DESC', id: 'DESC' }, take: params.rowsPerPage, skip: params.rowsPerPage * (params.page - 1) });
+        const transfers = await this.transferRepository.find({
+            where: filter,
+            order: { date: 'DESC', id: 'DESC' },
+            take: params.rowsPerPage,
+            skip: params.rowsPerPage * (params.page - 1),
+        });
+
+        this.templateNameMapperService.mapTransfersTemplateNames(transfers);
+        return transfers;
     }
 
     public getAllFilteredCount(params: GetFilteredTransfersRequest): Promise<number> {
         const filter = this.createFilteredFindConditions(params);
 
-        return getConnection()
-            .getRepository(Transfer)
-            .count({ where: filter, order: { date: 'DESC', id: 'DESC' } });
+        return this.transferRepository.count({ where: filter, order: { date: 'DESC', id: 'DESC' } });
     }
 
-    private createFilteredFindConditions(params: GetFilteredTransfersRequest): FindConditions<Transfer> {
-        const filter: FindConditions<Transfer> = {};
+    private createFilteredFindConditions(params: GetFilteredTransfersRequest): FindOptionsWhere<Transfer> {
+        const filter: FindOptionsWhere<Transfer> = {};
 
         this.assignInFilterIfExists(filter, 'contractorId', params.contractorIds);
         this.assignInFilterIfExists(filter, 'accountId', params.accountIds);
         this.assignInFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignInFilterIfExists(filter, 'id', params.transferIds);
         this.assignBetweenFilterIfExists(filter, 'date', params.date);
-        this.assignBetweenFilterIfExists(filter, '_amount', params.amount);
+        this.assignBetweenFilterIfExists(filter, 'amount', params.amount);
 
         if (params.description) {
             filter.description = ILike(`%${params.description}%`);
         }
 
         if (!params.showPlanned) {
-            filter.date = LessThanOrEqual(this.getToday());
+            filter.date = LessThanOrEqual(new Date());
         }
 
         return filter;
     }
 
-    private assignInFilterIfExists(filter: FindConditions<Transfer>, key: KeysOfType<Transfer, number | null>, values?: number[]) {
+    private assignInFilterIfExists(filter: FindOptionsWhere<Transfer>, key: KeysOfType<Transfer, number | null>, values?: number[]) {
         if (values && values.length > 0) {
             filter[key] = In(values);
         }
     }
 
     private assignBetweenFilterIfExists(
-        filter: FindConditions<Transfer>,
+        filter: FindOptionsWhere<Transfer>,
         key: KeysOfType<Transfer, string | number | null | Date>,
         range?: Range<string | number | null | Date>
     ) {
@@ -93,9 +92,9 @@ export class TransferDao {
         }
     }
 
-    public getRecentlyEditedTransfersForUser(userId: number, count?: number): Promise<Transfer[]> {
-        return getConnection()
-            .createQueryBuilder(Transfer, 'transfer')
+    public async getRecentlyEditedTransfersForUser(userId: number, count?: number): Promise<Transfer[]> {
+        const transfers = await this.transferRepository
+            .createQueryBuilder('transfer')
             .select()
             .leftJoinAndSelect('transfer.account', 'account')
             .leftJoinAndSelect('transfer.category', 'category')
@@ -106,46 +105,47 @@ export class TransferDao {
             .where('user.id = :userId', { userId })
             .take(count)
             .getMany();
-    }
 
-    async getTransferByDateContractor(date: Date, contractorId: number): Promise<Transfer[]> {
-        const transfers = await getConnection()
-            .getRepository(Transfer)
-            .find({
-                where: { date: Equal(date), contractorId: Equal(contractorId) },
-            });
+        this.templateNameMapperService.mapTransfersTemplateNames(transfers);
         return transfers;
     }
 
-    async getByCategory(categoryId: number) {
-        const transfers = await getConnection()
-            .getRepository(Transfer)
-            .find({
-                where: { categoryId: Equal(categoryId) },
-            });
+    public async getTransferByDateContractor(date: Date, contractorId: number | null): Promise<Transfer[]> {
+        const whereOptions: FindOptionsWhere<Transfer> = { date: Equal(date) };
+        if (contractorId) {
+            whereOptions.contractorId = Equal(contractorId);
+        } else {
+            whereOptions.contractorId = IsNull();
+        }
+        const transfers = await this.transferRepository.find({ where: whereOptions, order: { createdDate: 'DESC' } });
+
+        this.templateNameMapperService.mapTransfersTemplateNames(transfers);
         return transfers;
     }
 
-    async insert(transfer: Transfer): Promise<InsertResult> {
-        return await getConnection().getRepository(Transfer).insert(transfer);
+    public async getByCategory(categoryId: number) {
+        const transfers = await this.transferRepository.find({
+            where: { categoryId: Equal(categoryId) },
+        });
+
+        this.templateNameMapperService.mapTransfersTemplateNames(transfers);
+        return transfers;
     }
 
-    async save(transfer: Transfer): Promise<Transfer> {
-        return await getConnection().getRepository(Transfer).save(transfer);
+    public async insert(transfer: Transfer): Promise<InsertResult> {
+        return await this.transferRepository.insert(transfer);
     }
 
-    async deleteById(id: number): Promise<DeleteResult> {
-        return await getConnection()
-            .getRepository(Transfer)
-            .delete({ id: Equal(id) });
+    public async save(transfer: Writeable<Transfer>): Promise<Transfer> {
+        transfer.editedDate = new Date();
+        return await this.transferRepository.save(transfer);
+    }
+
+    public async deleteById(id: number): Promise<DeleteResult> {
+        return await this.transferRepository.delete({ id: Equal(id) });
     }
 
     public async deleteEthereals(): Promise<number> {
         return (await this.transferRepository.delete({ isEthereal: Equal(true) })).affected ?? 0;
-    }
-
-    private getToday(): string {
-        const date = new Date();
-        return `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
     }
 }

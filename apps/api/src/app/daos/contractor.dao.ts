@@ -1,26 +1,29 @@
 import { Injectable } from '@nestjs/common';
-import { DeleteResult, Equal, getConnection } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteResult, Equal, Repository } from 'typeorm';
 import { Contractor } from '../entities/Contractor.entity';
+import { BaseDao } from './base.bao';
 
 @Injectable()
-export class ContractorDao {
-    async getById(id: number): Promise<Contractor | undefined> {
-        return await getConnection()
-            .getRepository(Contractor)
-            .findOne({ where: { id: Equal(id) } });
+export class ContractorDao extends BaseDao {
+    public constructor(@InjectRepository(Contractor) private readonly contractorRepository: Repository<Contractor>) {
+        super();
     }
 
-    async getAll(): Promise<Contractor[]> {
-        return await getConnection().getRepository(Contractor).find();
+    public async getById(id: number): Promise<Contractor> {
+        const contractor = await this.contractorRepository.findOneBy({ id: Equal(id) });
+        return this.validateNotNullById(Contractor.name, id, contractor);
     }
 
-    async save(contractor: Contractor): Promise<Contractor> {
-        return getConnection().getRepository(Contractor).save(contractor);
+    public async getAll(): Promise<Contractor[]> {
+        return await this.contractorRepository.find();
     }
 
-    async deleteById(id: number): Promise<DeleteResult> {
-        return await getConnection()
-            .getRepository(Contractor)
-            .delete({ id: Equal(id) });
+    public async save(contractor: Contractor): Promise<Contractor> {
+        return this.contractorRepository.save(contractor);
+    }
+
+    public async deleteById(id: number): Promise<DeleteResult> {
+        return await this.contractorRepository.delete({ id: Equal(id) });
     }
 }

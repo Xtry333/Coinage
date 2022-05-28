@@ -1,11 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ActivatedRoute } from '@angular/router';
-import { ApiPathsModule } from '@coinage-app/router';
 import { AppRoutingModule } from '../app-routing/app-routing.module';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { MonthSummaryComponent } from './summary.component';
+import { MonthSummaryComponent } from './month-summary.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
@@ -19,7 +18,6 @@ describe('Summary Component', () => {
             declarations: [MonthSummaryComponent],
             providers: [
                 AppRoutingModule,
-                ApiPathsModule,
                 {
                     provide: ActivatedRoute,
                     useValue: {
@@ -43,7 +41,7 @@ describe('Summary Component', () => {
                         amount: 123.1,
                         categoryPath: [],
                         contractor: 'Abc',
-                        date: '2021-05-16',
+                        date: new Date(2021 - 05 - 16),
                         otherTransfers: [],
                         description: '',
                         createdDate: new Date('2021-05-16'),

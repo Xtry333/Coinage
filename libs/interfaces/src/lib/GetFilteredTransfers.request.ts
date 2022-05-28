@@ -3,13 +3,14 @@ import { Range } from './interfaces';
 import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
 
 export class GetFilteredTransfersRequest extends PagedRequest {
-    transferIds?: number[];
-    description?: string;
-    amount?: Range<number>;
-    contractorIds?: number[];
-    categoryIds?: number[];
-    accountIds?: number[];
-    type?: TransferTypeEnum;
-    date?: Range<Date>;
-    showPlanned?: boolean;
+    public transferIds?: number[];
+    public description?: string;
+    public amount?: Range<number>;
+    public contractorIds?: number[];
+    public categoryIds?: number[];
+    public accountIds?: number[];
+    public userId?: number;
+    public type?: TransferTypeEnum;
+    public date?: Range<Date>;
+    public showPlanned?: boolean;
 }

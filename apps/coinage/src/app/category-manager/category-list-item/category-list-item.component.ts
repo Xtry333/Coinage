@@ -10,11 +10,9 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons';
 export class CategoryListItemComponent {
     public editIcon = faEdit;
 
-    @Input()
-    category!: CategoryDTO;
+    @Input() public category!: CategoryDTO;
 
-    @Output()
-    editCategory = new EventEmitter<CategoryDTO>();
+    @Output() public editCategory = new EventEmitter<CategoryDTO>();
 
     public onSelectCategoryForEdit(category: CategoryDTO): void {
         this.editCategory.emit(category);

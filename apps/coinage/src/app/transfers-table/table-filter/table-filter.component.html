@@ -25,8 +25,16 @@
                     [max]="filterValue.range.to ?? 0"
                     [(ngModel)]="filterValue.range.from"
                     autocomplete="off"
+                    (change)="onChangeFilterRangeFrom()"
                 />
-                <input name="filterRangeTo" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
+                <input
+                    name="filterRangeTo"
+                    type="number"
+                    [min]="filterValue.range.from ?? 0"
+                    [(ngModel)]="filterValue.range.to"
+                    autocomplete="off"
+                    (change)="onChangeFilterRangeTo()"
+                />
             </div>
             <div *ngIf="isFilterDateRange">
                 <span>Not implemented!</span>
@@ -42,7 +50,16 @@
                         autocomplete="off"
                         placeholder="Search..."
                     />
-                    <button type="button" class="clear-button" (click)="onClearOptionsSearchValue()">X</button>
+                    <button type="button" class="clear-button" (click)="onClearOptionsSearchValue()" title="Clear Search">X</button>
+                    <button
+                        *ngIf="shouldShowCheckVisibleButton"
+                        type="button"
+                        class="check-visible-button"
+                        (click)="onCheckVisibleOptions()"
+                        title="Check Visible"
+                    >
+                        +
+                    </button>
                 </div>
 
                 <div class="filter-options">

@@ -19,7 +19,7 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { FormsModule } from '@angular/forms';
 import { MathAbsPipe } from './pipes/math-abs.pipe';
 import { ModalComponent } from './components/modal/modal.component';
-import { MonthSummaryComponent } from './summary/summary.component';
+import { MonthSummaryComponent } from './month-summary/month-summary.component';
 import { NetworkInterceptor } from './loaderGadget/network.interceptor';
 import { NgChartsModule } from 'ng2-charts';
 import { NgModule } from '@angular/core';
@@ -39,6 +39,9 @@ import { TransferDetailsComponent } from './transfer-details/transfer-details.co
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 import { TransfersTableComponent } from './transfers-table/transfers-table.component';
 import zoomPlugin from 'chartjs-plugin-zoom';
+import { ItemsTableComponent } from './transfer-details/items-table/items-table.component';
+import { ItemShoppingListComponent } from './create-edit-transfer/item-shopping-list/item-shopping-list.component';
+import { EditableShopListItemComponent } from './create-edit-transfer/item-shopping-list/editable-shop-list-item/editable-shop-list-item.component';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
@@ -70,6 +73,9 @@ Chart.register(zoomPlugin);
         AutoPaginationComponent,
         CreateEditCategoryComponent,
         ChartComponent,
+        ItemsTableComponent,
+        ItemShoppingListComponent,
+        EditableShopListItemComponent,
     ],
     imports: [
         BrowserModule,

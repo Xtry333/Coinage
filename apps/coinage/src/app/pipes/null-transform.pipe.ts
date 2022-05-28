@@ -1,12 +1,12 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-    name: 'undefined',
+    name: 'ifNull',
 })
 export class NullTransformPipe implements PipeTransform {
     public static readonly DEFAULT_SYMBOL = '−';
 
-    transform(value?: unknown, valueIfNull: string = NullTransformPipe.DEFAULT_SYMBOL): unknown {
+    public transform(value: null | undefined | unknown, valueIfNull: string = NullTransformPipe.DEFAULT_SYMBOL): unknown {
         return value ? value : valueIfNull;
     }
 }

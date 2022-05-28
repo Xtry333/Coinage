@@ -94,7 +94,7 @@
                         </span>
                     </td>
                     <td>
-                        {{ transfer.contractorName | undefined: EMPTY_CONTRACTOR }}
+                        {{ transfer.contractorName | ifNull: EMPTY_CONTRACTOR }}
                     </td>
                     <td class="nowrap currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
                     <td>{{ transfer.accountName }}</td>

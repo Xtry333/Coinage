@@ -9,12 +9,12 @@ import { CoinageDataService } from '../../services/coinage.data-service';
     styleUrls: ['./dashboard-counters.component.scss'],
 })
 export class DashboardCountersComponent implements OnInit {
-    balance: BalanceDTO[] = [];
-    todaySpendings = 0;
+    public balance: BalanceDTO[] = [];
+    public todaySpendings = 0;
 
-    constructor(private readonly coinageData: CoinageDataService) {}
+    public constructor(private readonly coinageData: CoinageDataService) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.loadData();
     }
 
@@ -28,7 +28,7 @@ export class DashboardCountersComponent implements OnInit {
         this.coinageData.getTodaySpendings(date).subscribe((res) => (this.todaySpendings = res.reduce((acc, cur) => acc + cur.balance, 0)));
     }
 
-    trackByAccountId(index: number, item: BalanceDTO) {
+    public trackByAccountId(index: number, item: BalanceDTO) {
         return item.accountId;
     }
 }

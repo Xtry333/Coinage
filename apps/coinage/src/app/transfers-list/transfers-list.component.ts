@@ -1,5 +1,3 @@
-import * as Rx from 'rxjs';
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
 
@@ -7,7 +5,6 @@ import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { TableFilterFields } from '../transfers-table/transfers-table.component';
-import { finalize } from 'rxjs/operators';
 
 interface TransfersListQueryParams {
     page: number;
@@ -24,21 +21,25 @@ export class TransfersListComponent implements OnInit, OnDestroy {
 
     public readonly TRANSFERS_FILTER_CACHE_PATH = 'transfers.list.filters';
 
-    showPage = false;
+    public showPage = false;
 
-    refreshInterval?: ReturnType<typeof setInterval>;
+    public refreshInterval?: ReturnType<typeof setInterval>;
 
-    transfers: TransferDTO[] = [];
-    totalCount = 0;
+    public transfers: TransferDTO[] = [];
+    public totalCount = 0;
 
-    filterParams: GetFilteredTransfersRequest = {
+    public filterParams: GetFilteredTransfersRequest = {
         page: 1,
         rowsPerPage: 100,
     };
 
-    constructor(private route: ActivatedRoute, private readonly coinageData: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
+    public constructor(
+        private route: ActivatedRoute,
+        private readonly coinageData: CoinageDataService,
+        private readonly localStorage: CoinageLocalStorageService
+    ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.showPage = false;
         this.route.queryParams.subscribe((params) => {
             const { page, rowsPerPage } = params as TransfersListQueryParams;
@@ -62,7 +63,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
         this.refreshInterval = setInterval(() => this.refreshData(), TransfersListComponent.REFRESH_INTERVAL);
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         if (this.refreshInterval) {
             clearInterval(this.refreshInterval);
             this.refreshInterval = undefined;
@@ -94,7 +95,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
         console.log('onEndOfPage');
     }
 
-    get lastPageNumber(): number {
+    public get lastPageNumber(): number {
         return Math.ceil(this.totalCount / this.filterParams.rowsPerPage);
     }
 

@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs';
 
-import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, SaveTransferDTO, TransferDetailsDTO } from '@coinage-app/interfaces';
+import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, TransferDetailsDTO, TransferItemDTO } from '@coinage-app/interfaces';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
@@ -10,6 +10,7 @@ import { CoinageLocalStorageService } from '../services/coinage-local-storage.se
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NotificationService } from '../services/notification.service';
 import { finalize } from 'rxjs/operators';
+import { ShoppingListItem } from './item-shopping-list/editable-shop-list-item/editable-shop-list-item.component';
 
 export interface NewTransferObject {
     description: string;
@@ -28,14 +29,18 @@ export interface NewTransferObject {
 export class CreateEditTransferComponent implements OnInit {
     public static FUEL_TEMPLATE = 'Paliwo x,xx PLN/L Miejsce';
 
-    showPage = true;
-    totalPayment = 0;
-    categories: CategoryDTO[] = [];
-    contractors: ContractorDTO[] = [];
-    accounts: AccountDTO[] = [];
-    editMode = false;
-    transferDTO!: TransferDetailsDTO;
-    transferId!: number;
+    public showPage = true;
+    public totalPayment = 0;
+    public categories: CategoryDTO[] = [];
+    public contractors: ContractorDTO[] = [];
+    public accounts: AccountDTO[] = [];
+    public editMode = false;
+    public transferDTO?: TransferDetailsDTO;
+    public transferId!: number;
+
+    public itemsInTransfer: ShoppingListItem[] = [];
+
+    public shouldDisplayShoppingList = false;
 
     @ViewChildren('categorySelect')
     private categorySelect?: QueryList<NgSelectComponent>;
@@ -43,12 +48,12 @@ export class CreateEditTransferComponent implements OnInit {
     @ViewChildren('contractorSelect')
     private contractorSelect?: QueryList<NgSelectComponent>;
 
-    @Input() redirectAfterSave = true;
-    @Input() selectedTransferInputs!: NewTransferObject;
+    @Input() public redirectAfterSave = true;
+    @Input() public selectedTransferInputs!: NewTransferObject;
 
-    @Output() saveSuccess = new EventEmitter<void>();
+    @Output() public saveSuccess = new EventEmitter<void>();
 
-    constructor(
+    public constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly navigator: NavigatorService,
@@ -57,7 +62,7 @@ export class CreateEditTransferComponent implements OnInit {
         private readonly coinageLocalStorageService: CoinageLocalStorageService
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.showPage = false;
         this.clearInputData();
         this.route.params.subscribe((params) => {
@@ -66,6 +71,8 @@ export class CreateEditTransferComponent implements OnInit {
                 this.transferId = id;
                 this.coinageData.getTransferDetails(id).then((transfer) => {
                     this.transferDTO = transfer;
+                    this.itemsInTransfer = this.mapToTransferItems(transfer.items);
+                    this.shouldDisplayShoppingList = transfer.items.length > 0;
                     this.editMode = true;
                     console.log(transfer);
                     this.selectedTransferInputs = {
@@ -92,18 +99,20 @@ export class CreateEditTransferComponent implements OnInit {
             });
     }
 
-    onClickSaveTransfer(): void {
-        const newTransfer: CreateEditTransferModelDTO = {
-            id: this.transferId,
-            description: this.selectedTransferInputs.description,
-            amount: parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
-            categoryId: this.selectedTransferInputs.categoryId ?? 0,
-            contractorId: this.selectedTransferInputs.contractorId ?? null,
-            accountId: this.selectedTransferInputs.accountId ?? 0,
-            date: new Date(this.selectedTransferInputs.date) as any,
-        };
+    public onClickSaveTransfer(): void {
+        const newTransfer = new CreateEditTransferModelDTO(
+            this.transferId,
+            this.selectedTransferInputs.description,
+            parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
+            this.selectedTransferInputs.categoryId ?? 0,
+            this.selectedTransferInputs.contractorId ?? null,
+            this.selectedTransferInputs.accountId ?? 0,
+            new Date(this.selectedTransferInputs.date),
+            this.transferDTO?.receipt?.id ?? null,
+            this.itemsInTransfer
+        );
         console.log(newTransfer);
-        this.coinageData.postCreateSaveTransaction(newTransfer).subscribe((result) => {
+        this.coinageData.postCreateSaveTransfer(newTransfer).subscribe((result) => {
             console.log(result);
             const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
             if (result.error) {
@@ -120,7 +129,7 @@ export class CreateEditTransferComponent implements OnInit {
                 // }
                 this.notificationService.push({
                     title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`,
-                    message: newTransfer.description ?? this.categories.find((c) => c.id === newTransfer.categoryId)!.name,
+                    message: newTransfer.description ?? this.categories.find((c) => c.id === newTransfer.categoryId)?.name ?? 'Saved Transfer',
                     linkTo: NavigatorPages.TransferDetails(result.insertedId),
                 });
                 this.clearInputData();
@@ -146,16 +155,19 @@ export class CreateEditTransferComponent implements OnInit {
         }
     }
 
-    public onAddNewCategory = async (name: string): Promise<CategoryDTO> => {
+    public async onAddNewCategory(name: string): Promise<CategoryDTO> {
         const response = await Rx.lastValueFrom(this.coinageData.postCreateCategory({ name }));
         if (response.insertedId) {
             this.notificationService.push({ title: `Category Created`, message: name, linkTo: NavigatorPages.CategoryDetails(response.insertedId) });
         }
         return { id: response.insertedId ?? 0, name };
-    };
+    }
 
-    public onAddNewContractor = async (name: string): Promise<ContractorDTO> => {
-        const response = await Rx.lastValueFrom(this.coinageData.postCreateContractor({ name }));
+    public async onAddNewContractor(name: string): Promise<ContractorDTO> {
+        console.log(name);
+        console.log(this);
+        const response = await this.coinageData.postCreateContractor({ name });
+        console.log(response);
         if (response === undefined) {
             return { id: 0, name: '' };
         }
@@ -163,7 +175,7 @@ export class CreateEditTransferComponent implements OnInit {
             this.notificationService.push({ title: `Contractor Created`, message: name, linkTo: NavigatorPages.ContractorDetails(response.insertedId) });
         }
         return { id: response.insertedId ?? 0, name };
-    };
+    }
 
     public onChangeCategory(): void {
         if (this.selectedTransferInputs.categoryId === 1 && this.selectedTransferInputs.description === '') {
@@ -171,7 +183,7 @@ export class CreateEditTransferComponent implements OnInit {
         }
     }
 
-    get todayInputFormat(): string {
+    public get todayInputFormat(): string {
         const today = new Date().toLocaleDateString().split('.');
         return [today[2], today[1], today[0].padStart(2, '0')].join('-');
     }
@@ -190,5 +202,30 @@ export class CreateEditTransferComponent implements OnInit {
         };
         this.categorySelect?.first.handleClearClick();
         this.contractorSelect?.first.handleClearClick();
+        this.shouldDisplayShoppingList = false;
+    }
+
+    public openShoppingList(): void {
+        this.shouldDisplayShoppingList = true;
+    }
+
+    public onTotalCostChanged(cost: number): void {
+        this.selectedTransferInputs.amount = cost;
+    }
+
+    public onItemListChanged(items: ShoppingListItem[]): void {
+        this.itemsInTransfer = items;
+    }
+
+    private mapToTransferItems(items: TransferItemDTO[]): ShoppingListItem[] {
+        return items.map((item) => {
+            return {
+                amount: item.amount,
+                id: item.id,
+                name: item.itemName,
+                quantity: item.amount,
+                price: item.unitPrice,
+            };
+        });
     }
 }

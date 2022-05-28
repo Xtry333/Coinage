@@ -7,25 +7,36 @@ import { Injectable } from '@nestjs/common';
 import { TransferType } from '../entities/Category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transfer } from '../entities/Transfer.entity';
+import { BaseDao } from './base.bao';
 
 @Injectable()
-export class AccountDao {
-    constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {}
+export class AccountDao extends BaseDao {
+    public constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {
+        super();
+    }
 
     public async getById(id: number): Promise<Account> {
-        const accounts = await this.getByIds([id]);
-        if (accounts.length === 0) {
-            throw new Error(`Account with id ${id} not found.`);
-        }
-        return accounts[0];
+        const account = await this.accountRepository.findOneBy({ id: Equal(id) });
+
+        return this.validateNotNullById(Account.name, id, account);
     }
 
     public async getByIds(ids: number[]): Promise<Account[]> {
         return await this.accountRepository.findByIds(ids);
     }
 
+    public async countAllTransfersForAccount(id: number): Promise<number> {
+        const result = await this.accountRepository
+            .createQueryBuilder()
+            .select('COUNT(t.id)', 'count')
+            .from(Transfer, 't')
+            .where({ accountId: Equal(id) })
+            .getRawOne();
+        return parseInt(result[0].count, 10);
+    }
+
     public getAllActive(): Promise<Account[]> {
-        return this.accountRepository.find({ where: { isActiveBuffer: Equal(true) } });
+        return this.accountRepository.find({ where: { isActive: Equal(true) } });
     }
 
     public getForUserId(userId: number): Promise<Account[]> {
@@ -33,7 +44,7 @@ export class AccountDao {
     }
 
     public getCurrentlyActiveForUserId(userId: number): Promise<Account[]> {
-        return this.accountRepository.find({ where: { userId: Equal(userId), isActiveBuffer: Equal(true) } });
+        return this.accountRepository.find({ where: { userId: Equal(userId), isActive: Equal(true) } });
     }
 
     public save(account: Account): Promise<Account> {
@@ -86,9 +97,9 @@ export class AccountDao {
         });
     }
 
-    async getLast12MonthStats(
+    public async getLast12MonthStats(
         accountIds: number[],
-        sumOnlyInternalTransfers: boolean = true
+        sumOnlyInternalTransfers = true
     ): Promise<{ year: number; month: number; income: string; outcome: string; count: string }[]> {
         return await getConnection()
             .getRepository(Transfer)
@@ -101,7 +112,7 @@ export class AccountDao {
                     COUNT(t.id) AS 'count'
                 FROM transfer AS t
                 WHERE t.account_id IN (${accountIds.join(',')})
-                    AND t.date <= '${this.dateParser.formatMySql(new Date())}' ${sumOnlyInternalTransfers ? `AND t.is_internal = 0` : ``}
+                    AND t.date <= '${this.dateParser.getToday()}' ${sumOnlyInternalTransfers ? `AND t.is_internal = 0` : ``}
                 GROUP BY YEAR(t.date), MONTH(t.date)
                 ORDER BY year DESC, month DESC
                 LIMIT 12`

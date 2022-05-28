@@ -21,28 +21,28 @@ export class AppComponent implements OnInit, OnDestroy {
 
     public NavigatorPages = NavigatorPages;
 
-    isPageLoading = true;
-    title = 'Coinage';
-    dateTime = new Date().toLocaleString();
-    logo = 'assets/images/coin.png';
-    refreshInterval?: ReturnType<typeof setInterval>;
+    public isPageLoading = true;
+    public title = 'Coinage';
+    public dateTime = new Date().toLocaleString();
+    public logo = 'assets/images/coin.png';
+    public refreshInterval?: ReturnType<typeof setInterval>;
 
     @ViewChild(CreateEditTransferComponent)
-    createEditTransferComponent!: CreateEditTransferComponent;
+    public createEditTransferComponent!: CreateEditTransferComponent;
 
-    dashboardComponent?: DashboardComponent;
-    transfersListComponent?: TransfersListComponent;
+    public dashboardComponent?: DashboardComponent;
+    public transfersListComponent?: TransfersListComponent;
 
-    isTrinketDisplayed = false;
+    public isTrinketDisplayed = false;
 
-    constructor(
+    public constructor(
         private readonly loader: LoadingService,
         private readonly localStorageService: CoinageLocalStorageService,
         private readonly notificationService: NotificationService,
         private readonly socket: Socket
     ) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.socket.on('connect', () => {
             this.notificationService.push({ message: 'Connection estabilished.', title: 'Server' });
 
@@ -84,12 +84,12 @@ export class AppComponent implements OnInit, OnDestroy {
         this.localStorageService.setNumber(AppComponent.KEY_FORCE_MOCK_USER, mockUser ?? 1);
     }
 
-    onActivateRoute(component: Component): void {
+    public onActivateRoute(component: Component): void {
         this.dashboardComponent = component instanceof DashboardComponent ? component : undefined;
         this.transfersListComponent = component instanceof TransfersListComponent ? component : undefined;
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         if (this.refreshInterval) {
             clearInterval(this.refreshInterval);
             this.refreshInterval = undefined;

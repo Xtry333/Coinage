@@ -1,5 +1,5 @@
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 export const enum CoinageChartType {
     Bar = 'bar',
@@ -12,13 +12,13 @@ export const enum CoinageChartType {
     templateUrl: './chart.component.html',
     styleUrls: ['./chart.component.scss'],
 })
-export class ChartComponent implements OnInit {
-    @Input() showLegend: boolean = true;
-    @Input() header?: string;
-    @Input() datasets!: ChartDataset[];
-    @Input() labels!: string[];
-    @Input() type: CoinageChartType = CoinageChartType.Line;
-    @Input() options: ChartOptions = {
+export class ChartComponent {
+    @Input() public showLegend = true;
+    @Input() public header?: string;
+    @Input() public datasets!: ChartDataset[];
+    @Input() public labels!: string[];
+    @Input() public type: CoinageChartType = CoinageChartType.Line;
+    @Input() public options: ChartOptions = {
         responsive: true,
         elements: {
             line: {
@@ -26,10 +26,6 @@ export class ChartComponent implements OnInit {
             },
         },
     };
-
-    constructor() {}
-
-    ngOnInit(): void {}
 
     public get chartType(): ChartType {
         return this.type;

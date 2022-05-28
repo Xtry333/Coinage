@@ -1,8 +1,22 @@
-import { IsDate, IsDateString, IsNumber, IsOptional, IsString, Min } from 'class-validator';
-import { Transform, Type } from 'class-transformer';
+import { IsDate, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+
+export class ShoppingListItem {
+    public constructor(public id: number | undefined, public name: string, public amount: number, public price: number) {}
+}
 
 export class CreateEditTransferModelDTO {
-    constructor(id: number | undefined, description: string, amount: number, categoryId: number, contractorId: number | null, accountId: number, date: Date) {
+    public constructor(
+        id: number | undefined,
+        description: string,
+        amount: number,
+        categoryId: number,
+        contractorId: number | null,
+        accountId: number,
+        date: Date,
+        receiptId: number | null,
+        items: ShoppingListItem[] | undefined
+    ) {
         this.id = id;
         this.description = description;
         this.amount = amount;
@@ -10,35 +24,51 @@ export class CreateEditTransferModelDTO {
         this.contractorId = contractorId;
         this.accountId = accountId;
         this.date = date;
+        this.receiptId = receiptId;
+        this.items = items ?? [];
     }
 
     @IsOptional()
     @IsNumber()
     @Min(1)
-    id?: number;
+    @IsNotIn([NaN])
+    public id?: number;
 
     @IsOptional()
     @IsString()
-    description?: string;
+    public description?: string;
 
     @IsNumber({ maxDecimalPlaces: 2 })
     @Min(0)
-    amount: number;
+    @IsNotIn([NaN])
+    public amount: number;
 
     @IsNumber()
     @Min(1)
-    categoryId: number;
+    @IsNotIn([NaN])
+    public categoryId: number;
 
     @IsOptional()
     @IsNumber()
     @Min(1)
-    contractorId: number | null;
+    @IsNotIn([NaN])
+    public contractorId: number | null;
 
     @IsNumber()
     @Min(1)
-    accountId: number;
+    @IsNotIn([NaN])
+    public accountId: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(1)
+    @IsNotIn([NaN])
+    public receiptId: number | null;
 
     @IsDate()
     @Type(() => Date)
-    date: Date;
+    public date: Date;
+
+    @Type(() => ShoppingListItem)
+    public items: ShoppingListItem[];
 }

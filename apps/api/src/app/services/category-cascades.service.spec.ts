@@ -4,7 +4,6 @@ import { Category } from '../entities/Category.entity';
 import { CategoryCascadeService } from './category-cascades.service';
 import { CategoryDao } from '../daos/category.dao';
 import { PartialProvider } from '../test/partial-provider';
-import { Provider } from '@nestjs/common';
 
 describe('CategoryCascadeService', () => {
     let service: CategoryCascadeService;

@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 
 import { Account } from './Account.entity';
@@ -6,83 +6,82 @@ import { BooleanTransformer } from './transformers/boolean.transformer';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
 import { Receipt } from './Receipt.entity';
+import { TransferItem } from './TransferItem.entity';
 import { TransferTypeEnum } from '@coinage-app/interfaces';
+import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 
 @Entity()
 export class Transfer {
-    constructor() {
+    public constructor() {
+        this.createdDate = new Date();
+        this.editedDate = new Date();
         this.metadata = {};
     }
 
     @PrimaryGeneratedColumn()
-    id!: number;
+    public id!: number;
 
     @Column('text', { nullable: false })
-    description!: string;
+    public description!: string;
 
-    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false })
-    _amount!: string; // Decimal returns a string for precision, need to parse later in DTO
-
-    get amount(): number {
-        return Number(this._amount);
-    }
-
-    set amount(value: number) {
-        this._amount = value.toFixed(2);
-    }
+    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    public amount!: number;
 
     @Column({
         type: 'date',
         nullable: false,
         transformer: new DateTransformer(DateTransformerType.DATE),
     })
-    date!: Date;
+    public date!: Date;
 
     @UpdateDateColumn({ name: 'edited_date', type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
-    editedDate!: Date;
+    public readonly editedDate!: Date;
 
     @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true, transformer: new DateTransformer(DateTransformerType.DATETIME) })
-    createdDate!: Date;
+    public readonly createdDate!: Date;
 
-    @Column({ name: 'category', type: 'integer', nullable: false })
-    categoryId!: number;
+    @Column({ type: 'integer', nullable: false })
+    public categoryId!: number;
 
-    @ManyToOne('Category', { eager: true, nullable: false })
-    @JoinColumn({ name: 'category' })
-    category!: Category;
+    @ManyToOne(() => Category, { eager: true, nullable: false })
+    @JoinColumn({ name: 'category_id' })
+    public category!: Category;
 
-    @Column({ name: 'contractor', type: 'integer', nullable: true })
-    contractorId?: number | null;
+    @Column({ type: 'integer', nullable: true })
+    public contractorId!: number | null;
 
-    @ManyToOne('Contractor', { eager: true, nullable: true })
-    @JoinColumn({ name: 'contractor' })
-    contractor?: Contractor | null;
+    @ManyToOne(() => Contractor, { eager: true, nullable: true })
+    @JoinColumn({ name: 'contractor_id' })
+    public contractor!: Contractor | null;
 
-    @Column({ name: 'receipt', type: 'numeric', nullable: true })
-    receiptId?: number | null;
+    @Column({ type: 'integer', nullable: true })
+    public receiptId!: number | null;
 
-    @ManyToOne('Receipt', { eager: false, nullable: true })
-    @JoinColumn({ name: 'receipt' })
-    receipt?: Receipt | null;
+    @ManyToOne(() => Receipt, { eager: false, nullable: true })
+    @JoinColumn({ name: 'receipt_id' })
+    public receipt!: Promise<Receipt | null>;
 
     @Column({ name: 'type', type: 'varchar', length: 50, nullable: false })
-    type!: TransferTypeEnum;
+    public type!: TransferTypeEnum;
 
-    @Column({ type: 'numeric' })
-    accountId!: number;
+    @Column({ type: 'integer' })
+    public accountId!: number;
 
-    @ManyToOne('Account', { eager: true, nullable: true })
+    @ManyToOne(() => Account, { eager: true, nullable: false })
     @JoinColumn({ name: 'account_id' })
-    account!: Account;
+    public account!: Account;
 
     @Column({ name: 'is_internal', type: 'bit', nullable: false, transformer: new BooleanTransformer() })
-    isInternal!: boolean;
+    public isInternal!: boolean;
 
     @Column({ name: 'is_ethereal', type: 'bit', nullable: false, transformer: new BooleanTransformer() })
-    isEthereal!: boolean;
+    public isEthereal!: boolean;
 
     @Column({ nullable: true, type: 'json', default: {} })
-    metadata!: TransferMetadata & { [key: string]: string | number | undefined };
+    public metadata!: TransferMetadata & { [key: string]: string | number | undefined };
+
+    @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: false })
+    public transferItems!: TransferItem[];
 }
 
 interface TransferMetadata {

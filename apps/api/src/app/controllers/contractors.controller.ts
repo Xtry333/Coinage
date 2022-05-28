@@ -6,10 +6,10 @@ import { ContractorDao } from '../daos/contractor.dao';
 
 @Controller('contractor')
 export class ContractorController {
-    constructor(private readonly contractorDao: ContractorDao) {}
+    public constructor(private readonly contractorDao: ContractorDao) {}
 
     @Get('list')
-    async getCategoryList(): Promise<ContractorDTO[]> {
+    public async getCategoryList(): Promise<ContractorDTO[]> {
         const contractors = (await this.contractorDao.getAll()).map((c) => {
             return {
                 id: c.id,
@@ -21,7 +21,7 @@ export class ContractorController {
     }
 
     @Post('save')
-    async saveContractor(@Body() contractor: CreateEditContractorDTO): Promise<BaseResponseDTO> {
+    public async saveContractor(@Body() contractor: CreateEditContractorDTO): Promise<BaseResponseDTO> {
         let entity: Contractor;
 
         if (contractor.id) {

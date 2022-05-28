@@ -18,6 +18,7 @@ import {
     TotalInMonthByCategory,
     TransferDTO,
     TransferDetailsDTO,
+    ItemDTO,
 } from '@coinage-app/interfaces';
 import { Observable, lastValueFrom, map } from 'rxjs';
 
@@ -31,7 +32,7 @@ import { plainToInstance } from 'class-transformer';
 export class CoinageDataService {
     public static readonly API_URL = '/api/';
 
-    constructor(private http: HttpClient) {}
+    public constructor(private http: HttpClient) {}
 
     public getBalanceForActiveAccounts(date: Date): Observable<BalanceDTO[]> {
         return this.http.get<BalanceDTO[]>(
@@ -109,8 +110,8 @@ export class CoinageDataService {
         return this.http.get<AccountDTO[]>(`${CoinageDataService.API_URL}account/all`);
     }
 
-    public postCreateSaveTransaction(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {
-        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfers/save`, request);
+    public postCreateSaveTransfer(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
     public postRefundTransfer(transferId: number, date: Date) {
@@ -137,7 +138,8 @@ export class CoinageDataService {
     }
 
     public postCreateContractor(request: CreateEditContractorDTO) {
-        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}contractor/save`, request);
+        console.log(request);
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}contractor/save`, request));
     }
 
     public deleteTransfer(transferId: number): Observable<boolean> {
@@ -150,5 +152,9 @@ export class CoinageDataService {
 
     public getTotalPerCategory(year: number, month: number, day?: number): Observable<TotalInMonthByCategory[]> {
         return this.http.get<TotalInMonthByCategory[]>(`${CoinageDataService.API_URL}category/totalPerCategory/${year}/${month}${day ? '/' + day : ''}`);
+    }
+
+    public getAllItems(): Promise<ItemDTO[]> {
+        return lastValueFrom(this.http.get<ItemDTO[]>(`${CoinageDataService.API_URL}items/all`));
     }
 }

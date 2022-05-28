@@ -1,5 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Timestamp } from 'typeorm';
-import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { BooleanTransformer } from './transformers/boolean.transformer';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
@@ -7,22 +6,26 @@ import { User } from './User.entity';
 
 @Entity()
 export class Account {
+    public constructor() {
+        this.createdDate = new Date();
+    }
+
     @PrimaryGeneratedColumn()
-    id!: number;
+    public id!: number;
 
     @Column('text', { nullable: false })
-    name!: string;
+    public name!: string;
 
     @Column('number', { nullable: false })
-    userId!: number;
+    public userId!: number;
 
-    @ManyToOne('User', { eager: true, nullable: false })
+    @ManyToOne(() => User, { eager: true, nullable: false })
     @JoinColumn({ name: 'user_id' })
-    user!: User;
+    public user!: User;
 
     @Column('bit', { name: 'is_active', nullable: false, transformer: new BooleanTransformer() })
-    isActive!: boolean;
+    public isActive!: boolean;
 
-    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true, transformer: new TimestampTransformer() })
-    createdDate!: Date;
+    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })
+    public readonly createdDate!: Date;
 }

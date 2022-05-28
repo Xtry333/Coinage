@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import '~@ng-select/ng-select/themes/default.theme.css';
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 
 body {
     margin: 0;
@@ -8,6 +9,7 @@ body {
 }
 
 * {
+    font-family: 'Roboto', sans-serif;
     box-sizing: border-box;
 }
 
@@ -22,6 +24,46 @@ a:visited {
     float: right;
 }
 
-.mt-1 {
-    margin-top: 2px;
+@for $i from 1 through 5 {
+    .ml-#{$i} {
+        margin-left: #{$i * 2}px;
+    }
+
+    .mr-#{$i} {
+        margin-right: #{$i * 2}px;
+    }
+
+    .mt-#{$i} {
+        margin-top: #{$i * 2}px;
+    }
+
+    .mb-#{$i} {
+        margin-bottom: #{$i * 2}px;
+    }
+
+    .mv-#{$i} {
+        margin-top: #{$i * 2}px;
+        margin-bottom: #{$i * 2}px;
+    }
+
+    .mh-#{$i} {
+        margin-left: #{$i * 2}px;
+        margin-right: #{$i * 2}px;
+    }
+}
+
+.nowrap {
+    white-space: nowrap;
+}
+
+.align-left {
+    text-align: left;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.d-block {
+    display: block;
 }

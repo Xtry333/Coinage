@@ -3,33 +3,26 @@ import { DateTransformer, DateTransformerType } from './transformers/date.transf
 
 import { Contractor } from './Contractor.entity';
 import { Transfer } from './Transfer.entity';
+import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 
 @Entity()
 export class Receipt {
     @PrimaryGeneratedColumn()
-    id!: number;
+    public id!: number;
 
     @Column('text', { nullable: false })
-    description!: string;
+    public description!: string;
 
-    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false })
-    _amount!: string; // Decimal returns a string for precision, need to parse later in DTO
-
-    get amount(): number {
-        return Number(this._amount);
-    }
-
-    set amount(value: number) {
-        this._amount = value.toFixed(2);
-    }
+    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer(2) })
+    public amount!: number;
 
     @Column({ type: 'date', nullable: true, transformer: new DateTransformer(DateTransformerType.DATE) })
-    date!: Date | null;
+    public date!: Date | null;
 
-    @ManyToOne('Contractor', { eager: true, nullable: true })
-    @JoinColumn({ name: 'contractor' })
-    contractor?: Contractor | null;
+    @ManyToOne(() => Contractor, { eager: true, nullable: true })
+    @JoinColumn({ name: 'contractor_id' })
+    public contractor?: Contractor | null;
 
-    @OneToMany('Transfer', 'receipt', { eager: true })
-    transfers!: Promise<Transfer[]>;
+    @OneToMany(() => Transfer, (transfer) => transfer.receipt, { eager: true })
+    public transfers!: Transfer[];
 }

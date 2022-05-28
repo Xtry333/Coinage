@@ -1,3 +1,5 @@
+import { IsNumber, Min } from 'class-validator';
+
 import { TransferDTO } from './FilteredTransferDTO.response';
 
 export interface Message {
@@ -24,7 +26,7 @@ export interface ReceiptDTO {
     transferIds: number[];
 }
 
-export interface Range<T> {
-    from: T;
-    to: T;
+export class Range<T> {
+    public from!: T;
+    public to!: T;
 }

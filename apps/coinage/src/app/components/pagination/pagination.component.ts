@@ -29,15 +29,15 @@ type PageNumber =
     styleUrls: ['./pagination.component.scss'],
 })
 export class PaginationComponent implements OnInit, OnChanges {
-    @Input() firstPage = 1;
-    @Input() currentPage = 1;
-    @Input() lastPage = 1;
+    @Input() public firstPage = 1;
+    @Input() public currentPage = 1;
+    @Input() public lastPage = 1;
 
-    pageNumbers: PageNumber[] = [{ value: this.firstPage, isActive: false }];
+    public pageNumbers: PageNumber[] = [{ value: this.firstPage, isActive: false }];
 
-    constructor(private readonly router: Router, private readonly route: ActivatedRoute) {}
+    public constructor(private readonly router: Router, private readonly route: ActivatedRoute) {}
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.route.queryParams.subscribe((params) => {
             const { page } = params as PaginationQueryParams;
             const currentPageNumber = Number(page);
@@ -51,7 +51,7 @@ export class PaginationComponent implements OnInit, OnChanges {
         });
     }
 
-    ngOnChanges(changes: { lastPage: SimpleChange }): void {
+    public ngOnChanges(changes: { lastPage: SimpleChange }): void {
         if (changes.lastPage.currentValue !== changes.lastPage.previousValue) {
             this.calculatePageNumbers();
         }
@@ -84,7 +84,7 @@ export class PaginationComponent implements OnInit, OnChanges {
         this.pageNumbers = numbers.map((n) => (n ? { value: n, isActive: n === this.currentPage } : { value: undefined, isSpacer: true }));
     }
 
-    onClickChangePage(event: MouseEvent, pageNumber: PageNumber) {
+    public onClickChangePage(event: MouseEvent, pageNumber: PageNumber) {
         if (!pageNumber.isSpacer) {
             this.currentPage = pageNumber.value;
             this.goToPage(pageNumber.value);

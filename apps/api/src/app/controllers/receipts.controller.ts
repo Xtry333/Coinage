@@ -11,7 +11,7 @@ import { DateParserService } from '../services/date-parser.service';
 
 @Controller('receipt(s)?')
 export class ReceiptsController {
-    constructor(
+    public constructor(
         private readonly transferDao: TransferDao,
         private readonly receiptDao: ReceiptDao,
         private readonly categoryDao: CategoryDao,
@@ -21,7 +21,7 @@ export class ReceiptsController {
     ) {}
 
     @Get(':id/details')
-    async getReceiptDetails(@Param('id') id: number): Promise<ReceiptDetailsDTO> {
+    public async getReceiptDetails(@Param('id') id: number): Promise<ReceiptDetailsDTO> {
         if (!id) {
             throw new Error('Invalid ID provided.');
         }
@@ -30,14 +30,14 @@ export class ReceiptsController {
         return {
             id: receipt.id,
             date: receipt.date,
-            nextTransferDate: this.getNextTransferDate(await receipt.transfers),
+            nextTransferDate: this.getNextTransferDate(receipt.transfers),
             description: receipt.description,
             amount: Number(receipt.amount),
-            totalAmount: this.calculateTotalAmount(await receipt.transfers, true),
-            totalTransferred: this.calculateTotalAmount(await receipt.transfers, false),
+            totalAmount: this.calculateTotalAmount(receipt.transfers, true),
+            totalTransferred: this.calculateTotalAmount(receipt.transfers, false),
             contractorId: receipt.contractor?.id ?? null,
             contractorName: receipt.contractor?.name ?? null,
-            allTransfers: (await receipt.transfers)
+            allTransfers: receipt.transfers
                 .map(this.toTransferDTO)
                 .sort((a, b) => a.date.getTime() - b.date.getTime())
                 .reverse(),

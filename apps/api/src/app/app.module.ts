@@ -5,11 +5,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import controllers from './controllers/_index';
 import daos from './daos/_index';
 import entities from './entities/_index';
-import ormconfig from '../../ormconfig';
 import services from './services/_index';
+import { opts } from 'apps/api/ormconfig';
 
 @Module({
-    imports: [TypeOrmModule.forRoot(ormconfig), ScheduleModule.forRoot(), TypeOrmModule.forFeature(entities)],
+    imports: [TypeOrmModule.forRoot(opts), ScheduleModule.forRoot(), TypeOrmModule.forFeature(entities)],
     controllers: controllers,
     providers: [...services, ...daos, EventsGateway],
 })

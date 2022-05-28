@@ -4,7 +4,7 @@ import { Pipe, PipeTransform } from '@angular/core';
     name: 'mathAbs',
 })
 export class MathAbsPipe implements PipeTransform {
-    transform(value: number): number {
+    public transform(value: number): number {
         return Math.abs(value);
     }
 }

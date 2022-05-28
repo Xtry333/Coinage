@@ -14,15 +14,15 @@ export class ModalComponent implements OnInit, OnChanges {
 
     public closeIcon = faTimes;
 
-    @Input() closeable = true;
-    @Input() isDisplayed = false;
-    @Input() centered = false;
-    @Input() moveable = true;
+    @Input() public closeable = true;
+    @Input() public isDisplayed = false;
+    @Input() public centered = false;
+    @Input() public moveable = true;
 
-    @Output() hideModalEvent: EventEmitter<void> = new EventEmitter();
-    @Output() moveModalEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
+    @Output() public hideModalEvent: EventEmitter<void> = new EventEmitter();
+    @Output() public moveModalEvent: EventEmitter<boolean> = new EventEmitter<boolean>();
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         const el = document.getElementById('fresh-modal-container');
         if (el) {
             this.modalElement = el;
@@ -32,7 +32,7 @@ export class ModalComponent implements OnInit, OnChanges {
         }
     }
 
-    ngOnChanges(changes: SimpleChanges): void {
+    public ngOnChanges(changes: SimpleChanges): void {
         if (changes.isDisplayed && changes.isDisplayed.currentValue === false && changes.isDisplayed.previousValue === true) {
             this.modalElement.style.left = this.getPageWidth() - 400 + 'px';
             this.modalElement.style.top = '35px';
@@ -40,7 +40,7 @@ export class ModalComponent implements OnInit, OnChanges {
     }
 
     @HostListener('mousedown', ['$event'])
-    onMouseDown(event: MouseEvent) {
+    public onMouseDown(event: MouseEvent) {
         if (event.target === this.modalElement && this.moveable) {
             this.isGrabbed = true;
             this.moveModalEvent.emit(true);
@@ -52,7 +52,7 @@ export class ModalComponent implements OnInit, OnChanges {
     }
 
     @HostListener('document:mouseup', ['$event'])
-    onMouseUp() {
+    public onMouseUp() {
         if (this.moveable) {
             this.isGrabbed = false;
             this.moveModalEvent.emit(false);
@@ -61,7 +61,7 @@ export class ModalComponent implements OnInit, OnChanges {
     }
 
     @HostListener('document:mousemove', ['$event'])
-    onMouseMove(event: MouseEvent) {
+    public onMouseMove(event: MouseEvent) {
         if (this.isGrabbed && this.moveable) {
             this.modalElement.style.right = '';
             this.moveModalEvent.emit(true);

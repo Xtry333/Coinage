@@ -16,22 +16,22 @@ export interface UiTotalInMonthByCategory {
 }
 
 @Component({
-    selector: 'coinage-app-summary',
-    templateUrl: './summary.component.html',
-    styleUrls: ['./summary.component.scss'],
+    selector: 'coinage-app-month-summary',
+    templateUrl: './month-summary.component.html',
+    styleUrls: ['./month-summary.component.scss'],
 })
 export class MonthSummaryComponent implements OnInit, OnDestroy {
-    showPage = false;
-    partedDate!: PartedDate;
-    datetime!: Date;
-    datePartsArray!: string[];
-    selectedDate!: string;
-    selectedMonth!: string;
-    outcomesPerCategory: UiTotalInMonthByCategory[] = [];
-    transfers: TransferDTO[] = [];
-    tableFilterParams: TableFilterFields = {};
+    public showPage = false;
+    public partedDate!: PartedDate;
+    public datetime!: Date;
+    public datePartsArray!: string[];
+    public selectedDate!: string;
+    public selectedMonth!: string;
+    public outcomesPerCategory: UiTotalInMonthByCategory[] = [];
+    public transfers: TransferDTO[] = [];
+    public tableFilterParams: TableFilterFields = {};
 
-    routeSubscription?: Subscription;
+    public routeSubscription?: Subscription;
 
     public summaryChartData: ChartDataset[] = [];
     public summaryChartLabels: string[] = [];
@@ -39,7 +39,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         animation: false,
     };
 
-    constructor(
+    public constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly coinageData: CoinageDataService,
@@ -48,7 +48,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         console.log(this);
     }
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         this.routeSubscription = this.route.paramMap.subscribe((params) => {
             // this.showPage = false;
             this.selectedMonth = params.get('month') ?? '';
@@ -91,8 +91,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
     }
 
     private loadData(): void {
-        const requestDateBalance = new Date(this.selectedMonth);
-        requestDateBalance.setDate(0);
+        const requestedDateBalance = new Date(this.selectedMonth);
+        requestedDateBalance.setDate(0);
+        console.log(requestedDateBalance);
         if (this.isDateTargetMonth) {
             Promise.all([
                 this.coinageData.getAllFilteredTransfers({
@@ -100,9 +101,10 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
                     rowsPerPage: 500,
                     ...this.tableFilterParams,
                     date: { from: this.monthStartDate, to: this.monthEndDate },
+                    userId: 1,
                     showPlanned: true,
                 }),
-                lastValueFrom(this.coinageData.getBalanceForActiveAccounts(requestDateBalance)),
+                lastValueFrom(this.coinageData.getBalanceForActiveAccounts(requestedDateBalance)),
             ])
                 .then(([allFilteredTransfers, balance]) => {
                     this.transfers = allFilteredTransfers.transfers.filter(
@@ -117,7 +119,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
 
     private initializeChartLabels(): void {
         this.summaryChartLabels = [];
-        for (let i = 1; i <= this.getThisMonthsLastDay(); i++) {
+        for (let i = 0; i <= this.getThisMonthsLastDay(); i++) {
             this.summaryChartLabels.push(`${i}`);
         }
     }
@@ -137,9 +139,9 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
             const transfer = this.transfers[i];
             const day = transfer.date.getDate();
             if (transfer.type === TransferTypeEnum.OUTCOME) {
-                dailyChange[day - 1] -= transfer.amount;
+                dailyChange[day] -= transfer.amount;
             } else {
-                dailyChange[day - 1] += transfer.amount;
+                dailyChange[day] += transfer.amount;
             }
         }
 
@@ -165,21 +167,21 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         console.log(this);
     }
 
-    get isDateTargetDay(): boolean {
+    public get isDateTargetDay(): boolean {
         return this.partedDateService.isDateTargetDay(this.partedDate);
     }
 
-    get isDateTargetMonth(): boolean {
+    public get isDateTargetMonth(): boolean {
         return this.partedDateService.isDateTargetMonth(this.partedDate);
     }
 
-    get monthStartDate(): Date {
+    public get monthStartDate(): Date {
         const date = new Date(this.datetime);
         date.setUTCDate(1);
         return date;
     }
 
-    get monthEndDate(): Date {
+    public get monthEndDate(): Date {
         const date = new Date(this.selectedMonth);
         // date.setUTCDate(1);
         date.setUTCMonth(date.getUTCMonth() + 1);
@@ -197,7 +199,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         return monthName.charAt(0).toUpperCase() + monthName.slice(1);
     }
 
-    getParentPartedDate(): PartedDate {
+    public getParentPartedDate(): PartedDate {
         const date = { ...this.partedDate };
 
         if (date.month && date.day) {
@@ -216,27 +218,27 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         return item.id.toString();
     }
 
-    get tableHeader(): string {
+    public get tableHeader(): string {
         return 'Transfers in ' + this.partedDateService.joinPartedDate(this.partedDate);
     }
 
-    onDateChange() {
+    public onDateChange() {
         console.log(this.selectedDate);
         const parted = this.partedDateService.toPartedDate(this.selectedDate);
         const target = this.partedDateService.joinPartedDate(parted);
         this.router.navigate(['summary', target]);
     }
 
-    onMonthChange() {
+    public onMonthChange() {
         console.log(this.selectedMonth);
         this.router.navigate(['summary', this.selectedMonth]);
     }
 
-    goUp() {
+    public goUp() {
         this.router.navigate(['summary', this.partedDateService.joinPartedDate(this.getParentPartedDate())]);
     }
 
-    shouldShowGoUpButton(): boolean {
+    public shouldShowGoUpButton(): boolean {
         return !!this.partedDate.month;
     }
 

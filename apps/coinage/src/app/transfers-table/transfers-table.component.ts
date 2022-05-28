@@ -91,20 +91,20 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         contractors: [],
     };
 
-    currentPage = 1;
+    public currentPage = 1;
 
-    @Input() header?: string;
-    @Input() transfers!: TransferDTO[];
-    @Input() showFilters?: boolean = false;
-    @Input() showSummary?: boolean = true;
-    @Input() showReceiptIcon?: boolean = true;
-    @Input() showTodayMarker?: boolean = true;
-    @Input() filterCachePath?: string;
-    @Input() lastPageNumber?: number;
+    @Input() public header?: string;
+    @Input() public transfers!: TransferDTO[];
+    @Input() public showFilters?: boolean = false;
+    @Input() public showSummary?: boolean = true;
+    @Input() public showReceiptIcon?: boolean = true;
+    @Input() public showTodayMarker?: boolean = true;
+    @Input() public filterCachePath?: string;
+    @Input() public lastPageNumber?: number;
 
     @Output() public tableFilter = new EventEmitter<TableFilterFields>();
 
-    constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
+    public constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
 
     public ngOnInit(): void {
         if (this.showFilters) {
@@ -223,15 +223,15 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         return a.toLocaleLowerCase().includes(b.toLocaleLowerCase());
     }
 
-    get isHeaderDisplayed(): boolean {
+    public get isHeaderDisplayed(): boolean {
         return this.header !== undefined;
     }
 
-    get noRowsFound(): boolean {
+    public get noRowsFound(): boolean {
         return this.transfersForTable.length === 0;
     }
 
-    get noRows(): boolean {
+    public get noRows(): boolean {
         return this.transfers?.length === 0;
     }
 
@@ -244,7 +244,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         this.doFiltering();
     }
 
-    get isAnyFilterApplied(): boolean {
+    public get isAnyFilterApplied(): boolean {
         for (const key in this.filter) {
             if (this.filter[key] !== undefined) {
                 return true;
@@ -253,7 +253,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         return false;
     }
 
-    get dummyTransfer(): UiTransfer {
+    public get dummyTransfer(): UiTransfer {
         return {
             id: -1,
             date: new Date(),

@@ -13,32 +13,32 @@ export class NotificationComponent implements OnInit, OnDestroy {
 
     private closeTimeout?: ReturnType<typeof setTimeout>;
 
-    @Input() content!: CoinageNotification;
+    @Input() public content!: CoinageNotification;
 
-    @Output() dismissedEvent = new EventEmitter<number>();
+    @Output() public dismissedEvent = new EventEmitter<number>();
 
-    ngOnInit(): void {
+    public ngOnInit(): void {
         if (this.content.autoCloseDelay ?? 0 > 0) {
             this.closeTimeout = setTimeout(this.dismiss, this.content.autoCloseDelay);
         }
     }
 
-    ngOnDestroy(): void {
+    public ngOnDestroy(): void {
         this.dismiss();
     }
 
-    dismiss = () => {
+    public dismiss = () => {
         if (this.closeTimeout) {
             clearTimeout(this.closeTimeout);
         }
         this.dismissedEvent.emit(this.content.id);
     };
 
-    get displayGoToIcon(): boolean {
+    public get displayGoToIcon(): boolean {
         return !!this.content.linkTo;
     }
 
-    get classLevel(): string {
+    public get classLevel(): string {
         switch (this.content.level) {
             default:
             case NotificationLevel.Info:
@@ -50,7 +50,7 @@ export class NotificationComponent implements OnInit, OnDestroy {
         }
     }
 
-    get isError(): boolean {
+    public get isError(): boolean {
         return this.content.level === NotificationLevel.Error;
     }
 }

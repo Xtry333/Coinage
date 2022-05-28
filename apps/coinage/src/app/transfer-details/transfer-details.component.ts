@@ -2,9 +2,8 @@ import * as Rx from 'rxjs';
 
 import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
-import { catchError, finalize } from 'rxjs/operators';
 import { faClock, faFeatherAlt, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 
 import { CoinageDataService } from '../services/coinage.data-service';
@@ -17,24 +16,24 @@ import { NotificationService } from '../services/notification.service';
     styleUrls: ['./transfer-details.component.scss'],
 })
 export class TransferDetailsComponent implements OnInit, OnDestroy {
-    plannedIcon: IconDefinition = faClock;
-    receiptIcon: IconDefinition = faReceipt;
-    refundedIcon: IconDefinition = faReply;
-    etherealIcon: IconDefinition = faFeatherAlt;
+    public plannedIcon: IconDefinition = faClock;
+    public receiptIcon: IconDefinition = faReceipt;
+    public refundedIcon: IconDefinition = faReply;
+    public etherealIcon: IconDefinition = faFeatherAlt;
 
-    showPage = false;
-    transfer!: TransferDetailsDTO;
+    public showPage = false;
+    public transfer!: TransferDetailsDTO;
 
     public NavigatorPages = NavigatorPages;
 
-    splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
-    totalPayment = 0;
-    shouldShowSplit = false;
-    routeSubscription!: Rx.Subscription;
+    public splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
+    public totalPayment = 0;
+    public shouldShowSplit = false;
+    public routeSubscription!: Rx.Subscription;
 
-    categories: CategoryDTO[] = [];
+    public categories: CategoryDTO[] = [];
 
-    constructor(
+    public constructor(
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly navigator: NavigatorService,
@@ -67,7 +66,7 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
                     transfer.amount * TransferType[transfer.type].mathSymbol +
                     transfer.otherTransfers.reduce((a, t) => a + t.amount * TransferType[t.type].mathSymbol, 0);
 
-                console.log(this.transfer.otherTransfers);
+                console.log(this.transfer);
             })
             .catch(() => {
                 this.notificationService.push({

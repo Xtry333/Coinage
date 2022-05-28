@@ -47,7 +47,7 @@
                     "builder": "@nrwl/jest:jest",
                     "outputs": ["coverage/apps/api"],
                     "options": {
-                        "jestConfig": "apps/api/jest.config.js",
+                        "jestConfig": "apps/api/jest.config.ts",
                         "passWithNoTests": true
                     }
                 }
@@ -140,7 +140,7 @@
                     "builder": "@nrwl/jest:jest",
                     "outputs": ["coverage/apps/coinage"],
                     "options": {
-                        "jestConfig": "apps/coinage/jest.config.js",
+                        "jestConfig": "apps/coinage/jest.config.ts",
                         "passWithNoTests": true
                     }
                 }
@@ -187,7 +187,7 @@
                     "builder": "@nrwl/jest:jest",
                     "outputs": ["coverage/libs/common"],
                     "options": {
-                        "jestConfig": "libs/common/jest.config.js",
+                        "jestConfig": "libs/common/jest.config.ts",
                         "passWithNoTests": true
                     }
                 },
