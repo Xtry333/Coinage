@@ -37,7 +37,8 @@
         "format:check": "nx format:check",
         "typeorm": "typeorm-ts-node-commonjs",
         "migration:create": "yarn typeorm migration:create -n",
-        "update": "nx migrate latest",
+        "update": "run-s update:latest format",
+        "update:latest": "nx migrate latest",
         "workspace-generator": "nx workspace-generator",
         "dep-graph": "nx dep-graph",
         "help": "nx help"
