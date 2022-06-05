@@ -20,6 +20,7 @@ export * from './lib/MonthlyUserStatsDTO.response';
 export * from './model/TransferDetails.dto.response';
 export * from './model/CreateEditTransfer.dto.request';
 export * from './lib/ItemDTO.response';
+export * from './lib/ItemWithLastUsedPriceDTO.response';
 
 export * from './model/PartialDate';
 

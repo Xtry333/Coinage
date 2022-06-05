@@ -19,6 +19,7 @@ import {
     TransferDTO,
     TransferDetailsDTO,
     ItemDTO,
+    ItemWithLastUsedPriceDTO,
 } from '@coinage-app/interfaces';
 import { Observable, lastValueFrom, map } from 'rxjs';
 
@@ -154,7 +155,7 @@ export class CoinageDataService {
         return this.http.get<TotalInMonthByCategory[]>(`${CoinageDataService.API_URL}category/totalPerCategory/${year}/${month}${day ? '/' + day : ''}`);
     }
 
-    public getAllItems(): Promise<ItemDTO[]> {
-        return lastValueFrom(this.http.get<ItemDTO[]>(`${CoinageDataService.API_URL}items/all`));
+    public getAllItems(): Promise<ItemWithLastUsedPriceDTO[]> {
+        return lastValueFrom(this.http.get<ItemWithLastUsedPriceDTO[]>(`${CoinageDataService.API_URL}items/all`));
     }
 }

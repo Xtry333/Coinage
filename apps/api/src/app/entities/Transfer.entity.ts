@@ -91,4 +91,5 @@ interface TransferMetadata {
     refundTargetId?: number;
     subject?: string;
     subjectDate?: string;
+    otherTransferId?: number;
 }

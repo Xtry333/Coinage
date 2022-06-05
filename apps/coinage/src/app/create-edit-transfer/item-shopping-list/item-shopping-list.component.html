@@ -6,10 +6,11 @@
         <div class="item-input-id">
             <label for="itemId">Item</label>
             <ng-select
-                #categorySelect
+                #itemSelect
                 name="itemId"
                 labelForId="itemId"
                 [(ngModel)]="selectedItem.id"
+                (change)="onItemSelected($event)"
                 [clearable]="true"
                 [required]="false"
                 [editableSearchTerm]="true"

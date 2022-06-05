@@ -1,6 +1,7 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
-import { ItemDTO } from '@coinage-app/interfaces';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
+import { ItemDTO, ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { ShoppingListItem } from './editable-shop-list-item/editable-shop-list-item.component';
 
@@ -11,8 +12,11 @@ import { ShoppingListItem } from './editable-shop-list-item/editable-shop-list-i
 })
 export class ItemShoppingListComponent implements OnInit, OnChanges {
     public removeIcon = faTrash;
-    public allItems: ItemDTO[] = [];
+    public allItems: ItemWithLastUsedPriceDTO[] = [];
     public itemsLoading = true;
+
+    @ViewChildren('itemSelect')
+    private itemSelect?: QueryList<NgSelectComponent>;
 
     @Input() public preselectedItems: ShoppingListItem[] = [];
 
@@ -39,6 +43,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         this.coinageDataService
             .getAllItems()
             .then((items) => {
+                console.log(items);
                 this.allItems = items;
             })
             .finally(() => {
@@ -53,6 +58,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         this.itemList.push(shoppingItem);
         this.itemListChanged.emit(this.itemList);
         this.recalculateAndEmitTotalCost();
+        this.itemSelect?.first.handleClearClick();
     }
 
     public get itemsLoaded(): boolean {
@@ -65,8 +71,18 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         this.recalculateAndEmitTotalCost();
     }
 
+    public onItemSelected(selected: ShoppingListItem): void {
+        if (selected === undefined) {
+            return;
+        }
+        const item = this.allItems.find((item) => item.id === selected.id);
+        if (item && item.lastUnitPrice !== null) {
+            this.selectedItem.price = item.lastUnitPrice;
+        }
+    }
+
     private recalculateAndEmitTotalCost(): void {
-        const totalCost = Number(this.itemList.reduce((acc, curr) => acc + curr.price * curr.amount, 0).toFixed(4));
+        const totalCost = Number(this.itemList.reduce((acc, curr) => acc + curr.price * curr.amount, 0).toFixed(2));
         this.totalCostChanged.emit(totalCost);
     }
 }

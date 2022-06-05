@@ -1,4 +1,4 @@
-import { ItemDTO } from '@coinage-app/interfaces';
+import { ItemDTO, ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
 import { Controller, Get } from '@nestjs/common';
 
 import { ItemDao } from '../daos/item.dao';
@@ -8,7 +8,7 @@ export class ItemsController {
     public constructor(private readonly itemDao: ItemDao) {}
 
     @Get('/all')
-    public async getAllItems(): Promise<ItemDTO[]> {
-        return this.itemDao.getAll();
+    public async getAllItems(): Promise<ItemWithLastUsedPriceDTO[]> {
+        return this.itemDao.getAllWithLastUsedPrice();
     }
 }

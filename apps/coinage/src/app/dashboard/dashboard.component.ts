@@ -18,8 +18,9 @@ interface UiTotalAmountPerMonth {
     incomes: number;
     outcomes: number;
     balance: number;
+    profit: number;
     transactionsCount: number;
-    costPerDay: number;
+    profitPerDay: number;
 }
 
 @Component({
@@ -163,7 +164,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     private mapToUiOutcome(totalOutcomes: MonthlyUserStatsDTO[]): UiTotalAmountPerMonth[] {
         return totalOutcomes.map((total) => {
-            return {
+            const profit = total.incomes - total.outcomes;
+            const uiData: UiTotalAmountPerMonth = {
                 year: total.year,
                 date: total.year + '-' + (total.month + 1),
                 monthName: new Date(total.year, total.month).toLocaleString(undefined, { month: 'long' }),
@@ -171,9 +173,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
                 outcomes: total.outcomes,
                 incomes: total.incomes,
                 balance: total.balance,
+                profit: profit,
                 transactionsCount: total.transactionsCount,
-                costPerDay: total.outcomes / this.daysInMonth(total.year, total.month),
+                profitPerDay: -profit / this.daysInMonth(total.year, total.month),
             };
+
+            return uiData;
         });
     }
 

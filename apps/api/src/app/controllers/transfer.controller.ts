@@ -14,6 +14,7 @@ import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { ContractorDao } from '../daos/contractor.dao';
+import { ReceiptDao } from '../daos/receipt.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
@@ -35,6 +36,7 @@ export class TransferController {
         private readonly categoryDao: CategoryDao,
         private readonly contractorDao: ContractorDao,
         private readonly accountDao: AccountDao,
+        private readonly receiptDao: ReceiptDao,
         private readonly dateParserService: DateParserService,
         private readonly saveTransfersService: SaveTransfersService,
         private readonly transferItemsService: TransferItemsService
@@ -177,6 +179,7 @@ export class TransferController {
         const category = await this.categoryDao.getById(transfer.categoryId);
         const account = await this.accountDao.getById(transfer.accountId);
         const contractor = transfer.contractorId !== null ? await this.contractorDao.getById(transfer.contractorId) : null;
+        const receipt = transfer.receiptId !== null ? await this.receiptDao.getById(transfer.receiptId) : null;
 
         if (transfer.id !== undefined) {
             entity = await this.transferDao.getById(transfer.id);
@@ -194,11 +197,11 @@ export class TransferController {
         entity.account = account;
         entity.accountId = account.id;
 
-        entity.contractor = contractor;
+        // entity.contractor = contractor;
         entity.contractorId = contractor?.id ?? null;
 
-        entity.receipt = Promise.resolve(null);
-        entity.receiptId = transfer.receiptId;
+        // entity.receipt = Promise.resolve(receipt);
+        entity.receiptId = receipt?.id ?? null;
 
         if (entity.category.name === 'Paliwo') {
             try {
@@ -371,6 +374,13 @@ export class TransferController {
 
         const insertedFrom = await this.transferDao.save(entityFrom);
         const insertedTo = await this.transferDao.save(entityTo);
+
+        entityFrom.metadata.otherTransferId = insertedTo.id;
+        entityTo.metadata.otherTransferId = insertedFrom.id;
+
+        await this.transferDao.save(entityFrom);
+        await this.transferDao.save(entityTo);
+
         return { originTransferId: insertedFrom.id, targetTransferId: insertedTo.id };
     }
 }
