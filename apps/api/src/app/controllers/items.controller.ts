@@ -1,4 +1,4 @@
-import { ItemDTO, ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
+import { ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
 import { Controller, Get } from '@nestjs/common';
 
 import { ItemDao } from '../daos/item.dao';
