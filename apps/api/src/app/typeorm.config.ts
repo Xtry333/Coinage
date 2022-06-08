@@ -1,10 +1,9 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import entities from './src/app/entities/_index';
-import migrations from './src/app/migrations/_index';
+import entities from './entities/_index';
+import migrations from './migrations/_index';
 
 export const opts: DataSourceOptions = {
-    name: 'default',
     type: 'mysql',
     host: process.env.MYSQL_HOST || 'localhost',
     port: Number(process.env.COINAGE_MYSQL_PORT) || 3306,

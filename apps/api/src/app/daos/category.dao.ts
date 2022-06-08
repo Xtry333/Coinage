@@ -1,7 +1,7 @@
 import { TotalInMonthByCategory } from '@coinage-app/interfaces';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Equal, getConnection, InsertResult, Repository } from 'typeorm';
+import { DataSource, DeleteResult, Equal, InsertResult, Repository } from 'typeorm';
 import { Account } from '../entities/Account.entity';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
@@ -11,7 +11,7 @@ import { BaseDao } from './base.bao';
 export class CategoryDao extends BaseDao {
     public static SYSTEM_CATEGORY_NOT_FOUND_MESSAGE = (tag: string) => `System category '${tag}' not found. Something went wrong in the database.`;
 
-    public constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>) {
+    public constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>, private readonly dataSource: DataSource) {
         super();
     }
 
@@ -34,7 +34,7 @@ export class CategoryDao extends BaseDao {
     }
 
     public async getTotalByCategoryMonth(year: number, month?: number, day?: number): Promise<TotalInMonthByCategory[]> {
-        return await getConnection()
+        return await this.dataSource
             .createQueryBuilder<TotalInMonthByCategory>(Category, 'Category')
             .select('Category.name', 'categoryName')
             .addSelect('Category.id', 'categoryId')

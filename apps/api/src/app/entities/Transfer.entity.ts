@@ -7,7 +7,6 @@ import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
 import { Receipt } from './Receipt.entity';
 import { TransferItem } from './TransferItem.entity';
-import { TransferTypeEnum } from '@coinage-app/interfaces';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 
 @Entity()
@@ -92,4 +91,9 @@ interface TransferMetadata {
     subject?: string;
     subjectDate?: string;
     otherTransferId?: number;
+}
+
+export enum TransferTypeEnum {
+    INCOME = 'INCOME',
+    OUTCOME = 'OUTCOME',
 }

@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { TransferTypeEnum } from '@coinage-app/interfaces';
 import { User } from './User.entity';
 
 export enum TransferType {
@@ -38,4 +37,9 @@ export class Category {
 
     @Column('text', { nullable: true })
     public tag!: string | null;
+}
+
+export enum TransferTypeEnum {
+    INCOME = 'INCOME',
+    OUTCOME = 'OUTCOME',
 }

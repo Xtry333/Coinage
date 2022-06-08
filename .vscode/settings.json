@@ -10,5 +10,6 @@
     },
     "editor.fontSize": 11,
     "files.autoSave": "afterDelay",
-    "angular.view-engine": false
+    "angular.view-engine": false,
+    "js/ts.implicitProjectConfig.experimentalDecorators": true
 }

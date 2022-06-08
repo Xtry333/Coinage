@@ -6,7 +6,7 @@ import controllers from './controllers/_index';
 import daos from './daos/_index';
 import entities from './entities/_index';
 import services from './services/_index';
-import { opts } from 'apps/api/ormconfig';
+import { opts } from './typeorm.config';
 
 @Module({
     imports: [TypeOrmModule.forRoot(opts), ScheduleModule.forRoot(), TypeOrmModule.forFeature(entities)],

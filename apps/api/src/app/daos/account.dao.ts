@@ -1,4 +1,4 @@
-import { DeleteResult, Equal, Repository, getConnection } from 'typeorm';
+import { DeleteResult, Equal, Repository, DataSource } from 'typeorm';
 
 import { Account } from '../entities/Account.entity';
 import { BalanceDTO } from '@coinage-app/interfaces';
@@ -11,7 +11,11 @@ import { BaseDao } from './base.bao';
 
 @Injectable()
 export class AccountDao extends BaseDao {
-    public constructor(@InjectRepository(Account) private readonly accountRepository: Repository<Account>, private readonly dateParser: DateParserService) {
+    public constructor(
+        @InjectRepository(Account) private readonly accountRepository: Repository<Account>,
+        private readonly dateParser: DateParserService,
+        private readonly dataSource: DataSource
+    ) {
         super();
     }
 
@@ -36,7 +40,7 @@ export class AccountDao extends BaseDao {
     }
 
     public getAllActive(): Promise<Account[]> {
-        return this.accountRepository.find({ where: { isActive: Equal(true) } });
+        return this.accountRepository.find({ where: { isActive: true } });
     }
 
     public getForUserId(userId: number): Promise<Account[]> {
@@ -44,17 +48,15 @@ export class AccountDao extends BaseDao {
     }
 
     public getCurrentlyActiveForUserId(userId: number): Promise<Account[]> {
-        return this.accountRepository.find({ where: { userId: Equal(userId), isActive: Equal(true) } });
+        return this.accountRepository.find({ where: { userId: Equal(userId), isActive: true } });
     }
 
     public save(account: Account): Promise<Account> {
-        return getConnection().getRepository(Account).save(account);
+        return this.dataSource.getRepository(Account).save(account);
     }
 
     public deleteById(id: number): Promise<DeleteResult> {
-        return getConnection()
-            .getRepository(Account)
-            .delete({ id: Equal(id) });
+        return this.dataSource.getRepository(Account).delete({ id: Equal(id) });
     }
 
     public getAccountBalance(accountIds: number[]): Promise<BalanceDTO[]> {
@@ -62,7 +64,7 @@ export class AccountDao extends BaseDao {
     }
 
     public async getAccountBalanceForAccountAsOfDate(accountIds: number[], asOfDate: Date): Promise<BalanceDTO[]> {
-        const result = await getConnection().query(`
+        const result = await this.dataSource.query(`
                 SELECT t.account_id AS accountId, a.name, 
                 SUM(CASE WHEN t.type = '${TransferType.Income}' THEN t.amount WHEN t.type = '${TransferType.Outcome}' THEN -t.amount ELSE 0 END) AS balance
                 FROM transfer t
@@ -79,7 +81,7 @@ export class AccountDao extends BaseDao {
     }
 
     public async getSpendingsAsOfDate(accountIds: number[], asOfDate: Date, userId: number): Promise<BalanceDTO[]> {
-        const result = await getConnection().query(`
+        const result = await this.dataSource.query(`
                 SELECT a.id, a.name,
                 SUM(CASE WHEN t.type = '${TransferType.Income}' THEN t.amount WHEN t.type = '${TransferType.Outcome}' THEN -t.amount ELSE 0 END) AS balance,
                 COUNT(t.id) AS transfer_count
@@ -101,10 +103,8 @@ export class AccountDao extends BaseDao {
         accountIds: number[],
         sumOnlyInternalTransfers = true
     ): Promise<{ year: number; month: number; income: string; outcome: string; count: string }[]> {
-        return await getConnection()
-            .getRepository(Transfer)
-            .query(
-                `SELECT
+        return await this.dataSource.getRepository(Transfer).query(
+            `SELECT
                     YEAR(t.date) AS 'year',
                     MONTH(t.date) AS 'month',
                     SUM(CASE WHEN t.type = '${TransferType.Income}' THEN t.amount ELSE 0 END) AS 'income',
@@ -116,11 +116,11 @@ export class AccountDao extends BaseDao {
                 GROUP BY YEAR(t.date), MONTH(t.date)
                 ORDER BY year DESC, month DESC
                 LIMIT 12`
-            );
+        );
     }
 
     public async getLastTransferDate(accountId: number): Promise<string> {
-        const result = await getConnection().query(`SELECT t.date FROM transfer t WHERE t.account_id = ${accountId} ORDER BY t.date DESC LIMIT 1;`);
+        const result = await this.dataSource.query(`SELECT t.date FROM transfer t WHERE t.account_id = ${accountId} ORDER BY t.date DESC LIMIT 1;`);
         return result[0].date;
     }
 }

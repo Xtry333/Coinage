@@ -18,7 +18,12 @@
         "strict": true,
         "noImplicitReturns": true,
         "noFallthroughCasesInSwitch": true,
-        "plugins": [{ "name": "@angular/language-service" }]
+        "plugins": [
+            {
+                "name": "@angular/language-service"
+            }
+        ],
+        "target": "es2020"
     },
     "angularCompilerOptions": {
         "strictInjectionParameters": true,

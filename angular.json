@@ -2,6 +2,7 @@
     "version": 1,
     "projects": {
         "api": {
+            "$schema": "../../node_modules/nx/schemas/project-schema.json",
             "root": "apps/api",
             "sourceRoot": "apps/api/src",
             "projectType": "application",
@@ -55,6 +56,7 @@
             "tags": []
         },
         "coinage": {
+            "$schema": "../../node_modules/nx/schemas/project-schema.json",
             "projectType": "application",
             "root": "apps/coinage",
             "sourceRoot": "apps/coinage/src",
@@ -149,6 +151,7 @@
             "implicitDependencies": []
         },
         "coinage-e2e": {
+            "$schema": "../../node_modules/nx/schemas/project-schema.json",
             "root": "apps/coinage-e2e",
             "sourceRoot": "apps/coinage-e2e/src",
             "projectType": "application",
@@ -178,6 +181,7 @@
             "implicitDependencies": ["coinage"]
         },
         "common": {
+            "$schema": "../../node_modules/nx/schemas/project-schema.json",
             "root": "libs/common",
             "projectType": "library",
             "sourceRoot": "libs/common/src",
@@ -201,6 +205,7 @@
             "tags": []
         },
         "interfaces": {
+            "$schema": "../../node_modules/nx/schemas/project-schema.json",
             "root": "libs/interfaces",
             "sourceRoot": "libs/interfaces/src",
             "projectType": "library",

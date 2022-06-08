@@ -146,6 +146,6 @@ export class TransferDao extends BaseDao {
     }
 
     public async deleteEthereals(): Promise<number> {
-        return (await this.transferRepository.delete({ isEthereal: Equal(true) })).affected ?? 0;
+        return (await this.transferRepository.delete({ isEthereal: true })).affected ?? 0;
     }
 }
