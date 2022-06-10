@@ -19,7 +19,7 @@ export class Receipt {
     @Column({ type: 'date', nullable: true, transformer: new DateTransformer(DateTransformerType.DATE) })
     public date!: Date | null;
 
-    @ManyToOne(() => Contractor, { eager: true, nullable: true })
+    @ManyToOne(() => Contractor, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'contractor_id' })
     public contractor?: Contractor | null;
 

@@ -42,38 +42,38 @@ export class Transfer {
     @Column({ type: 'integer', nullable: false })
     public categoryId!: number;
 
-    @ManyToOne(() => Category, { eager: true, nullable: false })
+    @ManyToOne(() => Category, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'category_id' })
     public category!: Category;
 
     @Column({ type: 'integer', nullable: true })
     public contractorId!: number | null;
 
-    @ManyToOne(() => Contractor, { eager: true, nullable: true })
+    @ManyToOne(() => Contractor, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'contractor_id' })
     public contractor!: Contractor | null;
 
     @Column({ type: 'integer', nullable: true })
     public receiptId!: number | null;
 
-    @ManyToOne(() => Receipt, { eager: false, nullable: true })
+    @ManyToOne(() => Receipt, { eager: false, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'receipt_id' })
     public receipt!: Promise<Receipt | null>;
 
-    @Column({ name: 'type', type: 'varchar', length: 50, nullable: false })
+    @Column({ name: 'type', type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
 
     @Column({ type: 'integer' })
     public accountId!: number;
 
-    @ManyToOne(() => Account, { eager: true, nullable: false })
+    @ManyToOne(() => Account, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'account_id' })
     public account!: Account;
 
-    @Column({ name: 'is_internal', type: 'bit', nullable: false, transformer: new BooleanTransformer() })
+    @Column({ name: 'is_internal', type: 'bit', nullable: false, default: false, transformer: new BooleanTransformer() })
     public isInternal!: boolean;
 
-    @Column({ name: 'is_ethereal', type: 'bit', nullable: false, transformer: new BooleanTransformer() })
+    @Column({ name: 'is_ethereal', type: 'bit', nullable: false, default: false, transformer: new BooleanTransformer() })
     public isEthereal!: boolean;
 
     @Column({ nullable: true, type: 'json', default: {} })
@@ -91,6 +91,7 @@ interface TransferMetadata {
     subject?: string;
     subjectDate?: string;
     otherTransferId?: number;
+    targetDate?: string;
 }
 
 export enum TransferTypeEnum {

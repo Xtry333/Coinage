@@ -11,10 +11,10 @@ export class User {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column('text', { nullable: false })
+    @Column('varchar', { length: 50, nullable: false })
     public name!: string;
 
-    @OneToMany(() => Account, (account) => account.user, { eager: false, cascade: true })
+    @OneToMany(() => Account, (account) => account.user)
     public accounts!: Promise<Account[]>;
 
     @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })

@@ -18,14 +18,14 @@ export class TransferItem {
     @Column({ type: 'integer' })
     public transferId!: number;
 
-    @ManyToOne(() => Transfer, (transfer) => transfer.transferItems, { eager: false, nullable: false })
+    @ManyToOne(() => Transfer, (transfer) => transfer.transferItems, { eager: false, nullable: false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
     @JoinColumn({ name: 'transfer_id' })
     public transfer!: Promise<Transfer>;
 
     @Column({ type: 'integer' })
     public itemId!: number;
 
-    @ManyToOne(() => Item, { eager: true, nullable: false })
+    @ManyToOne(() => Item, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'item_id' })
     public item!: Item;
 }
