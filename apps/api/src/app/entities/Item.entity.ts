@@ -14,7 +14,7 @@ export class Item {
 
     @Column('varchar', { length: 50, nullable: false })
     public name!: string;
-    
+
     @Column({ type: 'integer', nullable: true })
     public categoryId!: number | null;
 
