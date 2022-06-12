@@ -12,13 +12,13 @@ export class Category {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column('varchar', { length: 50, nullable: false, unique: true })
+    @Column({ type: 'varchar', length: 50, nullable: false, unique: true })
     public name!: string;
 
-    @Column('text', { nullable: true })
+    @Column({ type: 'text', nullable: true })
     public description!: string | null;
 
-    @Column({ name: 'type', type: 'enum', enum: ['INCOME', 'OUTCOME'], nullable: false })
+    @Column({ type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
 
     @Column({ nullable: true })
@@ -35,8 +35,7 @@ export class Category {
     @OneToMany(() => Category, (category) => category.parent, {})
     public children!: Promise<Category[]>;
 
-    @Index()
-    @Column('text', { nullable: true, unique: true })
+    @Column({ type: 'varchar', length: 64, nullable: true, unique: true })
     public tag!: string | null;
 }
 

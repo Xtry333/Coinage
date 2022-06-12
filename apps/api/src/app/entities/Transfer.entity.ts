@@ -20,10 +20,10 @@ export class Transfer {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column('text', { nullable: false })
+    @Column({ type: 'text', nullable: false })
     public description!: string;
 
-    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    @Column({ type: 'decimal', precision: 20, scale: 2, default: 0, nullable: false, transformer: new DecimalToNumberTransformer() })
     public amount!: number;
 
     @Column({
@@ -33,50 +33,50 @@ export class Transfer {
     })
     public date!: Date;
 
-    @UpdateDateColumn({ name: 'edited_date', type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
+    @UpdateDateColumn({ type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
     public readonly editedDate!: Date;
 
-    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: true, transformer: new DateTransformer(DateTransformerType.DATETIME) })
+    @CreateDateColumn({ type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
     public readonly createdDate!: Date;
 
-    @Column({ type: 'integer', nullable: false })
+    @Column({ nullable: false })
     public categoryId!: number;
 
     @ManyToOne(() => Category, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'category_id' })
     public category!: Category;
 
-    @Column({ type: 'integer', nullable: true })
+    @Column({ nullable: true })
     public contractorId!: number | null;
 
     @ManyToOne(() => Contractor, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'contractor_id' })
     public contractor!: Contractor | null;
 
-    @Column({ type: 'integer', nullable: true })
+    @Column({ nullable: true })
     public receiptId!: number | null;
 
     @ManyToOne(() => Receipt, { eager: false, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'receipt_id' })
     public receipt!: Promise<Receipt | null>;
 
-    @Column({ name: 'type', type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
+    @Column({ type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
 
-    @Column({ type: 'integer' })
+    @Column({ nullable: false })
     public accountId!: number;
 
     @ManyToOne(() => Account, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'account_id' })
     public account!: Account;
 
-    @Column({ name: 'is_internal', type: 'bit', nullable: false, default: false, transformer: new BooleanTransformer() })
+    @Column({ type: 'bit', nullable: false, default: "b'0'", transformer: new BooleanTransformer() })
     public isInternal!: boolean;
 
-    @Column({ name: 'is_ethereal', type: 'bit', nullable: false, default: false, transformer: new BooleanTransformer() })
+    @Column({ type: 'bit', nullable: false, default: "b'0'", transformer: new BooleanTransformer() })
     public isEthereal!: boolean;
 
-    @Column({ nullable: true, type: 'json', default: {} })
+    @Column({ type: 'json', nullable: false, default: 'json_object()' })
     public metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 
     @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: false })

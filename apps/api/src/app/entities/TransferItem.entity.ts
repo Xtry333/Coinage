@@ -9,20 +9,20 @@ export class TransferItem {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column({ name: 'unit_price', type: 'decimal', default: 0, precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    @Column({ type: 'decimal', default: 0, precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
     public unitPrice!: number;
 
-    @Column({ name: 'units', type: 'float', nullable: false, default: 1 })
+    @Column({ type: 'float', nullable: false, default: 1 })
     public quantity!: number;
 
-    @Column({ type: 'integer' })
+    @Column({ nullable: false })
     public transferId!: number;
 
     @ManyToOne(() => Transfer, (transfer) => transfer.transferItems, { eager: false, nullable: false, onUpdate: 'CASCADE', onDelete: 'CASCADE' })
     @JoinColumn({ name: 'transfer_id' })
     public transfer!: Promise<Transfer>;
 
-    @Column({ type: 'integer' })
+    @Column({ nullable: false })
     public itemId!: number;
 
     @ManyToOne(() => Item, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })

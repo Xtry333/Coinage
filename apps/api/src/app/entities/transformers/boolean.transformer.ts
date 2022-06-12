@@ -5,7 +5,7 @@ export const enum BooleanTransformerType {
 }
 
 export class BooleanTransformer implements ValueTransformer {
-    constructor(private readonly type: BooleanTransformerType = BooleanTransformerType.BUFFER) {}
+    public constructor(private readonly type: BooleanTransformerType = BooleanTransformerType.BUFFER) {}
 
     public from(value: Buffer | null | undefined): boolean | null | undefined {
         if (value === null) {

@@ -12,19 +12,19 @@ export class Item {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column('varchar', { length: 50, nullable: false })
+    @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
 
-    @Column({ type: 'integer', nullable: true })
+    @Column({ nullable: true })
     public categoryId!: number | null;
 
     @ManyToOne(() => Category, { eager: false, nullable: false, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'category_id' })
     public category!: Promise<Category | null>;
 
-    @UpdateDateColumn({ name: 'edited_date', type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
+    @UpdateDateColumn({ type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
     public readonly editedDate!: Date;
 
-    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
+    @CreateDateColumn({ type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
     public readonly createdDate!: Date;
 }

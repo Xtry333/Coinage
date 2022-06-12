@@ -14,19 +14,19 @@ export class Account {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column('varchar', { length: 50, nullable: false })
+    @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
 
-    @Column('number', { nullable: false })
+    @Column({ nullable: false })
     public userId!: number;
 
     @ManyToOne(() => User, { eager: true, nullable: false, onUpdate: 'RESTRICT', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'user_id' })
     public user!: User;
 
-    @Column('bit', { name: 'is_active', nullable: false, default: true, transformer: new BooleanTransformer() })
+    @Column({ type: 'bit', name: 'is_active', nullable: false, default: "b'1'", transformer: new BooleanTransformer() })
     public isActive!: boolean;
 
-    @CreateDateColumn({ name: 'created_date', type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })
+    @CreateDateColumn({ type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })
     public readonly createdDate!: Date;
 }

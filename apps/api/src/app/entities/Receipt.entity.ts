@@ -10,14 +10,17 @@ export class Receipt {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column('text', { nullable: false })
+    @Column({ type: 'text', nullable: true })
     public description!: string;
 
-    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer(2) })
+    @Column({ type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer(2) })
     public amount!: number;
 
     @Column({ type: 'date', nullable: true, transformer: new DateTransformer(DateTransformerType.DATE) })
     public date!: Date | null;
+
+    @Column({ nullable: true })
+    public contractorId?: number | null;
 
     @ManyToOne(() => Contractor, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'contractor_id' })
