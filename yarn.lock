@@ -3552,16 +3552,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ng-select/ng-select@npm:8.3.0":
-  version: 8.3.0
-  resolution: "@ng-select/ng-select@npm:8.3.0"
+"@ng-select/ng-select@npm:9.0.1":
+  version: 9.0.1
+  resolution: "@ng-select/ng-select@npm:9.0.1"
   dependencies:
     tslib: ^2.3.1
   peerDependencies:
-    "@angular/common": ">=13.0.0 <14.0.0"
-    "@angular/core": ">=13.0.0 <14.0.0"
-    "@angular/forms": ">=13.0.0 <14.0.0"
-  checksum: a0fc6fd5788d8ae996e61dccc04b782e31c54ab4766ec3d27c87b422977e3b09efb9ca03ad8c426e67218a79ffa397594960209f138fd232655ce0a5702e39dc
+    "@angular/common": ^14.0.0
+    "@angular/core": ^14.0.0
+    "@angular/forms": ^14.0.0
+  checksum: 4a3016dd9ce4a949ec55e87d6eecda138250750f266020ac7fc1b1257ca468e67a001abca97ae01899f16b126306c4e69e87b45a046162976ca7ce6d64434aa1
   languageName: node
   linkType: hard
 
@@ -6454,7 +6454,7 @@ __metadata:
     "@nestjs/testing": 8.4.6
     "@nestjs/typeorm": 8.1.2
     "@nestjs/websockets": 8.4.6
-    "@ng-select/ng-select": 8.3.0
+    "@ng-select/ng-select": 9.0.1
     "@nrwl/angular": 14.2.4
     "@nrwl/cli": 14.2.4
     "@nrwl/cypress": 14.2.4
@@ -6477,7 +6477,7 @@ __metadata:
     chartjs-plugin-zoom: 1.2.1
     class-transformer: 0.5.1
     class-validator: 0.13.2
-    cypress: 10.0.3
+    cypress: 10.1.0
     dotenv: 16.0.1
     eslint: 8.17.0
     eslint-config-prettier: 8.5.0
@@ -7060,9 +7060,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cypress@npm:10.0.3":
-  version: 10.0.3
-  resolution: "cypress@npm:10.0.3"
+"cypress@npm:10.1.0":
+  version: 10.1.0
+  resolution: "cypress@npm:10.1.0"
   dependencies:
     "@cypress/request": ^2.88.10
     "@cypress/xvfb": ^1.2.4
@@ -7108,7 +7108,7 @@ __metadata:
     yauzl: ^2.10.0
   bin:
     cypress: bin/cypress
-  checksum: b65ed7aba0b767b760d6b3103c5d93d4ba78c195650c0ffed5af0d26454fe35455b17c452882db6826bc88245e75925c5f6c333ae962d5813a4db274ab7fd55f
+  checksum: 5c93db957f70eba2299896754b43cc56274fe4f13df9569622924f5d98a61b464bb619b641baeb60244b5d95ee4483d1903930ce631efa55fdd35e33cf951f28
   languageName: node
   linkType: hard
 
