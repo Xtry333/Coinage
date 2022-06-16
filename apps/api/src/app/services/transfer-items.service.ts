@@ -31,4 +31,8 @@ export class TransferItemsService {
             throw e;
         }
     }
+
+    public removeTransferItemsForTransferId(transferId: number) {
+        return this.transferItemDao.removeTransferItemsForTransferId(transferId);
+    }
 }

@@ -18,7 +18,6 @@ import {
     TotalInMonthByCategory,
     TransferDTO,
     TransferDetailsDTO,
-    ItemDTO,
     ItemWithLastUsedPriceDTO,
 } from '@coinage-app/interfaces';
 import { Observable, lastValueFrom, map } from 'rxjs';
@@ -109,6 +108,10 @@ export class CoinageDataService {
 
     public getAllAvailableAccounts(): Observable<AccountDTO[]> {
         return this.http.get<AccountDTO[]>(`${CoinageDataService.API_URL}account/all`);
+    }
+
+    public getUserAccounts(): Promise<AccountDTO[]> {
+        return lastValueFrom(this.http.get<AccountDTO[]>(`${CoinageDataService.API_URL}accounts/all`));
     }
 
     public postCreateSaveTransfer(request: CreateEditTransferModelDTO): Observable<BaseResponseDTO> {

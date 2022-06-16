@@ -42,6 +42,7 @@ import zoomPlugin from 'chartjs-plugin-zoom';
 import { ItemsTableComponent } from './transfer-details/items-table/items-table.component';
 import { ItemShoppingListComponent } from './create-edit-transfer/item-shopping-list/item-shopping-list.component';
 import { EditableShopListItemComponent } from './create-edit-transfer/item-shopping-list/editable-shop-list-item/editable-shop-list-item.component';
+import { AccountSettingsPageComponent } from './pages/account-settings-page/account-settings-page.component';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
@@ -76,6 +77,7 @@ Chart.register(zoomPlugin);
         ItemsTableComponent,
         ItemShoppingListComponent,
         EditableShopListItemComponent,
+        AccountSettingsPageComponent,
     ],
     imports: [
         BrowserModule,

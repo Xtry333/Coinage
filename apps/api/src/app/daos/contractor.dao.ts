@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { DeleteResult, Equal, Repository } from 'typeorm';
+import { DeleteResult, Equal, Repository, UpdateResult } from 'typeorm';
 import { Contractor } from '../entities/Contractor.entity';
 import { BaseDao } from './base.bao';
 
@@ -15,8 +15,12 @@ export class ContractorDao extends BaseDao {
         return this.validateNotNullById(Contractor.name, id, contractor);
     }
 
-    public async getAll(): Promise<Contractor[]> {
-        return await this.contractorRepository.find();
+    public async getActive(): Promise<Contractor[]> {
+        return await this.contractorRepository.findBy({ isActive: true });
+    }
+
+    public async setActive(id: number, value: boolean): Promise<UpdateResult> {
+        return await this.contractorRepository.update({ id: Equal(id) }, { isActive: value });
     }
 
     public async save(contractor: Contractor): Promise<Contractor> {

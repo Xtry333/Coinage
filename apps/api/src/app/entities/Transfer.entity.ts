@@ -1,4 +1,4 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 
 import { Account } from './Account.entity';
@@ -8,12 +8,12 @@ import { Contractor } from './Contractor.entity';
 import { Receipt } from './Receipt.entity';
 import { TransferItem } from './TransferItem.entity';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
+import { WithDateEntity } from './WithDate.partialEntity';
 
 @Entity()
-export class Transfer {
+export class Transfer extends WithDateEntity {
     public constructor() {
-        this.createdDate = new Date();
-        this.editedDate = new Date();
+        super();
         this.metadata = {};
     }
 
@@ -32,12 +32,6 @@ export class Transfer {
         transformer: new DateTransformer(DateTransformerType.DATE),
     })
     public date!: Date;
-
-    @UpdateDateColumn({ type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
-    public readonly editedDate!: Date;
-
-    @CreateDateColumn({ type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })
-    public readonly createdDate!: Date;
 
     @Column({ nullable: false })
     public categoryId!: number;

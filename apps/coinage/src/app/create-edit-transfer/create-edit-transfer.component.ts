@@ -42,6 +42,8 @@ export class CreateEditTransferComponent implements OnInit {
 
     public shouldDisplayShoppingList = false;
 
+    public selectedCategoryId: number | null = null;
+
     @ViewChildren('categorySelect')
     private categorySelect?: QueryList<NgSelectComponent>;
 
@@ -181,6 +183,8 @@ export class CreateEditTransferComponent implements OnInit {
         if (this.selectedTransferInputs.categoryId === 1 && this.selectedTransferInputs.description === '') {
             this.selectedTransferInputs.description = CreateEditTransferComponent.FUEL_TEMPLATE;
         }
+
+        this.selectedCategoryId = this.selectedTransferInputs.categoryId ?? null;
     }
 
     public get todayInputFormat(): string {
@@ -214,7 +218,24 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     public onItemListChanged(items: ShoppingListItem[]): void {
+        console.log(items);
         this.itemsInTransfer = items;
+        if (this.itemsInTransfer.length === 0) {
+            this.categorySelect?.first.handleClearClick();
+        } else {
+            if (this.selectedTransferInputs.categoryId == undefined && items[0].categoryId !== null) {
+                this.selectedTransferInputs.categoryId = items[0].categoryId;
+                this.selectedCategoryId = items[0].categoryId;
+            }
+        }
+    }
+
+    public onItemAddedToList(item: ShoppingListItem): void {
+        console.log(item);
+        if (this.selectedTransferInputs.categoryId == undefined && item.categoryId !== null) {
+            this.selectedTransferInputs.categoryId = item.categoryId;
+            this.selectedCategoryId = item.categoryId;
+        }
     }
 
     private mapToTransferItems(items: TransferItemDTO[]): ShoppingListItem[] {
@@ -225,6 +246,7 @@ export class CreateEditTransferComponent implements OnInit {
                 name: item.itemName,
                 quantity: item.amount,
                 price: item.unitPrice,
+                categoryId: 0,
             };
         });
     }

@@ -10,7 +10,7 @@ export class ContractorController {
 
     @Get('list')
     public async getCategoryList(): Promise<ContractorDTO[]> {
-        const contractors = (await this.contractorDao.getAll()).map((c) => {
+        const contractors = (await this.contractorDao.getActive()).map((c) => {
             return {
                 id: c.id,
                 name: c.name,

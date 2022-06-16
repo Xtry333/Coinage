@@ -10,5 +10,5 @@ export class Contractor {
     public name!: string;
 
     @Column({ type: 'bit', default: "b'1'", nullable: false, transformer: new BooleanTransformer() })
-    public isActive!: string;
+    public isActive!: boolean;
 }

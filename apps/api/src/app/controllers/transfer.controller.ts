@@ -213,6 +213,7 @@ export class TransferController {
         }
 
         const inserted = await this.transfersService.saveTransfer(entity);
+        await this.transferItemsService.removeTransferItemsForTransferId(inserted.id);
 
         // This will save items async in case of any issues with items not appearing in the transfer details
         const transferItems: TransferItem[] = [];

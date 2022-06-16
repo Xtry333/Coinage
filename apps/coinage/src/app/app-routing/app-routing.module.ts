@@ -10,6 +10,7 @@ import { NgModule } from '@angular/core';
 import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { TransfersListComponent } from '../transfers-list/transfers-list.component';
+import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
 
 const routes: Routes = [
     {
@@ -52,6 +53,14 @@ const routes: Routes = [
     {
         path: 'manage/categories',
         component: CategoryManagerComponent,
+    },
+    {
+        path: 'manage/accounts',
+        component: AccountSettingsPageComponent,
+    },
+    {
+        path: 'manage/account/:accountId',
+        component: AccountSettingsPageComponent,
     },
 ];
 

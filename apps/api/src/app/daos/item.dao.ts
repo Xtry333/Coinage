@@ -10,6 +10,7 @@ interface ItemWithLastUsedPriceDBObject {
     name: string;
     last_unit_price: number | null;
     last_used_date: Date | null;
+    category_id: number;
 }
 
 @Injectable()
@@ -34,7 +35,7 @@ export class ItemDao extends BaseDao {
             LEFT JOIN latest_transfer_item lti ON i.id = lti.item_id AND rn = 1
             ORDER BY i.name;
           `);
-        return result.map((item) => new ItemWithLastUsedPriceDTO(item.id, item.name, item.last_used_date, item.last_unit_price ?? 0));
+        return result.map((item) => new ItemWithLastUsedPriceDTO(item.id, item.name, item.last_used_date, item.last_unit_price ?? 0, item.category_id));
     }
 
     public async getById(id: number): Promise<Item> {

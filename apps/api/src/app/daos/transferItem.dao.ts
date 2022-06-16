@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, Repository } from 'typeorm';
+import { Equal, In, Repository } from 'typeorm';
 import { Item } from '../entities/Item.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { Writeable } from '../types/Writeable.type';
@@ -23,6 +23,10 @@ export class TransferItemDao extends BaseDao {
 
     public async save(transferItem: Writeable<TransferItem>): Promise<TransferItem> {
         return await this.transferItemRepository.save(transferItem);
+    }
+
+    public async removeTransferItemsForTransferId(transferId: number): Promise<number> {
+        return (await this.transferItemRepository.delete({ transferId: Equal(transferId) })).affected ?? 0;
     }
 
     public async findUnique(transferId: number, itemId: number, itemPrice: number): Promise<TransferItem | null> {
