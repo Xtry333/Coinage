@@ -19,6 +19,7 @@ import {
     TransferDTO,
     TransferDetailsDTO,
     ItemWithLastUsedPriceDTO,
+    CreateEditItemDTO,
 } from '@coinage-app/interfaces';
 import { Observable, lastValueFrom, map } from 'rxjs';
 
@@ -144,6 +145,10 @@ export class CoinageDataService {
     public postCreateContractor(request: CreateEditContractorDTO) {
         console.log(request);
         return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}contractor/save`, request));
+    }
+
+    public postCreateItem(request: CreateEditItemDTO) {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}item/save`, request));
     }
 
     public deleteTransfer(transferId: number): Observable<boolean> {

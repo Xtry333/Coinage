@@ -1,6 +1,14 @@
 import * as Rx from 'rxjs';
 
-import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, TransferDetailsDTO, TransferItemDTO } from '@coinage-app/interfaces';
+import {
+    AccountDTO,
+    CategoryDTO,
+    ContractorDTO,
+    CreateEditTransferModelDTO,
+    ShoppingListItem,
+    TransferDetailsDTO,
+    TransferItemDTO,
+} from '@coinage-app/interfaces';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
@@ -10,7 +18,6 @@ import { CoinageLocalStorageService } from '../services/coinage-local-storage.se
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NotificationService } from '../services/notification.service';
 import { finalize } from 'rxjs/operators';
-import { ShoppingListItem } from './item-shopping-list/editable-shop-list-item/editable-shop-list-item.component';
 
 export interface NewTransferObject {
     description: string;
@@ -41,8 +48,6 @@ export class CreateEditTransferComponent implements OnInit {
     public itemsInTransfer: ShoppingListItem[] = [];
 
     public shouldDisplayShoppingList = false;
-
-    public selectedCategoryId: number | null = null;
 
     @ViewChildren('categorySelect')
     private categorySelect?: QueryList<NgSelectComponent>;
@@ -183,8 +188,6 @@ export class CreateEditTransferComponent implements OnInit {
         if (this.selectedTransferInputs.categoryId === 1 && this.selectedTransferInputs.description === '') {
             this.selectedTransferInputs.description = CreateEditTransferComponent.FUEL_TEMPLATE;
         }
-
-        this.selectedCategoryId = this.selectedTransferInputs.categoryId ?? null;
     }
 
     public get todayInputFormat(): string {
@@ -225,7 +228,6 @@ export class CreateEditTransferComponent implements OnInit {
         } else {
             if (this.selectedTransferInputs.categoryId == undefined && items[0].categoryId !== null) {
                 this.selectedTransferInputs.categoryId = items[0].categoryId;
-                this.selectedCategoryId = items[0].categoryId;
             }
         }
     }
@@ -234,7 +236,6 @@ export class CreateEditTransferComponent implements OnInit {
         console.log(item);
         if (this.selectedTransferInputs.categoryId == undefined && item.categoryId !== null) {
             this.selectedTransferInputs.categoryId = item.categoryId;
-            this.selectedCategoryId = item.categoryId;
         }
     }
 

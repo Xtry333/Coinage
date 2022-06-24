@@ -1,9 +1,9 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
-import { ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { CreateEditItemDTO, ItemDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@coinage-app/interfaces';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { CoinageDataService } from '../../services/coinage.data-service';
-import { ShoppingListItem } from './editable-shop-list-item/editable-shop-list-item.component';
+import { NotificationService } from '../../services/notification.service';
 
 @Component({
     selector: 'coinage-app-item-shopping-list',
@@ -27,7 +27,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0);
     public itemList: ShoppingListItem[] = [];
 
-    public constructor(private readonly coinageDataService: CoinageDataService) {}
+    public constructor(private readonly coinageDataService: CoinageDataService, private readonly notificationService: NotificationService) {}
 
     public ngOnInit(): void {
         this.loadItems();
@@ -59,6 +59,17 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         this.searchableItems = this.allItems.filter((item) => this.selectedCategoryId === null || item.categoryId === this.selectedCategoryId);
     }
 
+    public async onAddNewItem(name: string): Promise<ItemWithLastUsedPriceDTO> {
+        const item = new CreateEditItemDTO(null, null, name, this.selectedCategoryId, null, null);
+        const response = await this.coinageDataService.postCreateItem(item);
+        if (response.insertedId) {
+            this.notificationService.push({ title: `Item Created`, message: name });
+        }
+        const addedItem: ItemWithLastUsedPriceDTO = { id: response.insertedId ?? 0, name, categoryId: 0, lastUnitPrice: 0, lastUsedDate: null };
+        this.allItems.push(addedItem);
+        return addedItem;
+    }
+
     public onClickAddNewItemToList(): void {
         console.log(this.selectedItem);
         const item = this.allItems.find((item) => item.id === this.selectedItem.id);
@@ -72,6 +83,8 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         this.itemList.push(shoppingItem);
         this.recalculateAndEmitTotalCost();
         this.itemSelect?.first.handleClearClick();
+        this.selectedItem.price = 0;
+        this.selectedItem.amount = 1;
     }
 
     public onRemoveItemFromList(item: ShoppingListItem): void {

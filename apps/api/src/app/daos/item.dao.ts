@@ -7,10 +7,13 @@ import { BaseDao } from './base.bao';
 
 interface ItemWithLastUsedPriceDBObject {
     id: number;
+    brand: string;
     name: string;
     last_unit_price: number | null;
     last_used_date: Date | null;
     category_id: number;
+    container_size: number | null;
+    container_size_unit: string | null;
 }
 
 @Injectable()
@@ -35,7 +38,17 @@ export class ItemDao extends BaseDao {
             LEFT JOIN latest_transfer_item lti ON i.id = lti.item_id AND rn = 1
             ORDER BY i.name;
           `);
-        return result.map((item) => new ItemWithLastUsedPriceDTO(item.id, item.name, item.last_used_date, item.last_unit_price ?? 0, item.category_id));
+        return result.map(
+            (item) => new ItemWithLastUsedPriceDTO(item.id, this.formatItemName(item), item.last_used_date, item.last_unit_price ?? 0, item.category_id)
+        );
+    }
+
+    private formatItemName(item: ItemWithLastUsedPriceDBObject): string {
+        return `${item.brand ?? ''} ${item.name} ${item.container_size ?? ''}${item.container_size ? item.container_size_unit : ''}`.trim();
+    }
+
+    public save(entity: Item): Promise<Item> {
+        return this.itemRepository.save(entity);
     }
 
     public async getById(id: number): Promise<Item> {

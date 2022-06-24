@@ -8,7 +8,7 @@ export class Item extends WithDateEntity {
     public id!: number;
 
     @Column({ type: 'varchar', length: 50, nullable: true })
-    public brand!: string;
+    public brand!: string | null;
 
     @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
@@ -16,13 +16,13 @@ export class Item extends WithDateEntity {
     @Column({ nullable: true })
     public categoryId!: number | null;
 
-    @ManyToOne(() => Category, { eager: false, nullable: false, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
+    @ManyToOne(() => Category, { eager: false, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'category_id' })
     public category!: Promise<Category | null>;
 
     @Column({ type: 'float', nullable: true })
-    public containerSize!: number;
+    public containerSize!: number | null;
 
     @Column({ type: 'varchar', length: 16, nullable: true })
-    public containerSizeUnit!: string;
+    public containerSizeUnit!: string | null;
 }

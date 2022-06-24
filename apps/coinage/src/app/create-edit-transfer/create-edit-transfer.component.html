@@ -80,7 +80,7 @@
             <coinage-app-item-shopping-list
                 (totalCostChanged)="onTotalCostChanged($event)"
                 (itemListChanged)="onItemListChanged($event)"
-                [selectedCategoryId]="selectedCategoryId"
+                [selectedCategoryId]="selectedTransferInputs.categoryId ?? null"
                 [preselectedItems]="itemsInTransfer"
             ></coinage-app-item-shopping-list>
         </div>
