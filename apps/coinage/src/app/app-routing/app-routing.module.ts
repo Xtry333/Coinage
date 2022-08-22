@@ -11,6 +11,7 @@ import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.comp
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { TransfersListComponent } from '../transfers-list/transfers-list.component';
 import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
+import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
 
 const routes: Routes = [
     {
@@ -29,6 +30,10 @@ const routes: Routes = [
     {
         path: 'transfer/details/:id',
         component: TransferDetailsComponent,
+    },
+    {
+        path: 'item/details/:id',
+        component: TransferItemDetailsComponent,
     },
     {
         path: 'receipt/details/:id',

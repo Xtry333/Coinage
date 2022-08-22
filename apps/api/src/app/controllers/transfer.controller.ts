@@ -316,7 +316,18 @@ export class TransferController {
         (transfer as any).editedDate = undefined;
         transfer.metadata.refundedBy = undefined;
 
+        const transferItems = transfer.transferItems;
+        transfer.transferItems = [];
+
         const inserted = await this.transferDao.save(transfer);
+
+        transferItems.forEach(async (transferItem) => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (transferItem as any).id = undefined;
+            transferItem.transferId = inserted.id;
+            await this.transferItemsService.save(transferItem);
+        });
+
         return { insertedId: inserted.id };
     }
 

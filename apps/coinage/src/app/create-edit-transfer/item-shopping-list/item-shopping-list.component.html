@@ -27,7 +27,7 @@
             <input id="itemAmount" name="itemAmount" type="number" [(ngModel)]="selectedItem.amount" min="0" step="0.01" />
         </div>
     </div>
-    <button class="add-item-button" (click)="onClickAddNewItemToList()">+</button>
+    <button class="add-item-button" (click)="onClickAddNewItemToList()">Add</button>
     <div class="shopping-list">
         <ol>
             <li class="shopping-item" *ngFor="let item of itemList">

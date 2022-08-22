@@ -1,0 +1,29 @@
+.item-details-component {
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: auto;
+
+    .item-details-table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+        table-layout: fixed;
+        border: 1px solid #ccc;
+
+        caption {
+            font-weight: bold;
+            font-size: 15px;
+            padding: 5px;
+        }
+
+        tr {
+            border-bottom: 1px solid #ccc;
+        }
+
+        td,
+        th {
+            padding: 10px;
+            text-align: left;
+        }
+    }
+}

@@ -1,7 +1,7 @@
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import entities from './entities/_index';
-import migrations from './migrations/_index';
+import migrations from '../database/migrations/_index';
 
 import { Table } from 'typeorm';
 

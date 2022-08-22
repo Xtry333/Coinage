@@ -1,5 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { TransferItemDTO } from '@coinage-app/interfaces';
+import { NavigatorPages } from '../../services/navigator.service';
 
 export class UiTransferItemDTO extends TransferItemDTO {
     public totalPrice: number;
@@ -22,6 +23,8 @@ export class UiTransferItemDTO extends TransferItemDTO {
     styleUrls: ['./items-table.component.scss'],
 })
 export class ItemsTableComponent implements OnChanges {
+    public readonly NavigatorPages = NavigatorPages;
+
     @Input() public items: TransferItemDTO[] = [];
 
     public tableItems: UiTransferItemDTO[] = [];

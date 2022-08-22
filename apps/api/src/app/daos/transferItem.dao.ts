@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, In, Repository } from 'typeorm';
 import { Item } from '../entities/Item.entity';
+import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { Writeable } from '../types/Writeable.type';
 import { BaseDao } from './base.bao';
@@ -34,6 +35,16 @@ export class TransferItemDao extends BaseDao {
             transferId: Equal(transferId),
             itemId: Equal(itemId),
             unitPrice: Equal(itemPrice),
+        });
+        return item;
+    }
+
+    public async findByItemId(itemId: number): Promise<TransferItem[]> {
+        const item = await this.transferItemRepository.find({
+            where: { itemId: Equal(itemId) },
+            relations: {
+                transfer: true,
+            },
         });
         return item;
     }

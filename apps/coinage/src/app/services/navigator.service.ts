@@ -10,6 +10,7 @@ export const NavigatorPages = {
     TransferDetails: (id: number) => `/transfer/details/${id}`,
     TransferEdit: (id: number) => `/transfer/edit/${id}`,
     ReceiptDetails: (id: number) => `/receipt/details/${id}`,
+    ItemDetails: (id: number) => `/item/details/${id}`,
     Summary: (date: PartialDate) => `/summary/${date.toString()}`,
     SummaryFullDate: (date: Date) => `/summary/${PartialDate.fromDate(date).toString()}`,
     CategoryDetails: (id: number) => `/category/${id}`,

@@ -205,7 +205,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     };
                 });
         }
-        if (this.showTodayMarker) {
+        if (this.showTodayMarker && this.filter.showPlanned) {
             this.placeTodayMarkerRow();
         }
     }
