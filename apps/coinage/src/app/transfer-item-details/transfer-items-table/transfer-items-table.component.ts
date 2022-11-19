@@ -58,4 +58,12 @@ export class TransferItemsTableComponent {
     public get hasAnyRows(): boolean {
         return this.transfersWithItem.length > 0;
     }
+
+    public get totalQuantity(): number {
+        return this.transfersWithItem.reduce((acc, transferItem) => (acc += transferItem.quantity), 0);
+    }
+
+    public get totalPrice(): number {
+        return this.transfersWithItem.reduce((acc, transferItem) => (acc += transferItem.quantity * transferItem.unitPrice), 0);
+    }
 }

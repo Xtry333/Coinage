@@ -9,7 +9,7 @@ export class DashboardComponent {
 
     @Get('/balance/:date')
     public async getBalance(@Param('date') date: Date): Promise<BalanceDTO[]> {
-        const accountIds = [1, 5, 6];
+        const accountIds = [1, 5, 6, 4];
         const balance = await this.accountDao.getAccountBalanceForAccountAsOfDate(accountIds, date);
         return balance;
     }

@@ -45,6 +45,11 @@ export class TransferItemDao extends BaseDao {
             relations: {
                 transfer: true,
             },
+            order: {
+                transfer: {
+                    date: 'DESC',
+                },
+            },
         });
         return item;
     }
