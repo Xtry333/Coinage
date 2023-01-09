@@ -25,7 +25,9 @@ export class DashboardCountersComponent implements OnInit {
 
     private loadData(): void {
         const date = new Date();
-        this.coinageData.getBalanceForActiveAccounts(date).subscribe((res) => (this.balance = res, this.sumPkoWilla = this.balance[0].balance + this.balance[1].balance));
+        this.coinageData
+            .getBalanceForActiveAccounts(date)
+            .subscribe((res) => ((this.balance = res), (this.sumPkoWilla = this.balance[0].balance + this.balance[1].balance)));
         this.coinageData.getTodaySpendings(date).subscribe((res) => (this.todaySpendings = res.reduce((acc, cur) => acc + cur.balance, 0)));
     }
 

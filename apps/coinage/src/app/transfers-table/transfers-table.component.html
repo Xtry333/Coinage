@@ -1,7 +1,13 @@
 <div class="transfers-table-container">
-    <div *ngIf="showFilters">
-        <input id="showAllCheckbox" type="checkbox" [ngModel]="filter.showPlanned" (ngModelChange)="showAllChecked($event)" />
-        <label for="showAllCheckbox">Show planned transfers</label>
+    <div *ngIf="showFilters" class="header-filters-container">
+        <div>
+            <input id="showAllCheckbox" type="checkbox" [ngModel]="filter.showPlanned" (ngModelChange)="showAllChecked($event)" />
+            <label for="showAllCheckbox">Show planned transfers</label>
+        </div>
+        <div>
+            <input id="showFlaggedCheckbox" type="checkbox" [ngModel]="filter.showFlagged" (ngModelChange)="showFlaggedChecked($event)" />
+            <label for="showFlaggedCheckbox">Only flagged transfers</label>
+        </div>
     </div>
     <coinage-app-pagination class="pull-right" *ngIf="showFilters && lastPageNumber" [lastPage]="lastPageNumber"></coinage-app-pagination>
     <table class="transfers-table">
@@ -92,6 +98,9 @@
                                 <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
                             </a>
                         </span>
+                        <span class="planned-icon" *ngIf="transfer.isFlagged">
+                            <fa-icon [icon]="flagIcon" [fixedWidth]="true" title="Flagged as important"></fa-icon>
+                        </span>
                     </td>
                     <td>
                         {{ transfer.contractorName | ifNull: EMPTY_CONTRACTOR }}
@@ -117,7 +126,7 @@
             </tr>
             <tr *ngIf="noRowsFound">
                 <td colspan="6">
-                    No transfers found.
+                    <span>No transfers found.</span>
                     <span *ngIf="isAnyFilterApplied && !noRows"> Please check filters, there are {{ transfers?.length }} unmatched transfers. </span>
                 </td>
             </tr>

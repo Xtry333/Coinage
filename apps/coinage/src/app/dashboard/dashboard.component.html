@@ -13,7 +13,7 @@
         ></coinage-app-transfers-table>
         <div>
             <p>Average Income ({{ this.averageAmountLimit }} months): {{ rollingAverageIncomes | plnCurrency }}</p>
-            <p>Average Outcome ({{ this.averageAmountLimit }}) months): {{ rollingAverageOutcomes | plnCurrency }}</p>
+            <p>Average Outcome ({{ this.averageAmountLimit }} months): {{ rollingAverageOutcomes | plnCurrency }}</p>
         </div>
         <coinage-app-chart [datasets]="accountStatsChartData" [labels]="accountStatsChartLabels"></coinage-app-chart>
         <table class="last-transactions-table">
@@ -25,7 +25,7 @@
                     <th class="align-left">Date</th>
                     <th class="align-right">Outcomes</th>
                     <th class="align-right">Incomes</th>
-                    <th class="align-right">Profit</th>
+                    <th class="align-right">Savings</th>
                     <th class="align-left">Count</th>
                     <th class="align-right">Cost Per Day</th>
                 </tr>

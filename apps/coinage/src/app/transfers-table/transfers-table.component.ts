@@ -12,7 +12,7 @@ import {
     PopupSide,
     TableFilterComponent,
 } from './table-filter/table-filter.component';
-import { IconDefinition, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faReceipt, faFlag, faFlagCheckered } from '@fortawesome/free-solid-svg-icons';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
@@ -56,6 +56,7 @@ export interface TableFilterFields {
     dateFrom?: Date;
     dateTo?: Date;
     showPlanned?: boolean;
+    showFlagged?: boolean;
     [key: string]: Date | string | boolean | number | number[] | undefined;
 }
 
@@ -77,6 +78,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public readonly NavigatorPages = NavigatorPages;
 
     public receiptIcon: IconDefinition = faReceipt;
+    public flagIcon: IconDefinition = faFlagCheckered;
 
     public filter: TableFilterFields = {};
     public outcomesSum = 0;
@@ -244,6 +246,15 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         this.doFiltering();
     }
 
+    public showFlaggedChecked(value: boolean) {
+        this.filter.showFlagged = value;
+        if (this.filterCachePath) {
+            this.localStorage.setObject(this.filterCachePath, this.filter);
+        }
+        this.tableFilter.emit(this.filter);
+        this.doFiltering();
+    }
+
     public get isAnyFilterApplied(): boolean {
         for (const key in this.filter) {
             if (this.filter[key] !== undefined) {
@@ -269,6 +280,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             receiptId: 0,
             typeSymbol: TransferType.OUTCOME.symbol,
             isTodayMarkerRow: true,
+            isFlagged: false,
         };
     }
 }

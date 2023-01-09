@@ -70,6 +70,9 @@ export class Transfer extends WithDateEntity {
     @Column({ type: 'bit', nullable: false, default: "b'0'", transformer: new BooleanTransformer() })
     public isEthereal!: boolean;
 
+    @Column({ type: 'bit', nullable: false, default: "b'0'", transformer: new BooleanTransformer() })
+    public isFlagged!: boolean;
+
     @Column({ type: 'json', nullable: false, default: 'json_object()' })
     public metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 

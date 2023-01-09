@@ -1,4 +1,4 @@
-import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
 import { Type } from 'class-transformer';
@@ -21,5 +21,6 @@ export class TransferDTO {
     @IsNumber() public accountId!: number;
     @IsString() public accountName!: string;
     @IsNumber() public receiptId!: number | null;
+    @IsBoolean() public isFlagged!: boolean;
     @Type(() => Date) public date!: Date;
 }

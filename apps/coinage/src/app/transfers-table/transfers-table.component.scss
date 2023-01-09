@@ -59,4 +59,11 @@ div.transfers-table-container {
             text-align: right;
         }
     }
+
+    .header-filters-container {
+        > div {
+            display: inline;
+            margin-left: 10px;
+        }
+    }
 }

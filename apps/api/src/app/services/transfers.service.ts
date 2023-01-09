@@ -44,9 +44,10 @@ export class TransfersService {
             contractorId: transfer.contractor?.id ?? null,
             contractorName: transfer.contractor?.name ?? null,
             accountId: transfer.accountId,
-            accountName: transfer.account.name,
+            accountName: `${transfer.account.name} [${transfer.account.currencySymbol}]`,
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
+            isFlagged: transfer.isFlagged,
         };
     }
 }

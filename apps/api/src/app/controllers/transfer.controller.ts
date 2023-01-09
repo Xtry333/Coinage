@@ -50,9 +50,9 @@ export class TransferController {
 
         const transfer = await this.transferDao.getById(transferId);
 
-        transfer.transferItems.forEach((item) => {
-            console.log(`${item.quantity}x ${item.item.name} (${item.unitPrice * item.quantity} PLN)`);
-        });
+        // transfer.transferItems.forEach((item) => {
+        //     console.log(`${item.quantity}x ${item.item.name} (${item.unitPrice * item.quantity} PLN)`);
+        // });
 
         const categoryPath: Category[] = [];
         categoryPath.push(transfer.category);
@@ -140,6 +140,7 @@ export class TransferController {
             accountName: transfer.account.name,
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
+            isFlagged: transfer.isFlagged,
         };
     }
 

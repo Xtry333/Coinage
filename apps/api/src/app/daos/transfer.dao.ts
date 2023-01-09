@@ -72,6 +72,10 @@ export class TransferDao extends BaseDao {
             filter.date = LessThanOrEqual(new Date());
         }
 
+        if (params.showFlagged) {
+            filter.isFlagged = true;
+        }
+
         return filter;
     }
 

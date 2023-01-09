@@ -22,6 +22,7 @@ export class TransferItemsService {
             entity.itemId = item.itemId;
             entity.quantity = item.quantity;
             entity.unitPrice = item.unitPrice;
+            entity.totalSetDiscount = item.totalSetDiscount;
 
             entity = await this.transferItemDao.save(entity);
 

@@ -66,6 +66,7 @@ export class ReceiptsController {
             accountId: transfer.account.id,
             accountName: transfer.account.name,
             receiptId: transfer.receiptId ?? null,
+            isFlagged: transfer.isFlagged,
         };
     }
 

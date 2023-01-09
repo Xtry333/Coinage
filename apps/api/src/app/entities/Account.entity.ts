@@ -17,6 +17,9 @@ export class Account {
     @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
 
+    @Column({ name: 'currency_symbol', type: 'varchar', length: 5, nullable: false })
+    public currencySymbol!: string;
+
     @Column({ nullable: false })
     public userId!: number;
 

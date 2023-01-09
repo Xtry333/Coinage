@@ -12,6 +12,9 @@ export class TransferItem {
     @Column({ type: 'decimal', default: 0, precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
     public unitPrice!: number;
 
+    @Column({ type: 'decimal', default: 0, precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    public totalSetDiscount!: number;
+
     @Column({ type: 'float', nullable: false, default: 1 })
     public quantity!: number;
 
