@@ -37,6 +37,12 @@
                 "jest": true
             },
             "rules": {}
+        },
+        {
+            "files": ["*.ts", "*.tsx"],
+            "rules": {
+                "@typescript-eslint/explicit-member-accessibility": ["warn"]
+            }
         }
     ]
 }
