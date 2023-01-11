@@ -10,7 +10,7 @@ services:
     coinage-api:
         build:
             context: .
-            dockerfile: api.Dockerfile
+            dockerfile: docker/api.Dockerfile
         image: coinage-api
         environment:
             MYSQL_HOST: coinage-db
@@ -23,7 +23,7 @@ services:
     coinage-webapp:
         build:
             context: .
-            dockerfile: webapp.Dockerfile
+            dockerfile: docker/webapp.Dockerfile
         image: coinage-webapp
         ports:
             - 80:80

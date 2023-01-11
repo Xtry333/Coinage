@@ -17,7 +17,6 @@
         "baseUrl": ".",
         "paths": {
             "@coinage-app/common": ["libs/common/src/index.ts"],
-            "@coinage-app/data": ["libs/data/src/index.ts"],
             "@coinage-app/interfaces": ["libs/interfaces/src/index.ts"]
         }
     },

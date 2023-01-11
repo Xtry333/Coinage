@@ -1,0 +1,9 @@
+<div>
+    <p>Categories Tree</p>
+
+    <ul *ngIf="parentCategory">
+        <app-category-list-item [category]="parentCategory" (editCategory)="onSelectCategoryForEdit($event)"></app-category-list-item>
+    </ul>
+
+    <app-create-edit-category (categorySaved)="onCategorySaved($event)" [selectedCategory]="selectedCategoryForEdit"></app-create-edit-category>
+</div>

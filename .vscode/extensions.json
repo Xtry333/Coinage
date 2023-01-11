@@ -1,3 +1,10 @@
 {
-    "recommendations": ["nrwl.angular-console", "angular.ng-template", "esbenp.prettier-vscode", "firsttris.vscode-jest-runner", "chrisbibby.hide-node-modules"]
+    "recommendations": [
+        "nrwl.angular-console",
+        "angular.ng-template",
+        "esbenp.prettier-vscode",
+        "firsttris.vscode-jest-runner",
+        "chrisbibby.hide-node-modules",
+        "dbaeumer.vscode-eslint"
+    ]
 }

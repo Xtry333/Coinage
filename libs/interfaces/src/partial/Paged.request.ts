@@ -1,4 +1,4 @@
 export class PagedRequest {
-    page!: number;
-    rowsPerPage!: number;
+    public page!: number;
+    public rowsPerPage!: number;
 }

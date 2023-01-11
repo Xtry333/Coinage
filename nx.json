@@ -1,44 +1,22 @@
 {
-    "implicitDependencies": {
-        "angular.json": "*",
-        "package.json": {
-            "dependencies": "*",
-            "devDependencies": "*"
-        },
-        "tsconfig.base.json": "*",
-        "tslint.json": "*",
-        ".eslintrc.json": "*",
-        "nx.json": "*"
+    "tasksRunnerOptions": {
+        "default": {
+            "runner": "@nrwl/nx-cloud",
+            "options": {
+                "cacheableOperations": ["build", "lint", "test", "e2e"],
+                "accessToken": "MjY4YThhODUtNTJhMy00OWExLTg2NDYtNzdhNDk5MWNiZjBkfHJlYWQtd3JpdGU="
+            }
+        }
     },
     "affected": {
         "defaultBase": "master"
     },
-    "npmScope": "coinage-app",
-    "tasksRunnerOptions": {
-        "default": {
-            "runner": "@nrwl/workspace/tasks-runners/default",
-            "options": {
-                "cacheableOperations": ["build", "lint", "test", "e2e"],
-                "parallel": 1
-            }
-        }
-    },
     "cli": {
         "packageManager": "yarn"
     },
-    "defaultProject": "coinage",
+    "extends": "nx/presets/npm.json",
+    "$schema": "./node_modules/nx/schemas/nx-schema.json",
     "generators": {
-        "@nrwl/angular": {
-            "application": {
-                "linter": "eslint"
-            },
-            "library": {
-                "linter": "eslint"
-            },
-            "storybook-configuration": {
-                "linter": "eslint"
-            }
-        },
         "@nrwl/angular:application": {
             "style": "scss",
             "linter": "eslint",
@@ -53,10 +31,12 @@
             "style": "scss"
         }
     },
-    "$schema": "./node_modules/nx/schemas/nx-schema.json",
     "targetDefaults": {
-        "build": {
-            "dependsOn": ["^build"]
+        "test": {
+            "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"]
+        },
+        "lint": {
+            "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
         }
     }
 }

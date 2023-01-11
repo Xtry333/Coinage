@@ -1,0 +1,31 @@
+<header class="flex">
+    <div class="logo">
+        <a routerLink="/"><img alt="Coinage logo" width="75" [src]="logo" /></a>
+        <h1>{{ title }}</h1>
+    </div>
+    <nav>
+        <ul class="nav-list">
+            <li><a [routerLink]="NavigatorPages.Dashboard()">Dashboard</a></li>
+            <li><a [routerLink]="NavigatorPages.TransfersList()">Transfers</a></li>
+            <li><a [routerLink]="'/manage/categories'">Manage Categories</a></li>
+            <li><a routerLink="/transfer/add">Add Transfer</a></li>
+            <li><a (click)="toggleTrinketModal()">Add Transfer (Modal)</a></li>
+            <li><a routerLink="/manage/accounts">Account Settings</a></li>
+        </ul>
+    </nav>
+    <div class="datetime">
+        <h4>{{ dateTime }}</h4>
+    </div>
+</header>
+<main>
+    <app-modal [isDisplayed]="isTrinketDisplayed" (hideModalEvent)="hideTrinketModal()">
+        <div>
+            <app-create-transfer (saveSuccess)="hideTrinketModal(); forceDashboardRefresh()" [redirectAfterSave]="false"></app-create-transfer>
+        </div>
+    </app-modal>
+    <router-outlet (activate)="onActivateRoute($event)"></router-outlet>
+    <app-notifications-container></app-notifications-container>
+</main>
+<div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">
+    <app-spinner></app-spinner>
+</div>
