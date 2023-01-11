@@ -7,10 +7,10 @@ export default {
             tsconfig: '<rootDir>/tsconfig.spec.json',
         },
     },
+    coverageDirectory: '../../coverage/packages/coinage-api',
     testEnvironment: 'node',
     transform: {
         '^.+\\.[tj]s$': 'ts-jest',
     },
     moduleFileExtensions: ['ts', 'js', 'html'],
-    coverageDirectory: '../../coverage/packages/coinage-api',
 };
