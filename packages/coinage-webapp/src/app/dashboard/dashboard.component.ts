@@ -2,7 +2,7 @@ import * as Rx from 'rxjs';
 
 import { ChartDataset } from 'chart.js';
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MonthlyUserStatsDTO, PartialDate, TransferDTO } from '@coinage-app/interfaces';
+import { MonthlyUserStatsDTO, NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
 import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
@@ -150,31 +150,41 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .subscribe(([recentlyEditedTransfers, stats, balance]) => {
                 this.lastTransactions = recentlyEditedTransfers;
                 this.totalAmountPerMonth = this.mapToUiOutcome(stats);
+                const accountData = this.mapAccountData(stats);
                 // this.balanceMainAccount = balance[0].balance;
                 // this.balanceSecondary = balance[1].balance;
-                this.accountStatsChartData[0].data = this.totalAmountPerMonth.map((item) => -item.outcomes).reverse();
+
+                // this.accountStatsChartData.splice(0, this.accountStatsChartData.length);
+                // this.accountStatsChartData = [
+                //     { data: [], label: 'Outcomes', type: 'bar', stack: 'change', barPercentage: 0.33, inflateAmount: 0.33 },
+                //     { data: [], label: 'Incomes', type: 'bar', stack: 'change', barPercentage: 0.33, inflateAmount: 0.33 },
+                //     { data: [], label: 'Balance', type: 'line', order: -1 },
+                // ];
+                this.accountStatsChartData[0].data = this.totalAmountPerMonth.map((item) => item.outcomes).reverse();
                 this.accountStatsChartData[1].data = this.totalAmountPerMonth.map((item) => item.incomes).reverse();
                 this.accountStatsChartData[2].data = this.totalAmountPerMonth.map((item) => item.balance).reverse();
                 this.accountStatsChartLabels = this.totalAmountPerMonth.map((item) => `${item.monthName} ${item.year}`).reverse();
+
+                //accountData.forEach((a) => this.accountStatsChartData.push(a));
             });
         if (this.countersComponent) {
             this.countersComponent.refreshData();
         }
     }
 
-    private mapToUiOutcome(totalOutcomes: MonthlyUserStatsDTO[]): UiTotalAmountPerMonth[] {
+    private mapToUiOutcome(totalOutcomes: NewMonthlyUserStatsDTO[]): UiTotalAmountPerMonth[] {
         return totalOutcomes.map((total) => {
-            const profit = total.incomes - total.outcomes;
+            const profit = total.totalIncoming - total.totalOutgoing;
             const uiData: UiTotalAmountPerMonth = {
                 year: total.year,
-                date: total.year + '-' + (total.month + 1),
-                monthName: new Date(total.year, total.month).toLocaleString(undefined, { month: 'long' }),
-                partedDate: new PartialDate(total.year, total.month + 1),
-                outcomes: total.outcomes,
-                incomes: total.incomes,
+                date: total.year + '-' + total.month,
+                monthName: new Date(total.year, total.month - 1).toLocaleString(undefined, { month: 'long' }),
+                partedDate: new PartialDate(total.year, total.month),
+                outcomes: total.externalOutgoing,
+                incomes: total.externalIncoming,
                 balance: total.balance,
                 profit: profit,
-                transactionsCount: total.transactionsCount,
+                transactionsCount: 0,
                 profitPerDay: -profit / this.daysInMonth(total.year, total.month),
             };
 
@@ -182,12 +192,24 @@ export class DashboardComponent implements OnInit, OnDestroy {
         });
     }
 
+    private mapAccountData(totalOutcomes: NewMonthlyUserStatsDTO[]) {
+        const accountsData: { data: number[]; label: any }[] = [];
+        totalOutcomes.forEach((monthly) => {
+            monthly.accountStats.forEach((acc) => {
+                accountsData[acc.accountId] ??= { data: [], label: acc.accountId };
+                accountsData[acc.accountId].data.push(acc.balance);
+            });
+        });
+        return accountsData;
+    }
+
     private daysInMonth(year: number, month: number): number {
         const today = new Date();
-        if (today.getFullYear() == year && today.getMonth() == month) {
+        if (today.getFullYear() == year && today.getMonth() + 1 == month) {
             return today.getDate();
         }
-        return new Date(year, month + 1, 0).getDate();
+        const date = new Date(year, month, 0);
+        return date.getDate();
     }
 
     public formatDate(date: string): string {

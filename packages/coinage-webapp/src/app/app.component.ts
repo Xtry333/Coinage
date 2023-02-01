@@ -1,12 +1,16 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { Socket } from 'ngx-socket-io';
 
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
 import { CoinageLocalStorageService } from './services/coinage-local-storage.service';
+import { CurrentUserDataService } from './services/current-user.service';
+import { LangService } from './services/lang-service.service';
 import { NavigatorPages } from './services/navigator.service';
 import { NotificationService } from './services/notification.service';
+import { WebSocketService } from './services/web-socket.service';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 
 @Component({
@@ -21,8 +25,11 @@ export class AppComponent implements OnInit, OnDestroy {
 
     public NavigatorPages = NavigatorPages;
 
+    public userIcon = faUser;
+
     public isPageLoading = true;
     public title = 'Coinage';
+    public username = 'User';
     public dateTime = new Date().toLocaleString();
     public logo = 'assets/images/coin.png';
     public refreshInterval?: ReturnType<typeof setInterval>;
@@ -39,13 +46,19 @@ export class AppComponent implements OnInit, OnDestroy {
         private readonly loader: LoadingService,
         private readonly localStorageService: CoinageLocalStorageService,
         private readonly notificationService: NotificationService,
-        private readonly socket: Socket
+        private readonly socket: Socket,
+        private readonly userDataService: CurrentUserDataService,
+        private readonly webSocketService: WebSocketService,
+        private readonly langService: LangService
     ) {}
 
     public ngOnInit(): void {
+        console.log(this.langService);
+        console.log(this);
         this.socket.on('connect', () => {
             this.notificationService.push({ message: 'Connection estabilished.', title: 'Server' });
 
+            this.socket.emit('login', { userId: 1 }, (data: any) => console.log(data));
             this.socket.emit('events', { test: 'test' });
             this.socket.emit('identity', 0, (response: any) => console.log('Identity:', response));
         });
@@ -58,16 +71,12 @@ export class AppComponent implements OnInit, OnDestroy {
             console.log(msg);
         });
 
-        this.socket.on('debug', (msg: any) => {
-            console.log(msg);
-        });
-
         this.loader.loading$.subscribe((loading) => {
             this.isPageLoading = loading;
         });
 
         this.refreshInterval = setInterval(() => {
-            this.dateTime = new Date().toLocaleString();
+            //this.dateTime = new Date().toLocaleString();
         }, 1000);
 
         const lastVisit = this.localStorageService.getObject(AppComponent.KEY_LAST_USER_VISIT_DATE, (d) => new Date(d));
@@ -82,6 +91,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
         const mockUser = this.localStorageService.getNumber(AppComponent.KEY_FORCE_MOCK_USER);
         this.localStorageService.setNumber(AppComponent.KEY_FORCE_MOCK_USER, mockUser ?? 1);
+        this.userDataService.userData$.subscribe((user) => {
+            this.username = user['username'];
+            this.dateTime = new Date(user['date'] ?? 0).toLocaleString();
+            //console.log(user['date']);
+        });
+    }
+
+    public loginAs(id: number) {
+        this.socket.emit('login', { userId: id }, (data: any) => console.log(data));
     }
 
     public onActivateRoute(component: Component): void {

@@ -27,3 +27,5 @@ services:
         image: coinage-webapp
         ports:
             - 80:80
+        depends_on:
+            - coinage-api

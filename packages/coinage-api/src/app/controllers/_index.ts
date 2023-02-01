@@ -6,6 +6,7 @@ import { ItemsController } from './items.controller';
 import { ReceiptsController } from './receipts.controller';
 import { TransferController } from './transfer.controller';
 import { TransfersController } from './transfers.controller';
+import { UserController } from './user/user.controller';
 
 export default [
     AccountsController,
@@ -16,4 +17,5 @@ export default [
     TransfersController,
     TransferController,
     ItemsController,
+    UserController,
 ];

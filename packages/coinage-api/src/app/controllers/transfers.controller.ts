@@ -11,6 +11,7 @@ import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
 import { Transfer } from '../entities/Transfer.entity';
+import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
@@ -26,6 +27,7 @@ export class TransfersController {
         private readonly etherealTransferService: EtherealTransferService,
         private readonly categoryDao: CategoryDao,
         private readonly accountDao: AccountDao,
+        private readonly accountBalanceService: AccountBalanceService,
         private readonly dateParserService: DateParserService,
         private readonly saveTransfersService: SaveTransfersService,
         private readonly userDao: UserDao
@@ -124,18 +126,16 @@ export class TransfersController {
         entityFrom.description = transfer.description;
         entityFrom.amount = transfer.amount;
         entityFrom.categoryId = categoryFrom.id;
-        entityFrom.accountId = originAccount.id;
+        entityFrom.originAccountId = originAccount.id;
         entityFrom.date = transfer.date;
         entityFrom.type = categoryFrom.type;
-        entityFrom.isInternal = true;
 
         entityTo.description = transfer.description;
         entityTo.amount = transfer.amount;
         entityTo.categoryId = categoryTo.id;
-        entityTo.accountId = targetAccount.id;
+        entityTo.originAccountId = targetAccount.id;
         entityTo.date = transfer.date;
         entityTo.type = categoryTo.type;
-        entityTo.isInternal = true;
 
         const insertedFrom = await this.transferDao.save(entityFrom);
         const insertedTo = await this.transferDao.save(entityTo);

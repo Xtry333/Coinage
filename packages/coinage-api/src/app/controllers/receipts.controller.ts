@@ -63,8 +63,8 @@ export class ReceiptsController {
             categoryName: transfer.category.name,
             contractorId: transfer.contractorId ?? null,
             contractorName: transfer.contractor?.name ?? null,
-            accountId: transfer.account.id,
-            accountName: transfer.account.name,
+            accountId: transfer.originAccount.id,
+            accountName: transfer.originAccount.name,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
         };

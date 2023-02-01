@@ -44,10 +44,20 @@ import { ItemShoppingListComponent } from './create-edit-transfer/item-shopping-
 import { AccountSettingsPageComponent } from './pages/account-settings-page/account-settings-page.component';
 import { TransferItemDetailsComponent } from './transfer-item-details/transfer-item-details.component';
 import { TransferItemsTableComponent } from './transfer-item-details/transfer-items-table/transfer-items-table.component';
+import { ChatComponent } from './demo/chat/chat.component';
 
 const pipes = [PlnCurrencyPipe, NullTransformPipe, ReplacePipe, MathAbsPipe];
 
-const socketIoConfig: SocketIoConfig = { url: '/', options: {} };
+const socketIoConfig: SocketIoConfig = {
+    url: '/',
+    options: {
+        path: '/ws/',
+        transports: ['websocket'],
+        auth: {
+            key: 'Key',
+        },
+    },
+};
 Chart.register(zoomPlugin);
 
 @NgModule({
@@ -80,6 +90,7 @@ Chart.register(zoomPlugin);
         AccountSettingsPageComponent,
         TransferItemDetailsComponent,
         TransferItemsTableComponent,
+        ChatComponent,
     ],
     imports: [
         BrowserModule,

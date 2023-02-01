@@ -1,4 +1,4 @@
-import { DeleteResult, Equal, Repository, DataSource } from 'typeorm';
+import { DeleteResult, Equal, Repository, DataSource, In } from 'typeorm';
 
 import { Account } from '../entities/Account.entity';
 import { BalanceDTO } from '@coinage-app/interfaces';
@@ -8,13 +8,18 @@ import { TransferType } from '../entities/Category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transfer } from '../entities/Transfer.entity';
 import { BaseDao } from './base.bao';
+import { AccountSubBalance } from './daoDtos/AccountSubBalance.dto';
+import { DatabaseSourceService } from '../services/database-source.service';
+import { AccountMonthlySubChange } from './daoDtos/AccountMonthlySubBalance.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Injectable()
 export class AccountDao extends BaseDao {
     public constructor(
         @InjectRepository(Account) private readonly accountRepository: Repository<Account>,
         private readonly dateParser: DateParserService,
-        private readonly dataSource: DataSource
+        private readonly dataSource: DataSource,
+        private readonly databaseSourceService: DatabaseSourceService
     ) {
         super();
     }
@@ -26,7 +31,7 @@ export class AccountDao extends BaseDao {
     }
 
     public async getByIds(ids: number[]): Promise<Account[]> {
-        return await this.accountRepository.findByIds(ids);
+        return await this.accountRepository.findBy({ id: In(ids) });
     }
 
     public async countAllTransfersForAccount(id: number): Promise<number> {
@@ -35,6 +40,7 @@ export class AccountDao extends BaseDao {
             .select('COUNT(t.id)', 'count')
             .from(Transfer, 't')
             .where({ accountId: Equal(id) })
+            .orWhere({ targetAccountId: Equal(id) })
             .getRawOne();
         return parseInt(result[0].count, 10);
     }
@@ -87,7 +93,7 @@ export class AccountDao extends BaseDao {
                 COUNT(t.id) AS transfer_count
                 FROM account a
                 LEFT JOIN transfer t
-                ON t.account_id = a.id AND t.date = '${this.dateParser.formatMySql(asOfDate)}' AND t.is_internal = 0
+                ON t.account_id = a.id AND t.date = '${this.dateParser.formatMySql(asOfDate)}' #AND t.is_internal = 0
                 WHERE a.id IN (${accountIds.join(',')}) AND a.user_id = ${userId} AND t.type = '${TransferType.Outcome}'
                 GROUP BY a.id;`);
         return result.map((r: { id: number; name: string; balance: string }) => {
@@ -112,15 +118,107 @@ export class AccountDao extends BaseDao {
                     COUNT(t.id) AS 'count'
                 FROM transfer AS t
                 WHERE t.account_id IN (${accountIds.join(',')})
-                    AND t.date <= '${this.dateParser.getToday()}' ${sumOnlyInternalTransfers ? `AND t.is_internal = 0` : ``}
+                    AND t.date <= '${this.dateParser.getToday()}' ${sumOnlyInternalTransfers ? `#AND t.is_internal = 0` : ``}
                 GROUP BY YEAR(t.date), MONTH(t.date)
                 ORDER BY year DESC, month DESC
                 LIMIT 12`
         );
     }
 
+    public async getMonthlySubChangeForUserId(userId: number, numberOfLastMonths = 12) {
+        return await this.databaseSourceService.queryWithParams(
+            `
+SELECT
+    YEAR(t.date) AS 'changeYear',
+    MONTH(t.date) AS 'changeMonth',
+    oa.id AS 'originAccountId',
+    ta.id AS 'targetAccountId',
+    SUM(IFNULL(t.amount, 0)) AS 'monthlySubChange',
+    oa.user_id = ta.user_id AS 'isInternal',
+    COUNT(t.id) AS 'transferCount'
+FROM transfer AS t
+LEFT JOIN account AS oa ON oa.id = t.account_id
+LEFT JOIN account AS ta ON ta.id = t.target_account_id
+WHERE (oa.user_id = :userId OR ta.user_id = :userId)
+    AND t.date <= NOW()
+    AND t.date >= DATE_SUB(NOW(), INTERVAL (:monthsCount + 1) MONTH)
+GROUP BY YEAR(t.date), MONTH(t.date), oa.id, ta.id
+ORDER BY changeYear DESC, changeMonth DESC
+#LIMIT 12
+        `,
+            { userId: userId, monthsCount: numberOfLastMonths },
+            AccountMonthlySubChange
+        );
+    }
+
     public async getLastTransferDate(accountId: number): Promise<string> {
         const result = await this.dataSource.query(`SELECT t.date FROM transfer t WHERE t.account_id = ${accountId} ORDER BY t.date DESC LIMIT 1;`);
         return result[0].date;
+    }
+
+    public async getSubBalanceByFilter(filter: { accountIds?: number[]; userId?: number }, asOfDate?: Date): Promise<AccountSubBalance[]> {
+        const asOfDateString = asOfDate ? this.dateParser.formatMySql(asOfDate) : this.dateParser.getToday();
+        return await this.databaseSourceService.queryWithParams(
+            `
+            SELECT
+                oa.id AS 'fromAccountId',
+                oa.name AS 'fromAccountName',
+                ta.id AS 'toAccountId',
+                ta.name AS 'toAccountName',
+                SUM(t.amount) AS 'subBalance',
+                oa.user_id AS 'fromUserId',
+                ta.user_id AS 'toUserId',
+                oa.user_id = ta.user_id AS 'isInternalTransfer'
+            FROM transfer AS t
+            LEFT JOIN account oa ON t.account_id = oa.id
+            LEFT JOIN account ta ON t.target_account_id = ta.id
+            WHERE t.date <= :asOfDate
+                ${filter.accountIds ? `AND (oa.id IN (:accountIds) OR ta.id IN (:accountIds))` : ``}
+                ${filter.userId ? `AND (oa.user_id = :userId OR ta.user_id = :userId)` : ``}
+            GROUP BY oa.id, ta.id;
+            `,
+            { accountIds: filter.accountIds, asOfDate: asOfDateString, userId: filter.userId },
+            AccountSubBalance
+        );
+    }
+
+    public async getBalanceNew(
+        filter: { accountIds?: number[]; userId?: number },
+        asOfDate?: Date
+    ): Promise<
+        {
+            accountId: number;
+            accountName: string;
+            balance: string;
+            userId: number;
+        }[]
+    > {
+        const asOfDateString = asOfDate ? this.dateParser.toUTCString(asOfDate) : this.dateParser.getToday();
+        const query = this.dataSource.driver.escapeQueryWithParameters(
+            `
+SELECT
+	oa.id AS 'accountId',
+	oa.name AS 'accountName',
+	(
+        (SELECT
+            IFNULL(SUM(ot.amount), 0)
+        FROM transfer ot
+        WHERE ot.target_account_id = oa.id
+            AND ot.date <= :asOfDate)
+		- SUM(IFNULL(t.amount, 0))
+	) AS 'balance',
+	oa.user_id AS 'userId'
+FROM account AS oa
+LEFT JOIN transfer AS t ON t.account_id = oa.id
+#LEFT JOIN account ta ON t.target_account_id = ta.id
+WHERE t.date <= :asOfDate
+    ${filter.accountIds ? `AND oa.id IN (:accountIds)` : ``}
+    ${filter.userId ? `AND oa.user_id = :userId` : ``}
+GROUP BY oa.id
+        `,
+            { accountIds: filter.accountIds, asOfDate: asOfDateString, userId: filter.userId },
+            {}
+        );
+        return await this.dataSource.query(...query);
     }
 }

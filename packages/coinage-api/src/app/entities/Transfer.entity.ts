@@ -9,6 +9,8 @@ import { Receipt } from './Receipt.entity';
 import { TransferItem } from './TransferItem.entity';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 import { WithDateEntity } from './WithDate.partialEntity';
+import { BitFalse } from '../constants/booleanBuffer.const';
+import { User } from './User.entity';
 
 @Entity()
 export class Transfer extends WithDateEntity {
@@ -20,57 +22,69 @@ export class Transfer extends WithDateEntity {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column({ type: 'text', nullable: false })
+    @Column({ name: 'description', type: 'text', nullable: false })
     public description!: string;
 
-    @Column({ type: 'decimal', precision: 20, scale: 2, default: 0, nullable: false, transformer: new DecimalToNumberTransformer() })
+    @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, default: 0, nullable: false, transformer: new DecimalToNumberTransformer() })
     public amount!: number;
 
     @Column({
+        name: 'date',
         type: 'date',
         nullable: false,
         transformer: new DateTransformer(DateTransformerType.DATE),
     })
     public date!: Date;
 
-    @Column({ nullable: false })
+    @Column({ name: 'category_id', nullable: false })
     public categoryId!: number;
 
-    @ManyToOne(() => Category, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
+    @ManyToOne(() => Category, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'category_id' })
     public category!: Category;
 
-    @Column({ nullable: true })
+    @Column({ name: 'contractor_id', nullable: true })
     public contractorId!: number | null;
 
-    @ManyToOne(() => Contractor, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
+    @ManyToOne(() => Contractor, { eager: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'contractor_id' })
     public contractor!: Contractor | null;
 
-    @Column({ nullable: true })
+    @Column({ name: 'owner_user_id', nullable: true })
+    public ownerUserId!: number | null;
+
+    @ManyToOne(() => Contractor, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
+    @JoinColumn({ name: 'owner_user_id' })
+    public ownerUser?: User | null;
+
+    @Column({ name: 'receipt_id', nullable: true })
     public receiptId!: number | null;
 
-    @ManyToOne(() => Receipt, { eager: false, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
+    @ManyToOne(() => Receipt, { eager: false, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'receipt_id' })
     public receipt!: Promise<Receipt | null>;
 
     @Column({ type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
 
-    @Column({ nullable: false })
-    public accountId!: number;
+    @Column({ name: 'account_id', nullable: false })
+    public originAccountId!: number;
 
-    @ManyToOne(() => Account, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
+    @ManyToOne(() => Account, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'account_id' })
-    public account!: Account;
+    public originAccount!: Account;
 
-    @Column({ type: 'bit', nullable: false, default: "b'0'", transformer: new BooleanTransformer() })
-    public isInternal!: boolean;
+    @Column({ name: 'target_account_id', nullable: true })
+    public targetAccountId!: number | null;
 
-    @Column({ type: 'bit', nullable: false, default: "b'0'", transformer: new BooleanTransformer() })
+    @ManyToOne(() => Account, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
+    @JoinColumn({ name: 'target_account_id' })
+    public targetAccount!: Account | null;
+
+    @Column({ type: 'bit', nullable: false, default: BitFalse, transformer: new BooleanTransformer() })
     public isEthereal!: boolean;
 
-    @Column({ type: 'bit', nullable: false, default: "b'0'", transformer: new BooleanTransformer() })
+    @Column({ type: 'bit', nullable: false, default: BitFalse, transformer: new BooleanTransformer() })
     public isFlagged!: boolean;
 
     @Column({ type: 'json', nullable: false, default: 'json_object()' })

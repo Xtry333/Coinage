@@ -10,3 +10,25 @@ export interface MonthlyUserStatsDTO {
     }[];
     transactionsCount: number;
 }
+
+export interface NewMonthlyAccountStatsDTO {
+    accountId: number;
+    balance: number;
+    totalIncoming: number;
+    totalOutgoing: number;
+    externalIncoming: number;
+    externalOutgoing: number;
+}
+
+export interface NewMonthlyUserStatsDTO {
+    year: number;
+    month: number;
+    totalIncoming: number;
+    totalOutgoing: number;
+    totalChange: number;
+    externalIncoming: number;
+    externalOutgoing: number;
+    externalChange: number;
+    balance: number;
+    accountStats: NewMonthlyAccountStatsDTO[];
+}

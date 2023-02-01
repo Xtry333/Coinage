@@ -1,4 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { BitFalse, BitTrue } from '../constants/booleanBuffer.const';
+import { Contractor } from './Contractor.entity';
 
 import { BooleanTransformer } from './transformers/boolean.transformer';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
@@ -20,14 +22,17 @@ export class Account {
     @Column({ name: 'currency_symbol', type: 'varchar', length: 5, nullable: false })
     public currencySymbol!: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     public userId!: number;
 
-    @ManyToOne(() => User, { eager: true, nullable: false, onUpdate: 'RESTRICT', onDelete: 'RESTRICT' })
+    @ManyToOne(() => User, { eager: true, onUpdate: 'RESTRICT', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'user_id' })
     public user!: User;
 
-    @Column({ type: 'bit', name: 'is_active', nullable: false, default: "b'1'", transformer: new BooleanTransformer() })
+    @Column({ type: 'bit', name: 'is_contractor_account', nullable: false, default: BitFalse, transformer: new BooleanTransformer() })
+    public isContractorAccount!: boolean;
+
+    @Column({ type: 'bit', name: 'is_active', nullable: false, default: BitTrue, transformer: new BooleanTransformer() })
     public isActive!: boolean;
 
     @CreateDateColumn({ type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })

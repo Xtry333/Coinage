@@ -17,7 +17,8 @@
                 "inlineStyleLanguage": "scss",
                 "assets": ["packages/coinage-webapp/src/favicon.ico", "packages/coinage-webapp/src/assets"],
                 "styles": ["packages/coinage-webapp/src/styles.scss"],
-                "scripts": []
+                "scripts": [],
+                "allowedCommonJsDependencies": ["validator"]
             },
             "configurations": {
                 "production": {

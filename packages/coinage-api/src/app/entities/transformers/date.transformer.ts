@@ -1,4 +1,4 @@
-import { FindOperator, ValueTransformer } from 'typeorm';
+import { ValueTransformer } from 'typeorm';
 
 export const enum DateTransformerType {
     DATETIME = 'datetime',
@@ -7,7 +7,7 @@ export const enum DateTransformerType {
 }
 
 export class DateTransformer implements ValueTransformer {
-    constructor(private readonly type: DateTransformerType = DateTransformerType.DATETIME) {}
+    public constructor(private readonly type: DateTransformerType = DateTransformerType.DATETIME) {}
 
     public from(value: string | null): Date | null {
         if (value === null) {

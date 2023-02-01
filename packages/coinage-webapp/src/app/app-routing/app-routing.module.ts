@@ -12,6 +12,7 @@ import { TransferDetailsComponent } from '../transfer-details/transfer-details.c
 import { TransfersListComponent } from '../transfers-list/transfers-list.component';
 import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
 import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
+import { ChatComponent } from '../demo/chat/chat.component';
 
 const routes: Routes = [
     {
@@ -66,6 +67,10 @@ const routes: Routes = [
     {
         path: 'manage/account/:accountId',
         component: AccountSettingsPageComponent,
+    },
+    {
+        path: 'chat',
+        component: ChatComponent,
     },
 ];
 

@@ -102,7 +102,8 @@ export class TransferController {
             contractor: transfer.contractor?.name,
             contractorId: transfer.contractor?.id,
             categoryId: transfer.category.id,
-            account: { id: transfer.account?.id ?? 0, name: transfer.account?.name ?? '' },
+            account: { id: transfer.originAccount?.id ?? 0, name: transfer.originAccount?.name ?? '' },
+            targetAccount: { id: transfer.targetAccount?.id ?? 0, name: transfer.targetAccount?.name ?? '' },
             otherTransfers: otherTransfers,
             receipt: receiptDto,
             date: transfer.date,
@@ -123,6 +124,7 @@ export class TransferController {
             refundedOn: refundTransfer?.date.toJSON(),
             isRefundable: !transfer.metadata.refundedBy && !transfer.metadata.refundTargetId,
             isEthereal: transfer.isEthereal,
+            isInternal: transfer.originAccount.userId === transfer.targetAccount?.userId,
         };
     }
 
@@ -136,8 +138,8 @@ export class TransferController {
             categoryName: transfer.category?.name,
             contractorId: transfer.contractor?.id ?? null,
             contractorName: transfer.contractor?.name ?? null,
-            accountId: transfer.accountId,
-            accountName: transfer.account.name,
+            accountId: transfer.originAccountId,
+            accountName: transfer.originAccount.name,
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
@@ -195,8 +197,8 @@ export class TransferController {
         entity.categoryId = category.id;
         entity.type = category.type;
 
-        entity.account = account;
-        entity.accountId = account.id;
+        entity.originAccount = account;
+        entity.originAccountId = account.id;
 
         // entity.contractor = contractor;
         entity.contractorId = contractor?.id ?? null;
@@ -257,7 +259,7 @@ export class TransferController {
             throw new BadRequestException('Amount too high! Create new transfer instead.');
         }
         entity.date = target.date;
-        entity.accountId = target.accountId;
+        entity.originAccountId = target.originAccountId;
 
         entity.contractor = target.contractor;
         entity.receiptId = target.receiptId;
@@ -288,7 +290,7 @@ export class TransferController {
         refundTransferEntity.type = refundCategory.type;
         refundTransferEntity.categoryId = refundCategory.id;
         refundTransferEntity.date = refundDate;
-        refundTransferEntity.accountId = transfer.accountId;
+        refundTransferEntity.originAccountId = transfer.originAccountId;
         refundTransferEntity.metadata.refundTargetId = refundTargetId;
         refundTransferEntity.contractor = transfer.contractor;
         refundTransferEntity.receipt = transfer.receipt;
@@ -372,18 +374,16 @@ export class TransferController {
         entityFrom.description = transfer.description;
         entityFrom.amount = transfer.amount;
         entityFrom.categoryId = categoryFrom.id;
-        entityFrom.accountId = originAccount.id;
+        entityFrom.originAccountId = originAccount.id;
         entityFrom.date = transfer.date;
         entityFrom.type = categoryFrom.type;
-        entityFrom.isInternal = true;
 
         entityTo.description = transfer.description;
         entityTo.amount = transfer.amount;
         entityTo.categoryId = categoryTo.id;
-        entityTo.accountId = targetAccount.id;
+        entityTo.originAccountId = targetAccount.id;
         entityTo.date = transfer.date;
         entityTo.type = categoryTo.type;
-        entityTo.isInternal = true;
 
         const insertedFrom = await this.transferDao.save(entityFrom);
         const insertedTo = await this.transferDao.save(entityTo);

@@ -21,6 +21,7 @@ import {
     ItemWithLastUsedPriceDTO,
     CreateEditItemDTO,
     ItemDetailsDTO,
+    NewMonthlyUserStatsDTO,
 } from '@coinage-app/interfaces';
 import { Observable, lastValueFrom, map } from 'rxjs';
 
@@ -94,8 +95,8 @@ export class CoinageDataService {
         );
     }
 
-    public getAccountMonthlyStats(): Observable<MonthlyUserStatsDTO[]> {
-        return this.http.get<MonthlyUserStatsDTO[]>(`${CoinageDataService.API_URL}account/lastYearMonthlyStats`, {
+    public getAccountMonthlyStats(): Observable<NewMonthlyUserStatsDTO[]> {
+        return this.http.get<NewMonthlyUserStatsDTO[]>(`${CoinageDataService.API_URL}account/lastYearMonthlyStats`, {
             // params: { accountIds: [1] },
         });
     }

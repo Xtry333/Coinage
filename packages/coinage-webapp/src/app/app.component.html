@@ -14,7 +14,11 @@
         </ul>
     </nav>
     <div class="datetime">
-        <h4>{{ dateTime }}</h4>
+        <span>
+            <fa-icon class="icon" [icon]="userIcon"></fa-icon>
+            <span class="username">{{ username }}</span>
+        </span>
+        <span>{{ dateTime }}</span>
     </div>
 </header>
 <main>

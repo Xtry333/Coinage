@@ -25,6 +25,7 @@ export class TransferDetailsDTO {
     public amount!: number;
     public type!: TransferTypeEnum;
     public account!: AccountDTO;
+    public targetAccount!: AccountDTO;
     public categoryPath!: CategoryPathDTO[];
     public categoryId!: number;
     public contractor?: string;
@@ -39,6 +40,7 @@ export class TransferDetailsDTO {
     public refundedOn?: string;
     public isPlanned!: boolean;
     public isRefundable!: boolean;
+    public isInternal!: boolean;
     public isEthereal!: boolean;
 }
 

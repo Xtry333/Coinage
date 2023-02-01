@@ -6,6 +6,10 @@ export class DateParserService {
         return date.toISOString().slice(0, 10);
     }
 
+    public toUTCString(date: Date) {
+        return `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}`;
+    }
+
     public getStartOfNextMonthDate(): Date {
         const date = new Date();
         date.setDate(1);
@@ -23,6 +27,13 @@ export class DateParserService {
         const date = new Date(year, month, 1);
         date.setMonth(date.getMonth() + 1);
         date.setDate(0);
+        return date;
+    }
+
+    public getEndOfMonthSeconds(year: number, month: number): Date {
+        const date = new Date(year, month, 1);
+        date.setMonth(date.getMonth() + 1);
+        date.setMilliseconds(date.getMilliseconds() - 1);
         return date;
     }
 

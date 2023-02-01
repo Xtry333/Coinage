@@ -79,8 +79,12 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Account Name</th>
-                    <td>{{ transfer.account.name }}</td>
+                    <th>Account</th>
+                    <td>{{ transfer.account.name }} → {{ transfer.targetAccount.name }}</td>
+                </tr>
+                <tr>
+                    <th>Internal</th>
+                    <td>{{ transfer.isInternal ? 'Yes' : 'No' }}</td>
                 </tr>
             </table>
         </div>

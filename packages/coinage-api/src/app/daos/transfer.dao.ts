@@ -58,7 +58,8 @@ export class TransferDao extends BaseDao {
         const filter: FindOptionsWhere<Transfer> = {};
 
         this.assignInFilterIfExists(filter, 'contractorId', params.contractorIds);
-        this.assignInFilterIfExists(filter, 'accountId', params.accountIds);
+        this.assignInFilterIfExists(filter, 'originAccountId', params.accountIds);
+        this.assignInFilterIfExists(filter, 'targetAccountId', params.accountIds);
         this.assignInFilterIfExists(filter, 'categoryId', params.categoryIds);
         this.assignInFilterIfExists(filter, 'id', params.transferIds);
         this.assignBetweenFilterIfExists(filter, 'date', params.date);
@@ -100,13 +101,16 @@ export class TransferDao extends BaseDao {
         const transfers = await this.transferRepository
             .createQueryBuilder('transfer')
             .select()
-            .leftJoinAndSelect('transfer.account', 'account')
+            .leftJoinAndSelect('transfer.originAccount', 'originAccount')
+            .leftJoinAndSelect('transfer.targetAccount', 'targetAccount')
             .leftJoinAndSelect('transfer.category', 'category')
             .leftJoinAndSelect('transfer.contractor', 'contractor')
-            .leftJoinAndSelect('account.user', 'user')
+            .leftJoinAndSelect('originAccount.user', 'originUser')
+            .leftJoinAndSelect('targetAccount.user', 'targetUser')
             .orderBy('transfer.editedDate', 'DESC')
             .addOrderBy('transfer.id', 'DESC')
-            .where('user.id = :userId', { userId })
+            .where('originUser.id = :userId', { userId })
+            .orWhere('targetUser.id = :userId', { userId })
             .take(count)
             .getMany();
 
