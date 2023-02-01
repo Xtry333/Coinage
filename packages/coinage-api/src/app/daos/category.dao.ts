@@ -5,7 +5,7 @@ import { DataSource, DeleteResult, Equal, InsertResult, Repository } from 'typeo
 import { Account } from '../entities/Account.entity';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
-import { BaseDao } from './base.bao';
+import { BaseDao } from './base.dao';
 
 @Injectable()
 export class CategoryDao extends BaseDao {

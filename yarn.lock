@@ -2109,6 +2109,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@hirez_io/auto-spies-core@npm:1.6.7":
+  version: 1.6.7
+  resolution: "@hirez_io/auto-spies-core@npm:1.6.7"
+  dependencies:
+    javascript-stringify: 2.1.0
+  peerDependencies:
+    rxjs: ">=6.0.0 < 8"
+    typescript: ">=2.8.1"
+  checksum: 4e84b08f681f30847e15b87bf864cffb86f64d08d01511ec20c99c95fd8ff9818ff9f1af57d7419861d89f7e6779b12fa48ae9c49483d047012b85e259abdf72
+  languageName: node
+  linkType: hard
+
 "@humanwhocodes/config-array@npm:^0.11.8":
   version: 0.11.8
   resolution: "@humanwhocodes/config-array@npm:0.11.8"
@@ -3528,6 +3540,13 @@ __metadata:
   dependencies:
     "@types/node": "*"
   checksum: bfcadb042a41b124c4e3de4925e3be6d35b78f93f27c4535d5ff86980dc0f8bc407ed99b9b54528952dc62834d5a779392f7a12c2947dd19330eb05a6bcae15a
+  languageName: node
+  linkType: hard
+
+"@types/chance@npm:^1.1.3":
+  version: 1.1.3
+  resolution: "@types/chance@npm:1.1.3"
+  checksum: df2be43fab359e5fa734fb91aa1c4c15108310be0e4990d00203805a63f9b2182da74eaabc8859b742e150d970decf27a773fcc6cbf28fb5b372c9b1bd7e9b89
   languageName: node
   linkType: hard
 
@@ -5531,6 +5550,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"chance@npm:^1.1.9":
+  version: 1.1.9
+  resolution: "chance@npm:1.1.9"
+  checksum: 57d09fd404ffb87f5e106705c28c38a77cb0a6d96f3828d63052947a12d62d65f40a100d74b123bea3d5ebce3b53333a93d3b81783c64d8473788a0ce6b6e8db
+  languageName: node
+  linkType: hard
+
 "char-regex@npm:^1.0.2":
   version: 1.0.2
   resolution: "char-regex@npm:1.0.2"
@@ -5802,6 +5828,7 @@ __metadata:
     "@nrwl/nest": 15.4.5
     "@nrwl/node": 15.4.5
     "@nrwl/nx-cloud": latest
+    "@types/chance": ^1.1.3
     "@types/jest": 29.2.5
     "@types/node": ^18.11.18
     "@types/passport": ^1.0.11
@@ -5809,6 +5836,7 @@ __metadata:
     "@types/validator": ^13.7.10
     "@typescript-eslint/eslint-plugin": ^5.36.1
     "@typescript-eslint/parser": ^5.36.1
+    chance: ^1.1.9
     chart.js: ^4.1.2
     chartjs-plugin-zoom: ^2.0.0
     class-transformer: ^0.5.1
@@ -5820,6 +5848,7 @@ __metadata:
     eslint-plugin-cypress: ^2.12.1
     helmet: ^6.0.1
     jest: 29.3.1
+    jest-auto-spies: ^1.6.10
     jest-environment-jsdom: 29.3.1
     jest-preset-angular: ~12.2.3
     lodash: ^4.17.21
@@ -9743,6 +9772,26 @@ __metadata:
   bin:
     jake: ./bin/cli.js
   checksum: 56c913ecf5a8d74325d0af9bc17a233bad50977438d44864d925bb6c45c946e0fee8c4c1f5fe2225471ef40df5222e943047982717ebff0d624770564d3c46ba
+  languageName: node
+  linkType: hard
+
+"javascript-stringify@npm:2.1.0":
+  version: 2.1.0
+  resolution: "javascript-stringify@npm:2.1.0"
+  checksum: 009981ec84299da88795fc764221ed213e3d52251cc93a396430a7a02ae09f1163a9be36a36808689681a8e6113cf00fe97ec2eea2552df48111f79be59e9358
+  languageName: node
+  linkType: hard
+
+"jest-auto-spies@npm:^1.6.10":
+  version: 1.6.10
+  resolution: "jest-auto-spies@npm:1.6.10"
+  dependencies:
+    "@hirez_io/auto-spies-core": 1.6.7
+  peerDependencies:
+    jest: < 29.x
+    rxjs: ">=6.0.0 < 8"
+    typescript: ">=2.8.1"
+  checksum: 1256a95282f9ea14bf93314d6af4945efe10549d5421649aa6584316407dd40e5b0504766db35c5151fb83468297e59911182efc469e18b5f1a08e002ba31247
   languageName: node
   linkType: hard
 

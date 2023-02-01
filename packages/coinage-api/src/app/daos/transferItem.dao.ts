@@ -5,7 +5,7 @@ import { Item } from '../entities/Item.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { Writeable } from '../types/Writeable.type';
-import { BaseDao } from './base.bao';
+import { BaseDao } from './base.dao';
 
 @Injectable()
 export class TransferItemDao extends BaseDao {

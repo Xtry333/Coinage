@@ -8,6 +8,7 @@ import { TemplateNameMapperService } from './template-name-mapper.service';
 import { AuthGuard } from './auth.guard';
 import { TransferItemsService } from './transfer-items.service';
 import { DatabaseSourceService } from './database-source.service';
+import { AccountsService } from './accounts/accounts.service';
 
 export default [
     DatabaseSourceService,
@@ -20,4 +21,5 @@ export default [
     EtherealTransferService,
     TemplateNameMapperService,
     TransferItemsService,
+    AccountsService,
 ];

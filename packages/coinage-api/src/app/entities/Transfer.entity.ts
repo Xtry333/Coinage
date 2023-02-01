@@ -53,7 +53,7 @@ export class Transfer extends WithDateEntity {
     @Column({ name: 'owner_user_id', nullable: true })
     public ownerUserId!: number | null;
 
-    @ManyToOne(() => Contractor, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
+    @ManyToOne(() => User, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'owner_user_id' })
     public ownerUser?: User | null;
 

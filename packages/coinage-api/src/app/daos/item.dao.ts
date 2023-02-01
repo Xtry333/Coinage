@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, Repository } from 'typeorm';
 import { Item } from '../entities/Item.entity';
-import { BaseDao } from './base.bao';
+import { BaseDao } from './base.dao';
 
 interface ItemWithLastUsedPriceDBObject {
     id: number;

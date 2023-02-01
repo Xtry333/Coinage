@@ -5,7 +5,7 @@ import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
 import { Writeable } from '../types/Writeable.type';
-import { BaseDao } from './base.bao';
+import { BaseDao } from './base.dao';
 
 type KeysOfType<O, T> = {
     [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;

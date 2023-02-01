@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, Repository } from 'typeorm';
 import { User } from '../entities/User.entity';
-import { BaseDao } from './base.bao';
+import { BaseDao } from './base.dao';
 
 @Injectable()
 export class UserDao extends BaseDao {

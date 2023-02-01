@@ -7,7 +7,7 @@ import { Injectable } from '@nestjs/common';
 import { TransferType } from '../entities/Category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Transfer } from '../entities/Transfer.entity';
-import { BaseDao } from './base.bao';
+import { BaseDao } from './base.dao';
 import { AccountSubBalance } from './daoDtos/AccountSubBalance.dto';
 import { DatabaseSourceService } from '../services/database-source.service';
 import { AccountMonthlySubChange } from './daoDtos/AccountMonthlySubBalance.dto';

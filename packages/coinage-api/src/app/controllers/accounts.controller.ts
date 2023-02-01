@@ -1,29 +1,28 @@
-import { Controller, Delete, Get, Param, ParseArrayPipe, Query, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 
-import { AccountDetailsDTOResponse, AccountDTO, BalanceDTO, BaseResponseDTO, MonthlyUserStatsDTO, NewMonthlyUserStatsDTO } from '@coinage-app/interfaces';
+import { AccountDetailsDTOResponse, AccountDTO, BalanceDTO, BaseResponseDTO, NewMonthlyUserStatsDTO } from '@coinage-app/interfaces';
 import { AccountDao } from '../daos/account.dao';
-import { DateParserService } from '../services/date-parser.service';
-import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { User } from '../entities/User.entity';
 import { AccountBalanceService } from '../services/account-balance.service';
+import { AccountsService } from '../services/accounts/accounts.service';
+import { AuthGuard, RequestingUser } from '../services/auth.guard';
+import { DateParserService } from '../services/date-parser.service';
+import { EtherealTransferService } from '../services/ethereal-transfer.service';
 
 @UseGuards(AuthGuard)
 @Controller('account(s)?')
 export class AccountsController {
     public constructor(
         private readonly accountDao: AccountDao,
+        private readonly accountsService: AccountsService,
         private readonly etherealTransferService: EtherealTransferService,
         private readonly dateParser: DateParserService,
         private readonly accountBalanceService: AccountBalanceService
     ) {}
 
     @Get('all')
-    public async getAllTransactions(@RequestingUser('id') userId: number): Promise<AccountDTO[]> {
-        // console.log('------------------');
-        // console.log(JSON.stringify(await this.accountBalanceService.getMonthlyAccountsBalanceForUserId(1), undefined, 4));
-        // console.log('------------------');
-        return await this.accountDao.getForUserId(userId);
+    public async getAccountsForUserId(@RequestingUser('id') userId: number): Promise<AccountDTO[]> {
+        return await this.accountsService.getForUserId(userId);
     }
 
     @Get('balance/:accountId/:asOfDate')
@@ -77,83 +76,8 @@ export class AccountsController {
     }
 
     @Get('/lastYearMonthlyStats')
-    public async getMongthlyStats(
-        @RequestingUser() user: User,
-        @Query('accountIds', new ParseArrayPipe({ expectedType: Number, items: Number, optional: true })) accountIds?: number[]
-    ): Promise<NewMonthlyUserStatsDTO[]> {
-        let accounts = await this.accountDao.getForUserId(user.id);
-        let shouldUseAllAccounts = true;
-        if (accountIds !== undefined) {
-            accounts = await this.accountDao.getByIds(accountIds);
-            shouldUseAllAccounts = false;
-        } else {
-            accountIds = accounts.map((a) => a.id);
-        }
-
-        const monthlyStats = this.accountBalanceService.getMonthlyAccountsBalanceForUserId(user.id);
-
-        // const monthlyStats =
-        //     accountIds.length > 0
-        //         ? (await this.accountDao.getLast12MonthStats(accountIds, shouldUseAllAccounts)).map((stats) => {
-        //               return {
-        //                   year: stats.year,
-        //                   month: stats.month - 1,
-        //                   income: parseFloat(stats.income),
-        //                   outcome: parseFloat(stats.outcome),
-        //                   change: parseFloat(stats.income) - parseFloat(stats.outcome),
-        //                   transactionsCount: parseInt(stats.count),
-        //               };
-        //           })
-        //         : [];
-
-        // const today = new Date();
-        // let year = today.getFullYear();
-        // let month = today.getMonth();
-
-        // for (let i = 0; i < 12; i++) {
-        //     if (monthlyStats.find((entry) => entry.year === year && entry.month === month) === undefined) {
-        //         monthlyStats.push({
-        //             year: year,
-        //             month: month,
-        //             income: 0,
-        //             outcome: 0,
-        //             change: 0,
-        //             transactionsCount: 0,
-        //         });
-        //     }
-        //     month--;
-        //     if (month < 0) {
-        //         year--;
-        //         month = 11;
-        //     }
-        // }
-        // const last12Months = monthlyStats.sort((a, b) => new Date(b.year, b.month).getTime() - new Date(a.year, a.month).getTime()).slice(0, 12);
-        // const date = this.dateParser.getEndOfMonth(last12Months[11].year, last12Months[11].month - 1);
-
-        // let initialBalance = (await this.accountDao.getAccountBalanceForAccountAsOfDate(accountIds, date)).reduce((acc, curr) => {
-        //     return acc + curr.balance;
-        // }, 0);
-
-        // const b: MonthlyUserStatsDTO[] = last12Months.map((o) => {
-        //     return {
-        //         ...o,
-        //         outcomes: o.outcome,
-        //         incomes: o.income,
-        //         balance: o.income - o.outcome,
-        //         selectedAccounts: accounts.map((a) => {
-        //             return {
-        //                 id: a.id,
-        //                 name: a.name,
-        //             };
-        //         }),
-        //     };
-        // });
-
-        // b.reverse().forEach((m) => {
-        //     initialBalance = m.balance + initialBalance;
-        //     m.balance = initialBalance;
-        // });
-        return monthlyStats;
+    public async getMongthlyStats(@RequestingUser() user: User): Promise<NewMonthlyUserStatsDTO[]> {
+        return this.accountBalanceService.getMonthlyAccountsBalanceForUserId(user.id);
     }
 
     @Delete(':id/ethereals')

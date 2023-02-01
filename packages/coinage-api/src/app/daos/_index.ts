@@ -1,5 +1,5 @@
 import { AccountDao } from './account.dao';
-import { BaseDao } from './base.bao';
+import { BaseDao } from './base.dao';
 import { CategoryDao } from './category.dao';
 import { ContractorDao } from './contractor.dao';
 import { ItemDao } from './item.dao';

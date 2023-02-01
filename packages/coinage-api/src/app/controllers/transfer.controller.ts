@@ -9,7 +9,7 @@ import {
     TransferDTO,
     CreateEditTransferModelDTO,
 } from '@coinage-app/interfaces';
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -19,12 +19,15 @@ import { TransferDao } from '../daos/transfer.dao';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
+import { User } from '../entities/User.entity';
+import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { TransferItemsService } from '../services/transfer-items.service';
 import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
+@UseGuards(AuthGuard)
 @Controller('transfer')
 export class TransferController {
     private static INVALID_ID_MESSAGE = 'Invalid ID provided.';
@@ -177,7 +180,7 @@ export class TransferController {
     }
 
     @Post('save')
-    public async saveTransferObject(@Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
+    public async saveTransferObject(@RequestingUser() user: User, @Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
         let entity: Transfer;
         const category = await this.categoryDao.getById(transfer.categoryId);
         const account = await this.accountDao.getById(transfer.accountId);
@@ -197,10 +200,15 @@ export class TransferController {
         entity.categoryId = category.id;
         entity.type = category.type;
 
+        if (entity.ownerUserId === null) {
+            entity.ownerUser = user;
+            entity.ownerUserId = user.id;
+        }
+
         entity.originAccount = account;
         entity.originAccountId = account.id;
 
-        // entity.contractor = contractor;
+        entity.contractor = contractor;
         entity.contractorId = contractor?.id ?? null;
 
         // entity.receipt = Promise.resolve(receipt);
