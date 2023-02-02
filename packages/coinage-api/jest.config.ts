@@ -9,7 +9,7 @@ const jestConfig: JestConfigWithTsJest = {
         '^.+\\.[tj]s$': [
             'ts-jest',
             {
-                tsconfig: 'packages/coinage-api/tsconfig.spec.json',
+                tsconfig: '<rootDir>/tsconfig.spec.json',
             },
         ],
     },

@@ -1,8 +1,8 @@
+import { createMockAccounts } from '@coinage-app/test/mock-generators/accounts.mock';
 import { Chance } from 'chance';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 import { AccountDao } from '../../daos/account.dao';
 import { AccountsService } from './accounts.service';
-import { createMockAccounts } from '@coinage-app/test/mock-generators/accounts.mock';
 
 describe('AccountsService', () => {
     let service: AccountsService, accountDao: Spy<AccountDao>;
@@ -12,7 +12,7 @@ describe('AccountsService', () => {
 
     beforeEach(() => {
         accountDao = createSpyFromClass(AccountDao);
-        jest.spyOn(accountDao, 'getForUserId').mockResolvedValue(mockAccounts);
+        accountDao.getForUserId.mockResolvedValue(mockAccounts);
 
         service = new AccountsService(accountDao);
     });
@@ -22,7 +22,7 @@ describe('AccountsService', () => {
     });
 
     describe('.getForUserId', () => {
-        it('should call dao.getForUserId', async () => {
+        it('should call dao.getForUserId and return accounts', async () => {
             const userId = chance.natural({ max: 100 });
             const result = await service.getForUserId(userId);
 

@@ -1,2 +1,4 @@
-export const BitFalse = "b'0'";
-export const BitTrue = "b'1'";
+export const Bit = {
+    False: "b'0'",
+    True: "b'1'",
+};

@@ -9,7 +9,7 @@ import { Receipt } from './Receipt.entity';
 import { TransferItem } from './TransferItem.entity';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 import { WithDateEntity } from './WithDate.partialEntity';
-import { BitFalse } from '../constants/booleanBuffer.const';
+import { Bit } from '../constants/booleanBuffer.const';
 import { User } from './User.entity';
 
 @Entity()
@@ -81,10 +81,10 @@ export class Transfer extends WithDateEntity {
     @JoinColumn({ name: 'target_account_id' })
     public targetAccount!: Account | null;
 
-    @Column({ type: 'bit', nullable: false, default: BitFalse, transformer: new BooleanTransformer() })
+    @Column({ type: 'bit', nullable: false, default: Bit.False, transformer: new BooleanTransformer() })
     public isEthereal!: boolean;
 
-    @Column({ type: 'bit', nullable: false, default: BitFalse, transformer: new BooleanTransformer() })
+    @Column({ type: 'bit', nullable: false, default: Bit.False, transformer: new BooleanTransformer() })
     public isFlagged!: boolean;
 
     @Column({ type: 'json', nullable: false, default: 'json_object()' })
