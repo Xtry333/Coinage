@@ -11,6 +11,13 @@ import { DecimalToNumberTransformer } from './transformers/decimal-to-number.tra
 import { WithDateEntity } from './WithDate.partialEntity';
 import { Bit } from '../constants/booleanBuffer.const';
 import { User } from './User.entity';
+import { Currency } from './Currency.entity';
+
+export enum TransferTypeEnum {
+    INCOME = 'INCOME',
+    OUTCOME = 'OUTCOME',
+    INTERNAL = 'INTERNAL',
+}
 
 @Entity()
 export class Transfer extends WithDateEntity {
@@ -27,6 +34,10 @@ export class Transfer extends WithDateEntity {
 
     @Column({ name: 'amount', type: 'decimal', precision: 20, scale: 2, default: 0, nullable: false, transformer: new DecimalToNumberTransformer() })
     public amount!: number;
+
+    @ManyToOne(() => Currency, { eager: true, nullable: false, onUpdate: 'RESTRICT', onDelete: 'RESTRICT' })
+    @JoinColumn({ name: 'currency_symbol' })
+    public currency!: Currency;
 
     @Column({
         name: 'date',
@@ -55,7 +66,7 @@ export class Transfer extends WithDateEntity {
 
     @ManyToOne(() => User, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'owner_user_id' })
-    public ownerUser?: User | null;
+    public ownerUser!: User | null;
 
     @Column({ name: 'receipt_id', nullable: true })
     public receiptId!: number | null;
@@ -74,10 +85,10 @@ export class Transfer extends WithDateEntity {
     @JoinColumn({ name: 'account_id' })
     public originAccount!: Account;
 
-    @Column({ name: 'target_account_id', nullable: true })
+    @Column({ name: 'target_account_id', nullable: false })
     public targetAccountId!: number | null;
 
-    @ManyToOne(() => Account, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
+    @ManyToOne(() => Account, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'target_account_id' })
     public targetAccount!: Account | null;
 
@@ -105,7 +116,7 @@ interface TransferMetadata {
     targetDate?: string;
 }
 
-export enum TransferTypeEnum {
-    INCOME = 'INCOME',
-    OUTCOME = 'OUTCOME',
-}
+// export enum TransferTypeEnum {
+//     INCOME = 'INCOME',
+//     OUTCOME = 'OUTCOME',
+// }

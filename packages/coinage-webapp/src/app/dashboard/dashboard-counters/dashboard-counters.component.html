@@ -2,7 +2,7 @@
     <app-big-counter
         *ngFor="let item of balance; trackBy: trackByAccountId"
         [value]="item.balance"
-        [topHeader]="'PLN'"
+        [topHeader]="item.currencySymbol"
         [botHeader]="item.name"
     ></app-big-counter>
     <app-big-counter [value]="sumPkoWilla" [topHeader]="'PLN'" [botHeader]="'PKO+'"></app-big-counter>

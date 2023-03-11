@@ -1,4 +1,5 @@
 import { Account } from '../../app/entities/Account.entity';
+import { createMockCurrency } from './currency.mock';
 
 export function createMockAccounts(count: number): Account[] {
     const accounts: Account[] = [];
@@ -12,7 +13,7 @@ export function createMockAccount(id: number): Account {
     const account = new Account();
     account.id = id;
     account.name = `Account ${id}`;
-    account.currencySymbol = `PLN`;
+    account.currency = createMockCurrency(`PLN`);
     account.isActive = true;
     account.isContractorAccount = false;
     return account;

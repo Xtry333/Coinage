@@ -40,6 +40,7 @@
         "format:check": "nx format:check",
         "typeorm": "node -r dotenv/config -r ts-node node_modules/typeorm/cli-ts-node-commonjs -d packages/coinage-api/src/app/typeorm.config.ts",
         "migration:create": "typeorm migration:create",
+        "migration:generate": "typeorm migration:generate --",
         "update": "run-s update:latest format",
         "update:latest": "nx migrate latest",
         "workspace-generator": "nx workspace-generator",
@@ -85,7 +86,7 @@
         "socket.io": "^4.5.4",
         "socket.io-client": "^4.5.4",
         "tslib": "^2.5.0",
-        "typeorm": "^0.3.11",
+        "typeorm": "^0.3.12",
         "typeorm-naming-strategies": "^4.1.0",
         "zone.js": "~0.12.0"
     },

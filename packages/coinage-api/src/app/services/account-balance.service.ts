@@ -26,11 +26,14 @@ export class AccountBalanceService {
         //     account.balance = incomingBalance - outgoingBalance;
         // }
 
-        return (await this.accountDao.getBalanceNew({ accountIds }, asOfDate)).map((b) => ({
+        const balance = (await this.accountDao.getBalanceNew({ accountIds }, asOfDate)).map((b) => ({
             accountId: b.accountId,
             name: b.accountName,
             balance: parseFloat(b.balance),
+            currencySymbol: b.currencySymbol,
         }));
+
+        return balance;
     }
 
     public async getAccountsBalanceForUserId(userId: number) {

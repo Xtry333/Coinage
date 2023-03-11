@@ -37,10 +37,7 @@ export class ReceiptsController {
             totalTransferred: this.calculateTotalAmount(receipt.transfers, false),
             contractorId: receipt.contractor?.id ?? null,
             contractorName: receipt.contractor?.name ?? null,
-            allTransfers: receipt.transfers
-                .map(this.toTransferDTO)
-                .sort((a, b) => a.date.getTime() - b.date.getTime())
-                .reverse(),
+            allTransfers: receipt.transfers.map(this.toTransferDTO),
         };
     }
 

@@ -8,7 +8,12 @@ export class DatabaseSourceService {
 
     public async queryWithParams<T>(sql: string, params: ObjectLiteral, cls: ClassConstructor<T>): Promise<T[]>;
     public async queryWithParams<T>(sql: string, params: ObjectLiteral, cls: ClassConstructor<T>): Promise<T> {
-        const escapedQueryWithParams = this.dataSource.driver.escapeQueryWithParameters(sql, params, {});
+        const cleanSql = this.removeNewLinesWhiteSpaces(sql);
+        const escapedQueryWithParams = this.dataSource.driver.escapeQueryWithParameters(cleanSql, params, {});
         return plainToInstance(cls, this.dataSource.query(...escapedQueryWithParams));
+    }
+
+    private removeNewLinesWhiteSpaces(raw: string): string {
+        return raw.trim().replace(/(\r\n|\n|\r|\s+)/gm, ' ');
     }
 }

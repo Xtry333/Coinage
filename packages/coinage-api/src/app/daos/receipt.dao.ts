@@ -16,7 +16,15 @@ export class ReceiptDao extends BaseDao {
     }
 
     public async getById(id: number): Promise<Receipt> {
-        let receipt = await this.receiptRepository.findOneBy({ id: Equal(id) });
+        let receipt = await this.receiptRepository.findOne({
+            where: { id: Equal(id) },
+            order: {
+                transfers: {
+                    date: 'DESC',
+                    description: 'ASC',
+                },
+            },
+        });
         receipt = this.validateNotNullById(Receipt.name, id, receipt);
 
         this.templateNameMapperService.mapTransfersTemplateNames(receipt.transfers);

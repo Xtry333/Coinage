@@ -1,6 +1,7 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { Bit } from '../constants/booleanBuffer.const';
 import { Contractor } from './Contractor.entity';
+import { Currency } from './Currency.entity';
 
 import { BooleanTransformer } from './transformers/boolean.transformer';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
@@ -19,8 +20,9 @@ export class Account {
     @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
 
-    @Column({ name: 'currency_symbol', type: 'varchar', length: 5, nullable: false })
-    public currencySymbol!: string;
+    @ManyToOne(() => Currency, { eager: true, nullable: false, onUpdate: 'RESTRICT', onDelete: 'RESTRICT' })
+    @JoinColumn({ name: 'currency_symbol' })
+    public currency!: Currency;
 
     @Column({ nullable: true })
     public userId!: number;

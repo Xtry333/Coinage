@@ -5,7 +5,7 @@ import {
     GetFilteredTransfersRequest,
     TransferDTO,
 } from '@coinage-app/interfaces';
-import { Body, Controller, Get, Param, Post, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';

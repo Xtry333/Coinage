@@ -8,6 +8,7 @@ import {
     TransferDetailsDTO,
     TransferDTO,
     CreateEditTransferModelDTO,
+    TransferType,
 } from '@coinage-app/interfaces';
 import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
 
@@ -86,20 +87,21 @@ export class TransferController {
 
         const receiptDto: ReceiptDTO | null = receipt
             ? {
-                  id: receipt.id ?? 0,
-                  description: receipt.description ?? '',
-                  amount: receipt.amount ?? null,
+                  id: receipt.id,
+                  description: receipt.description,
+                  amount: receipt.amount,
                   date: receipt.date,
                   contractor: receipt.contractor?.name ?? '',
                   transferIds: receipt.transfers.map((t) => t.id) ?? [],
               }
             : null;
 
+        const transferType = transfer.originAccount.userId === transfer.targetAccount?.userId ? TransferType.INTERNAL.value : transfer.type;
         return {
             id: transfer.id,
             description: transfer.description,
             amount: transfer.amount,
-            type: transfer.category.type,
+            type: transferType,
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
             contractor: transfer.contractor?.name,
@@ -132,11 +134,12 @@ export class TransferController {
     }
 
     private toTransferDTO(transfer: Transfer): TransferDTO {
+        const transferType = transfer.originAccount.userId === transfer.targetAccount?.userId ? TransferType.INTERNAL.value : transfer.type;
         return {
             id: transfer.id,
             description: transfer.description,
             amount: transfer.amount,
-            type: transfer.type,
+            type: transferType,
             categoryId: transfer.category?.id,
             categoryName: transfer.category?.name,
             contractorId: transfer.contractor?.id ?? null,
@@ -292,16 +295,19 @@ export class TransferController {
         if (transfer.metadata.refundedBy || transfer.metadata.refundTargetId) {
             throw new Error('Cannot refund a refund or a refund target.');
         }
+
         const refundTransferEntity = new Transfer();
         refundTransferEntity.description = `Refund: ${transfer.description}`;
         refundTransferEntity.amount = transfer.amount;
         refundTransferEntity.type = refundCategory.type;
         refundTransferEntity.categoryId = refundCategory.id;
         refundTransferEntity.date = refundDate;
-        refundTransferEntity.originAccountId = transfer.originAccountId;
+        refundTransferEntity.originAccountId = transfer.targetAccountId ?? 0;
+        refundTransferEntity.targetAccountId = transfer.originAccountId;
         refundTransferEntity.metadata.refundTargetId = refundTargetId;
         refundTransferEntity.contractor = transfer.contractor;
         refundTransferEntity.receipt = transfer.receipt;
+        refundTransferEntity.ownerUser = transfer.ownerUser;
 
         const inserted = await this.transferDao.save(refundTransferEntity);
 

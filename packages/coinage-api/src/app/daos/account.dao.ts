@@ -188,6 +188,7 @@ ORDER BY changeYear DESC, changeMonth DESC
         {
             accountId: number;
             accountName: string;
+            currencySymbol: string;
             balance: string;
             userId: number;
         }[]
@@ -195,25 +196,28 @@ ORDER BY changeYear DESC, changeMonth DESC
         const asOfDateString = asOfDate ? this.dateParser.toUTCString(asOfDate) : this.dateParser.getToday();
         const query = this.dataSource.driver.escapeQueryWithParameters(
             `
-SELECT
-	oa.id AS 'accountId',
-	oa.name AS 'accountName',
-	(
-        (SELECT
-            IFNULL(SUM(ot.amount), 0)
-        FROM transfer ot
-        WHERE ot.target_account_id = oa.id
-            AND ot.date <= :asOfDate)
-		- SUM(IFNULL(t.amount, 0))
-	) AS 'balance',
-	oa.user_id AS 'userId'
-FROM account AS oa
-LEFT JOIN transfer AS t ON t.account_id = oa.id
-#LEFT JOIN account ta ON t.target_account_id = ta.id
-WHERE t.date <= :asOfDate
-    ${filter.accountIds ? `AND oa.id IN (:accountIds)` : ``}
-    ${filter.userId ? `AND oa.user_id = :userId` : ``}
-GROUP BY oa.id
+            SELECT
+                oa.id AS 'accountId',
+                oa.name AS 'accountName',
+                c.symbol AS 'currencySymbol',
+                (
+                    (SELECT
+                        IFNULL(SUM(ot.amount), 0)
+                    FROM transfer ot
+                    WHERE ot.target_account_id = oa.id
+                        AND ot.currency_symbol = currencySymbol
+                        AND ot.date <= :asOfDate)
+                    - SUM(IFNULL(t.amount, 0))
+                ) AS 'balance',
+                oa.user_id AS 'userId'
+            FROM account AS oa
+            LEFT JOIN currency AS c ON oa.currency_symbol = c.symbol
+            LEFT JOIN transfer AS t ON t.account_id = oa.id
+            #LEFT JOIN account ta ON t.target_account_id = ta.id
+            WHERE (t.date <= :asOfDate OR t.date IS NULL)
+                ${filter.accountIds ? `AND oa.id IN (:accountIds)` : ``}
+                ${filter.userId ? `AND oa.user_id = :userId` : ``}
+            GROUP BY oa.id, oa.currency_symbol
         `,
             { accountIds: filter.accountIds, asOfDate: asOfDateString, userId: filter.userId },
             {}

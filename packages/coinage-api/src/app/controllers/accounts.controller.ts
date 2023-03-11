@@ -67,6 +67,7 @@ export class AccountsController {
                 {
                     accountId: 0,
                     name: '',
+                    currencySymbol: '',
                     balance: 0,
                 },
             ];

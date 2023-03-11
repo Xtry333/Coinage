@@ -47,11 +47,13 @@ export class TransferDetailsDTO {
 export enum TransferTypeEnum {
     INCOME = 'INCOME',
     OUTCOME = 'OUTCOME',
+    INTERNAL = 'INTERNAL',
 }
 
 export class TransferType {
     public static readonly INCOME = new TransferType('Income', TransferTypeEnum.INCOME, '+', 1);
     public static readonly OUTCOME = new TransferType('Expense', TransferTypeEnum.OUTCOME, '−', -1);
+    public static readonly INTERNAL = new TransferType('Internal', TransferTypeEnum.INTERNAL, '~', 1);
 
     public constructor(
         public readonly displayName: string,

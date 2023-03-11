@@ -1,4 +1,4 @@
-import { GetFilteredTransfersRequest, TransferDTO } from '@coinage-app/interfaces';
+import { GetFilteredTransfersRequest, TransferDTO, TransferType } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
@@ -38,16 +38,26 @@ export class TransfersService {
             id: transfer.id,
             description: transfer.description,
             amount: transfer.amount,
-            type: transfer.type,
+            type: this.getTransferType(transfer).value,
             categoryId: transfer.category?.id,
             categoryName: transfer.category?.name,
             contractorId: transfer.contractor?.id ?? null,
             contractorName: transfer.contractor?.name ?? null,
             accountId: transfer.originAccountId,
-            accountName: `${transfer.originAccount.name} [${transfer.originAccount.currencySymbol}]`,
+            accountName: `${transfer.originAccount.name} [${transfer.currency.symbol}]`,
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
         };
+    }
+
+    private getTransferType(transfer: Transfer): TransferType {
+        if (transfer.originAccount.userId === transfer.targetAccount?.userId) {
+            return TransferType.INTERNAL;
+        }
+        if (transfer.originAccount.userId === transfer.ownerUserId) {
+            return TransferType.OUTCOME;
+        }
+        return TransferType.INCOME;
     }
 }
