@@ -207,9 +207,19 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     };
                 });
         }
-        if (this.showTodayMarker && this.filter.showPlanned) {
-            this.placeTodayMarkerRow();
+        if (this.showFilters) {
+            if (this.showTodayMarker && this.filter.showPlanned) {
+                this.placeTodayMarkerRow();
+            }
+        } else {
+            if (this.showTodayMarker) {
+                this.placeTodayMarkerRow();
+            }
         }
+    }
+
+    public onPageChanged(page: number) {
+        console.log(page);
     }
 
     private placeTodayMarkerRow(): void {
@@ -275,6 +285,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             contractorName: null,
             contractorId: null,
             amount: 0,
+            currency: '',
             categoryName: '',
             description: '',
             receiptId: 0,

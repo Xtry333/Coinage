@@ -38,6 +38,7 @@ export class TransfersService {
             id: transfer.id,
             description: transfer.description,
             amount: transfer.amount,
+            currency: transfer.currency.symbol,
             type: this.getTransferType(transfer).value,
             categoryId: transfer.category?.id,
             categoryName: transfer.category?.name,

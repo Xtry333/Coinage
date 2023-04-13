@@ -83,6 +83,8 @@
                 [selectedCategoryId]="selectedTransferInputs.categoryId ?? null"
                 [preselectedItems]="itemsInTransfer"
             ></app-item-shopping-list>
+            <input id="overrideTotalCostOnChange" type="checkbox" [(ngModel)]="shouldOverrideTotalCostOnChange" />
+            <label for="overrideTotalCostOnChange">Override Total Cost On Item Change</label>
         </div>
     </div>
 </div>

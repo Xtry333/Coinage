@@ -1,7 +1,5 @@
 import {
     BaseResponseDTO,
-    CreateInternalTransferDTO,
-    CreateInternalTransferDTOResponse,
     ReceiptDTO,
     RefundTransferDTO,
     SplitTransferDTO,
@@ -74,7 +72,7 @@ export class TransferController {
         try {
             refundTransfer = transfer.metadata.refundedBy ? await this.transferDao.getById(Number(transfer.metadata.refundedBy)) : undefined;
         } catch (e) {
-            console.log(e);
+            console.error(e);
             delete transfer.metadata.refundedBy;
             this.transferDao.save(transfer);
         }
@@ -139,6 +137,7 @@ export class TransferController {
             id: transfer.id,
             description: transfer.description,
             amount: transfer.amount,
+            currency: transfer.currency.symbol,
             type: transferType,
             categoryId: transfer.category?.id,
             categoryName: transfer.category?.name,
@@ -198,12 +197,13 @@ export class TransferController {
 
         entity.description = transfer.description === undefined ? category?.name : transfer.description;
         entity.amount = transfer.amount;
+        entity.currency = account.currency;
         entity.date = transfer.date;
         entity.category = category;
         entity.categoryId = category.id;
         entity.type = category.type;
 
-        if (entity.ownerUserId === null) {
+        if (entity.ownerUserId === undefined) {
             entity.ownerUser = user;
             entity.ownerUserId = user.id;
         }
@@ -353,61 +353,5 @@ export class TransferController {
         // TODO: On remove delete refundedBy metadata from target
         //const refundTransfer = transfer.metadata.refundedBy ? await this.transferDao.getById(Number(transfer.metadata.refundedBy)) : undefined;
         return (await this.transferDao.deleteById(id)).affected == 1;
-    }
-
-    @Post('create/internal/:originId/:targetId')
-    public async createInternalTransfer(
-        @Body() transfer: CreateInternalTransferDTO,
-        @Param('originId') originId: number,
-        @Param('targetId') targetId: number
-    ): Promise<CreateInternalTransferDTOResponse> {
-        if (!originId || originId < 1 || !targetId || targetId < 1) {
-            throw new BadRequestException(TransferController.INVALID_ID_MESSAGE);
-        }
-
-        console.log(transfer);
-        console.log(transfer.date);
-        console.log(originId, targetId);
-
-        const originAccount = await this.accountDao.getById(originId);
-        const targetAccount = await this.accountDao.getById(targetId);
-
-        if (!originAccount) {
-            throw new Error(`Cannot find origin account id ${originId}`);
-        }
-        if (!targetAccount) {
-            throw new Error(`Cannot find target account id ${targetId}`);
-        }
-
-        const categoryFrom = await this.categoryDao.getBySystemTag('system-outcome');
-        const categoryTo = await this.categoryDao.getBySystemTag('system-income');
-
-        const entityFrom = new Transfer(),
-            entityTo = new Transfer();
-
-        entityFrom.description = transfer.description;
-        entityFrom.amount = transfer.amount;
-        entityFrom.categoryId = categoryFrom.id;
-        entityFrom.originAccountId = originAccount.id;
-        entityFrom.date = transfer.date;
-        entityFrom.type = categoryFrom.type;
-
-        entityTo.description = transfer.description;
-        entityTo.amount = transfer.amount;
-        entityTo.categoryId = categoryTo.id;
-        entityTo.originAccountId = targetAccount.id;
-        entityTo.date = transfer.date;
-        entityTo.type = categoryTo.type;
-
-        const insertedFrom = await this.transferDao.save(entityFrom);
-        const insertedTo = await this.transferDao.save(entityTo);
-
-        entityFrom.metadata.otherTransferId = insertedTo.id;
-        entityTo.metadata.otherTransferId = insertedFrom.id;
-
-        await this.transferDao.save(entityFrom);
-        await this.transferDao.save(entityTo);
-
-        return { originTransferId: insertedFrom.id, targetTransferId: insertedTo.id };
     }
 }

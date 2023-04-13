@@ -13,7 +13,7 @@ export class LangService {
     private lang: KeyStringVal = {};
 
     public constructor(private readonly http: HttpClient) {
-        lastValueFrom(http.get<KeyStringVal>('/assets/lang/messages.json')).then((lang) => (this.lang = lang));
+        lastValueFrom(http.get<KeyStringVal>('/assets/lang/messages-en.json')).then((lang) => (this.lang = lang));
     }
 
     public getString(path: string): string {

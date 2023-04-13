@@ -15,6 +15,9 @@
                     <span>Unit Price</span>
                 </th>
                 <th class="align-right">
+                    <span>Standard Price</span>
+                </th>
+                <th class="align-right">
                     <span>Quantity</span>
                 </th>
                 <th class="align-right">
@@ -44,6 +47,7 @@
                     {{ details.transferContractorName | ifNull : EMPTY_CONTRACTOR }}
                 </td>
                 <td class="nowrap currency">{{ details.unitPrice | plnCurrency }}</td>
+                <td>{{ getStandardPrice(details) }}</td>
                 <td>{{ details.quantity }}</td>
                 <td class="nowrap currency">{{ details.unitPrice * details.quantity | plnCurrency }}</td>
                 <td>{{ details.accountName }}</td>
@@ -52,7 +56,10 @@
                 </td>
             </tr>
             <tr *ngIf="showSummary && hasAnyRows && totalPrice > 0" class="sum-row total-price top-border">
-                <td colspan="3">Total</td>
+                <td>Total</td>
+                <td></td>
+                <td>{{ totalItems }}</td>
+                <td>Avg: {{ (totalQuantity / totalItems).toFixed(3) }}/T</td>
                 <td>{{ totalQuantity }}</td>
                 <td class="currency">{{ totalPrice | plnCurrency }}</td>
                 <td colspan="2"></td>

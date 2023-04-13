@@ -26,10 +26,10 @@ export class ItemsController {
     public async getItemById(@Param('itemId') itemId: number): Promise<ItemDetailsDTO> {
         const item = await this.itemDao.getById(itemId),
             category = await item.category,
-            container = item.containerSize && item.containerSizeUnit ? new ItemContainer() : null;
+            container = item.containerSizeUnit ? new ItemContainer() : null;
 
-        if (container && item.containerSize && item.containerSizeUnit) {
-            container.size = item.containerSize;
+        if (container && item.containerSizeUnit) {
+            container.size = item.containerSize ?? undefined;
             container.unit = item.containerSizeUnit;
         }
 

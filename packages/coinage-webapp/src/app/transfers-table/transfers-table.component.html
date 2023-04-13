@@ -9,7 +9,7 @@
             <label for="showFlaggedCheckbox">Only flagged transfers</label>
         </div>
     </div>
-    <app-pagination class="pull-right" *ngIf="showFilters && lastPageNumber" [lastPage]="lastPageNumber"></app-pagination>
+    <app-pagination class="pull-right" *ngIf="showFilters && lastPageNumber" [lastPage]="lastPageNumber" (pageChange)="onPageChanged($event)"></app-pagination>
     <table class="transfers-table">
         <caption *ngIf="isHeaderDisplayed">
             <span>{{ header }}</span>

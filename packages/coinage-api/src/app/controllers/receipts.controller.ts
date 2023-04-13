@@ -55,6 +55,7 @@ export class ReceiptsController {
             date: transfer.date,
             description: transfer.description,
             amount: Number(transfer.amount),
+            currency: transfer.currency.symbol,
             type: transfer.type,
             categoryId: transfer.category.id,
             categoryName: transfer.category.name,

@@ -41,7 +41,7 @@ export class TransferDao extends BaseDao {
 
         const transfers = await this.transferRepository.find({
             where: filter,
-            order: { date: 'DESC', id: 'DESC' },
+            order: { date: 'DESC', description: 'ASC' },
             take: params.rowsPerPage,
             skip: params.rowsPerPage * (params.page - 1),
         });
@@ -154,6 +154,7 @@ export class TransferDao extends BaseDao {
 
     public async save(transfer: Writeable<Transfer>): Promise<Transfer> {
         transfer.editedDate = new Date();
+        console.log(transfer.editedDate);
         return await this.transferRepository.save(transfer);
     }
 

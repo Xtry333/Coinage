@@ -7,8 +7,8 @@ import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/
 })
 export class BigCounterComponent implements OnChanges, OnDestroy {
     @Input() public value = 0;
-    @Input() public topHeader = '';
-    @Input() public botHeader = '';
+    @Input() public upperLabel = '';
+    @Input() public lowerLabel = '';
     @Input() public animate = true;
 
     public internalValue = 0;
@@ -33,10 +33,10 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
     }
 
     public animateCounterValue(targetValue: number) {
-        const delta = Math.abs(targetValue - this.internalValue) / 25;
-        if (this.internalValue + delta < targetValue && this.internalValue <= targetValue && delta > 0.0001) {
+        const delta = Math.abs(targetValue - this.internalValue) / 15;
+        if (this.internalValue + delta < targetValue && this.internalValue <= targetValue && delta > 0.001) {
             this.internalValue += delta;
-        } else if (this.internalValue + delta > targetValue && this.internalValue >= targetValue && delta > 0.0001) {
+        } else if (this.internalValue + delta > targetValue && this.internalValue >= targetValue && delta > 0.001) {
             this.internalValue -= delta;
         } else {
             this.internalValue = targetValue;

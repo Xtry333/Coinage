@@ -6,8 +6,8 @@ import { DataSource, ObjectLiteral } from 'typeorm';
 export class DatabaseSourceService {
     public constructor(private readonly dataSource: DataSource) {}
 
-    public async queryWithParams<T>(sql: string, params: ObjectLiteral, cls: ClassConstructor<T>): Promise<T[]>;
-    public async queryWithParams<T>(sql: string, params: ObjectLiteral, cls: ClassConstructor<T>): Promise<T> {
+    public async queryArrWithParams<T>(sql: string, params: ObjectLiteral, cls: ClassConstructor<T>): Promise<T[]>;
+    public async queryArrWithParams<T>(sql: string, params: ObjectLiteral, cls: ClassConstructor<T>): Promise<T> {
         const cleanSql = this.removeNewLinesWhiteSpaces(sql);
         const escapedQueryWithParams = this.dataSource.driver.escapeQueryWithParameters(cleanSql, params, {});
         return plainToInstance(cls, this.dataSource.query(...escapedQueryWithParams));

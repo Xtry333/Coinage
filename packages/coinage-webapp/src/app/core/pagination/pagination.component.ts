@@ -1,14 +1,10 @@
-import { Component, Input, OnChanges, OnInit, SimpleChange } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChange } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 
-// interface PageNumber {
-//     value: number;
-//     isSpacer: boolean;
-// }
-
-interface PaginationQueryParams {
-    page: number;
-    rowsPerPage: number;
+export interface PaginationQueryParams {
+    page: string;
+    rows: string;
 }
 
 type PageNumber =
@@ -28,21 +24,31 @@ type PageNumber =
     templateUrl: './pagination.component.html',
     styleUrls: ['./pagination.component.scss'],
 })
-export class PaginationComponent implements OnInit, OnChanges {
+export class PaginationComponent implements OnInit, OnChanges, OnDestroy {
     @Input() public firstPage = 1;
     @Input() public currentPage = 1;
     @Input() public lastPage = 1;
+    @Input() public targetPage = 1;
 
+    @Output() public pageChange = new EventEmitter<number>();
+
+    public selectedPage = 1;
     public pageNumbers: PageNumber[] = [{ value: this.firstPage, isActive: false }];
+
+    private queryParamsSubscription?: Subscription;
+
+    private pageNumber = 1;
+    private rowsPerPage = 100;
 
     public constructor(private readonly router: Router, private readonly route: ActivatedRoute) {}
 
     public ngOnInit(): void {
-        this.route.queryParams.subscribe((params) => {
-            const { page } = params as PaginationQueryParams;
-            const currentPageNumber = Number(page);
-            if (currentPageNumber > 0 && currentPageNumber <= this.lastPage) {
-                this.currentPage = currentPageNumber;
+        this.queryParamsSubscription = this.route.queryParams.subscribe((params) => {
+            const { page, rows } = params as PaginationQueryParams;
+            this.pageNumber = Number(page) || this.pageNumber;
+            this.rowsPerPage = Number(rows) || this.rowsPerPage;
+            if (this.pageNumber > 0 && this.pageNumber <= this.lastPage) {
+                this.currentPage = this.pageNumber;
             } else {
                 this.currentPage = 1;
                 this.goToPage(this.currentPage);
@@ -55,6 +61,10 @@ export class PaginationComponent implements OnInit, OnChanges {
         if (changes.lastPage.currentValue !== changes.lastPage.previousValue) {
             this.calculatePageNumbers();
         }
+    }
+
+    public ngOnDestroy(): void {
+        this.queryParamsSubscription?.unsubscribe();
     }
 
     private calculatePageNumbers(showAll: boolean = false) {
@@ -87,6 +97,8 @@ export class PaginationComponent implements OnInit, OnChanges {
     public onClickChangePage(event: MouseEvent, pageNumber: PageNumber) {
         if (!pageNumber.isSpacer) {
             this.currentPage = pageNumber.value;
+            this.selectedPage = pageNumber.value;
+            this.pageChange.emit(this.currentPage);
             this.goToPage(pageNumber.value);
             this.calculatePageNumbers();
         } else {
@@ -95,10 +107,13 @@ export class PaginationComponent implements OnInit, OnChanges {
     }
 
     private goToPage(pageNumber: number) {
+        const queryParams: PaginationQueryParams = {
+            page: pageNumber.toString(),
+            rows: this.rowsPerPage.toString(),
+        };
+
         this.router.navigate([], {
-            queryParams: {
-                page: pageNumber,
-            },
+            queryParams,
         });
     }
 }

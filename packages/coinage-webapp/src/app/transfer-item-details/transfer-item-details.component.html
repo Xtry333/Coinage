@@ -20,7 +20,7 @@
                 <tr *ngIf="item.categoryId">
                     <th>Category</th>
                     <td>
-                        <span>{{ item?.categoryName }}</span>
+                        <span>{{ item.categoryName }}</span>
                     </td>
                 </tr>
                 <tr *ngIf="item.container">
@@ -33,5 +33,5 @@
         </table>
     </div>
 
-    <app-transfer-items-table [header]="'Transfers with Item'" [transfersWithItem]="item.transfersWithItems"></app-transfer-items-table>
+    <app-transfer-items-table [header]="'Transfers with Item'" [transfersWithItem]="item.transfersWithItems" [item]="item"></app-transfer-items-table>
 </div>

@@ -227,18 +227,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
     public get totalChange() {
         return this.totalAmountPerMonth.reduce((a, t) => a + t.incomes - t.outcomes, 0);
     }
-
-    public createInternalTransfer(desc: string, amount: number, date: Date, id1: number, id2: number) {
-        this.coinageData
-            .postCreateInternalTransfer(
-                {
-                    description: desc,
-                    amount: amount,
-                    date: date,
-                },
-                id1,
-                id2
-            )
-            .subscribe();
-    }
 }

@@ -7,8 +7,6 @@ import {
     CreateEditCategoryDTO,
     CreateEditContractorDTO,
     CreateEditTransferModelDTO,
-    CreateInternalTransferDTO,
-    CreateInternalTransferDTOResponse,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
     MonthlyUserStatsDTO,
@@ -135,13 +133,6 @@ export class CoinageDataService {
 
     public postDuplicateTransfer(transferId: number) {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/duplicate`, {});
-    }
-
-    public postCreateInternalTransfer(request: CreateInternalTransferDTO, originAccountId: number, targetAccountId: number) {
-        return this.http.post<CreateInternalTransferDTOResponse>(
-            `${CoinageDataService.API_URL}transfer/create/internal/${originAccountId}/${targetAccountId}`,
-            request
-        );
     }
 
     public postCreateCategory(request: CreateEditCategoryDTO) {

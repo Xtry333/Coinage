@@ -1,0 +1,25 @@
+<div class="top-nav-container">
+    <nav>
+        <div class="logo">
+            <a routerLink="/">
+                <img alt="Coinage logo" width="75" [src]="logo" />
+                <h1>{{ title }}</h1>
+            </a>
+        </div>
+        <ul class="nav-list">
+            <li><a [routerLink]="NavigatorPages.Dashboard()">Dashboard</a></li>
+            <li><a [routerLink]="NavigatorPages.TransfersList()">Transfers</a></li>
+            <li><a [routerLink]="'/manage/categories'">Manage Categories</a></li>
+            <li><a routerLink="/transfer/add">Add Transfer</a></li>
+            <!-- <li><a (click)="toggleTrinketModal()">Add Transfer (Modal)</a></li> -->
+            <li><a routerLink="/manage/accounts">Account Settings</a></li>
+        </ul>
+    </nav>
+    <div class="datetime">
+        <span>
+            <fa-icon class="icon" [icon]="userIcon"></fa-icon>
+            <span class="username">{{ username }}</span>
+        </span>
+        <span>{{ dateTime }}</span>
+    </div>
+</div>

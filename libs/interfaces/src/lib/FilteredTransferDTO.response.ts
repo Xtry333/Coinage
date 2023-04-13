@@ -13,6 +13,7 @@ export class TransferDTO {
     @IsNumber() public id!: number;
     @IsString() public description!: string;
     @IsNumber() public amount!: number;
+    @IsString() public currency!: string;
     @IsEnum(TransferTypeEnum) public type!: TransferTypeEnum;
     @IsNumber() public categoryId!: number;
     @IsString() public categoryName!: string;

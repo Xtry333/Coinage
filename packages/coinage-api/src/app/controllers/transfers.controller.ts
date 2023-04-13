@@ -1,10 +1,4 @@
-import {
-    CreateInternalTransferDTO,
-    CreateInternalTransferDTOResponse,
-    FilteredTransfersDTO,
-    GetFilteredTransfersRequest,
-    TransferDTO,
-} from '@coinage-app/interfaces';
+import { FilteredTransfersDTO, GetFilteredTransfersRequest, TransferDTO } from '@coinage-app/interfaces';
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -96,49 +90,4 @@ export class TransfersController {
         const millisecsInDay = 86400000;
         return Math.ceil((((date as any) - (onejan as any)) / millisecsInDay + onejan.getDay() + 1) / 7);
     };
-
-    @Post('create/internal/:originId/:targetId')
-    public async createInternalTransfer(
-        @Body() transfer: CreateInternalTransferDTO,
-        @Param('originId') originId: string,
-        @Param('targetId') targetId: string
-    ): Promise<CreateInternalTransferDTOResponse> {
-        console.log(transfer);
-        console.log(transfer.date);
-        console.log(originId, targetId);
-
-        const originAccount = await this.accountDao.getById(parseInt(originId));
-        const targetAccount = await this.accountDao.getById(parseInt(targetId));
-
-        if (!originAccount) {
-            throw new Error(`Cannot find origin account id ${originId}`);
-        }
-        if (!targetAccount) {
-            throw new Error(`Cannot find target account id ${targetId}`);
-        }
-
-        const categoryFrom = await this.categoryDao.getBySystemTag('system-outcome');
-        const categoryTo = await this.categoryDao.getBySystemTag('system-income');
-
-        const entityFrom = new Transfer(),
-            entityTo = new Transfer();
-
-        entityFrom.description = transfer.description;
-        entityFrom.amount = transfer.amount;
-        entityFrom.categoryId = categoryFrom.id;
-        entityFrom.originAccountId = originAccount.id;
-        entityFrom.date = transfer.date;
-        entityFrom.type = categoryFrom.type;
-
-        entityTo.description = transfer.description;
-        entityTo.amount = transfer.amount;
-        entityTo.categoryId = categoryTo.id;
-        entityTo.originAccountId = targetAccount.id;
-        entityTo.date = transfer.date;
-        entityTo.type = categoryTo.type;
-
-        const insertedFrom = await this.transferDao.save(entityFrom);
-        const insertedTo = await this.transferDao.save(entityTo);
-        return { originTransferId: insertedFrom.id, targetTransferId: insertedTo.id };
-    }
 }

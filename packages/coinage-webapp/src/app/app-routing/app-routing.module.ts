@@ -1,8 +1,6 @@
 import { RouterModule, Routes } from '@angular/router';
 
-import { BrowserModule } from '@angular/platform-browser';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
-import { CommonModule } from '@angular/common';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from '../dashboard/dashboard.component';
 import { MonthSummaryComponent } from '../month-summary/month-summary.component';
@@ -75,8 +73,8 @@ const routes: Routes = [
 ];
 
 @NgModule({
+    imports: [RouterModule.forRoot(routes)],
     declarations: [],
-    imports: [BrowserModule, CommonModule, RouterModule.forRoot(routes)],
     exports: [],
 })
 export class AppRoutingModule {}

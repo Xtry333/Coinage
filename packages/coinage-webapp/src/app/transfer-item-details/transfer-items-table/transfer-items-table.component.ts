@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 
 import { IconDefinition, faReceipt } from '@fortawesome/free-solid-svg-icons';
-import { TransferDTO, TransferItemDTO, TransferWithItemDetailsDTO } from '@coinage-app/interfaces';
+import { ItemDetailsDTO, TransferDTO, TransferItemDTO, TransferWithItemDetailsDTO } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { CoinageLocalStorageService } from '../../services/coinage-local-storage.service';
@@ -11,6 +11,7 @@ export enum TableColumn {
     Transfer = 'Transfer',
     Contractor = 'Contractor',
     UnitPrice = 'Unit Price',
+    StandardPrice = 'StandardPrice',
     Quantity = 'Quantity',
     Account = 'Account',
     Date = 'Date',
@@ -38,6 +39,7 @@ export class TransferItemsTableComponent {
 
     @Input() public header?: string;
     @Input() public transfersWithItem: TransferWithItemDetailsDTO[] = [];
+    @Input() public item?: ItemDetailsDTO;
     @Input() public showFilters?: boolean = false;
     @Input() public showSummary?: boolean = true;
     @Input() public showReceiptIcon?: boolean = true;
@@ -51,6 +53,11 @@ export class TransferItemsTableComponent {
         return item.transferId.toString() + item.unitPrice.toString();
     }
 
+    public getStandardPrice(details: TransferWithItemDetailsDTO): string {
+        const standardPrice = details.unitPrice / (this.item?.container?.size ?? 1);
+        return `${standardPrice.toFixed(3)} zł/${this.item?.container?.unit}`;
+    }
+
     public get isHeaderDisplayed(): boolean {
         return this.header !== undefined;
     }
@@ -61,6 +68,10 @@ export class TransferItemsTableComponent {
 
     public get totalQuantity(): number {
         return this.transfersWithItem.reduce((acc, transferItem) => (acc += transferItem.quantity), 0);
+    }
+
+    public get totalItems(): number {
+        return this.transfersWithItem.length;
     }
 
     public get totalPrice(): number {

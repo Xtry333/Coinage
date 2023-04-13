@@ -13,7 +13,7 @@ export class DateTransformer implements ValueTransformer {
         if (value === null) {
             return null;
         }
-        return new Date(`${value} UTC`);
+        return new Date(`${value}`);
     }
 
     public to(value: Date): string {
@@ -21,7 +21,9 @@ export class DateTransformer implements ValueTransformer {
             const date = value.toISOString().substring(0, 10);
             const time = value.toISOString().substring(11, 19);
             if (this.type === DateTransformerType.DATETIME) {
-                return `${date} ${time}`;
+                const dateWithOffest = new Date(value.getTime() - value.getTimezoneOffset() * 60000);
+
+                return `${dateWithOffest.toISOString().slice(0, 19).replace('T', ' ')}`;
             } else {
                 return date;
             }

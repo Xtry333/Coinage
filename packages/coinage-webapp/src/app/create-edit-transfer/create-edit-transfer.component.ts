@@ -48,6 +48,7 @@ export class CreateEditTransferComponent implements OnInit {
     public itemsInTransfer: ShoppingListItem[] = [];
 
     public shouldDisplayShoppingList = false;
+    public shouldOverrideTotalCostOnChange = true;
 
     @ViewChildren('categorySelect')
     private categorySelect?: QueryList<NgSelectComponent>;
@@ -81,6 +82,7 @@ export class CreateEditTransferComponent implements OnInit {
                     this.itemsInTransfer = this.mapToTransferItems(transfer.items);
                     this.shouldDisplayShoppingList = transfer.items.length > 0;
                     this.editMode = true;
+                    this.shouldOverrideTotalCostOnChange = false;
                     console.log(transfer);
                     this.selectedTransferInputs = {
                         amount: transfer.amount,

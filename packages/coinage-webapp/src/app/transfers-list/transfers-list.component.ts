@@ -5,11 +5,7 @@ import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
 import { TableFilterFields } from '../transfers-table/transfers-table.component';
-
-interface TransfersListQueryParams {
-    page: number;
-    rowsPerPage: number;
-}
+import { PaginationQueryParams } from '../core/pagination/pagination.component';
 
 @Component({
     selector: 'app-transfers-list',
@@ -42,9 +38,9 @@ export class TransfersListComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         this.showPage = false;
         this.route.queryParams.subscribe((params) => {
-            const { page, rowsPerPage } = params as TransfersListQueryParams;
+            const { page, rows } = params as PaginationQueryParams;
             this.filterParams.page = Number(page ?? this.filterParams.page);
-            this.filterParams.rowsPerPage = Number(rowsPerPage ?? this.filterParams.rowsPerPage);
+            this.filterParams.rowsPerPage = Number(rows ?? this.filterParams.rowsPerPage);
 
             const cachedFilters = this.localStorage.getObject<TableFilterFields>(this.TRANSFERS_FILTER_CACHE_PATH);
             if (cachedFilters) {

@@ -11,6 +11,7 @@ import { BaseDao } from './base.dao';
 import { AccountSubBalance } from './daoDtos/AccountSubBalance.dto';
 import { DatabaseSourceService } from '../services/database-source.service';
 import { AccountMonthlySubChange } from './daoDtos/AccountMonthlySubBalance.dto';
+import { SingularAccountDailyBalance } from './daoDtos/SingularAccountDailyBalance.dto';
 
 @Injectable()
 export class AccountDao extends BaseDao {
@@ -68,6 +69,33 @@ export class AccountDao extends BaseDao {
         return this.getAccountBalanceForAccountAsOfDate(accountIds, new Date());
     }
 
+    public getSingularAccountDailyBalance(accountId: number): Promise<SingularAccountDailyBalance[]> {
+        return this.databaseSourceService.queryArrWithParams(
+            `SELECT
+                *,
+                SUM(incomes - outcomes) OVER(PARTITION BY currencySymbol ORDER BY DATE) AS 'balance'
+            FROM (
+                SELECT
+                    t.date,
+                    t.currency_symbol AS 'currencySymbol',
+                    COUNT(t.id) AS 'transferCount',
+                    SUM(CASE WHEN t.account_id = :accountId THEN t.amount ELSE 0 END) AS 'outcomes',
+                    SUM(CASE WHEN t.target_account_id = :accountId THEN t.amount ELSE 0 END) AS 'incomes'
+                FROM account AS a
+                LEFT JOIN transfer AS t ON t.account_id = a.id OR t.target_account_id = a.id
+                WHERE a.id = :accountId
+                GROUP BY t.date, t.currency_symbol
+                ORDER BY t.date
+            ) AS subQuery
+            ORDER BY date
+            `,
+            {
+                accountId: accountId,
+            },
+            SingularAccountDailyBalance
+        );
+    }
+
     public async getAccountBalanceForAccountAsOfDate(accountIds: number[], asOfDate: Date): Promise<BalanceDTO[]> {
         const result = await this.dataSource.query(`
                 SELECT t.account_id AS accountId, a.name, 
@@ -93,7 +121,7 @@ export class AccountDao extends BaseDao {
                 FROM account a
                 LEFT JOIN transfer t
                 ON t.account_id = a.id AND t.date = '${this.dateParser.formatMySql(asOfDate)}' #AND t.is_internal = 0
-                WHERE a.id IN (${accountIds.join(',')}) AND a.user_id = ${userId} AND t.type = '${TransferType.Outcome}'
+                WHERE a.id IN (${accountIds.join(',')}) AND a.user_id = ${userId} AND t.type = '${TransferType.Outcome}' AND a.currency_symbol = 'PLN'
                 GROUP BY a.id;`);
         return result.map((r: { id: number; name: string; balance: string }) => {
             return {
@@ -125,7 +153,7 @@ export class AccountDao extends BaseDao {
     }
 
     public async getMonthlySubChangeForUserId(userId: number, numberOfLastMonths = 12) {
-        return await this.databaseSourceService.queryWithParams(
+        return await this.databaseSourceService.queryArrWithParams(
             `
 SELECT
     YEAR(t.date) AS 'changeYear',
@@ -157,7 +185,7 @@ ORDER BY changeYear DESC, changeMonth DESC
 
     public async getSubBalanceByFilter(filter: { accountIds?: number[]; userId?: number }, asOfDate?: Date): Promise<AccountSubBalance[]> {
         const asOfDateString = asOfDate ? this.dateParser.formatMySql(asOfDate) : this.dateParser.getToday();
-        return await this.databaseSourceService.queryWithParams(
+        return await this.databaseSourceService.queryArrWithParams(
             `
             SELECT
                 oa.id AS 'fromAccountId',

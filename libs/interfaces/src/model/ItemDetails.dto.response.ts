@@ -26,6 +26,6 @@ export class TransferWithItemDetailsDTO {
 }
 
 export class ItemContainer {
-    public size!: number;
+    public size?: number;
     public unit!: string;
 }

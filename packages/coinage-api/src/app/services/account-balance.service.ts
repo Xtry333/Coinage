@@ -36,6 +36,35 @@ export class AccountBalanceService {
         return balance;
     }
 
+    public async getAccountDailyBalanceById(accountId: number) {
+        // const subBalances = await this.accountDao.getSubBalanceByFilter({ accountIds }, asOfDate);
+        // const accountBalances = accountIds.map((id) => ({ accountId: id, name: '', balance: 0 }));
+
+        // for (const account of accountBalances) {
+        //     const incomingBalance = subBalances
+        //         .filter((b) => b.toAccountId === account.accountId)
+        //         .map((b) => b.subBalance)
+        //         .reduce((a, b) => a + b, 0);
+        //     const outgoingBalance = subBalances
+        //         .filter((b) => b.fromAccountId === account.accountId)
+        //         .map((b) => b.subBalance)
+        //         .reduce((a, b) => a + b, 0);
+
+        //     account.name = subBalances.find((a) => a.fromAccountId === account.accountId)?.fromAccountName ?? '';
+        //     account.balance = incomingBalance - outgoingBalance;
+        // }
+
+        const accountDetails = await this.accountDao.getById(accountId);
+        const balance = await this.accountDao.getSingularAccountDailyBalance(accountId);
+        return {
+            accountId: accountDetails.id,
+            accountName: accountDetails.name,
+            accountOwnerUserId: accountDetails.userId,
+            accountCurrency: accountDetails.currency.symbol,
+            dailyBalance: balance,
+        };
+    }
+
     public async getAccountsBalanceForUserId(userId: number) {
         const userAccounts = await this.accountDao.getForUserId(userId);
         const subBalances = await this.accountDao.getSubBalanceByFilter({ userId });
@@ -68,9 +97,6 @@ export class AccountBalanceService {
             userAccounts.map((a) => a.id),
             monthlyDates[0]
         );
-
-        console.log(monthlyDates);
-        console.log(initialBalance);
 
         const sumMonthlySubChange = (accountId: number, targetAccountKey: keyof AccountMonthlySubChange, validSubBalances: AccountMonthlySubChange[]) => {
             return validSubBalances.filter((b) => b[targetAccountKey] === accountId).reduce((sum, b) => sum + b.monthlySubChange, 0);
