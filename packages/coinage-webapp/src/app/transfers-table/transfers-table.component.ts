@@ -16,7 +16,7 @@ import { IconDefinition, faReceipt, faFlag, faFlagCheckered } from '@fortawesome
 import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
+import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
 import { NavigatorPages } from '../services/navigator.service';
 
 export enum TableColumn {

@@ -5,7 +5,7 @@ import { Socket } from 'ngx-socket-io';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
-import { CoinageLocalStorageService } from './services/coinage-local-storage.service';
+import { CoinageLocalStorageService } from './core/services/local-storage-service/coinage-local-storage.service';
 import { CurrentUserDataService } from './services/current-user.service';
 import { LangService } from './services/lang-service.service';
 import { NavigatorPages } from './services/navigator.service';

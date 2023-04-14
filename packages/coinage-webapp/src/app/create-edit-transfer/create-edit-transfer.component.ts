@@ -14,7 +14,7 @@ import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
+import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NotificationService } from '../services/notification.service';
 import { finalize } from 'rxjs/operators';

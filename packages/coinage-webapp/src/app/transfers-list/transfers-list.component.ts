@@ -3,9 +3,10 @@ import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/in
 
 import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../services/coinage-local-storage.service';
+import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
 import { TableFilterFields } from '../transfers-table/transfers-table.component';
 import { PaginationQueryParams } from '../core/pagination/pagination.component';
+import { WindowsService } from '../core/services/window-service/window-service.service';
 
 @Component({
     selector: 'app-transfers-list',
@@ -29,11 +30,16 @@ export class TransfersListComponent implements OnInit, OnDestroy {
         rowsPerPage: 100,
     };
 
+    private readonly window: Window;
+
     public constructor(
-        private route: ActivatedRoute,
+        windowService: WindowsService,
+        private readonly route: ActivatedRoute,
         private readonly coinageData: CoinageDataService,
         private readonly localStorage: CoinageLocalStorageService
-    ) {}
+    ) {
+        this.window = windowService.getWindow();
+    }
 
     public ngOnInit(): void {
         this.showPage = false;
@@ -49,7 +55,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
                 this.refreshData();
             }
 
-            window.scroll({
+            this.window.scroll({
                 top: 0,
                 left: 0,
                 behavior: 'smooth',

@@ -17,7 +17,7 @@
                 <tr>
                     <th>Description</th>
                     <td>
-                        <span>{{ transfer?.description }}</span>
+                        <span>{{ transfer.description }}</span>
                         <span *ngIf="transfer.isEthereal" (click)="onClickCommit()" class="planned-icon btn">
                             <fa-icon [icon]="etherealIcon" [fixedWidth]="true" title="Transfer has not been commited"></fa-icon>
                         </span>
@@ -27,7 +27,7 @@
                     <th>Receipt</th>
                     <td>
                         <a [routerLink]="receiptDetailsLink">
-                            {{ transfer?.receipt?.description }}
+                            {{ transfer.receipt.description }}
                         </a>
                     </td>
                 </tr>
@@ -65,8 +65,8 @@
                     <td>{{ transfer.contractor | ifNull }}</td>
                 </tr>
                 <tr>
-                    <th>Total {{ totalPayment < 0 ? 'payed to' : 'received from' }} {{ transfer?.contractor }}</th>
-                    <td>{{ transfer?.date | date }}: {{ totalPayment | mathAbs | plnCurrency }}</td>
+                    <th>Total {{ totalPayment < 0 ? 'payed to' : 'received from' }} {{ transfer.contractor }}</th>
+                    <td>{{ transfer.date | date }}: {{ totalPayment | mathAbs | plnCurrency }}</td>
                 </tr>
                 <tr>
                     <th>Category</th>

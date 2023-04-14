@@ -4,7 +4,7 @@ import { IconDefinition, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { ItemDetailsDTO, TransferDTO, TransferItemDTO, TransferWithItemDetailsDTO } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../../services/coinage-local-storage.service';
+import { CoinageLocalStorageService } from '../../core/services/local-storage-service/coinage-local-storage.service';
 import { NavigatorPages } from '../../services/navigator.service';
 
 export enum TableColumn {

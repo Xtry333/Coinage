@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { IconDefinition, faCaretDown, faEdit, faFilter } from '@fortawesome/free-solid-svg-icons';
 
-import { CoinageLocalStorageService } from '../../services/coinage-local-storage.service';
+import { CoinageLocalStorageService } from '../../core/services/local-storage-service/coinage-local-storage.service';
 import { Range } from '@coinage-app/interfaces';
 
 export enum FilterType {

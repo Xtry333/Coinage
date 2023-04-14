@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { CoinageLocalStorageService } from './coinage-local-storage.service';
+import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
 
 export enum NotificationLevel {
     Info,
