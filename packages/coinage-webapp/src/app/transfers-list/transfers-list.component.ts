@@ -6,7 +6,7 @@ import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
 import { TableFilterFields } from '../transfers-table/transfers-table.component';
 import { PaginationQueryParams } from '../core/pagination/pagination.component';
-import { WindowsService } from '../core/services/window-service/window-service.service';
+import { WindowService } from '../core/services/window-service/window-service.service';
 
 @Component({
     selector: 'app-transfers-list',
@@ -33,7 +33,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
     private readonly window: Window;
 
     public constructor(
-        windowService: WindowsService,
+        windowService: WindowService,
         private readonly route: ActivatedRoute,
         private readonly coinageData: CoinageDataService,
         private readonly localStorage: CoinageLocalStorageService
