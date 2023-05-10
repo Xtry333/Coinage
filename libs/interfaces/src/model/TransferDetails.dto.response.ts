@@ -31,6 +31,7 @@ export class TransferDetailsDTO {
     public contractor?: string;
     public contractorId?: number;
     @Type(() => Date) public date!: Date;
+    @Type(() => Date) public accountingDate!: Date | null;
     @Type(() => Date) public createdDate!: Date;
     @Type(() => Date) public editedDate!: Date;
     @Type(() => TransferDTO) public otherTransfers!: TransferDTO[];

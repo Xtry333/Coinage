@@ -49,7 +49,9 @@
                 <tr>
                     <th>Date</th>
                     <td>
-                        <span>{{ transfer.date | date }}</span>
+                        <span>
+                            <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time>
+                        </span>
                         <span *ngIf="transfer.isPlanned" class="planned-icon">
                             <fa-icon [icon]="plannedIcon" [fixedWidth]="true" title="Transfer is planned"></fa-icon>
                         </span>
@@ -60,13 +62,22 @@
                         </span>
                     </td>
                 </tr>
+                <tr *ngIf="!transfer.isPlanned">
+                    <th>Accounting Date</th>
+                    <td>
+                        <time [dateTime]="transfer.accountingDate?.toJSON()">{{ transfer.accountingDate | date | ifNull }}</time>
+                    </td>
+                </tr>
                 <tr>
                     <th>Contractor</th>
                     <td>{{ transfer.contractor | ifNull }}</td>
                 </tr>
                 <tr>
                     <th>Total {{ totalPayment < 0 ? 'payed to' : 'received from' }} {{ transfer.contractor }}</th>
-                    <td>{{ transfer.date | date }}: {{ totalPayment | mathAbs | plnCurrency }}</td>
+                    <td>
+                        <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time
+                        >: {{ totalPayment | mathAbs | plnCurrency }}
+                    </td>
                 </tr>
                 <tr>
                     <th>Category</th>

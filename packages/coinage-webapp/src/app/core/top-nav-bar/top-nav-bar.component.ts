@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+
 import { NavigatorPages } from '../../services/navigator.service';
 
 @Component({

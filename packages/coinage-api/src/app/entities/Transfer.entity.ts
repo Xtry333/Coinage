@@ -47,6 +47,15 @@ export class Transfer extends WithDateEntity {
     })
     public date!: Date;
 
+    @Column({
+        name: 'accounting_date',
+        type: 'date',
+        nullable: true,
+        transformer: new DateTransformer(DateTransformerType.DATE),
+    })
+    public accountingDate!: Date | null;
+
+
     @Column({ name: 'category_id', nullable: false })
     public categoryId!: number;
 

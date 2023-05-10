@@ -11,7 +11,7 @@ export class Receipt {
     public id!: number;
 
     @Column({ type: 'text', nullable: true })
-    public description!: string;
+    public description!: string | null;
 
     @Column({ type: 'decimal', precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer(2) })
     public amount!: number;

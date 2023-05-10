@@ -94,12 +94,18 @@ export class TransferController {
               }
             : null;
 
+        if (transfer.targetAccountId == 17 && transfer.targetAccount && transfer.contractor) {
+            transfer.targetAccount.name = `${transfer.contractor.name} [Contractor]`;
+        }
+
         const transferType = transfer.originAccount.userId === transfer.targetAccount?.userId ? TransferType.INTERNAL.value : transfer.type;
         return {
             id: transfer.id,
             description: transfer.description,
             amount: transfer.amount,
             type: transferType,
+            date: transfer.date,
+            accountingDate: transfer.accountingDate,
             createdDate: transfer.createdDate,
             editedDate: transfer.editedDate,
             contractor: transfer.contractor?.name,
@@ -109,7 +115,6 @@ export class TransferController {
             targetAccount: { id: transfer.targetAccount?.id ?? 0, name: transfer.targetAccount?.name ?? '' },
             otherTransfers: otherTransfers,
             receipt: receiptDto,
-            date: transfer.date,
             categoryPath: categoryPath.reverse().map((cat) => {
                 return { id: cat.id, name: cat.name };
             }),
@@ -270,6 +275,7 @@ export class TransferController {
             throw new BadRequestException('Amount too high! Create new transfer instead.');
         }
         entity.date = target.date;
+        entity.accountingDate = target.accountingDate;
         entity.originAccountId = target.originAccountId;
 
         entity.contractor = target.contractor;
@@ -302,6 +308,7 @@ export class TransferController {
         refundTransferEntity.type = refundCategory.type;
         refundTransferEntity.categoryId = refundCategory.id;
         refundTransferEntity.date = refundDate;
+        refundTransferEntity.accountingDate = refundDate;
         refundTransferEntity.originAccountId = transfer.targetAccountId ?? 0;
         refundTransferEntity.targetAccountId = transfer.originAccountId;
         refundTransferEntity.metadata.refundTargetId = refundTargetId;

@@ -1,5 +1,5 @@
 import { GetFilteredTransfersRequest, Range, TransferType } from '@coinage-app/interfaces';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, IsNull, LessThanOrEqual, Repository } from 'typeorm';
 import { Transfer } from '../entities/Transfer.entity';
@@ -41,7 +41,7 @@ export class TransferDao extends BaseDao {
 
         const transfers = await this.transferRepository.find({
             where: filter,
-            order: { date: 'DESC', description: 'ASC' },
+            order: { date: 'DESC', contractor: { name: 'ASC' }, description: 'ASC' },
             take: params.rowsPerPage,
             skip: params.rowsPerPage * (params.page - 1),
         });
