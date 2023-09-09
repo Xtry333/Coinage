@@ -1,5 +1,7 @@
-import { FilteredTransfersDTO, GetFilteredTransfersRequest, TransferDTO } from '@coinage-app/interfaces';
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+
+import { FilteredTransfersDTO, GetFilteredTransfersRequest, TransferDTO } from '@coinage-app/interfaces';
+
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
@@ -9,8 +11,8 @@ import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
+import { TransfersService } from '../services/transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfers')
@@ -29,6 +31,29 @@ export class TransfersController {
 
     @Post('all')
     public async getAllFilteredTransfers(
+        @RequestingUser('id') userId: number,
+        @Body() filterParams: GetFilteredTransfersRequest
+    ): Promise<FilteredTransfersDTO> {
+        filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
+        filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
+
+        if (filterParams.userId) {
+            const user = await this.userDao.getById(userId);
+            const userAccountIds = (await user.accounts).map((a) => a.id);
+            filterParams.accountIds = filterParams.accountIds !== undefined ? [...filterParams.accountIds, ...userAccountIds] : userAccountIds;
+        }
+
+        const pagedTransfersDTOs = await this.transfersService.getAllFilteredPagedDTO(filterParams);
+        const totalCount = await this.transfersService.getAllFilteredCount(filterParams);
+
+        return {
+            transfers: pagedTransfersDTOs,
+            totalCount: totalCount,
+        };
+    }
+
+    @Post('allPagedBatch')
+    public async getAllTransfersFilteredMonthly(
         @RequestingUser('id') userId: number,
         @Body() filterParams: GetFilteredTransfersRequest
     ): Promise<FilteredTransfersDTO> {

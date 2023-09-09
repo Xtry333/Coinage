@@ -24,7 +24,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     @Output() public itemListChanged = new EventEmitter<ShoppingListItem[]>();
     @Output() public totalCostChanged = new EventEmitter<number>();
 
-    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0);
+    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0);
     public itemList: ShoppingListItem[] = [];
 
     public constructor(private readonly coinageDataService: CoinageDataService, private readonly notificationService: NotificationService) {}
@@ -56,10 +56,13 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     }
 
     private filterItems(): void {
-        this.searchableItems = this.allItems.filter((item) => this.selectedCategoryId === null || item.categoryId === this.selectedCategoryId);
+        this.searchableItems = this.allItems; //.filter((item) => this.selectedCategoryId === null || item.categoryId === this.selectedCategoryId);
     }
 
     public async onAddNewItem(name: string): Promise<ItemWithLastUsedPriceDTO> {
+        if (this.selectedCategoryId === null) {
+            throw new Error();
+        }
         const item = new CreateEditItemDTO(null, null, name, this.selectedCategoryId, null, null);
         const response = await this.coinageDataService.postCreateItem(item);
         if (response.insertedId) {
@@ -78,6 +81,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             item?.name ?? this.selectedItem.name,
             this.selectedItem.amount,
             this.selectedItem.price,
+            undefined,
             item?.categoryId ?? 0
         );
         this.itemList.push(shoppingItem);

@@ -3,11 +3,11 @@ import { LoadingService } from './loading.service';
 import { HttpRequest, HttpHandler, HttpEvent, HttpInterceptor } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 
 @Injectable()
 export class NetworkInterceptor implements HttpInterceptor {
-    public constructor(private loader: LoadingService, private readonly storage: CoinageLocalStorageService) {}
+    public constructor(private loader: LoadingService, private readonly storage: CoinageStorageService) {}
 
     public intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
         this.loader.show();

@@ -5,7 +5,7 @@ export class CreateEditItemDTO {
         public id: number | null,
         public brand: string | null,
         public name: string,
-        public categoryId: number | null,
+        public categoryId: number,
         containerSize: number | null,
         public containerSizeUnit: string | null
     ) {

@@ -2,10 +2,12 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, OnChang
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { Socket } from 'ngx-socket-io';
 
+import { StorageScope } from './core/services/storage-service/storage-scope.enum';
+import { CoinageStorageService } from './core/services/storage-service/coinage-storage.service';
+import { SidebarNavComponent } from './core/sidebar-nav/sidebar-nav.component';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
 import { LoadingService } from './loaderGadget/loading.service';
-import { CoinageLocalStorageService } from './core/services/local-storage-service/coinage-local-storage.service';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CurrentUserDataService } from './services/current-user.service';
 import { LangService } from './services/lang-service.service';
 import { NavigatorPages } from './services/navigator.service';
@@ -41,10 +43,11 @@ export class AppComponent implements OnInit, OnDestroy {
     public transfersListComponent?: TransfersListComponent;
 
     public isTrinketDisplayed = false;
+    public isSidebarDisplayed = false;
 
     public constructor(
         private readonly loader: LoadingService,
-        private readonly localStorageService: CoinageLocalStorageService,
+        private readonly localStorageService: CoinageStorageService,
         private readonly notificationService: NotificationService,
         private readonly socket: Socket,
         private readonly userDataService: CurrentUserDataService,
@@ -79,7 +82,7 @@ export class AppComponent implements OnInit, OnDestroy {
             //this.dateTime = new Date().toLocaleString();
         }, 1000);
 
-        const lastVisit = this.localStorageService.getObject(AppComponent.KEY_LAST_USER_VISIT_DATE, (d) => new Date(d));
+        const lastVisit = this.localStorageService.getObject(AppComponent.KEY_LAST_USER_VISIT_DATE, StorageScope.Local, (d) => new Date(d));
         this.localStorageService.setObject(AppComponent.KEY_LAST_USER_VISIT_DATE, new Date());
         setTimeout(() => {
             if (lastVisit && lastVisit.getTime() < new Date().getTime() - AppComponent.WELCOME_DELAY) {
@@ -135,5 +138,9 @@ export class AppComponent implements OnInit, OnDestroy {
     public forceDashboardRefresh(): void {
         this.dashboardComponent?.refreshData();
         this.transfersListComponent?.refreshData();
+    }
+
+    public onToggleOpenSidebar() {
+        this.isSidebarDisplayed = !this.isSidebarDisplayed;
     }
 }

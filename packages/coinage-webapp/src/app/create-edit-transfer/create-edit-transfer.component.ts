@@ -14,7 +14,7 @@ import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { NotificationService } from '../services/notification.service';
 import { finalize } from 'rxjs/operators';
@@ -67,7 +67,7 @@ export class CreateEditTransferComponent implements OnInit {
         private readonly navigator: NavigatorService,
         private readonly coinageData: CoinageDataService,
         private readonly notificationService: NotificationService,
-        private readonly coinageLocalStorageService: CoinageLocalStorageService
+        private readonly coinageLocalStorageService: CoinageStorageService
     ) {}
 
     public ngOnInit(): void {
@@ -249,6 +249,7 @@ export class CreateEditTransferComponent implements OnInit {
                 name: item.itemName,
                 quantity: item.amount,
                 price: item.unitPrice,
+                setDiscount: undefined,
                 categoryId: 0,
             };
         });

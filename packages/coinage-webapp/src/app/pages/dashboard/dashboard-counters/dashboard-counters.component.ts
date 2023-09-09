@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { BalanceDTO } from '@coinage-app/interfaces';
-import { CoinageDataService } from '../../services/coinage.data-service';
+import { CoinageDataService } from '../../../services/coinage.data-service';
 
 @Component({
     selector: 'app-dashboard-counters',

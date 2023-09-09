@@ -1,0 +1,51 @@
+<div class="row g-3 pb-3 border-bottom">
+    <div class="col">
+        <label for="selectedAccountInput">Virtual Account</label>
+        <ng-select
+            #accountSelect
+            name="accountId"
+            labelForId="selectedAccountInput"
+            placeholder="Search"
+            [(ngModel)]="selected.accountId"
+            (change)="onAccountChanged($event)"
+            [clearable]="false"
+            [editableSearchTerm]="true"
+            [items]="accounts"
+            required="true"
+            bindValue="id"
+            bindLabel="name"
+        ></ng-select>
+    </div>
+    <div class="col">
+        <label for="selectedContractorInput">Contractor</label>
+        <ng-select
+            #contractorSelect
+            name="contractorId"
+            labelForId="selectedContractorInput"
+            placeholder="Search"
+            [clearable]="true"
+            [(ngModel)]="selected.contractorId"
+            (change)="onContractorChanged($event)"
+            [addTag]="onAddNewContractor.bind(this)"
+            addTagText="Add new contractor"
+            [editableSearchTerm]="true"
+            [items]="contractors"
+            required="false"
+            bindValue="id"
+            bindLabel="name"
+        ></ng-select>
+    </div>
+    <div class="col-md-4">
+        <label for="transferDateInput">Transfer Date</label>
+        <input
+            id="transferDateInput"
+            class="form-control"
+            type="date"
+            [(ngModel)]="selected.transferDate"
+            (change)="onDateChanged()"
+            required="true"
+            placeholder="Date"
+            aria-label="Transfer Date"
+        />
+    </div>
+</div>

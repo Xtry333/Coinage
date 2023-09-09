@@ -4,7 +4,7 @@ import { IconDefinition, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { ItemDetailsDTO, TransferDTO, TransferItemDTO, TransferWithItemDetailsDTO } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../../core/services/local-storage-service/coinage-local-storage.service';
+import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 import { NavigatorPages } from '../../services/navigator.service';
 
 export enum TableColumn {
@@ -47,7 +47,7 @@ export class TransferItemsTableComponent {
     @Input() public filterCachePath?: string;
     @Input() public lastPageNumber?: number;
 
-    public constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
+    public constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageStorageService) {}
 
     public transferWithItemIdTracker(_index: number, item: TransferWithItemDetailsDTO): string {
         return item.transferId.toString() + item.unitPrice.toString();

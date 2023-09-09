@@ -3,7 +3,7 @@ import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/in
 
 import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { TableFilterFields } from '../transfers-table/transfers-table.component';
 import { PaginationQueryParams } from '../core/pagination/pagination.component';
 import { WindowService } from '../core/services/window-service/window-service.service';
@@ -36,7 +36,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
         windowService: WindowService,
         private readonly route: ActivatedRoute,
         private readonly coinageData: CoinageDataService,
-        private readonly localStorage: CoinageLocalStorageService
+        private readonly localStorage: CoinageStorageService
     ) {
         this.window = windowService.getWindow();
     }

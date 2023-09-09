@@ -1,0 +1,26 @@
+<nav id="sidebarMenu" class="bg-secondary-subtle sidebar w-inherit">
+    <div class="position-sticky pt-3 sidebar-sticky">
+        <ul class="nav flex-column mb-auto">
+            <li class="nav-item" *ngFor="let link of links">
+                <a class="nav-link" [routerLink]="link.url" routerLinkActive="active" ariaCurrentWhenActive="page">
+                    <i class="pe-none me-2" [class]="link.icon"></i>
+                    <span>{{ link.text }}</span>
+                </a>
+            </li>
+        </ul>
+        <hr />
+        <div class="ms-2 dropdown">
+            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                <img [src]="avatarLink" alt="" width="32" height="32" class="rounded-circle me-2" />
+                <strong>{{ username | ifNull : 'User' }}</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                <li><a class="dropdown-item" href="#">New project...</a></li>
+                <li><a class="dropdown-item" href="#">Settings</a></li>
+                <li><a class="dropdown-item" href="#">Profile</a></li>
+                <li><hr class="dropdown-divider" /></li>
+                <li><a class="dropdown-item" href="#">Sign out</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>

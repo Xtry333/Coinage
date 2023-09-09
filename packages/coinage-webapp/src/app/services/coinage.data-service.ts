@@ -20,6 +20,7 @@ import {
     CreateEditItemDTO,
     ItemDetailsDTO,
     NewMonthlyUserStatsDTO,
+    CreateMultipleTransfersDTO,
 } from '@coinage-app/interfaces';
 import { Observable, lastValueFrom, map } from 'rxjs';
 
@@ -166,5 +167,9 @@ export class CoinageDataService {
 
     public getItemDetails(id: number): Promise<ItemDetailsDTO> {
         return lastValueFrom(this.http.get<ItemDetailsDTO>(`${CoinageDataService.API_URL}item/${id}`).pipe(map((i) => plainToInstance(ItemDetailsDTO, i))));
+    }
+
+    public postCreateAdvancedTransfers(request: CreateMultipleTransfersDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/createAdvanced`, request));
     }
 }

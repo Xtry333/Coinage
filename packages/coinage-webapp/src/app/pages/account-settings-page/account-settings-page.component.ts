@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+
 import { AccountDTO } from '@coinage-app/interfaces';
+
 import { CoinageDataService } from '../../services/coinage.data-service';
 
 @Component({

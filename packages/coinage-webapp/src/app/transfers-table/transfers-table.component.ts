@@ -16,7 +16,7 @@ import { IconDefinition, faReceipt, faFlag, faFlagCheckered } from '@fortawesome
 import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NavigatorPages } from '../services/navigator.service';
 
 export enum TableColumn {
@@ -106,7 +106,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     @Output() public tableFilter = new EventEmitter<TableFilterFields>();
 
-    public constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageLocalStorageService) {}
+    public constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageStorageService) {}
 
     public ngOnInit(): void {
         if (this.showFilters) {

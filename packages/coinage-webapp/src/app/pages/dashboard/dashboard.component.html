@@ -1,0 +1,80 @@
+<main class="ms-sm-auto px-md-4">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+        <h2 class="h2">Dashboard</h2>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
+                <button type="button" class="btn btn-sm btn-outline-secondary">Export</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="feather feather-calendar align-text-bottom"
+                    aria-hidden="true"
+                >
+                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                This week
+            </button>
+        </div>
+    </div>
+    <div>
+        <div *ngIf="showPage">
+            <div class="table-container">
+                <app-dashboard-counters></app-dashboard-counters>
+                <!-- <div class="counters-container">
+                    app-big-counter [value]="balanceMainAccount" [upperLabel]="'PLN'" [lowerLabel]="'Konto PKO'"></app-big-counter>
+                    app-big-counter [value]="balanceSecondary" [upperLabel]="'PLN'" [lowerLabel]="'Portfel'"></app-big-counter>
+                </div> -->
+
+                <app-transfers-table [transfers]="lastTransactions" [header]="'Recently Edited Transfers'" [showTodayMarker]="false"></app-transfers-table>
+                <div>
+                    <p>Average Income ({{ this.averageAmountLimit }} months): {{ rollingAverageIncomes | plnCurrency }}</p>
+                    <p>Average Outcome ({{ this.averageAmountLimit }} months): {{ rollingAverageOutcomes | plnCurrency }}</p>
+                </div>
+                <app-chart [datasets]="accountStatsChartData" [labels]="accountStatsChartLabels"></app-chart>
+                <table class="last-transactions-table">
+                    <caption>
+                        <span>Total In/Outcomes per Month</span>
+                    </caption>
+                    <thead>
+                        <tr>
+                            <th class="align-left">Date</th>
+                            <th class="align-right">Outcomes</th>
+                            <th class="align-right">Incomes</th>
+                            <th class="align-right">Savings</th>
+                            <th class="align-right">Cost Per Day</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let outcome of totalAmountPerMonth; trackBy: totalOutcomesTracker">
+                            <td class="month-name">
+                                <a [routerLink]="NavigatorPages.Summary(outcome.partedDate)">{{ outcome.monthName }} {{ outcome.year }}</a>
+                            </td>
+                            <td class="currency">{{ outcome.outcomes | plnCurrency }}</td>
+                            <td class="currency">{{ outcome.incomes | plnCurrency }}</td>
+                            <td class="currency">{{ outcome.profit | plnCurrency | replace : '-' : '− ' }}</td>
+                            <td class="currency">{{ outcome.profitPerDay | plnCurrency }}</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3"></td>
+                            <td class="currency">{{ totalChange | plnCurrency }}</td>
+                            <td colspan="1"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>

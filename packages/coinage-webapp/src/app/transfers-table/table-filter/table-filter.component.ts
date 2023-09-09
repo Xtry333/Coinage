@@ -1,7 +1,7 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { IconDefinition, faCaretDown, faEdit, faFilter } from '@fortawesome/free-solid-svg-icons';
 
-import { CoinageLocalStorageService } from '../../core/services/local-storage-service/coinage-local-storage.service';
+import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 import { Range } from '@coinage-app/interfaces';
 
 export enum FilterType {
@@ -138,7 +138,7 @@ export class TableFilterComponent implements OnInit {
         };
     }
 
-    public constructor(public readonly localStorage: CoinageLocalStorageService) {}
+    public constructor(public readonly localStorage: CoinageStorageService) {}
 
     public ngOnInit(): void {
         this.filterValue = TableFilterComponent.createEmptyFilterValue(this.filterType, this.filterName);

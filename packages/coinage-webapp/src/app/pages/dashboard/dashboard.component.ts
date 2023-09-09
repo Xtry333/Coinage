@@ -4,10 +4,10 @@ import { ChartDataset } from 'chart.js';
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MonthlyUserStatsDTO, NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@coinage-app/interfaces';
 
-import { CoinageDataService } from '../services/coinage.data-service';
+import { CoinageDataService } from '../../services/coinage.data-service';
 import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
-import { DateParserService } from '../services/date-parser.service';
-import { NavigatorPages } from '../services/navigator.service';
+import { DateParserService } from '../../services/date-parser.service';
+import { NavigatorPages } from '../../services/navigator.service';
 import { finalize } from 'rxjs/operators';
 
 interface UiTotalAmountPerMonth {

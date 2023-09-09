@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
-import { CoinageLocalStorageService } from '../core/services/local-storage-service/coinage-local-storage.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 
 export enum NotificationLevel {
     Info,
@@ -32,9 +32,9 @@ export class NotificationService {
 
     public readonly notifications$ = this.incomingNotifications.asObservable();
 
-    public constructor(private readonly localStorageService: CoinageLocalStorageService) {
+    public constructor(private readonly localStorageService: CoinageStorageService) {
         localStorageService.attachEventListener((event) => {
-            if (event.key === CoinageLocalStorageService.KEY_OBJECT_TEMPLATE(NotificationService.NOTIFICATION_KEY)) {
+            if (event.key === CoinageStorageService.KEY_OBJECT_TEMPLATE(NotificationService.NOTIFICATION_KEY)) {
                 const sharedNofitication = this.localStorageService.getObject<CoinageNotification>(NotificationService.NOTIFICATION_KEY);
                 if (sharedNofitication) {
                     this.incomingNotifications.next(this.buildNotification(sharedNofitication, sharedNofitication.id));

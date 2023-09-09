@@ -1,13 +1,13 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CoinageLocalStorageService } from './coinage-local-storage.service';
+import { CoinageStorageService } from './coinage-storage.service';
 
 describe('CoinageLocalStorageService', () => {
-    let service: CoinageLocalStorageService;
+    let service: CoinageStorageService;
 
     beforeEach(() => {
         TestBed.configureTestingModule({});
-        service = TestBed.inject(CoinageLocalStorageService);
+        service = TestBed.inject(CoinageStorageService);
     });
 
     it('should be created', () => {

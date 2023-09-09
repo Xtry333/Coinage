@@ -1,0 +1,113 @@
+:host {
+    //display: block;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    /* rtl:raw:
+    right: 0;
+    */
+    bottom: 0;
+    /* rtl:remove */
+    left: 0;
+    z-index: 100; /* Behind the navbar */
+    padding: 48px 0 0; /* Height of navbar */
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 767.98px) {
+    .sidebar {
+        top: 5rem;
+    }
+}
+
+.sidebar-sticky {
+    height: calc(100vh - 48px);
+    overflow-x: hidden;
+    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+}
+
+.sidebar .nav-link {
+    font-weight: 500;
+    color: #333;
+}
+
+.sidebar .nav-link .feather {
+    margin-right: 4px;
+    color: #727272;
+}
+
+.sidebar .nav-link.active {
+    color: #2470dc;
+}
+
+.sidebar .nav-link:hover .feather,
+.sidebar .nav-link.active .feather {
+    color: inherit;
+}
+
+.sidebar-heading {
+    font-size: 0.75rem;
+}
+
+// .top-nav-container {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     background-color: #3a3a3a;
+//     color: white;
+
+//     .datetime {
+//         margin-left: auto;
+//         padding-right: 20px;
+//         .username {
+//             margin-left: 5px;
+//             margin-right: 10px;
+//         }
+//     }
+// }
+
+// nav {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+
+//     .logo {
+//         display: inline-flex;
+//         h1 {
+//             margin-left: 0;
+//         }
+
+//         a {
+//             display: inherit;
+//         }
+//     }
+
+//     ul.nav-list {
+//         margin: 0px 15px;
+//         list-style: none;
+//         padding: 0px 0px;
+//         color: white;
+//         display: inline-flex;
+//         height: 100%;
+//         vertical-align: middle;
+
+//         li {
+//             a,
+//             a:link,
+//             a:visited {
+//                 display: inline-block;
+//                 padding: 25px 10px;
+//                 color: white;
+//                 text-decoration: none;
+//                 cursor: pointer;
+//                 height: 100%;
+//             }
+
+//             &:hover {
+//                 background-color: lighten($color: #3a3a3a, $amount: 5);
+//             }
+//         }
+//     }
+// }

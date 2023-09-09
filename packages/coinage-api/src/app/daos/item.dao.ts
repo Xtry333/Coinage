@@ -1,7 +1,7 @@
 import { ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, Repository } from 'typeorm';
+import { Equal, In, Repository } from 'typeorm';
 import { Item } from '../entities/Item.entity';
 import { BaseDao } from './base.dao';
 
@@ -24,6 +24,18 @@ export class ItemDao extends BaseDao {
 
     public async getAll(): Promise<Item[]> {
         return await this.itemRepository.find();
+    }
+
+    public async getById(id: number): Promise<Item> {
+        const item = await this.itemRepository.findOneBy({ id: Equal(id) });
+
+        return this.validateNotNullById(Item.name, id, item);
+    }
+
+    public async getByIds(itemIds: number[]): Promise<Item[]> {
+        const items = await this.itemRepository.findBy({ id: In(itemIds) });
+
+        return this.validateExactAmountByIds(Item.name, items, itemIds);
     }
 
     public async getAllWithLastUsedPrice(): Promise<ItemWithLastUsedPriceDTO[]> {
@@ -49,11 +61,5 @@ export class ItemDao extends BaseDao {
 
     public save(entity: Item): Promise<Item> {
         return this.itemRepository.save(entity);
-    }
-
-    public async getById(id: number): Promise<Item> {
-        const item = await this.itemRepository.findOneBy({ id: Equal(id) });
-
-        return this.validateNotNullById(Item.name, id, item);
     }
 }

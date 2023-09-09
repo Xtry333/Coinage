@@ -16,6 +16,7 @@ export * from './lib/GetFilteredTransfers.request';
 export * from './lib/FilteredTransferDTO.response';
 export * from './lib/MonthlyUserStatsDTO.response';
 export * from './model/TransferDetails.dto.response';
+export * from './model/CreateMultipleTransfers.dto.request';
 export * from './model/CreateEditTransfer.dto.request';
 export * from './model/CreateEditItem.dto.request';
 export * from './model/ItemDetails.dto.response';

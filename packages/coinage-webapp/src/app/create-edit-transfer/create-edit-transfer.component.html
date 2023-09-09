@@ -8,7 +8,16 @@
                 </div>
                 <div>
                     <label for="amount">Price</label>
-                    <input id="amount" name="amount" type="number" [(ngModel)]="selectedTransferInputs.amount" [min]="0" step=".01" required />
+                    <input
+                        id="amount"
+                        name="amount"
+                        type="number"
+                        [(ngModel)]="selectedTransferInputs.amount"
+                        [min]="0"
+                        step=".01"
+                        required
+                        autocomplete="off"
+                    />
                 </div>
                 <div>
                     <label for="category">Category</label>
@@ -62,7 +71,7 @@
                 </div>
                 <div>
                     <label for="date">Date</label>
-                    <input id="date" name="date" type="date" [(ngModel)]="selectedTransferInputs.date" required />
+                    <input id="date" name="date" type="date" [(ngModel)]="selectedTransferInputs.date" />
                 </div>
 
                 <button type="submit">

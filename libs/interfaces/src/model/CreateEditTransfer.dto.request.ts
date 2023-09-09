@@ -2,7 +2,14 @@ import { IsDate, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-vali
 import { Type } from 'class-transformer';
 
 export class ShoppingListItem {
-    public constructor(public id: number | undefined, public name: string, public amount: number, public price: number, public categoryId: number | null) {}
+    public constructor(
+        public id: number | undefined,
+        public name: string,
+        public amount: number,
+        public price: number,
+        public setDiscount: number | undefined,
+        public categoryId: number | null
+    ) {}
 }
 
 export class CreateEditTransferModelDTO {

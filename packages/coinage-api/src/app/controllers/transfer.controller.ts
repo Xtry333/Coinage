@@ -7,6 +7,7 @@ import {
     TransferDTO,
     CreateEditTransferModelDTO,
     TransferType,
+    CreateMultipleTransfersDTO,
 } from '@coinage-app/interfaces';
 import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
 
@@ -25,6 +26,7 @@ import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { TransferItemsService } from '../services/transfer-items.service';
 import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
+import { ItemsService } from '../services/items.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfer')
@@ -41,6 +43,7 @@ export class TransferController {
         private readonly receiptDao: ReceiptDao,
         private readonly dateParserService: DateParserService,
         private readonly saveTransfersService: SaveTransfersService,
+        private readonly itemsService: ItemsService,
         private readonly transferItemsService: TransferItemsService
     ) {}
 
@@ -186,6 +189,69 @@ export class TransferController {
         };
     }
 
+    @Post('createAdvanced')
+    public async createTransfersFromAdvancedObject(@RequestingUser() user: User, @Body() requestBody: CreateMultipleTransfersDTO): Promise<BaseResponseDTO> {
+        const transferEntities: Transfer[] = [];
+        const items = await this.itemsService.getByIds(requestBody.items.map((item) => item.itemId));
+        const contractor = requestBody.contractorId !== null ? await this.contractorDao.getById(requestBody.contractorId) : null;
+        const account = await this.accountDao.getById(requestBody.accountId);
+
+        // Create transfers from items
+        const itemCategoriesIds = [...new Set(items.map((i) => i.categoryId))];
+        for (const categoryId of itemCategoriesIds) {
+            const itemsForCategory = items.filter((item) => item.categoryId === categoryId);
+
+            const requestedItemsForCategory = itemsForCategory.map((item) => {
+                const mappedItem = requestBody.items.find((requestedItem) => requestedItem.itemId === item.id);
+                if (mappedItem === undefined) {
+                    throw new NotFoundException();
+                }
+                return mappedItem;
+            });
+
+            const category = await this.categoryDao.getById(categoryId);
+
+            const entity = new Transfer();
+            entity.amount = requestedItemsForCategory.map((i) => i.calculatedPrice).reduce((a, b) => a + b, 0); //requestBody.amount;
+            entity.currency = account.currency;
+            entity.date = requestBody.date;
+            entity.categoryId = category.id;
+            entity.type = category.type;
+            entity.contractorId = contractor?.id ?? null;
+
+            entity.ownerUserId = user.id;
+            entity.originAccountId = account.id;
+            entity.targetAccountId = 17; // TODO: Fix this
+
+            entity.receiptId = requestBody.receiptId ?? null;
+
+            entity.isEthereal = true;
+
+            await this.transfersService.saveTransfer(entity);
+
+            entity.transferItems = [];
+            for (const item of requestedItemsForCategory) {
+                const transferItem = new TransferItem();
+                transferItem.transferId = entity.id;
+                transferItem.itemId = item.itemId;
+                transferItem.quantity = item.quantity;
+                transferItem.unitPrice = item.unitPrice;
+                transferItem.totalSetDiscount = item.totalSetDiscount;
+                entity.transferItems.push(transferItem);
+            }
+
+            transferEntities.push(entity);
+        }
+
+        const newTransferIds: number[] = [];
+        for (const entity of transferEntities) {
+            const inserted = await this.transfersService.saveTransfer(entity);
+            newTransferIds.push(inserted.id);
+        }
+
+        return { insertedIds: newTransferIds };
+    }
+
     @Post('save')
     public async saveTransferObject(@RequestingUser() user: User, @Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
         let entity: Transfer;
@@ -200,7 +266,7 @@ export class TransferController {
             entity = new Transfer();
         }
 
-        entity.description = transfer.description === undefined ? category?.name : transfer.description;
+        entity.description = transfer.description === undefined ? category?.name : transfer.description.trim();
         entity.amount = transfer.amount;
         entity.currency = account.currency;
         entity.date = transfer.date;
@@ -339,6 +405,7 @@ export class TransferController {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (transfer as any).editedDate = undefined;
         transfer.metadata.refundedBy = undefined;
+        transfer.accountingDate = null;
 
         const transferItems = transfer.transferItems;
         transfer.transferItems = [];

@@ -55,7 +55,6 @@ export class Transfer extends WithDateEntity {
     })
     public accountingDate!: Date | null;
 
-
     @Column({ name: 'category_id', nullable: false })
     public categoryId!: number;
 
@@ -110,7 +109,7 @@ export class Transfer extends WithDateEntity {
     @Column({ type: 'json', nullable: false, default: 'json_object()' })
     public metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 
-    @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: false })
+    @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: ['insert'] })
     public transferItems!: TransferItem[];
 }
 

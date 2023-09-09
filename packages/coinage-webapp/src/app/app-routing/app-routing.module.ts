@@ -2,7 +2,7 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
-import { DashboardComponent } from '../dashboard/dashboard.component';
+import { DashboardComponent } from '../pages/dashboard/dashboard.component';
 import { MonthSummaryComponent } from '../month-summary/month-summary.component';
 import { NgModule } from '@angular/core';
 import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
@@ -11,6 +11,7 @@ import { TransfersListComponent } from '../transfers-list/transfers-list.compone
 import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
 import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
 import { ChatComponent } from '../demo/chat/chat.component';
+import { CreateMultipleTransfersComponent } from '../create-multiple-transfers/create-multiple-transfers.component';
 
 const routes: Routes = [
     {
@@ -45,6 +46,10 @@ const routes: Routes = [
     {
         path: 'transfer/add',
         component: CreateEditTransferComponent,
+    },
+    {
+        path: 'transfer/create',
+        component: CreateMultipleTransfersComponent,
     },
     {
         path: 'transfer/edit/:id',

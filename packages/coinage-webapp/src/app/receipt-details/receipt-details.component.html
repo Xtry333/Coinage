@@ -1,8 +1,8 @@
-<div *ngIf="showPage" class="receipt-details-component">
+<div *ngIf="receiptDetails" class="receipt-details-component">
     <table class="receipt-details-table">
         <tr>
             <th>Description</th>
-            <td>{{ receiptDetails?.description }}</td>
+            <td>{{ receiptDetails.description }}</td>
         </tr>
         <tr *ngIf="receiptDetails.amount">
             <th>Amount</th>

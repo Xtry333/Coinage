@@ -3,7 +3,7 @@ import { Type } from 'class-transformer';
 
 export class ReceiptDetailsDTO {
     id!: number;
-    description?: string;
+    description?: string | null;
     amount?: number | null;
     totalAmount!: number;
     totalTransferred!: number;
