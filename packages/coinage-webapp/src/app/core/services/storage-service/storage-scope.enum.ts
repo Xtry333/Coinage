@@ -1,4 +1,4 @@
 export const enum StorageScope {
     Session,
-    Local
+    Persistent
 }

@@ -24,7 +24,7 @@ export class CoinageStorageService {
         window.addEventListener(CoinageStorageService.STORAGE_EVENT, listener);
     }
 
-    public setBoolean(key: string, value: boolean | undefined, scope: StorageScope = StorageScope.Local): void {
+    public setBoolean(key: string, value: boolean | undefined, scope: StorageScope = StorageScope.Persistent): void {
         if (value !== undefined) {
             this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key), value.toString());
         } else {
@@ -32,7 +32,7 @@ export class CoinageStorageService {
         }
     }
 
-    public getBoolean(key: string, scope: StorageScope = StorageScope.Local): boolean | undefined {
+    public getBoolean(key: string, scope: StorageScope = StorageScope.Persistent): boolean | undefined {
         const n = this.getScopedStorage(scope).getItem(CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key));
         if (n !== null) {
             return Boolean(n);
@@ -40,7 +40,7 @@ export class CoinageStorageService {
         return undefined;
     }
 
-    public setNumber(key: string, value: number | undefined, scope: StorageScope = StorageScope.Local): void {
+    public setNumber(key: string, value: number | undefined, scope: StorageScope = StorageScope.Persistent): void {
         if (value !== undefined) {
             this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_NUMBER_TEMPLATE(key), value.toString());
         } else {
@@ -48,7 +48,7 @@ export class CoinageStorageService {
         }
     }
 
-    public getNumber(key: string, scope: StorageScope = StorageScope.Local): number | undefined {
+    public getNumber(key: string, scope: StorageScope = StorageScope.Persistent): number | undefined {
         const n = this.getScopedStorage(scope).getItem(CoinageStorageService.KEY_NUMBER_TEMPLATE(key));
         if (n !== null) {
             return Number(n);
@@ -56,7 +56,7 @@ export class CoinageStorageService {
         return undefined;
     }
 
-    public setString(key: string, value: string | undefined, scope: StorageScope = StorageScope.Local): void {
+    public setString(key: string, value: string | undefined, scope: StorageScope = StorageScope.Persistent): void {
         if (value !== undefined) {
             this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_STRING_TEMPLATE(key), value);
         } else {
@@ -64,11 +64,11 @@ export class CoinageStorageService {
         }
     }
 
-    public getString(key: string, scope: StorageScope = StorageScope.Local): string | undefined {
+    public getString(key: string, scope: StorageScope = StorageScope.Persistent): string | undefined {
         return this.getScopedStorage(scope).getItem(CoinageStorageService.KEY_STRING_TEMPLATE(key)) ?? undefined;
     }
 
-    public setObject<T>(key: string, object: T | undefined, scope: StorageScope = StorageScope.Local): void {
+    public setObject<T>(key: string, object: T | undefined, scope: StorageScope = StorageScope.Persistent): void {
         if (object !== undefined) {
             const serializedObject = JSON.stringify(object);
             this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_OBJECT_TEMPLATE(key), serializedObject);
@@ -78,7 +78,7 @@ export class CoinageStorageService {
         return undefined;
     }
 
-    public getObject<T>(key: string, scope: StorageScope = StorageScope.Local, constructor?: (v: string) => T): T | undefined {
+    public getObject<T>(key: string, scope: StorageScope = StorageScope.Persistent, constructor?: (v: string) => T): T | undefined {
         const objStr = this.getScopedStorage(scope).getItem(CoinageStorageService.KEY_OBJECT_TEMPLATE(key));
         if (objStr) {
             if (constructor) {
@@ -91,7 +91,7 @@ export class CoinageStorageService {
 
     private getScopedStorage(scope: StorageScope): Storage {
         switch (scope) {
-            case StorageScope.Local:
+            case StorageScope.Persistent:
                 return this.localStorage;
             case StorageScope.Session:
                 return this.sessionStorage;

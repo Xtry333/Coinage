@@ -82,7 +82,7 @@ export class AppComponent implements OnInit, OnDestroy {
             //this.dateTime = new Date().toLocaleString();
         }, 1000);
 
-        const lastVisit = this.localStorageService.getObject(AppComponent.KEY_LAST_USER_VISIT_DATE, StorageScope.Local, (d) => new Date(d));
+        const lastVisit = this.localStorageService.getObject(AppComponent.KEY_LAST_USER_VISIT_DATE, StorageScope.Persistent, (d) => new Date(d));
         this.localStorageService.setObject(AppComponent.KEY_LAST_USER_VISIT_DATE, new Date());
         setTimeout(() => {
             if (lastVisit && lastVisit.getTime() < new Date().getTime() - AppComponent.WELCOME_DELAY) {
