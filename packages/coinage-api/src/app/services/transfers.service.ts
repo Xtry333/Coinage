@@ -1,5 +1,7 @@
-import { GetFilteredTransfersRequest, TransferDTO, TransferType } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
+
+import { GetFilteredTransfersRequest, TransferDTO, TransferType } from '@coinage-app/interfaces';
+
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Transfer } from '../entities/Transfer.entity';

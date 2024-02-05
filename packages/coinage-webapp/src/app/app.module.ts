@@ -95,7 +95,7 @@ Chart.register(zoomPlugin);
         AccountSettingsPageComponent,
         TransferItemDetailsComponent,
         TransferItemsTableComponent,
-        ChatComponent
+        ChatComponent,
     ],
     providers: [
         {

@@ -13,7 +13,7 @@ import { NotificationService } from '../../services/notification.service';
 export interface SelectedDetails {
     accountId: number | undefined;
     contractorId: number | undefined;
-    transferDate: string | undefined;
+    transferDate: string;
 }
 
 @Component({
@@ -22,8 +22,8 @@ export interface SelectedDetails {
     styleUrls: ['./new-transfer-details.component.scss'],
 })
 export class NewTransferDetailsComponent implements OnInit {
-    public static LAST_USED_CONTRACTOR = 'receipt.last-used-contractor-id';
-    public static LAST_USED_ACCOUNT = 'receipt.last-used-account-id';
+    public static LAST_USED_CONTRACTOR = 'createTransfers.lastUsedContractorId';
+    public static LAST_USED_ACCOUNT = 'createTransfers.lastUsedAccountId';
 
     public dataReady = false;
 
@@ -61,19 +61,20 @@ export class NewTransferDetailsComponent implements OnInit {
                 this.contractors = contractors;
                 this.accounts = accounts;
 
-                this.selected.accountId = this.storage.getNumber(NewTransferDetailsComponent.LAST_USED_ACCOUNT, StorageScope.Session);
-                this.selected.contractorId = this.storage.getNumber(NewTransferDetailsComponent.LAST_USED_CONTRACTOR, StorageScope.Session);
+                this.selected.accountId = this.storage.getNumber(NewTransferDetailsComponent.LAST_USED_ACCOUNT, StorageScope.Persistent);
+                this.selected.contractorId = this.storage.getNumber(NewTransferDetailsComponent.LAST_USED_CONTRACTOR, StorageScope.Persistent);
                 this.selected.transferDate = this.todayInputFormat;
+                this.detailsChanged.emit(this.selected);
             });
     }
 
     public onAccountChanged(changed?: AccountDTO): void {
-        this.storage.setNumber(NewTransferDetailsComponent.LAST_USED_ACCOUNT, changed?.id, StorageScope.Session);
+        this.storage.setNumber(NewTransferDetailsComponent.LAST_USED_ACCOUNT, changed?.id, StorageScope.Persistent);
         this.detailsChanged.emit(this.selected);
     }
 
     public onContractorChanged(changed?: ContractorDTO): void {
-        this.storage.setNumber(NewTransferDetailsComponent.LAST_USED_CONTRACTOR, changed?.id, StorageScope.Session);
+        this.storage.setNumber(NewTransferDetailsComponent.LAST_USED_CONTRACTOR, changed?.id, StorageScope.Persistent);
         this.detailsChanged.emit(this.selected);
     }
 

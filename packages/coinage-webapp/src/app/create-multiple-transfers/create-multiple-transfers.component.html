@@ -1,143 +1,22 @@
 <main class="ms-sm-auto px-md-4">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-        <h2 class="h2">Add Receipt</h2>
+        <h2 class="h2">Create Multiple Transfer from Items</h2>
     </div>
     <div class="mx-2">
-        <app-section title="Details">
+        <app-section [header]="'Details'" class="border-bottom">
             <app-new-transfer-details #newTransferDetails (detailsChanged)="onCommonDetailsChanged($event)"></app-new-transfer-details>
         </app-section>
-        <app-section title="Add Items to Receipt">
-            <div class="row g-3 py-3">
-                <div class="col-md-8">
-                    <label for="selectedItemInput">Item</label>
-                    <ng-select
-                        #itemSelect
-                        name="itemId"
-                        labelForId="selectedItemInput"
-                        placeholder="Search"
-                        [(ngModel)]="selectedItemDetails.id"
-                        (change)="onItemSelected($event)"
-                        [clearable]="true"
-                        [editableSearchTerm]="true"
-                        [items]="allItems"
-                        [required]="true"
-                        bindValue="id"
-                        bindLabel="name"
-                    ></ng-select>
-                </div>
-                <div class="col-md">
-                    <label for="amountInput">Amount</label>
-                    <div class="input-group">
-                        <input
-                            id="amountInput"
-                            class="form-control pe-1"
-                            type="number"
-                            [(ngModel)]="selectedItemDetails.amount"
-                            (change)="onItemDetailsChanged()"
-                            required="true"
-                            min="0"
-                            value="1"
-                            placeholder="1.00"
-                            aria-label="Amount"
-                            aria-describedby="amountInputAddon"
-                        />
-                        <span id="amountInputAddon" class="input-group-text"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-3 mb-3">
-                <div class="col">
-                    <label for="unitPriceInput">Unit Price</label>
-                    <div class="input-group">
-                        <input
-                            id="unitPriceInput"
-                            class="form-control pe-1"
-                            type="number"
-                            [(ngModel)]="selectedItemDetails.price"
-                            (change)="onItemDetailsChanged()"
-                            required="true"
-                            min="0"
-                            step="0.01"
-                            placeholder="1.00"
-                            autocomplete="off"
-                            aria-label="Price"
-                            aria-describedby="unitPriceInputAddon"
-                        />
-                        <span id="unitPriceInputAddon" class="input-group-text">zł</span>
-                    </div>
-                </div>
-                <div class="col">
-                    <label for="setDiscountInput">Set discount</label>
-                    <div class="input-group">
-                        <input
-                            id="setDiscountInput"
-                            class="form-control pe-1"
-                            type="number"
-                            [(ngModel)]="selectedItemDetails.setDiscount"
-                            (change)="onItemDetailsChanged()"
-                            min="0"
-                            step="0.01"
-                            placeholder="0.00"
-                            aria-label="Set discount"
-                            aria-describedby="setDiscountInput"
-                        />
-                        <span class="input-group-text" id="setDiscountInput">zł</span>
-                    </div>
-                </div>
-            </div>
-            <div class="row g-3 mb-3">
-                <div class="d-grid col-md-6 mx-auto">
-                    <span class="text-muted">19.99/kg</span>
-                </div>
-            </div>
-            <div class="row g-3 mb-3">
-                <div class="d-grid col-md-6 mx-auto">
-                    <button type="button" class="btn btn-outline-secondary" (click)="onClickAddNewItemToList()">Add</button>
-                </div>
-            </div>
+        <app-section [header]="'Add Items to Transfer'" class="mt-3 border-bottom">
+            <app-item-details-for-transfer #itemDetailsForTranfer (itemAdded)="onItemAdded($event)"></app-item-details-for-transfer>
         </app-section>
-        <hr />
-        <ul class="list-group list-group-flush w-100">
-            <li class="list-group-item p-0" *ngFor="let category of categorisedItemList">
-                <div class="px-2 pt-2 d-flex justify-content-between">
-                    <div class="fw-bold">{{ category.name }}</div>
-                    <span class="badge bg-primary rounded-pill">{{ category.items.length }}</span>
-                </div>
-                <ul class="list-group list-group-flush">
-                    <li class="list-group-item p-2" *ngFor="let item of category.items">
-                        <div class="row">
-                            <div class="col-6">
-                                <span>{{ item.name }}</span>
-                            </div>
-                            <div class="col text-end">
-                                <span>{{ item.price | plnCurrency }} x {{ item.amount }}</span>
-                            </div>
-                            <div class="col text-end">
-                                <div>
-                                    <span>{{ getItemTotalPrice(item) | plnCurrency }}</span>
-                                </div>
-                                <div *ngIf="item.setDiscount && item.setDiscount > 0">
-                                    <span [title]="getItemTotalPriceWithDiscount(item) | plnCurrency">{{ -item.setDiscount | plnCurrency }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </li>
-                    <li *ngIf="categorisedItemList.length > 1" class="category-sum list-group-item p-2">
-                        <div class="text-end">{{ getTotalCategoryCost(category.items) | plnCurrency }}</div>
-                    </li>
-                </ul>
-            </li>
-            <li class="list-group-item p-2">
-                <div class="row">
-                    <div *ngIf="itemList.length === 0">The shopping cart is empty. Add something.</div>
-                    <div *ngIf="itemList.length > 0" class="col">
-                        <span class="fw-bold">Grand Total</span>
-                    </div>
-                    <div class="col text-end">{{ getItemsCost(itemList) | plnCurrency }}</div>
-                </div>
-            </li>
-        </ul>
-        <hr />
+        <app-section class="mt-3">
+            <app-selected-items
+                #selectedItemsList
+                [items]="itemsInTransfers"
+                [categories]="categories"
+                (removeItemClicked)="onItemRemoved($event)"
+            ></app-selected-items>
+        </app-section>
         <div class="row g-3 mb-3">
             <div class="d-grid col-md-6 mx-auto">
                 <button type="button" class="btn btn-outline-secondary" (click)="onClickCreateTransfer()">Create</button>

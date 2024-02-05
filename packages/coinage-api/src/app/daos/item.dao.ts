@@ -1,9 +1,11 @@
-import { ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, In, Repository } from 'typeorm';
-import { Item } from '../entities/Item.entity';
+
+import { ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
+
 import { BaseDao } from './base.dao';
+import { Item } from '../entities/Item.entity';
 
 interface ItemWithLastUsedPriceDBObject {
     id: number;
@@ -51,7 +53,16 @@ export class ItemDao extends BaseDao {
             ORDER BY i.name;
           `);
         return result.map(
-            (item) => new ItemWithLastUsedPriceDTO(item.id, this.formatItemName(item), item.last_used_date, item.last_unit_price ?? 0, item.category_id)
+            (item) =>
+                new ItemWithLastUsedPriceDTO(
+                    item.id,
+                    this.formatItemName(item),
+                    item.container_size,
+                    item.container_size_unit,
+                    item.last_used_date,
+                    item.last_unit_price ?? 0,
+                    item.category_id
+                )
         );
     }
 

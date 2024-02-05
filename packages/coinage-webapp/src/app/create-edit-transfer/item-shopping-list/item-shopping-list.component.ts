@@ -68,7 +68,15 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         if (response.insertedId) {
             this.notificationService.push({ title: `Item Created`, message: name });
         }
-        const addedItem: ItemWithLastUsedPriceDTO = { id: response.insertedId ?? 0, name, categoryId: 0, lastUnitPrice: 0, lastUsedDate: null };
+        const addedItem: ItemWithLastUsedPriceDTO = {
+            id: response.insertedId ?? 0,
+            name,
+            categoryId: 0,
+            lastUnitPrice: 0,
+            lastUsedDate: null,
+            containerSize: null,
+            containerSizeUnit: null,
+        };
         this.allItems.push(addedItem);
         return addedItem;
     }

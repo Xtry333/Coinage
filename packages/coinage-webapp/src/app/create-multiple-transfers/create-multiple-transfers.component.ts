@@ -15,6 +15,7 @@ import {
     TransferDetailsDTO,
 } from '@coinage-app/interfaces';
 
+import { SelectedTransferItemDetails } from './item-details-for-transfer/item-details-for-transfer.component';
 import { NewTransferDetailsComponent, SelectedDetails } from './new-transfer-details/new-transfer-details.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { StorageScope } from '../core/services/storage-service/storage-scope.enum';
@@ -37,7 +38,7 @@ export interface NewTransferObject {
     styleUrls: ['./create-multiple-transfers.component.scss'],
 })
 export class CreateMultipleTransfersComponent implements OnInit {
-    public static SAVED_ITEMS = 'receipt.saved-items';
+    public static SAVED_ITEMS = 'createTransfers.selectedItems';
 
     public showPage = true;
 
@@ -48,16 +49,13 @@ export class CreateMultipleTransfersComponent implements OnInit {
     public transferDTO?: TransferDetailsDTO;
     public selectedDetails?: SelectedDetails;
 
-    public itemsInTransfer: ShoppingListItem[] = [];
+    public itemsInTransfers: SelectedTransferItemDetails[] = [];
 
     public shouldDisplayShoppingList = false;
     public shouldOverrideTotalCostOnChange = true;
 
     @ViewChildren('newTransferDetails')
     private newTransferDetailsComponent?: QueryList<NewTransferDetailsComponent>;
-
-    @ViewChildren('itemSelect')
-    private itemSelect?: QueryList<NgSelectComponent>;
 
     @Input() public redirectAfterSave = true;
 
@@ -101,103 +99,32 @@ export class CreateMultipleTransfersComponent implements OnInit {
         this.selectedDetails = selected;
     }
 
+    public onItemAdded(item: SelectedTransferItemDetails) {
+        this.itemsInTransfers.push(item);
+        this.itemsInTransfers = Object.assign([], this.itemsInTransfers);
+        this.storage.setObject(CreateMultipleTransfersComponent.SAVED_ITEMS, this.itemsInTransfers, StorageScope.Session);
+    }
+
+    public onItemRemoved(item: SelectedTransferItemDetails) {
+        const index = this.itemsInTransfers.indexOf(item);
+        if (index > -1) {
+            this.itemsInTransfers.splice(index, 1);
+        }
+        this.itemsInTransfers = Object.assign([], this.itemsInTransfers);
+        this.storage.setObject(CreateMultipleTransfersComponent.SAVED_ITEMS, this.itemsInTransfers, StorageScope.Session);
+    }
+
     private initInputData(): void {
-        this.itemList = this.storage.getObject(CreateMultipleTransfersComponent.SAVED_ITEMS, StorageScope.Session) ?? [];
-        this.categorisedItemList = this.getShoppingListByCategories();
+        this.itemsInTransfers = this.storage.getObject(CreateMultipleTransfersComponent.SAVED_ITEMS, StorageScope.Session) ?? [];
     }
 
     private clearItemList(): void {
-        this.itemList = [];
-        this.storage.setObject(CreateMultipleTransfersComponent.SAVED_ITEMS, null, StorageScope.Session);
-        this.categorisedItemList = this.getShoppingListByCategories();
-    }
-
-    public selectedItemDetails: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0);
-    public itemList: ShoppingListItem[] = [];
-    public categorisedItemList: {
-        name: string;
-        items: ShoppingListItem[];
-    }[] = this.getShoppingListByCategories();
-
-    public onItemSelected(selected: ShoppingListItem): void {
-        if (selected === undefined) {
-            return;
-        }
-        const item = this.allItems.find((item) => item.id === selected.id);
-        if (item && item.lastUnitPrice !== null) {
-            this.selectedItemDetails.price = item.lastUnitPrice;
-        }
-        this.onItemDetailsChanged();
-    }
-
-    public onItemDetailsChanged(): void {
-        const item = this.allItems.find((item) => item.id === this.selectedItemDetails.id);
-        console.log(item);
-        console.log(this.selectedItemDetails);
-    }
-
-    public onClickAddNewItemToList(): void {
-        const item = this.allItems.find((item) => item.id === this.selectedItemDetails.id);
-        const shoppingItem = new ShoppingListItem(
-            item?.id,
-            item?.name ?? this.selectedItemDetails.name,
-            Number(this.selectedItemDetails.amount),
-            Number(this.selectedItemDetails.price),
-            Number(this.selectedItemDetails.setDiscount),
-            item?.categoryId ?? 0
-        );
-        this.itemList.push(shoppingItem);
-        this.categorisedItemList = this.getShoppingListByCategories();
-        this.itemSelect?.first.handleClearClick();
-        this.selectedItemDetails.price = 0;
-        this.selectedItemDetails.amount = 1;
-        this.selectedItemDetails.setDiscount = 0;
-
-        this.storage.setObject(CreateMultipleTransfersComponent.SAVED_ITEMS, this.itemList);
-    }
-
-    public getShoppingListByCategories() {
-        const categories = [...new Set(this.itemList.map((item) => item.categoryId ?? 0))].map((id) => {
-            const category = this.categories.find((cat) => cat.id === id);
-            if (!category) {
-                return {
-                    id: 0,
-                    name: 'None',
-                };
-            }
-            return category;
-        });
-        const categoryItems = [...categories].map((category) => {
-            return {
-                name: category.name,
-                items: this.itemList.filter((item) => item.categoryId === category.id),
-            };
-        });
-        return categoryItems;
-    }
-
-    public getItemTotalPrice(item: ShoppingListItem): number {
-        const a = Number((item.price * item.amount).toFixed(2));
-        //console.log(typeof a);
-        return a;
-    }
-
-    public getItemTotalPriceWithDiscount(item: ShoppingListItem): number {
-        return Number((item.price * item.amount - (item.setDiscount ?? 0)).toFixed(2));
-    }
-
-    public getTotalCategoryCost(items: ShoppingListItem[]): number {
-        const a = Number(items.reduce((sum: number, item: ShoppingListItem) => sum + item.price * item.amount - (item.setDiscount ?? 0), 0).toFixed(2));
-        //console.log(typeof a);
-        return a;
-    }
-
-    public getItemsCost(items: ShoppingListItem[]): number {
-        return Number(items.reduce((sum: number, item: ShoppingListItem) => sum + item.price * item.amount - (item.setDiscount ?? 0), 0).toFixed(2));
+        this.itemsInTransfers = [];
+        this.storage.setObject(CreateMultipleTransfersComponent.SAVED_ITEMS, [], StorageScope.Session);
     }
 
     public async onClickCreateTransfer(): Promise<void> {
-        console.log(this.itemList);
+        console.log(this.itemsInTransfers);
         if (!this.selectedDetails?.accountId) {
             this.newTransferDetailsComponent?.first.highlightAccountSelect();
             throw new Error('Select account!');
@@ -208,8 +135,8 @@ export class CreateMultipleTransfersComponent implements OnInit {
             contractorId: this.selectedDetails?.contractorId ?? null,
             accountId: this.selectedDetails?.accountId,
             receiptId: null,
-            date: new Date(),
-            items: this.itemList.map((i) => new ExistingItem(i.id ?? 0, i.amount, i.price, i.setDiscount ?? 0)),
+            date: new Date(`${this.selectedDetails.transferDate} 12:00`),
+            items: this.itemsInTransfers.map((i) => new ExistingItem(i.id ?? 0, i.amount, i.unitPrice, i.setDiscount ?? 0)),
         };
         const result = await this.dataService.postCreateAdvancedTransfers(dto);
         console.log(result);

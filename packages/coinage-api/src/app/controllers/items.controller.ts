@@ -51,7 +51,7 @@ export class ItemsController {
 
     @Post('/save')
     public async saveItem(@Body() item: CreateEditItemDTO): Promise<BaseResponseDTO> {
-        console.log(item)
+        console.log(item);
         const entity: Item = item.id !== null ? await this.itemDao.getById(item.id) : new Item();
 
         entity.brand = item.brand;

@@ -1,4 +1,8 @@
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
+import { finalize } from 'rxjs/operators';
 
 import {
     AccountDTO,
@@ -9,15 +13,11 @@ import {
     TransferDetailsDTO,
     TransferItemDTO,
 } from '@coinage-app/interfaces';
-import { ActivatedRoute, Router } from '@angular/router';
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
-import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 
-import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { NgSelectComponent } from '@ng-select/ng-select';
+import { CoinageDataService } from '../services/coinage.data-service';
+import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 import { NotificationService } from '../services/notification.service';
-import { finalize } from 'rxjs/operators';
 
 export interface NewTransferObject {
     description: string;
@@ -26,6 +26,7 @@ export interface NewTransferObject {
     categoryId?: number;
     contractorId?: number | null;
     accountId?: number;
+    targetAccountId?: number;
 }
 
 @Component({
@@ -91,6 +92,7 @@ export class CreateEditTransferComponent implements OnInit {
                         description: transfer.description,
                         contractorId: transfer.contractorId ?? undefined,
                         accountId: transfer.account.id,
+                        targetAccountId: transfer.targetAccount.id,
                     };
                 });
             }

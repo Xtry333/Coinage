@@ -30,7 +30,7 @@ const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe];
         SidebarNavComponent,
         DropdownMenuComponent,
         FontAwesomeModule,
-        CommonModule
+        CommonModule,
     ],
 })
 export class CoreModule {}

@@ -1,10 +1,11 @@
-import * as Rx from 'rxjs';
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import * as Rx from 'rxjs';
+
+import { ItemDetailsDTO } from '@coinage-app/interfaces';
+
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NavigatorPages, NavigatorService } from '../services/navigator.service';
-import { ItemDetailsDTO } from '@coinage-app/interfaces';
 import { NotificationService } from '../services/notification.service';
 
 @Component({

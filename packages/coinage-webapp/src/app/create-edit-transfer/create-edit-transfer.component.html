@@ -70,6 +70,20 @@
                     </ng-select>
                 </div>
                 <div>
+                    <label for="targetAccount">Target Account</label>
+                    <ng-select
+                        name="targetAccount"
+                        labelForId="targetAccount"
+                        [(ngModel)]="selectedTransferInputs.targetAccountId"
+                        [clearable]="false"
+                        [editableSearchTerm]="true"
+                        [items]="accounts"
+                        bindValue="id"
+                        bindLabel="name"
+                    >
+                    </ng-select>
+                </div>
+                <div>
                     <label for="date">Date</label>
                     <input id="date" name="date" type="date" [(ngModel)]="selectedTransferInputs.date" />
                 </div>
