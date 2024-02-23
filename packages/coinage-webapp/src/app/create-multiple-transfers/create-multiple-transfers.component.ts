@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
@@ -11,7 +10,6 @@ import {
     CreateMultipleTransfersDTO,
     ExistingItem,
     ItemWithLastUsedPriceDTO,
-    ShoppingListItem,
     TransferDetailsDTO,
 } from '@coinage-app/interfaces';
 
@@ -38,7 +36,7 @@ export interface NewTransferObject {
     styleUrls: ['./create-multiple-transfers.component.scss'],
 })
 export class CreateMultipleTransfersComponent implements OnInit {
-    public static SAVED_ITEMS = 'createTransfers.selectedItems';
+    public static readonly SAVED_ITEMS = 'createTransfers.selectedItems';
 
     public showPage = true;
 

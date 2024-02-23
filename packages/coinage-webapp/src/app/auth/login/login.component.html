@@ -1,0 +1,31 @@
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Login</h3>
+                </div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group">
+                            <label for="username">Username</label>
+                            <input type="text" name="username" class="form-control" id="username" placeholder="Enter your username" [(ngModel)]="username" />
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input
+                                type="password"
+                                name="password"
+                                class="form-control"
+                                id="password"
+                                placeholder="Enter your password"
+                                [(ngModel)]="password"
+                            />
+                        </div>
+                        <button type="submit" class="btn btn-primary" (click)="onClickLogin()">Login</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,3 +1,9 @@
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { plainToInstance } from 'class-transformer';
+import { Observable, lastValueFrom, map } from 'rxjs';
+
 import {
     AccountDTO,
     BalanceDTO,
@@ -9,7 +15,6 @@ import {
     CreateEditTransferModelDTO,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
-    MonthlyUserStatsDTO,
     ReceiptDetailsDTO,
     RefundTransferDTO,
     SplitTransferDTO,
@@ -22,11 +27,6 @@ import {
     NewMonthlyUserStatsDTO,
     CreateMultipleTransfersDTO,
 } from '@coinage-app/interfaces';
-import { Observable, lastValueFrom, map } from 'rxjs';
-
-import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { instanceToPlain, plainToInstance } from 'class-transformer';
 
 @Injectable({
     providedIn: 'root',
@@ -55,14 +55,13 @@ export class CoinageDataService {
     }
 
     public getAllFilteredTransfers(filterParams?: GetFilteredTransfersRequest): Promise<FilteredTransfersDTO> {
-        const a = plainToInstance(GetFilteredTransfersRequest, filterParams, {
+        const instance = plainToInstance(GetFilteredTransfersRequest, filterParams, {
             exposeUnsetFields: true,
             strategy: 'exposeAll',
             enableImplicitConversion: true,
         });
-        console.log(a);
         return lastValueFrom(
-            this.http.post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfers/all`, a).pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)))
+            this.http.post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfers/all`, instance).pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)))
         );
     }
 

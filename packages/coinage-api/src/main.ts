@@ -4,10 +4,10 @@
  */
 
 import { Logger, ValidationPipe } from '@nestjs/common';
-
-import { AppModule } from './app/app.module';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';
+
+import { AppModule } from './app/app.module';
 
 async function bootstrap() {
     const globalPrefix = 'api';

@@ -1,17 +1,18 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 
 import { Account } from './Account.entity';
-import { BooleanTransformer } from './transformers/boolean.transformer';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
+import { Currency } from './Currency.entity';
 import { Receipt } from './Receipt.entity';
+import { Schedule } from './Schedule.entity';
 import { TransferItem } from './TransferItem.entity';
+import { BooleanTransformer } from './transformers/boolean.transformer';
+import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
+import { User } from './User.entity';
 import { WithDateEntity } from './WithDate.partialEntity';
 import { Bit } from '../constants/booleanBuffer.const';
-import { User } from './User.entity';
-import { Currency } from './Currency.entity';
 
 export enum TransferTypeEnum {
     INCOME = 'INCOME',
@@ -85,6 +86,10 @@ export class Transfer extends WithDateEntity {
 
     @Column({ type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
+
+    @ManyToOne(() => Schedule, { eager: false, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
+    @JoinColumn({ name: 'schedule_id' })
+    public scheduleId!: Promise<Schedule | null>;
 
     @Column({ name: 'account_id', nullable: false })
     public originAccountId!: number;

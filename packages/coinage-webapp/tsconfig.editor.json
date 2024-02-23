@@ -1,6 +1,6 @@
 {
     "extends": "./tsconfig.json",
-    "include": ["src/**/*.ts"],
+    "include": ["src/**/*.ts", "src/app/auth/login/login.component.page.ts"],
     "compilerOptions": {
         "types": ["jest", "node"]
     }

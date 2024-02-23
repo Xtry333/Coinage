@@ -1,19 +1,24 @@
+import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { LoginComponent } from '../auth/login/login.component.page';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
-import { DashboardComponent } from '../pages/dashboard/dashboard.component';
+import { CreateMultipleTransfersComponent } from '../create-multiple-transfers/create-multiple-transfers.component';
+import { ChatComponent } from '../demo/chat/chat.component';
 import { MonthSummaryComponent } from '../month-summary/month-summary.component';
-import { NgModule } from '@angular/core';
+import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
+import { DashboardComponent } from '../pages/dashboard/dashboard.component';
 import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
-import { TransfersListComponent } from '../transfers-list/transfers-list.component';
-import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
 import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
-import { ChatComponent } from '../demo/chat/chat.component';
-import { CreateMultipleTransfersComponent } from '../create-multiple-transfers/create-multiple-transfers.component';
+import { TransfersListComponent } from '../transfers-list/transfers-list.component';
 
 const routes: Routes = [
+    {
+        path: 'login',
+        component: LoginComponent,
+    },
     {
         path: '',
         redirectTo: 'dashboard',

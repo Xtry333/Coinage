@@ -1,4 +1,8 @@
-import { CanActivate, createParamDecorator, ExecutionContext, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { Http2ServerRequest } from 'http2';
+
+import { CanActivate, createParamDecorator, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+
+import { AuthService } from '../auth/auth.service';
 import { UserDao } from '../daos/user.dao';
 import { User } from '../entities/User.entity';
 
@@ -11,23 +15,27 @@ export const RequestingUser = createParamDecorator((data: keyof User, context: E
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-    public static TEST_TOKEN = 'Bearer TOKEN_TEST_123_USER_ID#';
-    public constructor(public readonly userDao: UserDao) {}
+    public constructor(public readonly userDao: UserDao, private readonly authService: AuthService) {}
 
     public async canActivate(context: ExecutionContext): Promise<boolean> {
         try {
-            const request = context.switchToHttp().getRequest();
-            const bearerToken = request.headers.authorization as string;
-            const id = Number(bearerToken.split('#')[1]);
-            // console.log('Token:', bearerToken);
-            request.user = await this.userDao.getById(id);
+            const request: Http2ServerRequest & { [key: string]: unknown } = context.switchToHttp().getRequest();
+            const bearerToken = request.headers.authorization;
 
-            // If you want to allow the request even if auth fails, always return true
-            if (bearerToken.includes(AuthGuard.TEST_TOKEN)) {
+            if (!bearerToken) {
+                throw new UnauthorizedException();
+            }
+
+            const [, accessToken] = bearerToken.split(' ');
+
+            const user = await this.authService.validateUser(accessToken);
+
+            if (user) {
+                request.user = user;
                 return true;
             }
         } catch (error) {
-            throw new ForbiddenException();
+            throw new UnauthorizedException();
         }
         return false;
     }

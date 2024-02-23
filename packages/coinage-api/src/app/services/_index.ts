@@ -8,8 +8,9 @@ import { EtherealTransferService } from './ethereal-transfer.service';
 import { ItemsService } from './items.service';
 import { TemplateNameMapperService } from './template-name-mapper.service';
 import { TransferItemsService } from './transfer-items.service';
-import { TransfersService } from './transfers.service';
 import { SaveTransfersService } from './transfers/save-transfers.service';
+import { TransfersService } from './transfers.service';
+import { AuthService } from '../auth/auth.service';
 
 export default [
     DatabaseSourceService,
@@ -24,4 +25,5 @@ export default [
     TransferItemsService,
     AccountsService,
     ItemsService,
+    AuthService,
 ];

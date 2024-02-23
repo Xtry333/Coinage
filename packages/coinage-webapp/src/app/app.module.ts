@@ -15,6 +15,7 @@ import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
 
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { AppComponent } from './app.component';
+import { AuthModule } from './auth/auth.module';
 import { CategoryListItemComponent } from './category-manager/category-list-item/category-list-item.component';
 import { CategoryManagerComponent } from './category-manager/category-manager.component';
 import { CreateEditCategoryComponent } from './category-manager/create-edit-category/create-edit-category.component';
@@ -58,6 +59,7 @@ Chart.register(zoomPlugin);
     imports: [
         CoreModule,
         CommonComponentsModule,
+        AuthModule,
         ItemizedTransfersModule,
         NgxPopperjsModule,
         NgbModule,

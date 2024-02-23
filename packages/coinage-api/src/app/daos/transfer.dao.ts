@@ -154,7 +154,6 @@ export class TransferDao extends BaseDao {
 
     public async save(transfer: Writeable<Transfer>): Promise<Transfer> {
         transfer.editedDate = new Date();
-        console.log(transfer.editedDate);
         return await this.transferRepository.save(transfer);
     }
 
