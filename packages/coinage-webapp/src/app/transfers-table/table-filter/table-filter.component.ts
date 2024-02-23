@@ -1,8 +1,9 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { IconDefinition, faCaretDown, faEdit, faFilter } from '@fortawesome/free-solid-svg-icons';
 
-import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 import { Range } from '@coinage-app/interfaces';
+
+import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 
 export enum FilterType {
     TextBox = 'TextBox',

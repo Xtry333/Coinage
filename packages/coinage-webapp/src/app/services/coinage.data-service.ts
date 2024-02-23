@@ -1,4 +1,3 @@
-
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { plainToInstance } from 'class-transformer';
@@ -61,7 +60,9 @@ export class CoinageDataService {
             enableImplicitConversion: true,
         });
         return lastValueFrom(
-            this.http.post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfers/all`, instance).pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)))
+            this.http
+                .post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfers/all`, instance)
+                .pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)))
         );
     }
 

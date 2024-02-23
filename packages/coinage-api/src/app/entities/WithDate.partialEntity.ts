@@ -1,4 +1,5 @@
 import { CreateDateColumn, UpdateDateColumn } from 'typeorm';
+
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 
 export class WithDateEntity {

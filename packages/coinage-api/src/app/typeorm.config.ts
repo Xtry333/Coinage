@@ -1,9 +1,8 @@
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions, Table } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+
 import entities from './entities/_index';
 import migrations from '../database/migrations/_index';
-
-import { Table } from 'typeorm';
 
 export class CustomNamingStrategy extends SnakeNamingStrategy {
     public foreignKeyName(tableOrName: Table | string, columnNames: string[], referencedTablePath: string, referencedColumnNames: string[]): string {

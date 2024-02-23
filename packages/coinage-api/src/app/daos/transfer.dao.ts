@@ -1,11 +1,13 @@
-import { GetFilteredTransfersRequest, Range, TransferType } from '@coinage-app/interfaces';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, IsNull, LessThanOrEqual, Repository } from 'typeorm';
+
+import { GetFilteredTransfersRequest, Range, TransferType } from '@coinage-app/interfaces';
+
+import { BaseDao } from './base.dao';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
 import { Writeable } from '../types/Writeable.type';
-import { BaseDao } from './base.dao';
 
 type KeysOfType<O, T> = {
     [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;

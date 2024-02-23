@@ -1,13 +1,13 @@
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+import { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { faClock, faFeatherAlt, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
 
-import { ActivatedRoute, Router } from '@angular/router';
 import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
-import { Component, OnDestroy, OnInit } from '@angular/core';
-import { NavigatorPages, NavigatorService } from '../services/navigator.service';
-import { faClock, faFeatherAlt, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { IconDefinition } from '@fortawesome/fontawesome-common-types';
+import { NavigatorPages, NavigatorService } from '../services/navigator.service';
 import { NotificationService } from '../services/notification.service';
 
 @Component({

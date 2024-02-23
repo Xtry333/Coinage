@@ -1,8 +1,8 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
-import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 
 import { Contractor } from './Contractor.entity';
 import { Transfer } from './Transfer.entity';
+import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 
 @Entity()
