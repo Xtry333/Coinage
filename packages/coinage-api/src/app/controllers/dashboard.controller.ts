@@ -1,10 +1,11 @@
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 
-import { AccountDao } from '../daos/account.dao';
 import { BalanceDTO } from '@coinage-app/interfaces';
+
+import { AccountDao } from '../daos/account.dao';
+import { User } from '../entities/User.entity';
 import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
-import { User } from '../entities/User.entity';
 
 @UseGuards(AuthGuard)
 @Controller('dashboard')
