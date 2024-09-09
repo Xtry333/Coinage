@@ -22,7 +22,10 @@ export class CurrentUserDataService {
     public readonly userData$; // = this._userData.asObservable().pipe(delay(0));
     private _dataLoaded = false;
 
-    public constructor(private readonly http: HttpClient, private readonly webSocketService: WebSocketService) {
+    public constructor(
+        private readonly http: HttpClient,
+        private readonly webSocketService: WebSocketService,
+    ) {
         //this.refreshUserData();
         this.userData$ = this.webSocketService.on('hello') as Observable<{
             [key: string]: any;

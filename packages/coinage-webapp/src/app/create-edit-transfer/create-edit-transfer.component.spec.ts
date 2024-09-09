@@ -49,7 +49,7 @@ describe('CreateEditTransferComponent', () => {
                         createdDate: new Date('2021-05-16'),
                         editedDate: new Date('2021-05-16'),
                     });
-                })
+                }),
         );
         fixture = TestBed.createComponent(CreateEditTransferComponent);
         component = fixture.componentInstance;

@@ -27,7 +27,10 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0);
     public itemList: ShoppingListItem[] = [];
 
-    public constructor(private readonly coinageDataService: CoinageDataService, private readonly notificationService: NotificationService) {}
+    public constructor(
+        private readonly coinageDataService: CoinageDataService,
+        private readonly notificationService: NotificationService,
+    ) {}
 
     public ngOnInit(): void {
         this.loadItems();
@@ -90,7 +93,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             this.selectedItem.amount,
             this.selectedItem.price,
             undefined,
-            item?.categoryId ?? 0
+            item?.categoryId ?? 0,
         );
         this.itemList.push(shoppingItem);
         this.recalculateAndEmitTotalCost();

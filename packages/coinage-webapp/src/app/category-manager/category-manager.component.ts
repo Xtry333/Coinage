@@ -31,7 +31,7 @@ export class CategoryManagerComponent implements OnInit {
                 finalize(() => {
                     this.showPage = true;
                     console.log(this.categories);
-                })
+                }),
             )
             .subscribe((c) => (this.parentCategory = this.createRootCategory(c)));
     }

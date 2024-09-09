@@ -19,7 +19,7 @@ export class AccountDao extends BaseDao {
         @InjectRepository(Account) private readonly accountRepository: Repository<Account>,
         private readonly dateParser: DateParserService,
         private readonly dataSource: DataSource,
-        private readonly databaseSourceService: DatabaseSourceService
+        private readonly databaseSourceService: DatabaseSourceService,
     ) {
         super();
     }
@@ -92,7 +92,7 @@ export class AccountDao extends BaseDao {
             {
                 accountId: accountId,
             },
-            SingularAccountDailyBalance
+            SingularAccountDailyBalance,
         );
     }
 
@@ -134,7 +134,7 @@ export class AccountDao extends BaseDao {
 
     public async getLast12MonthStats(
         accountIds: number[],
-        sumOnlyInternalTransfers = true
+        sumOnlyInternalTransfers = true,
     ): Promise<{ year: number; month: number; income: string; outcome: string; count: string }[]> {
         return await this.dataSource.getRepository(Transfer).query(
             `SELECT
@@ -148,7 +148,7 @@ export class AccountDao extends BaseDao {
                     AND t.date <= '${this.dateParser.getToday()}' ${sumOnlyInternalTransfers ? `#AND t.is_internal = 0` : ``}
                 GROUP BY YEAR(t.date), MONTH(t.date)
                 ORDER BY year DESC, month DESC
-                LIMIT 12`
+                LIMIT 12`,
         );
     }
 
@@ -174,7 +174,7 @@ ORDER BY changeYear DESC, changeMonth DESC
 #LIMIT 12
         `,
             { userId: userId, monthsCount: numberOfLastMonths },
-            AccountMonthlySubChange
+            AccountMonthlySubChange,
         );
     }
 
@@ -205,13 +205,13 @@ ORDER BY changeYear DESC, changeMonth DESC
             GROUP BY oa.id, ta.id;
             `,
             { accountIds: filter.accountIds, asOfDate: asOfDateString, userId: filter.userId },
-            AccountSubBalance
+            AccountSubBalance,
         );
     }
 
     public async getBalanceNew(
         filter: { accountIds?: number[]; userId?: number },
-        asOfDate?: Date
+        asOfDate?: Date,
     ): Promise<
         {
             accountId: number;
@@ -248,7 +248,7 @@ ORDER BY changeYear DESC, changeMonth DESC
             GROUP BY oa.id, oa.currency_symbol
         `,
             { accountIds: filter.accountIds, asOfDate: asOfDateString, userId: filter.userId },
-            {}
+            {},
         );
         return await this.dataSource.query(...query);
     }

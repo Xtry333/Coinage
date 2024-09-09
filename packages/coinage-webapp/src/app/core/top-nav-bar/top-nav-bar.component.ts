@@ -28,7 +28,10 @@ export class TopNavBarComponent implements OnInit {
     @ViewChild('dropdownUserMenuComponent')
     private dropdownUserMenuComponent?: DropdownMenuComponent;
 
-    public constructor(private eRef: ElementRef, private readonly userDataService: CurrentUserDataService) {}
+    public constructor(
+        private eRef: ElementRef,
+        private readonly userDataService: CurrentUserDataService,
+    ) {}
 
     public ngOnInit(): void {
         this.userDataService.userData$.subscribe((user) => {

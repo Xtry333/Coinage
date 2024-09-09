@@ -43,7 +43,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly coinageData: CoinageDataService,
-        private readonly partedDateService: DateParserService
+        private readonly partedDateService: DateParserService,
     ) {
         console.log(this);
     }
@@ -108,7 +108,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
             ])
                 .then(([allFilteredTransfers, balance]) => {
                     this.transfers = allFilteredTransfers.transfers.filter(
-                        (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year
+                        (t) => new Date(t.date).getMonth() + 1 === this.partedDate.month && new Date(t.date).getFullYear() === this.partedDate.year,
                     );
                     this.initializeChartLabels();
                     this.populateChartDataset(balance);
@@ -150,7 +150,7 @@ export class MonthSummaryComponent implements OnInit, OnDestroy {
                 (acc) =>
                     this.tableFilterParams.accountIds === undefined ||
                     this.tableFilterParams.accountIds.length === 0 ||
-                    this.tableFilterParams.accountIds.includes(acc.accountId)
+                    this.tableFilterParams.accountIds.includes(acc.accountId),
             )
             .reduce((a, b) => a + b.balance, 0);
         for (let i = 0; i < dailyChange.length; i++) {

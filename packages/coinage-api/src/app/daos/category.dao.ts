@@ -11,7 +11,10 @@ import { BaseDao } from './base.dao';
 export class CategoryDao extends BaseDao {
     public static SYSTEM_CATEGORY_NOT_FOUND_MESSAGE = (tag: string) => `System category '${tag}' not found. Something went wrong in the database.`;
 
-    public constructor(@InjectRepository(Category) private readonly categoryRepository: Repository<Category>, private readonly dataSource: DataSource) {
+    public constructor(
+        @InjectRepository(Category) private readonly categoryRepository: Repository<Category>,
+        private readonly dataSource: DataSource,
+    ) {
         super();
     }
 

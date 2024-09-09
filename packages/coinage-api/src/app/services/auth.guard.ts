@@ -15,7 +15,10 @@ export const RequestingUser = createParamDecorator((data: keyof User, context: E
 
 @Injectable()
 export class AuthGuard implements CanActivate {
-    public constructor(public readonly userDao: UserDao, private readonly authService: AuthService) {}
+    public constructor(
+        public readonly userDao: UserDao,
+        private readonly authService: AuthService,
+    ) {}
 
     public async canActivate(context: ExecutionContext): Promise<boolean> {
         try {

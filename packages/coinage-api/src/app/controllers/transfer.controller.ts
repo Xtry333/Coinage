@@ -45,7 +45,7 @@ export class TransferController {
         private readonly dateParserService: DateParserService,
         private readonly saveTransfersService: SaveTransfersService,
         private readonly itemsService: ItemsService,
-        private readonly transferItemsService: TransferItemsService
+        private readonly transferItemsService: TransferItemsService,
     ) {}
 
     @Get(':transferId/details')

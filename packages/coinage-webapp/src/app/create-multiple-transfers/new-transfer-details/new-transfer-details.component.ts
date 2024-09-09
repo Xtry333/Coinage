@@ -41,7 +41,7 @@ export class NewTransferDetailsComponent implements OnInit {
     public constructor(
         private readonly dataService: CoinageDataService,
         private readonly storage: CoinageStorageService,
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
     ) {
         this.selected = {
             accountId: 0,
@@ -55,7 +55,7 @@ export class NewTransferDetailsComponent implements OnInit {
             .pipe(
                 finalize(() => {
                     this.dataReady = true;
-                })
+                }),
             )
             .subscribe(([contractors, accounts]) => {
                 this.contractors = contractors;

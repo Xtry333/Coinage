@@ -25,7 +25,7 @@ export class TransferItemDetailsComponent implements OnInit, OnDestroy {
         private readonly router: Router,
         private readonly navigator: NavigatorService,
         private readonly coinageData: CoinageDataService,
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
     ) {}
 
     public ngOnInit(): void {

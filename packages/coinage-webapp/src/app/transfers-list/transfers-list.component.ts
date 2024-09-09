@@ -36,7 +36,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
         windowService: WindowService,
         private readonly route: ActivatedRoute,
         private readonly coinageData: CoinageDataService,
-        private readonly localStorage: CoinageStorageService
+        private readonly localStorage: CoinageStorageService,
     ) {
         this.window = windowService.getWindow();
     }

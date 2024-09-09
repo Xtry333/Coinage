@@ -52,7 +52,7 @@ export class AppComponent implements OnInit, OnDestroy {
         private readonly socket: Socket,
         private readonly userDataService: CurrentUserDataService,
         private readonly webSocketService: WebSocketService,
-        private readonly langService: LangService
+        private readonly langService: LangService,
     ) {}
 
     public ngOnInit(): void {

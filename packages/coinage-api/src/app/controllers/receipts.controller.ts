@@ -17,7 +17,7 @@ export class ReceiptsController {
         private readonly categoryDao: CategoryDao,
         private readonly contractorDao: ContractorDao,
         private readonly accountDao: AccountDao,
-        private readonly dateParserService: DateParserService
+        private readonly dateParserService: DateParserService,
     ) {}
 
     @Get(':id/details')
@@ -45,7 +45,7 @@ export class ReceiptsController {
         return Math.abs(
             transfers
                 ?.filter((t) => withPlanned || new Date(t.date) <= new Date())
-                .reduce((amount, t) => amount + Number(t.amount) * TransferType[t.category.type].mathSymbol, 0)
+                .reduce((amount, t) => amount + Number(t.amount) * TransferType[t.category.type].mathSymbol, 0),
         );
     }
 

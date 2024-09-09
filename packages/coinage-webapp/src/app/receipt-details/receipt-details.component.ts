@@ -18,7 +18,7 @@ export class ReceiptDetailsComponent implements OnInit {
     public constructor(
         private readonly route: ActivatedRoute,
         private readonly navigator: NavigatorService,
-        private readonly coinageData: CoinageDataService
+        private readonly coinageData: CoinageDataService,
     ) {}
 
     public ngOnInit(): void {

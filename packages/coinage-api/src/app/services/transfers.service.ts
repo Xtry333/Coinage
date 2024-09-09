@@ -8,7 +8,10 @@ import { Transfer } from '../entities/Transfer.entity';
 
 @Injectable()
 export class TransfersService {
-    public constructor(private readonly transferDao: TransferDao, private readonly categoryDao: CategoryDao) {}
+    public constructor(
+        private readonly transferDao: TransferDao,
+        private readonly categoryDao: CategoryDao,
+    ) {}
 
     public async getAllFilteredPagedDTO(filter: GetFilteredTransfersRequest): Promise<TransferDTO[]> {
         return (await this.transferDao.getAllFilteredPaged(filter)).map((t) => this.toTransferDTO(t));

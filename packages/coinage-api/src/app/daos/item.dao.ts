@@ -61,8 +61,8 @@ export class ItemDao extends BaseDao {
                     item.container_size_unit,
                     item.last_used_date,
                     item.last_unit_price ?? 0,
-                    item.category_id
-                )
+                    item.category_id,
+                ),
         );
     }
 

@@ -26,13 +26,13 @@ export class TransfersController {
         private readonly accountBalanceService: AccountBalanceService,
         private readonly dateParserService: DateParserService,
         private readonly saveTransfersService: SaveTransfersService,
-        private readonly userDao: UserDao
+        private readonly userDao: UserDao,
     ) {}
 
     @Post('all')
     public async getAllFilteredTransfers(
         @RequestingUser('id') userId: number,
-        @Body() filterParams: GetFilteredTransfersRequest
+        @Body() filterParams: GetFilteredTransfersRequest,
     ): Promise<FilteredTransfersDTO> {
         filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
         filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;
@@ -55,7 +55,7 @@ export class TransfersController {
     @Post('allPagedBatch')
     public async getAllTransfersFilteredMonthly(
         @RequestingUser('id') userId: number,
-        @Body() filterParams: GetFilteredTransfersRequest
+        @Body() filterParams: GetFilteredTransfersRequest,
     ): Promise<FilteredTransfersDTO> {
         filterParams.page = filterParams.page > 0 ? filterParams.page : 1;
         filterParams.rowsPerPage = filterParams.rowsPerPage > 0 ? filterParams.rowsPerPage : 100;

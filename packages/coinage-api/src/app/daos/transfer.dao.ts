@@ -17,7 +17,7 @@ type KeysOfType<O, T> = {
 export class TransferDao extends BaseDao {
     public constructor(
         @InjectRepository(Transfer) private readonly transferRepository: Repository<Transfer>,
-        private readonly templateNameMapperService: TemplateNameMapperService
+        private readonly templateNameMapperService: TemplateNameMapperService,
     ) {
         super();
     }
@@ -99,7 +99,7 @@ export class TransferDao extends BaseDao {
     private assignBetweenFilterIfExists(
         filter: FindOptionsWhere<Transfer>,
         key: KeysOfType<Transfer, string | number | null | Date>,
-        range?: Range<string | number | null | Date>
+        range?: Range<string | number | null | Date>,
     ) {
         if (range !== undefined && range.from !== undefined && range.to !== undefined) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

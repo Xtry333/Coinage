@@ -7,7 +7,7 @@ export class CreateEditItemDTO {
         public name: string,
         public categoryId: number,
         containerSize: number | null,
-        public containerSizeUnit: string | null
+        public containerSizeUnit: string | null,
     ) {
         this.containerSize = containerSize;
     }

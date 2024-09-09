@@ -65,7 +65,7 @@ export class CreateMultipleTransfersComponent implements OnInit {
         private readonly navigator: NavigatorService,
         private readonly dataService: CoinageDataService,
         private readonly notificationService: NotificationService,
-        private readonly storage: CoinageStorageService
+        private readonly storage: CoinageStorageService,
     ) {
         this.initInputData();
     }
@@ -81,7 +81,7 @@ export class CreateMultipleTransfersComponent implements OnInit {
             .pipe(
                 finalize(() => {
                     this.showPage = true;
-                })
+                }),
             )
             .subscribe(([categories, contractors, accounts, items]) => {
                 this.categories = categories;

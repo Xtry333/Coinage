@@ -106,7 +106,10 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     @Output() public tableFilter = new EventEmitter<TableFilterFields>();
 
-    public constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageStorageService) {}
+    public constructor(
+        private readonly dataService: CoinageDataService,
+        private readonly localStorage: CoinageStorageService,
+    ) {}
 
     public ngOnInit(): void {
         if (this.showFilters) {
@@ -119,15 +122,15 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList(), this.dataService.getAllAvailableAccounts()).subscribe(
                 ([categories, contractors, accounts]) => {
                     this.optionsForCheckboxFilters.categories = categories.map((c) =>
-                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.categoryIds)
+                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.categoryIds),
                     );
                     this.optionsForCheckboxFilters.contractors = contractors.map((c) =>
-                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.contractorIds)
+                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.contractorIds),
                     );
                     this.optionsForCheckboxFilters.accounts = accounts.map((a) =>
-                        TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds)
+                        TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds),
                     );
-                }
+                },
             );
         }
 

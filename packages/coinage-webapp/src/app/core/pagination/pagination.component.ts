@@ -40,7 +40,10 @@ export class PaginationComponent implements OnInit, OnChanges, OnDestroy {
     private pageNumber = 1;
     private rowsPerPage = 100;
 
-    public constructor(private readonly router: Router, private readonly route: ActivatedRoute) {}
+    public constructor(
+        private readonly router: Router,
+        private readonly route: ActivatedRoute,
+    ) {}
 
     public ngOnInit(): void {
         this.queryParamsSubscription = this.route.queryParams.subscribe((params) => {

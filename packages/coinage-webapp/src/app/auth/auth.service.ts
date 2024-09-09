@@ -16,7 +16,7 @@ export class AuthService {
         private authDataService: AuthDataService,
         private coinageStorageService: CoinageStorageService,
         private navigatorService: NavigatorService,
-        private notificationService: NotificationService
+        private notificationService: NotificationService,
     ) {
         console.log(this);
     }

@@ -83,7 +83,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     @ViewChild(DashboardCountersComponent)
     public countersComponent!: DashboardCountersComponent;
 
-    public constructor(private readonly coinageData: CoinageDataService, private readonly partedDateService: DateParserService) {}
+    public constructor(
+        private readonly coinageData: CoinageDataService,
+        private readonly partedDateService: DateParserService,
+    ) {}
 
     public ngOnInit(): void {
         console.log(this);
@@ -145,7 +148,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
             .pipe(
                 finalize(() => {
                     this.showPage = true;
-                })
+                }),
             )
             .subscribe(([recentlyEditedTransfers, stats, balance]) => {
                 this.lastTransactions = recentlyEditedTransfers;

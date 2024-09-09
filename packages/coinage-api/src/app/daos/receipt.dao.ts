@@ -10,7 +10,7 @@ export class ReceiptDao extends BaseDao {
     public constructor(
         @InjectRepository(Receipt) private readonly receiptRepository: Repository<Receipt>,
         private readonly templateNameMapperService: TemplateNameMapperService,
-        private readonly dataSource: DataSource
+        private readonly dataSource: DataSource,
     ) {
         super();
     }

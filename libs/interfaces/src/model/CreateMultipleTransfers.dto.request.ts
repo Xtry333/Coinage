@@ -108,7 +108,7 @@ export class CreateMultipleTransfersDTO {
         accountId: number,
         date: Date,
         receiptId: number | null,
-        items: ExistingItem[] | undefined
+        items: ExistingItem[] | undefined,
     ) {
         this.description = description;
         this.amount = amount;

@@ -47,7 +47,10 @@ export class TransferItemsTableComponent {
     @Input() public filterCachePath?: string;
     @Input() public lastPageNumber?: number;
 
-    public constructor(private readonly dataService: CoinageDataService, private readonly localStorage: CoinageStorageService) {}
+    public constructor(
+        private readonly dataService: CoinageDataService,
+        private readonly localStorage: CoinageStorageService,
+    ) {}
 
     public transferWithItemIdTracker(_index: number, item: TransferWithItemDetailsDTO): string {
         return item.transferId.toString() + item.unitPrice.toString();

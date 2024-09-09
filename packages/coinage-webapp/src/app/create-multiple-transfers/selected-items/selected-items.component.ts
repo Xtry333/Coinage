@@ -39,7 +39,7 @@ export class SelectedItemsComponent implements OnChanges {
 
     public getTotalCategoryCost(items: SelectedTransferItemDetails[]): number {
         const a = Number(
-            items.reduce((sum: number, item: SelectedTransferItemDetails) => sum + item.unitPrice * item.amount - (item.setDiscount ?? 0), 0).toFixed(2)
+            items.reduce((sum: number, item: SelectedTransferItemDetails) => sum + item.unitPrice * item.amount - (item.setDiscount ?? 0), 0).toFixed(2),
         );
         //console.log(typeof a);
         return a;
@@ -47,7 +47,7 @@ export class SelectedItemsComponent implements OnChanges {
 
     public getItemsCost(items: SelectedTransferItemDetails[]): number {
         return Number(
-            items.reduce((sum: number, item: SelectedTransferItemDetails) => sum + item.unitPrice * item.amount - (item.setDiscount ?? 0), 0).toFixed(2)
+            items.reduce((sum: number, item: SelectedTransferItemDetails) => sum + item.unitPrice * item.amount - (item.setDiscount ?? 0), 0).toFixed(2),
         );
     }
 

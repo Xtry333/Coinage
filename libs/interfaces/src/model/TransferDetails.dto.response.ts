@@ -60,6 +60,6 @@ export class TransferType {
         public readonly displayName: string,
         public readonly value: TransferTypeEnum,
         public readonly symbol: string,
-        public readonly mathSymbol: number
+        public readonly mathSymbol: number,
     ) {}
 }

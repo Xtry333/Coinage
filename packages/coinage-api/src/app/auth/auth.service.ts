@@ -11,7 +11,10 @@ interface JwtPayload {
 
 @Injectable()
 export class AuthService {
-    public constructor(private readonly jwtService: JwtService, private readonly userDao: UserDao) {}
+    public constructor(
+        private readonly jwtService: JwtService,
+        private readonly userDao: UserDao,
+    ) {}
 
     public async validateUser(token: string): Promise<User | undefined> {
         try {

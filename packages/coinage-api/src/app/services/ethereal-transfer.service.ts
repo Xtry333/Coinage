@@ -5,7 +5,10 @@ import { TransferDao } from '../daos/transfer.dao';
 
 @Injectable()
 export class EtherealTransferService {
-    public constructor(private readonly transferDao: TransferDao, private readonly accountDao: AccountDao) {}
+    public constructor(
+        private readonly transferDao: TransferDao,
+        private readonly accountDao: AccountDao,
+    ) {}
 
     public async stage(id: number): Promise<Transfer> {
         const target = await this.transferDao.getById(id);

@@ -12,7 +12,10 @@ export class LoginComponent {
     public username: string;
     public password: string;
 
-    public constructor(private readonly authService: AuthService, private readonly navigatorService: NavigatorService) {
+    public constructor(
+        private readonly authService: AuthService,
+        private readonly navigatorService: NavigatorService,
+    ) {
         this.username = '';
         this.password = '';
     }

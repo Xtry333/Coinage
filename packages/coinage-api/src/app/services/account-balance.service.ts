@@ -6,7 +6,10 @@ import { DateParserService } from './date-parser.service';
 
 @Injectable()
 export class AccountBalanceService {
-    public constructor(private readonly accountDao: AccountDao, private readonly dateParser: DateParserService) {}
+    public constructor(
+        private readonly accountDao: AccountDao,
+        private readonly dateParser: DateParserService,
+    ) {}
 
     public async getAccountsBalanceByIds(accountIds: number[], asOfDate?: Date | undefined) {
         // const subBalances = await this.accountDao.getSubBalanceByFilter({ accountIds }, asOfDate);
@@ -95,7 +98,7 @@ export class AccountBalanceService {
         // beginningMonth.setDate(28)
         const initialBalance = await this.getInitialBalance(
             userAccounts.map((a) => a.id),
-            monthlyDates[0]
+            monthlyDates[0],
         );
 
         const sumMonthlySubChange = (accountId: number, targetAccountKey: keyof AccountMonthlySubChange, validSubBalances: AccountMonthlySubChange[]) => {

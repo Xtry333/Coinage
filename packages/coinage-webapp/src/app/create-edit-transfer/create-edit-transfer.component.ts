@@ -68,7 +68,7 @@ export class CreateEditTransferComponent implements OnInit {
         private readonly navigator: NavigatorService,
         private readonly coinageData: CoinageDataService,
         private readonly notificationService: NotificationService,
-        private readonly coinageLocalStorageService: CoinageStorageService
+        private readonly coinageLocalStorageService: CoinageStorageService,
     ) {}
 
     public ngOnInit(): void {
@@ -101,7 +101,7 @@ export class CreateEditTransferComponent implements OnInit {
             .pipe(
                 finalize(() => {
                     this.showPage = true;
-                })
+                }),
             )
             .subscribe(([categories, contractors, accounts]) => {
                 this.categories = categories;
@@ -120,7 +120,7 @@ export class CreateEditTransferComponent implements OnInit {
             this.selectedTransferInputs.accountId ?? 0,
             new Date(this.selectedTransferInputs.date),
             this.transferDTO?.receipt?.id ?? null,
-            this.itemsInTransfer
+            this.itemsInTransfer,
         );
         console.log(newTransfer);
         this.coinageData.postCreateSaveTransfer(newTransfer).subscribe((result) => {

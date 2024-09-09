@@ -6,7 +6,7 @@ describe('NetworkInterceptor', () => {
     beforeEach(() =>
         TestBed.configureTestingModule({
             providers: [NetworkInterceptor],
-        })
+        }),
     );
 
     it('should be created', () => {

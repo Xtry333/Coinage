@@ -4,5 +4,8 @@ import { TransferDao } from '../../daos/transfer.dao';
 
 @Injectable()
 export class SaveTransfersService {
-    constructor(private readonly transferDao: TransferDao, private readonly categoryDao: CategoryDao) {}
+    constructor(
+        private readonly transferDao: TransferDao,
+        private readonly categoryDao: CategoryDao,
+    ) {}
 }

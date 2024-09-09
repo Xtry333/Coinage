@@ -225,7 +225,7 @@ export class TableFilterComponent implements OnInit {
     public onChangeOptionSearchValue(value: string) {
         this.optionSearchValue = value;
         this.filterOptions?.forEach(
-            (option) => (option.isDisplayed = value.length === 0 || option.searchValues.some((values) => values.includes(value.toLowerCase())))
+            (option) => (option.isDisplayed = value.length === 0 || option.searchValues.some((values) => values.includes(value.toLowerCase()))),
         );
     }
 

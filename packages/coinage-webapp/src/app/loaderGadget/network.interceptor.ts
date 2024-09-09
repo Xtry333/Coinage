@@ -16,7 +16,7 @@ export class NetworkInterceptor implements HttpInterceptor {
         private readonly storage: CoinageStorageService,
         private readonly navigatorService: NavigatorService,
         private readonly authService: AuthService,
-        private readonly notificationService: NotificationService
+        private readonly notificationService: NotificationService,
     ) {}
 
     public intercept(request: HttpRequest<unknown>, nextHandler: HttpHandler): Observable<HttpEvent<unknown>> {
@@ -41,7 +41,7 @@ export class NetworkInterceptor implements HttpInterceptor {
             }),
             finalize(() => {
                 this.loader.hide();
-            })
+            }),
         );
     }
 }

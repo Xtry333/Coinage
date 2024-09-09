@@ -1,22 +1,22 @@
 {
-	"folders": [
-		{
-			"path": "."
-		}
-	],
-	"settings": {
-		"files.autoSave": "afterDelay",
-		"angular.view-engine": false,
-		"js/ts.implicitProjectConfig.experimentalDecorators": true
-	},
-	"extensions": {
-		"recommendations": [
-			"nrwl.angular-console",
-			"angular.ng-template",
-			"esbenp.prettier-vscode",
-			"firsttris.vscode-jest-runner",
-			"chrisbibby.hide-node-modules",
-			"dbaeumer.vscode-eslint"
-		]
-	},
+    "folders": [
+        {
+            "path": ".",
+        },
+    ],
+    "settings": {
+        "files.autoSave": "afterDelay",
+        "angular.view-engine": false,
+        "js/ts.implicitProjectConfig.experimentalDecorators": true,
+    },
+    "extensions": {
+        "recommendations": [
+            "nrwl.angular-console",
+            "angular.ng-template",
+            "esbenp.prettier-vscode",
+            "firsttris.vscode-jest-runner",
+            "chrisbibby.hide-node-modules",
+            "dbaeumer.vscode-eslint",
+        ],
+    },
 }

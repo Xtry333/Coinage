@@ -16,7 +16,10 @@ import { TransferItem } from '../entities/TransferItem.entity';
 
 @Controller('item(s)?')
 export class ItemsController {
-    public constructor(private readonly itemDao: ItemDao, private readonly transferItemDao: TransferItemDao) {}
+    public constructor(
+        private readonly itemDao: ItemDao,
+        private readonly transferItemDao: TransferItemDao,
+    ) {}
 
     @Get('/all')
     public async getAllItems(): Promise<ItemWithLastUsedPriceDTO[]> {

@@ -14,7 +14,7 @@ export class DashboardComponent {
     public constructor(
         private readonly accountDao: AccountDao,
         private readonly accountBalanceService: AccountBalanceService,
-        private readonly httpService: HttpService
+        private readonly httpService: HttpService,
     ) {}
 
     @Get('/balance/:date')

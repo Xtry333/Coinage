@@ -10,7 +10,10 @@ import { CategoryCascadeService } from '../services/category-cascades.service';
 @UseGuards(AuthGuard)
 @Controller('category')
 export class CategoriesController {
-    public constructor(private readonly categoryDao: CategoryDao, private readonly categoryCascadeService: CategoryCascadeService) {}
+    public constructor(
+        private readonly categoryDao: CategoryDao,
+        private readonly categoryCascadeService: CategoryCascadeService,
+    ) {}
 
     @Post('save')
     public async saveCategory(@Body() category: CreateEditCategoryDTO): Promise<BaseResponseDTO> {

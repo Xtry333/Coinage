@@ -18,7 +18,7 @@ export class AccountsController {
         private readonly accountsService: AccountsService,
         private readonly etherealTransferService: EtherealTransferService,
         private readonly dateParser: DateParserService,
-        private readonly accountBalanceService: AccountBalanceService
+        private readonly accountBalanceService: AccountBalanceService,
     ) {}
 
     @Get('all')

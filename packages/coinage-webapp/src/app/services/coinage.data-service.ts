@@ -40,7 +40,7 @@ export class CoinageDataService {
             `${CoinageDataService.API_URL}dashboard/balance/${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date
                 .getDate()
                 .toString()
-                .padStart(2, '0')}`
+                .padStart(2, '0')}`,
         );
     }
 
@@ -49,7 +49,7 @@ export class CoinageDataService {
             `${CoinageDataService.API_URL}accounts/spendings/${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date
                 .getDate()
                 .toString()
-                .padStart(2, '0')}`
+                .padStart(2, '0')}`,
         );
     }
 
@@ -62,7 +62,7 @@ export class CoinageDataService {
         return lastValueFrom(
             this.http
                 .post<FilteredTransfersDTO>(`${CoinageDataService.API_URL}transfers/all`, instance)
-                .pipe(map((t) => plainToInstance(FilteredTransfersDTO, t)))
+                .pipe(map((t) => plainToInstance(FilteredTransfersDTO, t))),
         );
     }
 
@@ -74,7 +74,7 @@ export class CoinageDataService {
         return lastValueFrom(
             this.http
                 .get<TransferDetailsDTO>(`${CoinageDataService.API_URL}transfer/${transferId}/details`)
-                .pipe(map((t) => plainToInstance(TransferDetailsDTO, t)))
+                .pipe(map((t) => plainToInstance(TransferDetailsDTO, t))),
         );
     }
 
@@ -90,7 +90,7 @@ export class CoinageDataService {
         return lastValueFrom(
             this.http
                 .get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/${transferId}/details`)
-                .pipe(map((t) => plainToInstance(ReceiptDetailsDTO, t)))
+                .pipe(map((t) => plainToInstance(ReceiptDetailsDTO, t))),
         );
     }
 

@@ -8,7 +8,7 @@ export class ShoppingListItem {
         public amount: number,
         public price: number,
         public setDiscount: number | undefined,
-        public categoryId: number | null
+        public categoryId: number | null,
     ) {}
 }
 
@@ -22,7 +22,7 @@ export class CreateEditTransferModelDTO {
         accountId: number,
         date: Date,
         receiptId: number | null,
-        items: ShoppingListItem[] | undefined
+        items: ShoppingListItem[] | undefined,
     ) {
         this.id = id;
         this.description = description;

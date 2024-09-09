@@ -20,8 +20,8 @@ export class FuelMigration1657578654226 implements MigrationInterface {
             console.log(price, amount, transfer.amount);
             queryRunner.query(`
                     INSERT INTO transfer_item(unit_price, quantity, transfer_id, item_id) VALUES(${price.toFixed(2)}, ${amount.toFixed(3)}, ${
-                transfer.id
-            }, ${54})
+                        transfer.id
+                    }, ${54})
                 `);
         }
     }

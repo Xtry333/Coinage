@@ -44,7 +44,7 @@
                     </span>
                 </td>
                 <td>
-                    {{ details.transferContractorName | ifNull : EMPTY_CONTRACTOR }}
+                    {{ details.transferContractorName | ifNull: EMPTY_CONTRACTOR }}
                 </td>
                 <td class="nowrap currency">{{ details.unitPrice | plnCurrency }}</td>
                 <td>{{ getStandardPrice(details) }}</td>

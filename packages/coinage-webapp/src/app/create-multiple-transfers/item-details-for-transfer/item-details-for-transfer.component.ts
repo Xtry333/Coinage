@@ -48,7 +48,7 @@ export class AddItemsToTransferComponent implements OnInit {
     public constructor(
         private readonly dataService: CoinageDataService,
         private readonly notificationService: NotificationService,
-        private readonly storage: CoinageStorageService
+        private readonly storage: CoinageStorageService,
     ) {
         this.selectedItemDetails = {
             id: undefined,
@@ -182,7 +182,7 @@ export class AddItemsToTransferComponent implements OnInit {
             Number(this.selectedItemDetails.amount),
             Number(this.selectedItemDetails.unitPrice),
             Number(this.selectedItemDetails.setDiscount),
-            item?.categoryId ?? 0
+            item?.categoryId ?? 0,
         );
         const selectedItemDetails = Object.assign({}, this.selectedItemDetails);
         this.itemAdded.emit(selectedItemDetails);

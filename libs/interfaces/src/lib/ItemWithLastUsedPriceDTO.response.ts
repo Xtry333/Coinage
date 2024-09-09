@@ -6,6 +6,6 @@ export class ItemWithLastUsedPriceDTO {
         public containerSizeUnit: string | null,
         public lastUsedDate: Date | null,
         public lastUnitPrice: number | null,
-        public categoryId: number
+        public categoryId: number,
     ) {}
 }
