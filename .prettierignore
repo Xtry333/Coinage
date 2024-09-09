@@ -4,3 +4,5 @@
 /coverage
 *.Dockerfile
 Dockerfile.*
+/.nx/cache
+/.nx/workspace-data

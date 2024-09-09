@@ -19,6 +19,7 @@ export class DashboardComponent {
 
     @Get('/balance/:date')
     public async getBalance(@RequestingUser() user: User, @Param('date') date: Date): Promise<BalanceDTO[]> {
+        date = new Date(date);
         const accounts = await this.accountDao.getForUserId(user.id);
         //date = new Date(2021, 0, 0);
         const accountIds = accounts.map((a) => a.id); //[1, 5, 6, 4, 9, 8];

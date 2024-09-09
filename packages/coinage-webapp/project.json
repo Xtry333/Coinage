@@ -4,6 +4,7 @@
     "projectType": "application",
     "sourceRoot": "packages/coinage-webapp/src",
     "prefix": "app",
+    "tags": [],
     "targets": {
         "build": {
             "executor": "@angular-devkit/build-angular:browser",
@@ -69,20 +70,14 @@
             }
         },
         "lint": {
-            "executor": "@nx/linter:eslint",
-            "outputs": ["{options.outputFile}"],
-            "options": {
-                "lintFilePatterns": ["packages/coinage-webapp/**/*.ts", "packages/coinage-webapp/**/*.html"]
-            }
+            "executor": "@nx/eslint:lint"
         },
         "test": {
             "executor": "@nx/jest:jest",
             "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
             "options": {
-                "jestConfig": "packages/coinage-webapp/jest.config.ts",
-                "passWithNoTests": true
+                "jestConfig": "packages/coinage-webapp/jest.config.ts"
             }
         }
-    },
-    "tags": []
+    }
 }

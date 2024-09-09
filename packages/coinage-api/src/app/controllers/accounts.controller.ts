@@ -44,6 +44,7 @@ export class AccountsController {
     @Get('spendings/:date')
     public async getTotalSpendingsAsOfToday(@Param('date') date: Date): Promise<BalanceDTO[]> {
         const accountIds = await this.accountDao.getForUserId(1);
+        date = new Date(date);
         return this.getAccountSpendingsAsOfDate({ accountIds: accountIds.map((a) => a.id).join(','), asOfDate: date.toISOString() });
     }
 

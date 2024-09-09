@@ -1,16 +1,4 @@
 {
-    "tasksRunnerOptions": {
-        "default": {
-            "runner": "nx-cloud",
-            "options": {
-                "cacheableOperations": ["build", "lint", "test", "e2e"],
-                "accessToken": "MjY4YThhODUtNTJhMy00OWExLTg2NDYtNzdhNDk5MWNiZjBkfHJlYWQtd3JpdGU="
-            }
-        }
-    },
-    "affected": {
-        "defaultBase": "master"
-    },
     "cli": {
         "packageManager": "yarn"
     },
@@ -32,11 +20,31 @@
         }
     },
     "targetDefaults": {
-        "test": {
-            "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"]
+        "build": {
+            "cache": true
         },
-        "lint": {
-            "inputs": ["default", "{workspaceRoot}/.eslintrc.json"]
+        "e2e": {
+            "cache": true
+        },
+        "@nx/jest:jest": {
+            "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
+            "cache": true,
+            "options": {
+                "passWithNoTests": true
+            },
+            "configurations": {
+                "ci": {
+                    "ci": true,
+                    "codeCoverage": true
+                }
+            }
+        },
+        "@nx/eslint:lint": {
+            "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+            "cache": true
         }
-    }
+    },
+    "nxCloudAccessToken": "MjY4YThhODUtNTJhMy00OWExLTg2NDYtNzdhNDk5MWNiZjBkfHJlYWQtd3JpdGU=",
+    "useInferencePlugins": false,
+    "defaultBase": "master"
 }
