@@ -1,3 +1,5 @@
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
+
 import {
     BaseResponseDTO,
     ReceiptDTO,
@@ -9,7 +11,6 @@ import {
     TransferType,
     CreateMultipleTransfersDTO,
 } from '@coinage-app/interfaces';
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, UseGuards } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -23,10 +24,10 @@ import { User } from '../entities/User.entity';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { TransferItemsService } from '../services/transfer-items.service';
-import { TransfersService } from '../services/transfers.service';
-import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 import { ItemsService } from '../services/items.service';
+import { TransferItemsService } from '../services/transfer-items.service';
+import { SaveTransfersService } from '../services/transfers/save-transfers.service';
+import { TransfersService } from '../services/transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfer')
@@ -80,8 +81,8 @@ export class TransferController {
             this.transferDao.save(transfer);
         }
 
-        const otherTransfers: TransferDTO[] = (await this.transferDao.getTransferByDateContractor(transfer.date, transfer.contractor?.id ?? 0))
-            .filter((t) => t.id !== transfer.id)
+        const otherTransfers: TransferDTO[] = (await this.transferDao.getTransfersByDate(transfer.date))
+            // .filter((t) => t.id !== transfer.id)
             .map((t) => this.toTransferDTO(t));
 
         const receipt = await transfer.receipt;

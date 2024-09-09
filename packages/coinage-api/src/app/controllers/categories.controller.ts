@@ -1,10 +1,13 @@
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+
 import { BaseResponseDTO, CategoryDTO, CreateEditCategoryDTO, TotalInMonthByCategory } from '@coinage-app/interfaces';
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
-import { Category } from '../entities/Category.entity';
 
 import { CategoryDao as CategoryDao } from '../daos/category.dao';
+import { Category } from '../entities/Category.entity';
+import { AuthGuard } from '../services/auth.guard';
 import { CategoryCascadeService } from '../services/category-cascades.service';
 
+@UseGuards(AuthGuard)
 @Controller('category')
 export class CategoriesController {
     public constructor(private readonly categoryDao: CategoryDao, private readonly categoryCascadeService: CategoryCascadeService) {}

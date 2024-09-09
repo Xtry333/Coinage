@@ -73,10 +73,10 @@
                     <td>{{ transfer.contractor | ifNull }}</td>
                 </tr>
                 <tr>
-                    <th>Total {{ totalPayment < 0 ? 'payed to' : 'received from' }} {{ transfer.contractor }}</th>
+                    <th>Total {{ totalPaymentToContractor < 0 ? 'payed to' : 'received from' }} {{ transfer.contractor }}</th>
                     <td>
                         <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time
-                        >: {{ totalPayment | mathAbs | plnCurrency }}
+                        >: {{ totalPaymentToContractor | mathAbs | plnCurrency }}
                     </td>
                 </tr>
                 <tr>
@@ -130,7 +130,7 @@
 
     <app-transfers-table
         *ngIf="transfer.otherTransfers.length > 0"
-        [header]="'Other Transfers This Day'"
+        [header]="'All Transfers This Day'"
         [transfers]="transfer.otherTransfers"
         [showTodayMarker]="false"
     ></app-transfers-table>

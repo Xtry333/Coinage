@@ -19,7 +19,7 @@ export class AuthService {
             const user = await this.userDao.getByUsername(payload.username);
             return user;
         } catch (error) {
-            console.error('Error:', error);
+            // console.error('Error:', error);
             return undefined;
         }
     }

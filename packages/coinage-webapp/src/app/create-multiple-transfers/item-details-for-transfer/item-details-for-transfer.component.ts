@@ -26,7 +26,7 @@ export interface SelectedTransferItemDetails {
 export class AddItemsToTransferComponent implements OnInit {
     public removeIcon = faTrash;
     public autoAdjustIcon = faMagicWandSparkles;
-    public autoAdjustTitleText = 'This field automatically adjusts according to other fields.';
+    public autoAdjustTitleText = 'This field automagically adjusts according to other fields. Click to change to other field.';
 
     public allItems: ItemWithLastUsedPriceDTO[] = [];
 

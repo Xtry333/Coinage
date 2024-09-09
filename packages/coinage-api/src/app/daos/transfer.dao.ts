@@ -129,13 +129,13 @@ export class TransferDao extends BaseDao {
         return transfers;
     }
 
-    public async getTransferByDateContractor(date: Date, contractorId: number | null): Promise<Transfer[]> {
+    public async getTransfersByDate(date: Date): Promise<Transfer[]> {
         const whereOptions: FindOptionsWhere<Transfer> = { date: Equal(date) };
-        if (contractorId) {
-            whereOptions.contractorId = Equal(contractorId);
-        } else {
-            whereOptions.contractorId = IsNull();
-        }
+        // if (contractorId) {
+        //     whereOptions.contractorId = Equal(contractorId);
+        // } else {
+        //     whereOptions.contractorId = IsNull();
+        // }
         const transfers = await this.transferRepository.find({ where: whereOptions, order: { createdDate: 'DESC', description: 'ASC' } });
         this.templateNameMapperService.mapTransfersTemplateNames(transfers);
         return transfers;

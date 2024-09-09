@@ -1,3 +1,4 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -13,6 +14,7 @@ import { opts } from './typeorm.config';
 
 @Module({
     imports: [
+        HttpModule,
         ConfigModule.forRoot(),
         TypeOrmModule.forRoot(opts),
         ScheduleModule.forRoot(),

@@ -2,14 +2,22 @@ import { Injectable } from '@angular/core';
 
 import { AuthDataService } from './auth.dataservice';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
+import { NavigatorService } from '../services/navigator.service';
+import { NotificationService } from '../services/notification.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class AuthService {
+    public static readonly BEARER_PREFIX = 'Bearer';
     public static readonly USER_ACCESS_TOKEN = 'user.accessToken';
 
-    public constructor(private authDataService: AuthDataService, private coinageStorageService: CoinageStorageService) {
+    public constructor(
+        private authDataService: AuthDataService,
+        private coinageStorageService: CoinageStorageService,
+        private navigatorService: NavigatorService,
+        private notificationService: NotificationService
+    ) {
         console.log(this);
     }
 
@@ -31,12 +39,22 @@ export class AuthService {
         }
     }
 
-    public logout(): void {
-        this.coinageStorageService.setString(AuthService.USER_ACCESS_TOKEN, undefined);
+    public logout(redirectToLogin?: boolean): void {
+        if (this.isAuthenticated()) {
+            this.coinageStorageService.setString(AuthService.USER_ACCESS_TOKEN, undefined);
+            this.notificationService.push({ message: 'You have been logged out.', title: 'Logout' });
+            if (redirectToLogin) {
+                this.navigatorService.navigateTo('login');
+            }
+        }
     }
 
     public isAuthenticated(): boolean {
         // Check if the token exists in CoinageStorageService
         return !!this.coinageStorageService.getString(AuthService.USER_ACCESS_TOKEN);
+    }
+
+    public getAccessToken(): string {
+        return `${AuthService.BEARER_PREFIX} ${this.coinageStorageService.getString(AuthService.USER_ACCESS_TOKEN)}`;
     }
 }

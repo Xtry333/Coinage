@@ -1,9 +1,12 @@
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+
 import { BaseResponseDTO, ContractorDTO, CreateEditContractorDTO } from '@coinage-app/interfaces';
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { Contractor } from '../entities/Contractor.entity';
 
 import { ContractorDao } from '../daos/contractor.dao';
+import { Contractor } from '../entities/Contractor.entity';
+import { AuthGuard } from '../services/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('contractor')
 export class ContractorController {
     public constructor(private readonly contractorDao: ContractorDao) {}

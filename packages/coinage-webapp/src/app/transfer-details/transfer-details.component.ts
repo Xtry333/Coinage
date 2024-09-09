@@ -27,7 +27,7 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
     public NavigatorPages = NavigatorPages;
 
     public splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
-    public totalPayment = 0;
+    public totalPaymentToContractor = 0;
     public shouldShowSplit = false;
     public routeSubscription!: Rx.Subscription;
 
@@ -62,10 +62,12 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
             .getTransferDetails(id)
             .then((transfer) => {
                 this.transfer = transfer;
-                this.totalPayment =
-                    transfer.amount * TransferType[transfer.type].mathSymbol +
-                    transfer.otherTransfers.reduce((a, t) => a + t.amount * TransferType[t.type].mathSymbol, 0);
-
+                this.totalPaymentToContractor =
+                    // transfer.amount * TransferType[transfer.type].mathSymbol +
+                    transfer.otherTransfers
+                        .filter((t) => t.contractorId === transfer.contractorId)
+                        .reduce((a, t) => a + t.amount * TransferType[t.type].mathSymbol, 0);
+                // TODO: Fix other transfers
                 console.log(this.transfer);
             })
             .catch(() => {
