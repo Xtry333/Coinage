@@ -15,7 +15,7 @@
                 "main": "packages/coinage-api/src/main.ts",
                 "tsConfig": "packages/coinage-api/tsconfig.app.json",
                 "assets": ["packages/coinage-api/src/assets"],
-            "webpackConfig": "packages/coinage-api/webpack.config.js"
+                "webpackConfig": "packages/coinage-api/webpack.config.js"
             },
             "configurations": {
                 "production": {
