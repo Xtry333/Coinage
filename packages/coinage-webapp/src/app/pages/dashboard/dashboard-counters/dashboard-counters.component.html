@@ -1,0 +1,10 @@
+<div class="counters-container">
+    <app-big-counter
+        *ngFor="let item of balance; trackBy: trackByAccountId"
+        [value]="item.balance"
+        [upperLabel]="item.currencySymbol"
+        [lowerLabel]="item.name"
+    ></app-big-counter>
+    <app-big-counter [value]="sumPkoWilla" [upperLabel]="'PLN'" [lowerLabel]="'PKO+'"></app-big-counter>
+    <app-big-counter [value]="todaySpendings" [upperLabel]="'PLN'" [lowerLabel]="'Today'"></app-big-counter>
+</div>

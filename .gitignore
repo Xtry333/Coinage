@@ -49,3 +49,5 @@ coinage-data.sql
 # Environment
 .env
 
+.nx/cache
+.nx/workspace-data

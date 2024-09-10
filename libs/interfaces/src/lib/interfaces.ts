@@ -19,7 +19,7 @@ export interface CategoryPathDTO {
 
 export interface ReceiptDTO {
     id: number;
-    description: string;
+    description: string | null;
     date?: Date | null;
     amount: number | null;
     contractor?: string;

@@ -6,9 +6,16 @@
         "**/CVS": true,
         "**/.DS_Store": true,
         "**/Thumbs.db": true,
+        "**/.angular": true,
         "**/node_modules": true
+    },
+    "search.exclude": {
+        "**/.git": true,
+        "**/node_modules": true,
+        "**/.angular": true
     },
     "editor.fontSize": 11,
     "files.autoSave": "afterDelay",
-    "angular.view-engine": false
+    "angular.view-engine": false,
+    "js/ts.implicitProjectConfig.experimentalDecorators": true
 }

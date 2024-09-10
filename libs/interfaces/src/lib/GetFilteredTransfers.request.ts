@@ -13,4 +13,5 @@ export class GetFilteredTransfersRequest extends PagedRequest {
     public type?: TransferTypeEnum;
     public date?: Range<Date>;
     public showPlanned?: boolean;
+    public showFlagged?: boolean;
 }

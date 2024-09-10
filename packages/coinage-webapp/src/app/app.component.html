@@ -1,0 +1,17 @@
+<app-top-nav-bar (toggleOpenSidebar)="onToggleOpenSidebar()"></app-top-nav-bar>
+<div class="d-flex">
+    <app-sidebar-nav class="col-md-3 col-lg-2 d-md-block collapse" [class.show]="isSidebarDisplayed"></app-sidebar-nav>
+    <app-modal [isDisplayed]="isTrinketDisplayed" (hideModalEvent)="hideTrinketModal()">
+        <div>
+            <app-create-transfer (saveSuccess)="hideTrinketModal(); forceDashboardRefresh()" [redirectAfterSave]="false"></app-create-transfer>
+        </div>
+    </app-modal>
+    <div class="flex-grow-1">
+        <router-outlet (activate)="onActivateRoute($event)"></router-outlet>
+    </div>
+    <app-notifications-container></app-notifications-container>
+</div>
+
+<div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">
+    <app-spinner></app-spinner>
+</div>

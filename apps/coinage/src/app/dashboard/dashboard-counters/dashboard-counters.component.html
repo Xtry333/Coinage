@@ -1,9 +1,0 @@
-<div class="counters-container">
-    <coinage-app-big-counter
-        *ngFor="let item of balance; trackBy: trackByAccountId"
-        [value]="item.balance"
-        [topHeader]="'PLN'"
-        [botHeader]="item.name"
-    ></coinage-app-big-counter>
-    <coinage-app-big-counter [value]="todaySpendings" [topHeader]="'PLN'" [botHeader]="'Today'"></coinage-app-big-counter>
-</div>

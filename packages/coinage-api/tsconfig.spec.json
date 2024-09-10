@@ -1,0 +1,15 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "outDir": "../../dist/out-tsc",
+        "module": "commonjs",
+        "types": ["jest", "node"],
+        "baseUrl": ".",
+        "paths": {
+            "@coinage-app/common": ["../../libs/common/src/index.ts"],
+            "@coinage-app/interfaces": ["../../libs/interfaces/src/index.ts"],
+            "@coinage-app/test/*": ["src/test/*"]
+        }
+    },
+    "include": ["jest.config.ts", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.d.ts", "src/test/**/*.mock.ts"]
+}

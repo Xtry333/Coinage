@@ -1,0 +1,40 @@
+<table class="items-table">
+    <caption>
+        <span>Item List</span>
+    </caption>
+    <thead>
+        <tr>
+            <th class="align-left">
+                <span>Name</span>
+            </th>
+            <th class="align-right">
+                <span>Unit Price</span>
+            </th>
+            <th class="align-right">
+                <span>Amount</span>
+            </th>
+            <th class="align-right">
+                <span>Total Price</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let item of tableItems; trackBy: idTracker">
+            <td class="align-left">
+                <a [routerLink]="NavigatorPages.ItemDetails(item.id)">
+                    {{ item.itemName }}
+                </a>
+            </td>
+            <td class="align-right">{{ item.unitPrice | plnCurrency }}</td>
+            <td class="align-right">{{ item.amount }}</td>
+            <td class="align-right">{{ item.totalPrice | plnCurrency }}</td>
+        </tr>
+        <tr *ngIf="!noRowsFound">
+            <td colspan="3"></td>
+            <td class="align-right">{{ totalSum | plnCurrency }}</td>
+        </tr>
+        <tr *ngIf="noRowsFound">
+            <td colspan="6">No items found.</td>
+        </tr>
+    </tbody>
+</table>

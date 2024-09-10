@@ -1,12 +1,27 @@
 {
     "root": true,
     "ignorePatterns": ["**/*"],
-    "plugins": ["@nrwl/nx"],
+    "plugins": ["@nx", "import"],
+    "extends": ["plugin:import/recommended", "plugin:import/typescript"],
+    "rules": {
+        "import/no-unresolved": "error",
+        "import/order": [
+            "warn",
+            {
+                "groups": ["builtin", "external", "internal", ["sibling", "parent"], "index", "unknown"],
+                "newlines-between": "always",
+                "alphabetize": {
+                    "order": "asc",
+                    "caseInsensitive": true
+                }
+            }
+        ]
+    },
     "overrides": [
         {
             "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
             "rules": {
-                "@nrwl/nx/enforce-module-boundaries": [
+                "@nx/enforce-module-boundaries": [
                     "error",
                     {
                         "enforceBuildableLibDependency": true,
@@ -23,19 +38,39 @@
         },
         {
             "files": ["*.ts", "*.tsx"],
-            "extends": ["plugin:@nrwl/nx/typescript"],
-            "rules": {}
+            "extends": ["plugin:@nx/typescript"],
+            "rules": {
+                "@typescript-eslint/no-extra-semi": "error",
+                "no-extra-semi": "off"
+            }
         },
         {
             "files": ["*.js", "*.jsx"],
-            "extends": ["plugin:@nrwl/nx/javascript"],
+            "extends": ["plugin:@nx/javascript"],
+            "rules": {
+                "@typescript-eslint/no-extra-semi": "error",
+                "no-extra-semi": "off"
+            }
+        },
+        {
+            "files": ["*.spec.ts", "*.spec.tsx", "*.spec.js", "*.spec.jsx"],
+            "env": {
+                "jest": true
+            },
             "rules": {}
         },
         {
             "files": ["*.ts", "*.tsx"],
             "rules": {
-                "@typescript-eslint/explicit-member-accessibility": ["error"]
+                "@typescript-eslint/explicit-member-accessibility": ["warn"]
             }
         }
-    ]
+    ],
+    "settings": {
+        "import/resolver": {
+            "typescript": {
+                "project": "./tsconfig.json"
+            }
+        }
+    }
 }

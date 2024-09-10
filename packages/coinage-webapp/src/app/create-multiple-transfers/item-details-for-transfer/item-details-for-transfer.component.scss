@@ -1,0 +1,113 @@
+:host {
+    display: block;
+
+    .auto-adjust-icon {
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .ng-select::ng-deep {
+        //height: 40px;
+
+        .ng-select-container {
+            height: 38px;
+            border-radius: 5px;
+            border-color: rgb(206, 212, 218);
+            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+
+            .ng-value-container {
+                padding-left: 12px;
+
+                .ng-input {
+                    padding-left: 12px;
+                    input {
+                        //font-size: 16px;
+                    }
+                }
+            }
+        }
+
+        & .ng-select-focused::ng-deep {
+            background: red !important;
+        }
+
+        & .ng-select-focused:not(.ng-select-opened) {
+            > .ng-select-container {
+                border-color: rgb(134, 183, 254) !important;
+                box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075) 0 0 0 3px rgba(0, 126, 255, 0.1) !important;
+            }
+        }
+
+        & .ng-select-opened.ng-select-bottom {
+            > .ng-select-container {
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+            }
+        }
+    }
+}
+
+input,
+button,
+select {
+    //display: block;
+    //height: 40px;
+    //width: 100%;
+    //padding: 10px;
+}
+
+.add-items-to-transfer {
+    //display: flex;
+    //width: 400px;
+    //padding-top: 5px;
+
+    .item-input-id {
+        //padding: 5px;
+        padding-left: 0;
+        width: 100%;
+        margin-right: 5px;
+    }
+
+    .item-input-price {
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+
+    .item-input-price,
+    .item-input-amount {
+        width: 25%;
+        //padding: 5px;
+
+        input {
+            padding-right: 0;
+            margin-top: 10px;
+        }
+    }
+
+    .item-input-amount {
+        width: 15%;
+        padding-right: 0;
+        margin-left: 5px;
+    }
+}
+
+.add-item-button {
+    margin-top: 10px;
+}
+
+.shopping-item {
+    .remove-icon {
+        display: none;
+        margin-left: 5px;
+    }
+
+    &:hover {
+        .remove-icon {
+            display: inline;
+
+            &:hover {
+                cursor: pointer;
+            }
+        }
+    }
+}

@@ -1,0 +1,87 @@
+.navbar-brand {
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    background-color: rgba(0, 0, 0, 0.25);
+    box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.25);
+}
+
+.navbar .navbar-toggler {
+    top: 0.25rem;
+    right: 1rem;
+}
+
+.navbar .form-control {
+    padding: 0.75rem 1rem;
+}
+
+.form-control-dark {
+    color: #fff;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.form-control-dark:focus {
+    border-color: transparent;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+}
+
+// .top-nav-container {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
+//     background-color: #3a3a3a;
+//     color: white;
+
+//     .datetime {
+//         margin-left: auto;
+//         padding-right: 20px;
+//         .username {
+//             margin-left: 5px;
+//             margin-right: 10px;
+//         }
+//     }
+// }
+
+// nav {
+//     display: flex;
+//     justify-content: center;
+//     align-items: center;
+
+//     .logo {
+//         display: inline-flex;
+//         h1 {
+//             margin-left: 0;
+//         }
+
+//         a {
+//             display: inherit;
+//         }
+//     }
+
+//     ul.nav-list {
+//         margin: 0px 15px;
+//         list-style: none;
+//         padding: 0px 0px;
+//         color: white;
+//         display: inline-flex;
+//         height: 100%;
+//         vertical-align: middle;
+
+//         li {
+//             a,
+//             a:link,
+//             a:visited {
+//                 display: inline-block;
+//                 padding: 25px 10px;
+//                 color: white;
+//                 text-decoration: none;
+//                 cursor: pointer;
+//                 height: 100%;
+//             }
+
+//             &:hover {
+//                 background-color: lighten($color: #3a3a3a, $amount: 5);
+//             }
+//         }
+//     }
+// }

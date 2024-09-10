@@ -1,4 +1,4 @@
 build:
     docker:
-        webapp: Dockerfile.webapp
-        api: Dockerfile.api
+        webapp: docker/Dockerfile.webapp
+        api: docker/Dockerfile.api

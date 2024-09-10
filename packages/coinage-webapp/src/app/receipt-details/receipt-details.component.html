@@ -1,0 +1,45 @@
+<div *ngIf="receiptDetails" class="receipt-details-component">
+    <table class="receipt-details-table">
+        <tr>
+            <th>Description</th>
+            <td>{{ receiptDetails.description }}</td>
+        </tr>
+        <tr *ngIf="receiptDetails.amount">
+            <th>Amount</th>
+            <td>
+                <span>{{ receiptDirectionDisplaySymbol }} {{ receiptDetails.amount | plnCurrency }}</span>
+            </td>
+        </tr>
+        <tr>
+            <th>Total Transferred</th>
+            <td>
+                <span>{{ receiptDetails.totalTransferred | plnCurrency }} / {{ receiptDetails.totalAmount | plnCurrency }}</span>
+                <span> ({{ remainingAmount | plnCurrency }})</span>
+            </td>
+        </tr>
+        <tr>
+            <th>Date</th>
+            <td>
+                <span>{{ receiptDetails.date | date }}</span>
+            </td>
+        </tr>
+        <tr *ngIf="receiptDetails.nextTransferDate">
+            <th>Next Transfer Date</th>
+            <td>
+                <span>{{ receiptDetails.nextTransferDate | date }}</span>
+            </td>
+        </tr>
+        <tr>
+            <th>Contractor</th>
+            <td>{{ receiptDetails.contractorName | ifNull }}</td>
+        </tr>
+    </table>
+    <app-transfers-table
+        [header]="'Transfers in receipt'"
+        [transfers]="receiptDetails.allTransfers"
+        [showTodayMarker]="true"
+        [showFilters]="false"
+        [showSummary]="false"
+        [showReceiptIcon]="false"
+    ></app-transfers-table>
+</div>

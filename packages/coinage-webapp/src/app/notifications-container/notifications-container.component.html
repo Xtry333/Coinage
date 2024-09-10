@@ -1,0 +1,7 @@
+<div class="notifications-container">
+    <app-notification
+        *ngFor="let notification of notificationsList"
+        [content]="notification"
+        (dismissedEvent)="onNotificationDismiss($event)"
+    ></app-notification>
+</div>

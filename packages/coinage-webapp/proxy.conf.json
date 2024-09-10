@@ -1,0 +1,14 @@
+{
+    "/ws": {
+        "target": "ws://localhost:3333",
+        "ws": true
+    },
+    "/api": {
+        "target": "http://localhost:3333",
+        "secure": false
+    },
+    "/socket.io/*": {
+        "target": "ws://localhost:3333",
+        "ws": true
+    }
+}

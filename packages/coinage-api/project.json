@@ -1,0 +1,56 @@
+{
+    "name": "coinage-api",
+    "$schema": "../../node_modules/nx/schemas/project-schema.json",
+    "sourceRoot": "packages/coinage-api/src",
+    "projectType": "application",
+    "tags": [],
+    "targets": {
+        "build": {
+            "executor": "@nrwl/webpack:webpack",
+            "outputs": ["{options.outputPath}"],
+            "options": {
+                "target": "node",
+                "compiler": "tsc",
+                "outputPath": "dist/packages/coinage-api",
+                "main": "packages/coinage-api/src/main.ts",
+                "tsConfig": "packages/coinage-api/tsconfig.app.json",
+                "assets": ["packages/coinage-api/src/assets"],
+                "webpackConfig": "packages/coinage-api/webpack.config.js"
+            },
+            "configurations": {
+                "production": {
+                    "optimization": true,
+                    "extractLicenses": true,
+                    "inspect": false,
+                    "fileReplacements": [
+                        {
+                            "replace": "packages/coinage-api/src/environments/environment.ts",
+                            "with": "packages/coinage-api/src/environments/environment.prod.ts"
+                        }
+                    ]
+                }
+            }
+        },
+        "serve": {
+            "executor": "@nrwl/js:node",
+            "options": {
+                "buildTarget": "coinage-api:build"
+            },
+            "configurations": {
+                "production": {
+                    "buildTarget": "coinage-api:build:production"
+                }
+            }
+        },
+        "lint": {
+            "executor": "@nx/eslint:lint"
+        },
+        "test": {
+            "executor": "@nx/jest:jest",
+            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+            "options": {
+                "jestConfig": "packages/coinage-api/jest.config.ts"
+            }
+        }
+    }
+}
