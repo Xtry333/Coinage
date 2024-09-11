@@ -7,8 +7,8 @@ import { AccountDTO, ContractorDTO } from '@coinage-app/interfaces';
 import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 import { StorageScope } from '../../core/services/storage-service/storage-scope.enum';
 import { CoinageDataService } from '../../services/coinage.data-service';
-import { NavigatorPages } from '../../services/navigator.service';
 import { NotificationService } from '../../services/notification.service';
+import { CoinageRoutes } from '../../app-routing/app-routes';
 
 export interface SelectedDetails {
     accountId: number | undefined;
@@ -84,7 +84,7 @@ export class NewTransferDetailsComponent implements OnInit {
             return { id: 0, name: '' };
         }
         if (response.insertedId) {
-            this.notificationService.push({ title: `Contractor Created`, message: name, linkTo: NavigatorPages.ContractorDetails(response.insertedId) });
+            this.notificationService.push({ title: `Contractor Created`, message: name });
         }
         return { id: response.insertedId ?? 0, name };
     }

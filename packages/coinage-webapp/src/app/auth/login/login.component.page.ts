@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 
-import { NavigatorService } from '../../services/navigator.service';
+import { NavigatorService } from '../../app-routing/navigator.service';
 import { AuthService } from '../auth.service';
 
 @Component({

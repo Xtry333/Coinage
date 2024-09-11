@@ -5,8 +5,9 @@ import * as Rx from 'rxjs';
 import { ItemDetailsDTO } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorPages, NavigatorService } from '../services/navigator.service';
+import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
+import { CoinageRoutes } from '../app-routing/app-routes';
 
 @Component({
     selector: 'app-transfer-item-details',
@@ -56,7 +57,7 @@ export class TransferItemDetailsComponent implements OnInit, OnDestroy {
                     title: 'Error',
                     message: 'Item not found',
                 });
-                this.navigator.goTo(NavigatorPages.Dashboard());
+                this.navigator.goTo(CoinageRoutes.DashboardPage.getUrl({}));
                 throw 404;
             })
             .finally(() => {

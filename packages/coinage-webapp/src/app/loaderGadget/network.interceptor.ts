@@ -6,7 +6,7 @@ import { catchError, finalize } from 'rxjs/operators';
 import { LoadingService } from './loading.service';
 import { AuthService } from '../auth/auth.service';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { NavigatorService } from '../services/navigator.service';
+import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
 
 @Injectable()

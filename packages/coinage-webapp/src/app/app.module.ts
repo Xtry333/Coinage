@@ -42,6 +42,7 @@ import { TransferItemsTableComponent } from './transfer-item-details/transfer-it
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 import { TableFilterComponent } from './transfers-table/table-filter/table-filter.component';
 import { TransfersTableComponent } from './transfers-table/transfers-table.component';
+import { AccountDetailsPage } from './pages/account-details-page/account-details-page.component';
 
 const socketIoConfig: SocketIoConfig = {
     url: '/',
@@ -98,6 +99,7 @@ Chart.register(zoomPlugin);
         TransferItemDetailsComponent,
         TransferItemsTableComponent,
         ChatComponent,
+        AccountDetailsPage,
     ],
     providers: [
         {

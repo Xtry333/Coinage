@@ -90,11 +90,11 @@
                 <ng-container *ngIf="!transfer.isTodayMarkerRow">
                     <td>{{ transfer.categoryName }}</td>
                     <td>
-                        <a [routerLink]="NavigatorPages.TransferDetails(transfer.id)">
+                        <a [routerLink]="CoinageRoutes.TransferDetailsPage.getUrl({ id: transfer.id })">
                             {{ transfer.description }}
                         </a>
                         <span class="planned-icon" *ngIf="transfer.receiptId">
-                            <a [routerLink]="NavigatorPages.ReceiptDetails(transfer.receiptId)">
+                            <a [routerLink]="CoinageRoutes.ReceiptDetailsPage.getUrl({ id: transfer.receiptId })">
                                 <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
                             </a>
                         </span>
@@ -108,7 +108,7 @@
                     <td class="nowrap currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
                     <td>{{ transfer.accountName }}</td>
                     <td class="nowrap align-right">
-                        <a [routerLink]="NavigatorPages.SummaryFullDate(transfer.date)">{{ transfer.date | date }}</a>
+                        <a [routerLink]="getSummaryPageUrl(transfer)">{{ transfer.date | date }}</a>
                     </td>
                 </ng-container>
             </tr>

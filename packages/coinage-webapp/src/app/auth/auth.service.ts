@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 
 import { AuthDataService } from './auth.dataservice';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { NavigatorService } from '../services/navigator.service';
+import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
 
 @Injectable({

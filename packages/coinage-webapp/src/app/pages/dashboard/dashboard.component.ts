@@ -1,14 +1,14 @@
 import * as Rx from 'rxjs';
 
-import { ChartDataset } from 'chart.js';
 import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MonthlyUserStatsDTO, NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@coinage-app/interfaces';
+import { NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@coinage-app/interfaces';
+import { ChartDataset } from 'chart.js';
 
-import { CoinageDataService } from '../../services/coinage.data-service';
-import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
-import { DateParserService } from '../../services/date-parser.service';
-import { NavigatorPages } from '../../services/navigator.service';
 import { finalize } from 'rxjs/operators';
+import { CoinageRoutes } from '../../app-routing/app-routes';
+import { CoinageDataService } from '../../services/coinage.data-service';
+import { DateParserService } from '../../services/date-parser.service';
+import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
 
 interface UiTotalAmountPerMonth {
     date: string;
@@ -31,7 +31,7 @@ interface UiTotalAmountPerMonth {
 export class DashboardComponent implements OnInit, OnDestroy {
     public static readonly REFRESH_INTERVAL = 10000;
 
-    public NavigatorPages = NavigatorPages;
+    public readonly CoinageRoutes = CoinageRoutes;
 
     public accountStatsChartData: ChartDataset[] = [
         { data: [], label: 'Outcomes', type: 'bar', stack: 'change', barPercentage: 0.33, inflateAmount: 0.33 },

@@ -5,7 +5,7 @@ import { ReceiptDetailsDTO, TransferType } from '@coinage-app/interfaces';
 
 import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorService } from '../services/navigator.service';
+import { NavigatorService } from '../app-routing/navigator.service';
 
 @Component({
     selector: 'app-receipt-details',

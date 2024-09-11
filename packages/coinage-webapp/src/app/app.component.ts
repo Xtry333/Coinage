@@ -1,16 +1,14 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, DoCheck, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { Socket } from 'ngx-socket-io';
 
 import { StorageScope } from './core/services/storage-service/storage-scope.enum';
 import { CoinageStorageService } from './core/services/storage-service/coinage-storage.service';
-import { SidebarNavComponent } from './core/sidebar-nav/sidebar-nav.component';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { LoadingService } from './loaderGadget/loading.service';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { CurrentUserDataService } from './services/current-user.service';
 import { LangService } from './services/lang-service.service';
-import { NavigatorPages } from './services/navigator.service';
 import { NotificationService } from './services/notification.service';
 import { WebSocketService } from './services/web-socket.service';
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
@@ -24,8 +22,6 @@ export class AppComponent implements OnInit, OnDestroy {
     public static readonly KEY_LAST_USER_VISIT_DATE = 'last-visit-date';
     public static readonly KEY_FORCE_MOCK_USER = 'debug-user-id';
     public static readonly WELCOME_DELAY = 1000 * 60 * 60 * 12;
-
-    public NavigatorPages = NavigatorPages;
 
     public userIcon = faUser;
 

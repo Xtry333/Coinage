@@ -34,11 +34,11 @@
         <tbody>
             <tr *ngFor="let details of transfersWithItem; trackBy: transferWithItemIdTracker">
                 <td>
-                    <a [routerLink]="NavigatorPages.TransferDetails(details.transferId)">
+                    <a [routerLink]="CoinageRoutes.TransferDetailsPage.getUrl({ id: details.transferId })">
                         {{ details.transferName }}
                     </a>
                     <span class="planned-icon" *ngIf="details.receiptId">
-                        <a [routerLink]="NavigatorPages.ReceiptDetails(details.receiptId)">
+                        <a [routerLink]="CoinageRoutes.ReceiptDetailsPage.getUrl({ id: details.receiptId })">
                             <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
                         </a>
                     </span>
@@ -52,7 +52,8 @@
                 <td class="nowrap currency">{{ details.unitPrice * details.quantity | plnCurrency }}</td>
                 <td>{{ details.accountName }}</td>
                 <td class="nowrap align-right">
-                    <a [routerLink]="NavigatorPages.SummaryFullDate(details.date)">{{ details.date | date }}</a>
+                    {{ details.date | date }}
+                    <!-- <a [routerLink]="CoinageRoutes.SummaryFullDate(details.date)">{{ details.date | date }}</a> -->
                 </td>
             </tr>
             <tr *ngIf="showSummary && hasAnyRows && totalPrice > 0" class="sum-row total-price top-border">

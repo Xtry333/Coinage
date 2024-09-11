@@ -21,7 +21,7 @@
     <tbody>
         <tr *ngFor="let item of tableItems; trackBy: idTracker">
             <td class="align-left">
-                <a [routerLink]="NavigatorPages.ItemDetails(item.id)">
+                <a [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })">
                     {{ item.itemName }}
                 </a>
             </td>

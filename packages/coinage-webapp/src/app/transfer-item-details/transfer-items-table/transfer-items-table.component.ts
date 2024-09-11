@@ -5,7 +5,7 @@ import { ItemDetailsDTO, TransferDTO, TransferItemDTO, TransferWithItemDetailsDT
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
-import { NavigatorPages } from '../../services/navigator.service';
+import { CoinageRoutes } from '../../app-routing/app-routes';
 
 export enum TableColumn {
     Transfer = 'Transfer',
@@ -28,7 +28,7 @@ export class TransferItemsTableComponent {
 
     public readonly EMPTY_CONTRACTOR = TransferItemsTableComponent.EMPTY_CONTRACTOR;
     public readonly TableColumn = TableColumn;
-    public readonly NavigatorPages = NavigatorPages;
+    public readonly CoinageRoutes = CoinageRoutes;
 
     public receiptIcon: IconDefinition = faReceipt;
 

@@ -7,8 +7,9 @@ import * as Rx from 'rxjs';
 import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorPages, NavigatorService } from '../services/navigator.service';
+import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
+import { CoinageRoutes } from '../app-routing/app-routes';
 
 @Component({
     selector: 'app-transfer-details',
@@ -23,8 +24,6 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
 
     public showPage = false;
     public transfer!: TransferDetailsDTO;
-
-    public NavigatorPages = NavigatorPages;
 
     public splitTransfer: SplitTransferDTO = { id: 0, description: '', amount: 0, categoryId: 0 };
     public totalPaymentToContractor = 0;
@@ -75,7 +74,7 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
                     title: 'Error',
                     message: 'Transfer not found',
                 });
-                this.navigator.goTo(NavigatorPages.Dashboard());
+                this.navigator.goTo(CoinageRoutes.DashboardPage.getUrl({}));
                 throw 404;
             })
             .finally(() => {
@@ -107,7 +106,7 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
                 .then((result) => {
                     this.shouldShowSplit = false;
                     if (result.insertedId) {
-                        this.navigator.goTo(NavigatorPages.TransferDetails(result.insertedId));
+                        this.navigator.goTo(CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }));
                     }
                 });
     }
@@ -118,7 +117,7 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
                 this.notificationService.push({
                     title: `Added Refund`,
                     message: result.message ?? 'Refunded succesfully.',
-                    linkTo: NavigatorPages.TransferDetails(result.insertedId),
+                    linkTo: CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }),
                 });
 
                 this.loadTransferDetails(this.transfer.id);
@@ -134,14 +133,14 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
                     message: 'Remember to save edited transfer',
                 });
 
-                this.navigator.goTo(NavigatorPages.TransferEdit(result.insertedId), true);
+                this.navigator.goTo(CoinageRoutes.EditTransferPage.getUrl({ id: result.insertedId }), true);
             }
         });
     }
 
     public onClickEditMode(): void {
         if (this.transfer) {
-            this.navigator.goTo(NavigatorPages.TransferEdit(this.transfer.id), true);
+            this.navigator.goTo(CoinageRoutes.EditTransferPage.getUrl({ id: this.transfer.id }), true);
         }
     }
 
@@ -150,21 +149,21 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
             this.coinageData.postCommitTransfer(this.transfer.id).finally(() => {
                 this.router
                     .navigateByUrl(`/`, { skipLocationChange: true })
-                    .then(() => this.router.navigateByUrl(NavigatorPages.TransferDetails(this.transfer.id), { skipLocationChange: true }));
+                    .then(() => this.router.navigateByUrl(CoinageRoutes.TransferDetailsPage.getUrl({ id: this.transfer.id }), { skipLocationChange: true }));
             });
         }
     }
 
     public get receiptDetailsLink(): string | undefined {
         if (this.transfer.receipt?.id) {
-            return NavigatorPages.ReceiptDetails(this.transfer.receipt?.id);
+            return CoinageRoutes.ReceiptDetailsPage.getUrl({ id: this.transfer.receipt?.id });
         }
         return undefined;
     }
 
     public get refundedByLink(): string | undefined {
         if (this.transfer.refundedBy) {
-            return NavigatorPages.TransferDetails(this.transfer.refundedBy);
+            return CoinageRoutes.TransferDetailsPage.getUrl({ id: this.transfer.refundedBy });
         }
         return undefined;
     }

@@ -1,9 +1,9 @@
 import { Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
-import { NavigatorPages } from '../../services/navigator.service';
 import { CurrentUserDataService } from '../../services/current-user.service';
 import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component';
+import { CoinageRoutes } from '../../app-routing/app-routes';
 
 @Component({
     selector: 'app-top-nav-bar',
@@ -11,8 +11,6 @@ import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component'
     styleUrls: ['./top-nav-bar.component.scss'],
 })
 export class TopNavBarComponent implements OnInit {
-    public NavigatorPages = NavigatorPages;
-
     public title = 'Coinage';
 
     public userIcon = faUser;

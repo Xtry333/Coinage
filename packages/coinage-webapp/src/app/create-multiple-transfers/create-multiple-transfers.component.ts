@@ -18,7 +18,7 @@ import { NewTransferDetailsComponent, SelectedDetails } from './new-transfer-det
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { StorageScope } from '../core/services/storage-service/storage-scope.enum';
 import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorService } from '../services/navigator.service';
+import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
 
 export interface NewTransferObject {

@@ -17,7 +17,7 @@ import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interf
 
 import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { NavigatorPages } from '../services/navigator.service';
+import { CoinageRoutes } from '../app-routing/app-routes';
 
 export enum TableColumn {
     Category = 'Category',
@@ -75,7 +75,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public readonly FilterType = FilterType;
     public readonly PopupSide = PopupSide;
     public readonly TableColumn = TableColumn;
-    public readonly NavigatorPages = NavigatorPages;
+    public readonly CoinageRoutes = CoinageRoutes;
 
     public receiptIcon: IconDefinition = faReceipt;
     public flagIcon: IconDefinition = faFlagCheckered;
@@ -296,5 +296,9 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             isTodayMarkerRow: true,
             isFlagged: false,
         };
+    }
+
+    public getSummaryPageUrl(transfer: UiTransfer): string {
+        return CoinageRoutes.SummaryPage.getUrl({ month: String(transfer.date) });
     }
 }

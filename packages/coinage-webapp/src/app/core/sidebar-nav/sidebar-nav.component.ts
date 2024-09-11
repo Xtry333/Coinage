@@ -1,9 +1,9 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
-import { NavigatorPages } from '../../services/navigator.service';
 import { CurrentUserDataService } from '../../services/current-user.service';
 import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component';
+import { CoinageRoutes } from '../../app-routing/app-routes';
 
 interface UiNavLink {
     text: string;
@@ -17,8 +17,6 @@ interface UiNavLink {
     styleUrls: ['./sidebar-nav.component.scss'],
 })
 export class SidebarNavComponent implements OnInit {
-    public NavigatorPages = NavigatorPages;
-
     public title = 'Coinage';
 
     public userIcon = faUser;
@@ -35,32 +33,37 @@ export class SidebarNavComponent implements OnInit {
         {
             text: 'Dashboard',
             icon: 'bi-house-door',
-            url: NavigatorPages.Dashboard(),
+            url: CoinageRoutes.DashboardPage.getUrl({}),
         },
         {
             text: 'Transfers',
             icon: 'bi-card-list',
-            url: NavigatorPages.TransfersList(),
+            url: CoinageRoutes.TransfersListPage.getUrl({}),
         },
         {
             text: 'Categories',
             icon: 'bi-tag',
-            url: '/manage/categories',
+            url: CoinageRoutes.CategoryManagerPage.getUrl({}),
+        },
+        {
+            text: 'Account 1',
+            icon: 'bi-wallet',
+            url: CoinageRoutes.AccountDetailsPage.getUrl({ id: 1 }),
         },
         {
             text: 'Add Transfer',
             icon: 'bi-plus',
-            url: '/transfer/add',
+            url: CoinageRoutes.CreateTransferPage.getUrl({}),
         },
         {
             text: 'Add Receipt',
             icon: 'bi-plus',
-            url: '/transfer/create',
+            url: CoinageRoutes.CreateMultipleTransfersPage.getUrl({}),
         },
         {
             text: 'Account Settings',
             icon: 'bi-person',
-            url: '/manage/accounts',
+            url: CoinageRoutes.ManageAccountsPage.getUrl({}),
         },
     ];
 

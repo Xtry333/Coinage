@@ -16,8 +16,9 @@ import {
 
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorPages, NavigatorService } from '../services/navigator.service';
+import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
+import { CoinageRoutes } from '../app-routing/app-routes';
 
 export interface NewTransferObject {
     description: string;
@@ -141,12 +142,12 @@ export class CreateEditTransferComponent implements OnInit {
                 this.notificationService.push({
                     title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`,
                     message: newTransfer.description ?? this.categories.find((c) => c.id === newTransfer.categoryId)?.name ?? 'Saved Transfer',
-                    linkTo: NavigatorPages.TransferDetails(result.insertedId),
+                    linkTo: CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }),
                 });
                 this.clearInputData();
             }
             if (this.redirectAfterSave && result.insertedId) {
-                this.navigator.goTo(NavigatorPages.TransferDetails(result.insertedId));
+                this.navigator.goTo(CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }));
             }
         });
         this.coinageLocalStorageService.setNumber('lastUsedAccountId', this.selectedTransferInputs.accountId);
@@ -160,7 +161,7 @@ export class CreateEditTransferComponent implements OnInit {
                         title: `Transfer Removed`,
                         message: `Transfer with ${this.selectedTransferInputs.description} has been deleted.`,
                     });
-                    this.navigator.goTo(NavigatorPages.Dashboard());
+                    this.navigator.goTo(CoinageRoutes.DashboardPage.getUrl({}));
                 }
             });
         }
@@ -169,7 +170,7 @@ export class CreateEditTransferComponent implements OnInit {
     public async onAddNewCategory(name: string): Promise<CategoryDTO> {
         const response = await Rx.lastValueFrom(this.coinageData.postCreateCategory({ name }));
         if (response.insertedId) {
-            this.notificationService.push({ title: `Category Created`, message: name, linkTo: NavigatorPages.CategoryDetails(response.insertedId) });
+            this.notificationService.push({ title: `Category Created`, message: name });
         }
         return { id: response.insertedId ?? 0, name };
     }
@@ -183,7 +184,7 @@ export class CreateEditTransferComponent implements OnInit {
             return { id: 0, name: '' };
         }
         if (response.insertedId) {
-            this.notificationService.push({ title: `Contractor Created`, message: name, linkTo: NavigatorPages.ContractorDetails(response.insertedId) });
+            this.notificationService.push({ title: `Contractor Created`, message: name });
         }
         return { id: response.insertedId ?? 0, name };
     }

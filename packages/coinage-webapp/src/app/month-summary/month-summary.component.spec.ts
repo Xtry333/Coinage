@@ -7,6 +7,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MonthSummaryComponent } from './month-summary.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
+import { TransferDetailsDTO } from '@coinage-app/interfaces';
 
 describe('Summary Component', () => {
     let component: MonthSummaryComponent;
@@ -46,7 +47,12 @@ describe('Summary Component', () => {
                         description: '',
                         createdDate: new Date('2021-05-16'),
                         editedDate: new Date('2021-05-16'),
-                    });
+                        type: '',
+                        account: '',
+                        targetAccount: '',
+                        categoryId: '',
+                        // Add the missing properties here
+                    } satisfies TransferDetailsDTO);
                 }),
         );
         fixture = TestBed.createComponent(MonthSummaryComponent);

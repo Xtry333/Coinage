@@ -1,6 +1,6 @@
 import { Component, Input, OnChanges } from '@angular/core';
 import { TransferItemDTO } from '@coinage-app/interfaces';
-import { NavigatorPages } from '../../services/navigator.service';
+import { CoinageRoutes } from '../../app-routing/app-routes';
 
 export class UiTransferItemDTO extends TransferItemDTO {
     public totalPrice: number;
@@ -23,7 +23,7 @@ export class UiTransferItemDTO extends TransferItemDTO {
     styleUrls: ['./items-table.component.scss'],
 })
 export class ItemsTableComponent implements OnChanges {
-    public readonly NavigatorPages = NavigatorPages;
+    public readonly CoinageRoutes = CoinageRoutes;
 
     @Input() public items: TransferItemDTO[] = [];
 
@@ -40,6 +40,10 @@ export class ItemsTableComponent implements OnChanges {
 
     public idTracker(_index: number, item: TransferItemDTO): string {
         return item.id.toString();
+    }
+
+    public getItemLink(item: TransferItemDTO) {
+        return CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id });
     }
 
     public get noRowsFound(): boolean {
