@@ -36,10 +36,10 @@ export class CoinageRoute<T extends UrlParams> {
     }
 
     public getUrl(params: T extends undefined ? undefined : MappedParams<NonNullable<T>>): string {
+        let url = `/${this.path}`;
         if (!this.queryKeys || !params) {
-            return this.path;
+            return url;
         }
-        let url = this.path;
         for (const key in this.queryKeys) {
             url = url.replace(`:${key}`, String(params[key]));
         }
