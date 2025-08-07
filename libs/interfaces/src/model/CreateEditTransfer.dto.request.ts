@@ -7,6 +7,7 @@ export class ShoppingListItem {
         public name: string,
         public amount: number,
         public price: number,
+        public totalPrice: number,
         public setDiscount: number | undefined,
         public categoryId: number | null,
     ) {}

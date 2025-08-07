@@ -1,6 +1,6 @@
 <div class="add-items-to-transfer ml-5" *ngIf="itemsLoaded">
-    <div class="row g-3 py-3">
-        <div class="col-md-8">
+    <div class="row g-3 pb-3">
+        <div class="col-md-4">
             <label for="selectedItemInput">Item</label>
             <ng-select
                 #itemSelect
@@ -12,10 +12,32 @@
                 [clearable]="true"
                 [editableSearchTerm]="true"
                 [items]="allItems"
+                [searchable]="true"
+                [notFoundText]="'No items found'"
                 [required]="true"
                 bindValue="id"
                 bindLabel="name"
                 aria-label="Search for item"
+            ></ng-select>
+        </div>
+        <div class="col-md-4">
+            <label for="selectedItemContainerInput">Container</label>
+            <ng-select
+                #containerSelect
+                name="containerId"
+                labelForId="selectedItemContainerInput"
+                placeholder="Search"
+                [(ngModel)]="selectedItemDetails.id"
+                (change)="onContainerSelected($event)"
+                [clearable]="true"
+                [editableSearchTerm]="true"
+                [items]="allContainers"
+                [required]="false"
+                [searchable]="true"
+                [notFoundText]="'No containers found'"
+                bindValue="id"
+                bindLabel="name"
+                aria-label="Search for container"
             ></ng-select>
         </div>
         <div class="col-md">
@@ -93,7 +115,7 @@
                     placeholder="1.00"
                     aria-describedby="amountInputAddon"
                 />
-                <span id="amountInputAddon" class="input-group-text"></span>
+                <span id="amountInputAddon" class="input-group-text">X</span>
             </div>
         </div>
         <div class="col-md">
@@ -132,7 +154,7 @@
             <span *ngIf="selectedItemDetails.name" class="text-muted">{{ itemDetailsInfo }}</span>
         </div>
     </div>
-    <div class="row g-3 mb-3">
+    <div class="row g-3">
         <div class="d-grid col-md-6 mx-auto">
             <button type="button" class="btn btn-outline-secondary" (click)="onClickAddNewItemToList()">Add</button>
         </div>

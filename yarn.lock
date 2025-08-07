@@ -8450,6 +8450,7 @@ __metadata:
     class-transformer: 0.5.1
     class-validator: 0.14.1
     cypress: 13.14.2
+    deep-copy-ts: ^0.5.4
     dotenv: 16.4.5
     eslint: 9.10.0
     eslint-config-prettier: 9.1.0
@@ -8461,7 +8462,6 @@ __metadata:
     jest-auto-spies: 3.0.0
     jest-environment-jsdom: 29.7.0
     jest-preset-angular: 14.2.2
-    lodash: 4.17.21
     mini-css-extract-plugin: 2.9.1
     mysql2: 3.11.0
     ng-mocks: 14.13.1
@@ -8476,6 +8476,7 @@ __metadata:
     postcss: 8.4.45
     postcss-import: 16.1.0
     prettier: 3.3.3
+    radashi: ^12.1.0
     reflect-metadata: 0.2.2
     rxjs: 7.8.1
     socket.io: 4.7.5
@@ -9392,6 +9393,13 @@ __metadata:
     babel-plugin-macros:
       optional: true
   checksum: 045b595557b2a8ea2eb9b0b4623d764e9a87326486fe2b61191b4342ed93dc01245644d8a09f3108a50c0ee7965f1eedd92e4a3a503ed89ea8e810566ea27f9a
+  languageName: node
+  linkType: hard
+
+"deep-copy-ts@npm:^0.5.4":
+  version: 0.5.4
+  resolution: "deep-copy-ts@npm:0.5.4"
+  checksum: bb3fcc98125334e6ecd390c57d0be5dcdf1fbc3666c04cf77524c44087d05a69b7708d6734165ea75e2f00617d6e20eba21acc97e14fa1ef7909aaef99961a0c
   languageName: node
   linkType: hard
 
@@ -17695,6 +17703,13 @@ __metadata:
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: b676f8c040cdc5b12723ad2f91414d267605b26419d5c821ff03befa817ddd10e238d22b25d604920340fd73efd8ba795465a0377c4adf45a4a41e4234e42dc4
+  languageName: node
+  linkType: hard
+
+"radashi@npm:^12.1.0":
+  version: 12.1.0
+  resolution: "radashi@npm:12.1.0"
+  checksum: a24d54fcd67ac7f9efb50bbf4c777504e7df865c967d85f6469accb2a603c1c0d9b19e4e76833856f7542772c4fae3bd6750675694befb2ca3c344b3d9e4ed7a
   languageName: node
   linkType: hard
 

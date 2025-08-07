@@ -33,7 +33,9 @@ import {
 export class CoinageDataService {
     public static readonly API_URL = '/api/';
 
-    public constructor(private http: HttpClient) {}
+    public constructor(private http: HttpClient) {
+        console.log(this);
+    }
 
     public getBalanceForActiveAccounts(date: Date): Observable<BalanceDTO[]> {
         return this.http.get<BalanceDTO[]>(
@@ -171,5 +173,11 @@ export class CoinageDataService {
 
     public postCreateAdvancedTransfers(request: CreateMultipleTransfersDTO): Promise<BaseResponseDTO> {
         return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/createAdvanced`, request));
+    }
+
+    public async getServerDate(): Promise<Date> {
+        const a = await lastValueFrom(this.http.get<Date>(`${CoinageDataService.API_URL}user/date`));
+        console.log(a);
+        return a;
     }
 }

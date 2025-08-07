@@ -134,7 +134,7 @@ export class CreateMultipleTransfersComponent implements OnInit {
             accountId: this.selectedDetails?.accountId,
             receiptId: null,
             date: new Date(`${this.selectedDetails.transferDate} 12:00`),
-            items: this.itemsInTransfers.map((i) => new ExistingItem(i.id ?? 0, i.amount, i.unitPrice, i.setDiscount ?? 0)),
+            items: this.itemsInTransfers.map((i) => new ExistingItem(i.id ?? 0, i.amount, i.unitPrice, i.totalPrice, i.setDiscount ?? 0)),
         };
         const result = await this.dataService.postCreateAdvancedTransfers(dto);
         console.log(result);
@@ -157,5 +157,25 @@ export class CreateMultipleTransfersComponent implements OnInit {
 
     public onClickClearItemList(): void {
         this.clearItemList();
+    }
+
+    public get transfersJsonData(): string {
+        return JSON.stringify(
+            this.itemsInTransfers.map((i) => {
+                return {
+                    id: i.id,
+                    amount: i.amount,
+                    totalPrice: i.totalPrice,
+                    setDiscount: i.setDiscount,
+                };
+            }),
+            null,
+            2,
+        );
+    }
+
+    public set transfersJsonData(value: string) {
+        try {
+        } catch (e) {}
     }
 }

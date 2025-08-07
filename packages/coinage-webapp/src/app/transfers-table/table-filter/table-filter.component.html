@@ -25,19 +25,19 @@
                     [max]="filterValue.range.to ?? 0"
                     [(ngModel)]="filterValue.range.from"
                     autocomplete="off"
+                />
+                <input name="filterRangeTo" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
+            </div>
+            <div *ngIf="filterValue.filterType === FilterType.DateRange" class="date-range-filter-container">
+                <input
+                    #autofocusedFilterInput
+                    name="filterDateFrom"
+                    type="date"
+                    [(ngModel)]="filterValue.range.from"
+                    autocomplete="off"
                     (change)="onChangeFilterRangeFrom()"
                 />
-                <input
-                    name="filterRangeTo"
-                    type="number"
-                    [min]="filterValue.range.from ?? 0"
-                    [(ngModel)]="filterValue.range.to"
-                    autocomplete="off"
-                    (change)="onChangeFilterRangeTo()"
-                />
-            </div>
-            <div *ngIf="isFilterDateRange">
-                <span>Not implemented!</span>
+                <input name="filterDateTo" type="date" [(ngModel)]="filterValue.range.to" autocomplete="off" (change)="onChangeFilterRangeTo()" />
             </div>
             <div *ngIf="filterValue.filterType === FilterType.MultiCheckbox" class="multi-checkbox-filter-container">
                 <div *ngIf="shouldDisplaySearchBox" class="filter-option-search-container">

@@ -10,6 +10,7 @@ export class ItemDetailsDTO {
     @Type(() => Date) public createdDate!: Date;
     @Type(() => Date) public editedDate!: Date;
     @Type(() => TransferWithItemDetailsDTO) public transfersWithItems!: TransferWithItemDetailsDTO[];
+    @Type(() => AdvancedItemContainer) public itemContainers!: AdvancedItemContainer[];
 }
 
 export class TransferWithItemDetailsDTO {
@@ -28,4 +29,11 @@ export class TransferWithItemDetailsDTO {
 export class ItemContainer {
     public size?: number;
     public unit!: string;
+}
+
+export class AdvancedItemContainer {
+    public weight?: number;
+    public weightUnit?: string;
+    public volume?: number;
+    public volumeUnit?: string;
 }

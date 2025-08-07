@@ -129,6 +129,8 @@ export class TransferController {
                     unit: 'Units',
                     amount: item.quantity,
                     unitPrice: item.unitPrice,
+                    totalPrice: item.totalSetPrice,
+                    setDiscount: item.totalSetDiscount,
                 };
             }),
             isPlanned: transfer.date > new Date(),
@@ -198,7 +200,7 @@ export class TransferController {
         const account = await this.accountDao.getById(requestBody.accountId);
 
         // Create transfers from items
-        const itemCategoriesIds = [...new Set(items.map((i) => i.categoryId))];
+        const itemCategoriesIds = [...new Set(items.filter(v => v !== null).map((i) => i.categoryId) as number[])];
         for (const categoryId of itemCategoriesIds) {
             const itemsForCategory = items.filter((item) => item.categoryId === categoryId);
 
@@ -237,6 +239,7 @@ export class TransferController {
                 transferItem.itemId = item.itemId;
                 transferItem.quantity = item.quantity;
                 transferItem.unitPrice = item.unitPrice;
+                transferItem.totalSetPrice = item.totalSetPrice;
                 transferItem.totalSetDiscount = item.totalSetDiscount;
                 entity.transferItems.push(transferItem);
             }

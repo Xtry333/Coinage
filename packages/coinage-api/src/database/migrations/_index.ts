@@ -7,6 +7,9 @@ import { NonNullTargetTransfer1678491536904 } from './1678491536904-NonNullTarge
 import { AddSchedule1708475125634 } from './1708475125634-AddSchedule';
 import { AddScheduleCounts1708476166410 } from './1708476166410-AddScheduleCounts';
 import { AddPasswords1708644980026 } from './1708644980026-AddPasswords';
+import { AddContainerTable1745336625326 } from './1745336625326-AddContainerTable';
+import { AddItemsWithContainersView1745754622461 } from './1745754622461-AddItemsWithContainersView';
+import { AddItemCount1751894045445 } from './1751894045445-AddItemCount';
 
 export default [
     CreateTables1000000000000,
@@ -18,4 +21,7 @@ export default [
     AddSchedule1708475125634,
     AddScheduleCounts1708476166410,
     AddPasswords1708644980026,
+    AddContainerTable1745336625326,
+    AddItemsWithContainersView1745754622461,
+    AddItemCount1751894045445
 ];

@@ -28,7 +28,8 @@ export class SelectedItemsComponent implements OnChanges {
     }[] = [];
 
     public getItemTotalPrice(item: SelectedTransferItemDetails): number {
-        const a = Number((item.unitPrice * item.amount).toFixed(2));
+        let a = Number((item.unitPrice * item.amount).toFixed(2));
+        a = item.totalPrice;
         //console.log(typeof a);
         return a;
     }

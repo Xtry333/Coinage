@@ -1,3 +1,19 @@
 <div>
     <app-big-counter [value]="5000" [upperLabel]="'PLN'"></app-big-counter>
+    <div>
+        <label>
+            <input type="checkbox" [(ngModel)]="locked" />
+            <span>Lock - {{ locked }}</span>
+        </label>
+    </div>
+    <div>
+        <label>
+            <input type="checkbox" [(ngModel)]="checkedValue" />
+            <span>Value - {{ checkedValue }}</span>
+        </label>
+    </div>
+
+    <div>
+        <app-money-amount></app-money-amount>
+    </div>
 </div>

@@ -8,7 +8,7 @@
                 <span>Name</span>
             </th>
             <th class="align-right">
-                <span>Unit Price</span>
+                <span>Est. Unit Price</span>
             </th>
             <th class="align-right">
                 <span>Amount</span>
@@ -27,7 +27,7 @@
             </td>
             <td class="align-right">{{ item.unitPrice | plnCurrency }}</td>
             <td class="align-right">{{ item.amount }}</td>
-            <td class="align-right">{{ item.totalPrice | plnCurrency }}</td>
+            <td class="align-right">{{ item.totalPrice - item.setDiscount | plnCurrency }}</td>
         </tr>
         <tr *ngIf="!noRowsFound">
             <td colspan="3"></td>

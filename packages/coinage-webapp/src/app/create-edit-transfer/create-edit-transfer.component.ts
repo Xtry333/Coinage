@@ -167,6 +167,10 @@ export class CreateEditTransferComponent implements OnInit {
         }
     }
 
+    public onClickCancelEdit(): void {
+        this.navigator.goTo(CoinageRoutes.TransferDetailsPage.getUrl({ id: this.transferId }));
+    }
+
     public async onAddNewCategory(name: string): Promise<CategoryDTO> {
         const response = await Rx.lastValueFrom(this.coinageData.postCreateCategory({ name }));
         if (response.insertedId) {
@@ -252,6 +256,7 @@ export class CreateEditTransferComponent implements OnInit {
                 name: item.itemName,
                 quantity: item.amount,
                 price: item.unitPrice,
+                totalPrice: item.unitPrice * item.amount,
                 setDiscount: undefined,
                 categoryId: 0,
             };

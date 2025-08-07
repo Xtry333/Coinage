@@ -1,0 +1,98 @@
+$outgoingArrowColor: #ff8b8b;
+$internalArrowColor: #bbbbbb;
+$incomingArrowColor: #69cb7e;
+
+.account-label {
+    text-align: center;
+}
+
+.account-transfer {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+}
+
+.arrow-container {
+    display: flex;
+    flex-direction: column;
+    padding-left: 8px;
+    padding-right: 10px;
+
+    .amount {
+        text-align: right;
+        text-wrap: nowrap;
+        font-size: 14px;
+        font-weight: bold;
+        padding-right: 5px;
+        font-family: monospace;
+    }
+
+    .arrow-border {
+        width: 100px;
+        position: relative;
+        margin: auto;
+        border-bottom: 2px solid;
+
+        &.outgoing {
+            border-bottom-color: $outgoingArrowColor;
+        }
+        &.internal {
+            border-bottom-color: $internalArrowColor;
+        }
+        &.incoming {
+            border-bottom-color: $incomingArrowColor;
+        }
+
+        &::after {
+            content: '';
+            position: absolute;
+            display: block;
+            height: 0;
+            border-top: 4px solid transparent;
+            border-bottom: 4px solid transparent;
+            border-left: 8px solid;
+            bottom: -5px;
+            right: -3px;
+            border-radius: 2px;
+        }
+        
+        &.outgoing::after {
+            border-left-color: $outgoingArrowColor;
+        }
+        &.internal::after {
+            border-left-color: $internalArrowColor;
+        }
+        &.incoming::after {
+            border-left-color: $incomingArrowColor;
+        }
+    }
+
+    // .arrow-border:after {
+    //     content: '';
+    //     position: absolute;
+    //     display: block;
+    //     height: 0;
+    //     border-top: 4px solid transparent;
+    //     border-bottom: 4px solid transparent;
+    //     border-left: 8px solid;
+    //     bottom: -5px;
+    //     right: -3px;
+    //     border-radius: 2px;
+
+    //     &.outgoing {
+    //         border-left-color: $outgoingArrowColor;
+    //     }
+    //     &.internal {
+    //         border-left-color: $internalArrowColor;
+    //     }
+    //     &.incoming {
+    //         border-left-color: $incomingArrowColor;
+    //     }
+    // }
+
+    .currency {
+        font-size: 12px;
+        text-align: center;
+        //padding-bottom: 4px;
+    }
+}

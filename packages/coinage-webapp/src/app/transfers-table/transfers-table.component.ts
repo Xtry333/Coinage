@@ -18,14 +18,15 @@ import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interf
 import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageRoutes } from '../app-routing/app-routes';
+import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
 
 export enum TableColumn {
     Category = 'Category',
     Description = 'Description',
-    Contractor = 'Contractor',
-    Amount = 'Amount',
-    Date = 'Date',
     Account = 'Account',
+    Amount = 'Amount',
+    Contractor = 'Contractor',
+    Date = 'Date',
 }
 
 export const TableColumnsFilterTypes: Record<TableColumn, FilterType> & { [key: string]: FilterType } = {
@@ -61,6 +62,8 @@ export interface TableFilterFields {
 }
 
 export type UiTransfer = TransferDTO & { typeSymbol: string; isTodayMarkerRow?: boolean };
+
+export type UiTableRow = UiTransfer | { isTodayMarkerRow: boolean };
 
 @Component({
     selector: 'app-transfers-table[transfers]',
@@ -158,8 +161,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             this.filter.amountFrom = event.range.from;
             this.filter.amountTo = event.range.to;
         } else if (this.checkFilterEventColumnName<OnDateRangeFilterEvent>(event, TableColumn.Date)) {
-            this.filter.dateFrom = event.range.from;
-            this.filter.dateTo = event.range.to;
+            this.filter.dateFrom = event.range.from ? new Date(event.range.from) : undefined;
+            this.filter.dateTo = event.range.to ? new Date(event.range.to) : undefined;
         } else {
             throw new Error(`Expected ${TableColumnsFilterTypes[event.name]} for ${event.name} column but received ${event.filterType} OnFilterEvent. `);
         }
@@ -275,6 +278,36 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             }
         }
         return false;
+    }
+
+    public getTransferRowClass(row: UiTableRow): { [key: string]: boolean } {
+        return {
+            'today-marker-row': row.isTodayMarkerRow ?? false,
+            'transfer-row': !row.isTodayMarkerRow,
+        };
+    }
+
+    public getTransferValueDetails(transfer: UiTransfer): MoneyAmountComponentData.TransferData {
+        return {
+            value: {
+                amount: transfer.amount,
+                currency: transfer.currency,
+            },
+        };
+    }
+
+    public getTransferAccountDetails(transfer: UiTransfer): MoneyAmountComponentData.TransferAccountsData {
+        return {
+            originAccount: {
+                name: transfer.accountName,
+                balance: 0,
+            },
+            transferType: transfer.type,
+            targetAccount: {
+                name: transfer.contractorName ?? TransfersTableComponent.EMPTY_CONTRACTOR,
+                balance: 0,
+            },
+        };
     }
 
     public get dummyTransfer(): UiTransfer {

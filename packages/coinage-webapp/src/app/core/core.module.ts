@@ -13,9 +13,10 @@ import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
 import { MathAbsPipe } from '../pipes/math-abs.pipe';
 import { NullTransformPipe } from '../pipes/null-transform.pipe';
 import { PlnCurrencyPipe } from '../pipes/pln-currency.pipe';
+import { CurrencyPipe } from '../pipes/currency.pipe';
 import { ReplacePipe } from '../pipes/replace.pipe';
 
-const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe];
+const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe, CurrencyPipe];
 
 @NgModule({
     imports: [CommonModule, RouterModule, FontAwesomeModule],

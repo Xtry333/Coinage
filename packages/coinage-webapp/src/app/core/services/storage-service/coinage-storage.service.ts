@@ -9,11 +9,11 @@ export class CoinageStorageService {
     private readonly localStorage: Storage;
     private readonly sessionStorage: Storage;
 
-    public static readonly KEY_BOOLEAN_TEMPLATE = (key: string) => `${key}-b`;
-    public static readonly KEY_NUMBER_TEMPLATE = (key: string) => `${key}-n`;
-    public static readonly KEY_STRING_TEMPLATE = (key: string) => `${key}-s`;
-    public static readonly KEY_OBJECT_TEMPLATE = (key: string) => `${key}-o`;
-    public static readonly KEY_ARRAY_TEMPLATE = (key: string) => `${key}-a`;
+    public static readonly KEY_BOOLEAN_TEMPLATE = (key: string) => `${key}.b`;
+    public static readonly KEY_NUMBER_TEMPLATE = (key: string) => `${key}.n`;
+    public static readonly KEY_STRING_TEMPLATE = (key: string) => `${key}.s`;
+    public static readonly KEY_OBJECT_TEMPLATE = (key: string) => `${key}.o`;
+    public static readonly KEY_ARRAY_TEMPLATE = (key: string) => `${key}.a`;
 
     public constructor() {
         this.localStorage = window.localStorage;
@@ -25,10 +25,11 @@ export class CoinageStorageService {
     }
 
     public setBoolean(key: string, value: boolean | undefined, scope: StorageScope = StorageScope.Persistent): void {
+        const scopedStorage = this.getScopedStorage(scope);
         if (value !== undefined) {
-            this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key), value.toString());
+            scopedStorage.setItem(CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key), value.toString());
         } else {
-            this.getScopedStorage(scope).removeItem(CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key));
+            scopedStorage.removeItem(CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key));
         }
     }
 
@@ -41,10 +42,11 @@ export class CoinageStorageService {
     }
 
     public setNumber(key: string, value: number | undefined, scope: StorageScope = StorageScope.Persistent): void {
+        const scopedStorage = this.getScopedStorage(scope);
         if (value !== undefined) {
-            this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_NUMBER_TEMPLATE(key), value.toString());
+            scopedStorage.setItem(CoinageStorageService.KEY_NUMBER_TEMPLATE(key), value.toString());
         } else {
-            this.getScopedStorage(scope).removeItem(CoinageStorageService.KEY_NUMBER_TEMPLATE(key));
+            scopedStorage.removeItem(CoinageStorageService.KEY_NUMBER_TEMPLATE(key));
         }
     }
 
@@ -57,10 +59,11 @@ export class CoinageStorageService {
     }
 
     public setString(key: string, value: string | undefined, scope: StorageScope = StorageScope.Persistent): void {
+        const scopedStorage = this.getScopedStorage(scope);
         if (value !== undefined) {
-            this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_STRING_TEMPLATE(key), value);
+            scopedStorage.setItem(CoinageStorageService.KEY_STRING_TEMPLATE(key), value);
         } else {
-            this.getScopedStorage(scope).removeItem(CoinageStorageService.KEY_STRING_TEMPLATE(key));
+            scopedStorage.removeItem(CoinageStorageService.KEY_STRING_TEMPLATE(key));
         }
     }
 
@@ -69,11 +72,12 @@ export class CoinageStorageService {
     }
 
     public setObject<T>(key: string, object: T | undefined, scope: StorageScope = StorageScope.Persistent): void {
+        const scopedStorage = this.getScopedStorage(scope);
         if (object !== undefined) {
             const serializedObject = JSON.stringify(object);
-            this.getScopedStorage(scope).setItem(CoinageStorageService.KEY_OBJECT_TEMPLATE(key), serializedObject);
+            scopedStorage.setItem(CoinageStorageService.KEY_OBJECT_TEMPLATE(key), serializedObject);
         } else {
-            this.getScopedStorage(scope).removeItem(CoinageStorageService.KEY_OBJECT_TEMPLATE(key));
+            scopedStorage.removeItem(CoinageStorageService.KEY_OBJECT_TEMPLATE(key));
         }
         return undefined;
     }

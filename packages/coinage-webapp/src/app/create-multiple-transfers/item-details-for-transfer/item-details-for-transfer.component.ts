@@ -26,9 +26,10 @@ export interface SelectedTransferItemDetails {
 export class AddItemsToTransferComponent implements OnInit {
     public removeIcon = faTrash;
     public autoAdjustIcon = faMagicWandSparkles;
-    public autoAdjustTitleText = 'This field automagically adjusts according to other fields. Click to change to other field.';
+    public autoAdjustTitleText = 'This field automagically adjusts according to other fields. Click to move to last changed field.';
 
     public allItems: ItemWithLastUsedPriceDTO[] = [];
+    public allContainers: ItemWithLastUsedPriceDTO[] = [];
 
     public itemsLoading = true;
 
@@ -115,6 +116,10 @@ export class AddItemsToTransferComponent implements OnInit {
         this.onItemDetailsChanged();
     }
 
+    public onContainerSelected(selected: ShoppingListItem): void {
+        // NOOP
+    }
+
     public onAmountChanged(): void {
         this.pushLastDataChangedHistory('amount');
         this.onItemDetailsChanged();
@@ -181,6 +186,7 @@ export class AddItemsToTransferComponent implements OnInit {
             item?.name ?? this.selectedItemDetails.name,
             Number(this.selectedItemDetails.amount),
             Number(this.selectedItemDetails.unitPrice),
+            Number(this.selectedItemDetails.totalPrice),
             Number(this.selectedItemDetails.setDiscount),
             item?.categoryId ?? 0,
         );

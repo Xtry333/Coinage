@@ -39,16 +39,16 @@
                         [cachedFilterValue]="filter.description"
                     ></app-table-filter>
                 </th>
-                <th>
-                    <span>Contractor</span>
+                <th class="align-right">
+                    <span>Account</span>
                     <app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumn.Contractor"
+                        [filterName]="TableColumn.Account"
                         (filterEvent)="onPerformFilter($event)"
                         [filterType]="FilterType.MultiCheckbox"
-                        [filterOptions]="optionsForCheckboxFilters.contractors"
+                        [filterOptions]="optionsForCheckboxFilters.accounts"
                         [popupSide]="PopupSide.ToLeft"
-                        [cachedFilterValue]="filter.contractor"
+                        [cachedFilterValue]="filter.account"
                     ></app-table-filter>
                 </th>
                 <th class="align-right">
@@ -61,16 +61,16 @@
                         [popupSide]="PopupSide.ToLeft"
                     ></app-table-filter>
                 </th>
-                <th class="align-right">
-                    <span>Account</span>
+                <th>
+                    <span>Contractor</span>
                     <app-table-filter
                         *ngIf="showFilters"
-                        [filterName]="TableColumn.Account"
+                        [filterName]="TableColumn.Contractor"
                         (filterEvent)="onPerformFilter($event)"
                         [filterType]="FilterType.MultiCheckbox"
-                        [filterOptions]="optionsForCheckboxFilters.accounts"
+                        [filterOptions]="optionsForCheckboxFilters.contractors"
                         [popupSide]="PopupSide.ToLeft"
-                        [cachedFilterValue]="filter.account"
+                        [cachedFilterValue]="filter.contractor"
                     ></app-table-filter>
                 </th>
                 <th class="align-right">
@@ -86,7 +86,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr *ngFor="let transfer of transfersForTable; trackBy: transferIdTracker" [ngClass]="{ 'today-marker-row': transfer.isTodayMarkerRow }">
+            <tr *ngFor="let transfer of transfersForTable; trackBy: transferIdTracker" [ngClass]="getTransferRowClass(transfer)">
                 <ng-container *ngIf="!transfer.isTodayMarkerRow">
                     <td>{{ transfer.categoryName }}</td>
                     <td>
@@ -102,11 +102,19 @@
                             <fa-icon [icon]="flagIcon" [fixedWidth]="true" title="Flagged as important"></fa-icon>
                         </span>
                     </td>
+                    <td>{{ transfer.accountName }}</td>
+                    <td class="nowrap currency">
+                        <app-money-amount
+                            [transferData]="getTransferValueDetails(transfer)"
+                            [transferAccounts]="getTransferAccountDetails(transfer)"
+                        ></app-money-amount>
+                    </td>
                     <td>
                         {{ transfer.contractorName | ifNull: EMPTY_CONTRACTOR }}
                     </td>
-                    <td class="nowrap currency">{{ transfer.typeSymbol }} {{ transfer.amount | plnCurrency }}</td>
-                    <td>{{ transfer.accountName }}</td>
+                    <!-- <td colspan="2">
+                        <app-money-amount [accountToAccountTransfer]="getTransferValueDetails(transfer)"></app-money-amount>
+                    </td> -->
                     <td class="nowrap align-right">
                         <a [routerLink]="getSummaryPageUrl(transfer)">{{ transfer.date | date }}</a>
                     </td>

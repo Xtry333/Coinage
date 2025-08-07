@@ -20,6 +20,7 @@
 
     .filter-popup {
         position: absolute;
+        z-index: 10;
         margin-top: -2px;
         background-color: rgb(225, 225, 225);
         border: gray 2px solid;
@@ -76,6 +77,11 @@
                 padding-right: 0;
                 width: 75px;
             }
+        }
+
+        input:invalid {
+            border-color: red;
+            border-radius: 4px;
         }
 
         .filter-buttons {

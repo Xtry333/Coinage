@@ -13,8 +13,8 @@ export class Item extends WithDateEntity {
     @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
 
-    @Column({ name: 'category_id', nullable: false })
-    public categoryId!: number;
+    @Column({ name: 'category_id', nullable: true })
+    public categoryId!: number | null;
 
     @ManyToOne(() => Category, { eager: false, nullable: true, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'category_id' })

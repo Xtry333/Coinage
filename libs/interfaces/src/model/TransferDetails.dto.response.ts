@@ -17,6 +17,8 @@ export class TransferItemDTO {
     public unit!: string;
     public amount!: number;
     public unitPrice!: number;
+    public totalPrice!: number;
+    public setDiscount!: number;
 }
 
 export class TransferDetailsDTO {

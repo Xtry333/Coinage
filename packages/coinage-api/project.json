@@ -38,7 +38,8 @@
             },
             "configurations": {
                 "production": {
-                    "buildTarget": "coinage-api:build:production"
+                    "buildTarget": "coinage-api:build:production",
+                    "disableHostCheck": true
                 }
             }
         },

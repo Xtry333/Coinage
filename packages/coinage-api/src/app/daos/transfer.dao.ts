@@ -78,7 +78,7 @@ export class TransferDao extends BaseDao {
                 filter.description = ILike(`%${params.description}%`);
             }
 
-            if (!params.showPlanned) {
+            if (!params.showPlanned && !params.date) {
                 filter.date = LessThanOrEqual(new Date());
             }
 

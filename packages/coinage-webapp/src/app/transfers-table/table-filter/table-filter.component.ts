@@ -1,5 +1,6 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { IconDefinition, faCaretDown, faEdit, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { deepCopy } from 'deep-copy-ts';
 
 import { Range } from '@coinage-app/interfaces';
 
@@ -38,7 +39,7 @@ export type OnNumericRangeFilterEvent = {
 export type OnDateRangeFilterEvent = {
     filterType: FilterType.DateRange;
     name: string;
-    range: Range<Date | undefined>;
+    range: Range<string | undefined>;
 };
 
 export type OnFilterEvent = OnTextBoxFilterEvent | OnNumericRangeFilterEvent | OnDateRangeFilterEvent | OnMultiCheckboxFilterEvent;
@@ -90,6 +91,8 @@ export class TableFilterComponent implements OnInit {
     @Output() public closeEvent = new EventEmitter<void>();
     @Output() public focusEvent = new EventEmitter<boolean>();
 
+    private touched = { from: false, to: false };
+
     public filterValue: OnFilterEvent = TableFilterComponent.createEmptyFilterValue(this.filterType, this.filterName);
 
     public FilterType = FilterType;
@@ -139,7 +142,9 @@ export class TableFilterComponent implements OnInit {
         };
     }
 
-    public constructor(public readonly localStorage: CoinageStorageService) {}
+    public constructor(public readonly localStorage: CoinageStorageService) {
+        console.log(this);
+    }
 
     public ngOnInit(): void {
         this.filterValue = TableFilterComponent.createEmptyFilterValue(this.filterType, this.filterName);
@@ -147,7 +152,7 @@ export class TableFilterComponent implements OnInit {
         if (this.cachedFilterValue && this.cachedFilterValue.length > 0 && this.filterValue.filterType === FilterType.TextBox) {
             this.filterValue.value = this.cachedFilterValue;
         }
-        this.lastFilterValue = { ...this.filterValue };
+        this.lastFilterValue = deepCopy(this.filterValue);
 
         if (this.isFilterMultiCheckbox && this.filterOptions === undefined) {
             throw new Error('MultiCheckbox Filter must have filterOptions defined.');
@@ -188,6 +193,7 @@ export class TableFilterComponent implements OnInit {
     }
 
     public onPerformFilter(): void {
+        let success = true;
         switch (this.filterValue.filterType) {
             case FilterType.TextBox:
                 this.filterValue.value = this.filterValue.value?.trim();
@@ -195,15 +201,27 @@ export class TableFilterComponent implements OnInit {
             case FilterType.MultiCheckbox:
                 this.filterValue.selectedIds = this.filterOptions?.filter((opt) => opt.isSelected).map((opt) => opt.id) ?? [];
                 break;
+            case FilterType.NumericRange:
+                if ((this.filterValue.range.from ?? 0) >= (this.filterValue.range.to ?? 0)) {
+                    success = false;
+                }
+                break;
+            case FilterType.DateRange:
+                if ((this.filterValue.range.from ?? 0) >= (this.filterValue.range.to ?? 0)) {
+                    success = false;
+                }
+                break;
         }
-        this.lastFilterValue = { ...this.filterValue };
-        this.filterEvent.emit(this.filterValue);
-        this.isPopupDisplayed = false;
+        if (success) {
+            this.lastFilterValue = deepCopy(this.filterValue);
+            this.filterEvent.emit(this.filterValue);
+            this.isPopupDisplayed = false;
+        }
     }
 
     public onClear(): void {
         this.filterValue = TableFilterComponent.createEmptyFilterValue(this.filterType, this.filterName);
-        this.lastFilterValue = { ...this.filterValue };
+        this.lastFilterValue = deepCopy(this.filterValue);
         this.filterEvent.emit(this.filterValue);
         this.isPopupDisplayed = false;
         this.onClearOptionsSearchValue();
@@ -231,10 +249,15 @@ export class TableFilterComponent implements OnInit {
 
     public onChangeFilterRangeFrom(): void {
         if (this.filterValue.filterType === FilterType.NumericRange && this.filterValue.range.from !== undefined) {
-            if (this.filterValue.range.to === undefined || this.filterValue.range.to < this.filterValue.range.from) {
+            if (!this.touched.from && (this.filterValue.range.to === undefined || this.filterValue.range.to < this.filterValue.range.from)) {
+                this.filterValue.range.to = this.filterValue.range.from ?? 0;
+            }
+        } else if (this.filterValue.filterType === FilterType.DateRange && this.filterValue.range.from !== undefined) {
+            if (!this.touched.to && (this.filterValue.range.to === undefined || this.filterValue.range.to < this.filterValue.range.from)) {
                 this.filterValue.range.to = this.filterValue.range.from ?? 0;
             }
         }
+        this.touched.from = true;
     }
 
     public onChangeFilterRangeTo(): void {
@@ -242,7 +265,12 @@ export class TableFilterComponent implements OnInit {
             if (this.filterValue.range.from === undefined || this.filterValue.range.from > this.filterValue.range.to) {
                 this.filterValue.range.from = this.filterValue.range.to ?? 0;
             }
+        } else if (this.filterValue.filterType === FilterType.DateRange && this.filterValue.range.to !== undefined) {
+            if (this.filterValue.range.from === undefined || this.filterValue.range.from > this.filterValue.range.to) {
+                this.filterValue.range.from = this.filterValue.range.to ?? 0;
+            }
         }
+        this.touched.to = true;
     }
 
     public get isFilterApplied(): boolean {

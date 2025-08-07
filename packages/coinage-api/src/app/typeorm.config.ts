@@ -34,10 +34,10 @@ export const opts: DataSourceOptions = {
     database: process.env.MYSQL_DATABASE,
     synchronize: false,
     logging: false,
-    migrationsRun: true,
+    migrationsRun: false,
     migrations: migrations,
-    migrationsTransactionMode: 'all',
-    entities: entities,
+    migrationsTransactionMode: 'each',
+    entities: [...entities],
     timezone: 'Z',
     namingStrategy: new CustomNamingStrategy(),
 };

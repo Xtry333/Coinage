@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsDate, IsNotIn, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
 
 export class ExistingItem {
     @IsNumber()
@@ -9,25 +9,34 @@ export class ExistingItem {
 
     @IsNumber()
     @IsNotIn([NaN])
+    @Min(0)
     public quantity: number;
 
     @IsNumber()
     @IsNotIn([NaN])
+    @Min(0)
     public unitPrice: number;
 
     @IsNumber()
     @IsNotIn([NaN])
+    @Min(0)
+    public totalSetPrice: number;
+
+    @IsNumber()
+    @IsNotIn([NaN])
+    @Min(0)
     public totalSetDiscount: number;
 
-    public constructor(itemId: number, quantity: number, unitPrice: number, totalSetDiscount: number) {
+    public constructor(itemId: number, quantity: number, unitPrice: number, totalSetPrice: number, totalSetDiscount: number) {
         this.itemId = itemId;
         this.quantity = quantity;
         this.unitPrice = unitPrice;
+        this.totalSetPrice = totalSetPrice;
         this.totalSetDiscount = totalSetDiscount;
     }
 
     public get calculatedPrice(): number {
-        return this.quantity * this.unitPrice - this.totalSetDiscount;
+        return this.totalSetPrice - this.totalSetDiscount;
     }
 }
 
@@ -42,6 +51,10 @@ export class FakeItem {
 
     @IsNumber()
     @IsNotIn([NaN])
+    public totalSetPrice: number;
+
+    @IsNumber()
+    @IsNotIn([NaN])
     public totalSetDiscount: number;
 
     @IsNumber()
@@ -49,9 +62,10 @@ export class FakeItem {
     @IsNotIn([NaN])
     public categoryId: number;
 
-    public constructor(quantity: number, unitPrice: number, totalSetDiscount: number, categoryId: number) {
+    public constructor(quantity: number, unitPrice: number, totalSetPrice: number, totalSetDiscount: number, categoryId: number) {
         this.quantity = quantity;
         this.unitPrice = unitPrice;
+        this.totalSetPrice = totalSetPrice;
         this.totalSetDiscount = totalSetDiscount;
         this.categoryId = categoryId;
     }

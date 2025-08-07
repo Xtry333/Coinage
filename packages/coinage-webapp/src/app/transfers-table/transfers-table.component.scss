@@ -34,12 +34,12 @@ div.transfers-table-container {
             height: 0px;
         }
 
-        tbody tr:nth-child(even) {
+        tbody tr.transfer-row:nth-child(even) {
             background-color: rgb(240, 240, 240);
         }
 
         td {
-            padding: 10px 15px;
+            padding: 5px 10px;
             &.currency {
                 text-align: right;
             }

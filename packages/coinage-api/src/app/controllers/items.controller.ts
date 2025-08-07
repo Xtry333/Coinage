@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import {
+    AdvancedItemContainer,
     BaseResponseDTO,
     CreateEditItemDTO,
     ItemContainer,
@@ -39,6 +40,16 @@ export class ItemsController {
 
         const transferItems = await this.transferItemDao.findByItemId(itemId);
         const transfersWithItems = await Promise.all(transferItems.map(async (transferItem) => this.toTransfersWithItemsDTO(transferItem)));
+        // filter only the unique containers
+        const uniqueContainers = new Set(transferItems.map((transferItem) => transferItem.containerId));
+        const itemContainers = (await Promise.all(transferItems.filter((transferItem) => transferItem.itemId === itemId).map(async (transferItem) => transferItem.container))).map((container) => {
+            const advancedContainer = new AdvancedItemContainer();
+            advancedContainer.weight = container?.weight ?? undefined;
+            advancedContainer.weightUnit = container?.weightUnit ?? undefined;
+            advancedContainer.volume = container?.volume ?? undefined;
+            advancedContainer.volumeUnit = container?.volumeUnit ?? undefined;
+            return advancedContainer;
+        });
 
         return {
             id: item.id,
@@ -50,6 +61,7 @@ export class ItemsController {
             createdDate: item.createdDate,
             editedDate: item.editedDate,
             transfersWithItems: transfersWithItems,
+            itemContainers: itemContainers,
         };
     }
 
@@ -70,6 +82,9 @@ export class ItemsController {
 
     private async toTransfersWithItemsDTO(transferItem: TransferItem): Promise<TransferWithItemDetailsDTO> {
         const transfer = await transferItem.transfer;
+         if (transferItem.containerId !== null) {
+            const container = await transferItem.container;
+        }
         return {
             transferId: transfer.id,
             transferName: transfer.description,

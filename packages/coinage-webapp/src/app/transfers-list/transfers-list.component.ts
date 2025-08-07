@@ -89,6 +89,7 @@ export class TransfersListComponent implements OnInit, OnDestroy {
             ...this.filterParams,
             ...filterParams,
             amount: this.mapRangeFilterParams(filterParams),
+            date: this.mapDateRangeFilterParams(filterParams),
         };
         this.refreshData();
     }
@@ -106,6 +107,17 @@ export class TransfersListComponent implements OnInit, OnDestroy {
             return {
                 from: filterParams.amountFrom,
                 to: filterParams.amountTo,
+            };
+        }
+
+        return undefined;
+    }
+
+    private mapDateRangeFilterParams(filterParams: TableFilterFields): Range<Date> | undefined {
+        if (filterParams.dateFrom !== undefined && filterParams.dateTo !== undefined) {
+            return {
+                from: filterParams.dateFrom,
+                to: filterParams.dateTo,
             };
         }
 

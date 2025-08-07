@@ -3,8 +3,6 @@ import { TransferItemDTO } from '@coinage-app/interfaces';
 import { CoinageRoutes } from '../../app-routing/app-routes';
 
 export class UiTransferItemDTO extends TransferItemDTO {
-    public totalPrice: number;
-
     public constructor(transferItem: TransferItemDTO) {
         super();
 
@@ -13,7 +11,8 @@ export class UiTransferItemDTO extends TransferItemDTO {
         this.unit = transferItem.unit;
         this.unitPrice = transferItem.unitPrice;
         this.amount = transferItem.amount;
-        this.totalPrice = transferItem.amount * transferItem.unitPrice;
+        this.totalPrice = transferItem.totalPrice;
+        this.setDiscount = transferItem.setDiscount;
     }
 }
 
@@ -31,11 +30,8 @@ export class ItemsTableComponent implements OnChanges {
     public totalSum = 0;
 
     public ngOnChanges(): void {
-        this.tableItems = [];
-        this.items.forEach((item) => {
-            this.tableItems.push(new UiTransferItemDTO(item));
-            this.totalSum = this.totalSum + item.amount * item.unitPrice;
-        });
+        this.tableItems = this.items.map((item) => new UiTransferItemDTO(item));
+        this.totalSum = this.items.reduce((sum, item) => sum + item.totalPrice - item.setDiscount, 0);
     }
 
     public idTracker(_index: number, item: TransferItemDTO): string {

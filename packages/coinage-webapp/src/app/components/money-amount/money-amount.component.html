@@ -1,0 +1,10 @@
+<div class="app-money-amount-component">
+    <div class="account-transfer">
+        <div *ngIf="showAccounts" class="account-label">{{ originAccount }}</div>
+        <div class="arrow-container">
+            <span class="arrow-border amount" [ngClass]="arrowColor">{{ amount | appCurrency: currency }}</span>
+            <span class="currency">{{ currency }}</span>
+        </div>
+        <div *ngIf="showAccounts" class="account-label">{{ targetAccount }}</div>
+    </div>
+</div>

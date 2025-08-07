@@ -8,10 +8,11 @@ import { ChartComponent } from './chart/chart.component';
 import { ModalComponent } from './modal/modal.component';
 import { SectionComponent } from './section/section.component';
 import { CoreModule } from '../core/core.module';
+import { MoneyAmountComponent } from './money-amount/money-amount.component';
 
 @NgModule({
     imports: [CoreModule, NgSelectModule, FormsModule, NgChartsModule],
-    declarations: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent],
-    exports: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent],
+    declarations: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent, MoneyAmountComponent],
+    exports: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent, MoneyAmountComponent],
 })
 export class CommonComponentsModule {}

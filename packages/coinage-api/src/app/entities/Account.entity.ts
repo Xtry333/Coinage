@@ -1,6 +1,5 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
 import { Bit } from '../constants/booleanBuffer.const';
-import { Contractor } from './Contractor.entity';
 import { Currency } from './Currency.entity';
 
 import { BooleanTransformer } from './transformers/boolean.transformer';

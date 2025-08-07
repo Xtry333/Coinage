@@ -17,7 +17,7 @@
                 (removeItemClicked)="onItemRemoved($event)"
             ></app-selected-items>
         </app-section>
-        <div class="row g-3 mb-3">
+        <div class="row p-3">
             <div class="d-grid col-md-6 mx-auto">
                 <button type="button" class="btn btn-outline-secondary" (click)="onClickCreateTransfer()">Create</button>
             </div>
@@ -25,5 +25,8 @@
                 <button type="button" class="btn btn-outline-danger" (click)="onClickClearItemList()">Clear</button>
             </div>
         </div>
+    </div>
+    <div>
+        <textarea class="form-control" rows="16" [readonly]="true" [(ngModel)]="transfersJsonData" aria-label="Transfer Details JSON"> </textarea>
     </div>
 </main>

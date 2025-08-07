@@ -24,7 +24,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     @Output() public itemListChanged = new EventEmitter<ShoppingListItem[]>();
     @Output() public totalCostChanged = new EventEmitter<number>();
 
-    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0);
+    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0, 0);
     public itemList: ShoppingListItem[] = [];
 
     public constructor(
@@ -92,6 +92,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             item?.name ?? this.selectedItem.name,
             this.selectedItem.amount,
             this.selectedItem.price,
+            this.selectedItem.price * this.selectedItem.amount,
             undefined,
             item?.categoryId ?? 0,
         );

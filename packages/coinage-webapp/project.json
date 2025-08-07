@@ -55,7 +55,8 @@
                     "browserTarget": "coinage-webapp:build:production"
                 },
                 "development": {
-                    "browserTarget": "coinage-webapp:build:development"
+                    "browserTarget": "coinage-webapp:build:development",
+                    "disableHostCheck": true
                 }
             },
             "defaultConfiguration": "development",

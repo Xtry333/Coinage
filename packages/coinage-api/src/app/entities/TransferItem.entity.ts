@@ -3,16 +3,20 @@ import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 't
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 import { Item } from './Item.entity';
 import { Transfer } from './Transfer.entity';
+import { Container } from './Container.entity';
 
 @Entity()
 export class TransferItem {
     @PrimaryGeneratedColumn()
     public id!: number;
 
-    @Column({ type: 'decimal', default: 0, precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    @Column({ type: 'decimal', default: 0, precision: 12, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
     public unitPrice!: number;
 
-    @Column({ type: 'decimal', default: 0, precision: 20, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    @Column({ type: 'decimal', default: 0, precision: 12, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
+    public totalSetPrice!: number;
+
+    @Column({ type: 'decimal', default: 0, precision: 12, scale: 2, nullable: false, transformer: new DecimalToNumberTransformer() })
     public totalSetDiscount!: number;
 
     @Column({ type: 'float', nullable: false, default: 1 })
@@ -31,4 +35,11 @@ export class TransferItem {
     @ManyToOne(() => Item, { eager: true, nullable: false, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'item_id' })
     public item!: Item;
+
+    @Column({ nullable: true })
+    public containerId!: number;
+
+    @ManyToOne(() => Container, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
+    @JoinColumn({ name: 'container_id' })
+    public container!: Promise<Container>;
 }

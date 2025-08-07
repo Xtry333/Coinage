@@ -96,6 +96,7 @@
                     <div>Clear</div>
                 </button>
                 <button *ngIf="editMode" (click)="onClickDeleteTransfer()" type="button">Delete</button>
+                <button *ngIf="editMode" (click)="onClickCancelEdit()" type="button">Cancel</button>
             </div>
         </form>
         <button *ngIf="!shouldDisplayShoppingList" (click)="openShoppingList()">{{ '>' }}</button>

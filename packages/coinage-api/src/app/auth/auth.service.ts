@@ -22,13 +22,17 @@ export class AuthService {
             const user = await this.userDao.getByUsername(payload.username);
             return user;
         } catch (error) {
-            // console.error('Error:', error);
+            console.error('Error:', error);
             return undefined;
         }
     }
 
     public async loginUser(username: string, password: string): Promise<string> {
         const user = await this.userDao.getByUsername(username);
+
+        if (user === undefined) {
+            throw new Error('Invalid password.');
+        }
 
         if (user.password === undefined || user.password !== password) {
             throw new Error('Invalid password.');
