@@ -10,6 +10,7 @@ import { AddPasswords1708644980026 } from './1708644980026-AddPasswords';
 import { AddContainerTable1745336625326 } from './1745336625326-AddContainerTable';
 import { AddItemsWithContainersView1745754622461 } from './1745754622461-AddItemsWithContainersView';
 import { AddItemCount1751894045445 } from './1751894045445-AddItemCount';
+import { AdjustItemView1754863716132 } from './1754863716132-migration';
 
 export default [
     CreateTables1000000000000,
@@ -23,5 +24,6 @@ export default [
     AddPasswords1708644980026,
     AddContainerTable1745336625326,
     AddItemsWithContainersView1745754622461,
-    AddItemCount1751894045445
+    AddItemCount1751894045445,
+    AdjustItemView1754863716132
 ];
