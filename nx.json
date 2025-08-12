@@ -45,5 +45,6 @@
         }
     },
     "useInferencePlugins": false,
-    "defaultBase": "master"
+    "defaultBase": "master",
+    "nxCloudId": "689bc435b0c1aa692565e89c"
 }
