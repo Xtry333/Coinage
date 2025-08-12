@@ -8,6 +8,7 @@ import { CoinageDataService } from '../../services/coinage.data-service';
     selector: 'app-account-settings-page',
     templateUrl: './account-settings-page.component.html',
     styleUrls: ['./account-settings-page.component.scss'],
+    standalone: false,
 })
 export class AccountSettingsPageComponent implements OnInit {
     public accounts: AccountDTO[] = [];

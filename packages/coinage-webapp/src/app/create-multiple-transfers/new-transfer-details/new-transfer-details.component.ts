@@ -9,6 +9,7 @@ import { StorageScope } from '../../core/services/storage-service/storage-scope.
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
 import { CoinageRoutes } from '../../app-routing/app-routes';
+import { FormsModule, NgForm } from '@angular/forms';
 
 export interface SelectedDetails {
     accountId: number | undefined;
@@ -20,6 +21,7 @@ export interface SelectedDetails {
     selector: 'app-new-transfer-details',
     templateUrl: './new-transfer-details.component.html',
     styleUrls: ['./new-transfer-details.component.scss'],
+    standalone: false
 })
 export class NewTransferDetailsComponent implements OnInit {
     public static LAST_USED_CONTRACTOR = 'createTransfers.lastUsedContractorId';

@@ -6,6 +6,7 @@ import { CoinageNotification, NotificationLevel } from '../../services/notificat
     selector: 'app-notification',
     templateUrl: './notification.component.html',
     styleUrls: ['./notification.component.scss'],
+    standalone: false,
 })
 export class NotificationComponent implements OnInit, OnDestroy {
     public closeIcon = faTimes;

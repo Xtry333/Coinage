@@ -56,6 +56,7 @@ export interface FilterOption {
     selector: 'app-table-filter[filterName]',
     templateUrl: './table-filter.component.html',
     styleUrls: ['./table-filter.component.scss'],
+    standalone: false,
 })
 export class TableFilterComponent implements OnInit {
     public static readonly ITEMS_TO_DISPLAY_SEARCH_BOX = 5;

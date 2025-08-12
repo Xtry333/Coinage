@@ -15,6 +15,7 @@ interface UiNavLink {
     selector: 'app-sidebar-nav',
     templateUrl: './sidebar-nav.component.html',
     styleUrls: ['./sidebar-nav.component.scss'],
+    standalone: false,
 })
 export class SidebarNavComponent implements OnInit {
     public title = 'Coinage';

@@ -5,6 +5,7 @@ import { CoinageNotification, NotificationService } from '../services/notificati
     selector: 'app-notifications-container',
     templateUrl: './notifications-container.component.html',
     styleUrls: ['./notifications-container.component.scss'],
+    standalone: false,
 })
 export class NotificationsContainerComponent implements OnInit {
     public notificationsList: CoinageNotification[] = [];

@@ -22,6 +22,7 @@ export interface SelectedTransferItemDetails {
     selector: 'app-item-details-for-transfer',
     templateUrl: './item-details-for-transfer.component.html',
     styleUrls: ['./item-details-for-transfer.component.scss'],
+    standalone: false,
 })
 export class AddItemsToTransferComponent implements OnInit {
     public removeIcon = faTrash;

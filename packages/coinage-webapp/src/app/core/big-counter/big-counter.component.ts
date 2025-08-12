@@ -4,6 +4,7 @@ import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/
     selector: 'app-big-counter',
     templateUrl: './big-counter.component.html',
     styleUrls: ['./big-counter.component.scss'],
+    standalone: false,
 })
 export class BigCounterComponent implements OnChanges, OnDestroy {
     @Input() public value = 0;

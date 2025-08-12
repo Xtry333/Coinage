@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'appCurrency',
+    standalone: false,
 })
 export class CurrencyPipe implements PipeTransform {
     private readonly CURRENCY_SYMBOL: Record<string, string> = { 'EUR': '€', 'PLN': 'zł' };

@@ -7,6 +7,7 @@ import { CoinageDataService } from '../../../services/coinage.data-service';
     selector: 'app-dashboard-counters',
     templateUrl: './dashboard-counters.component.html',
     styleUrls: ['./dashboard-counters.component.scss'],
+    standalone: false,
 })
 export class DashboardCountersComponent implements OnInit {
     public balance: BalanceDTO[] = [];

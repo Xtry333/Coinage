@@ -8,6 +8,7 @@ import { finalize } from 'rxjs/operators';
     selector: 'app-category-manager',
     templateUrl: './category-manager.component.html',
     styleUrls: ['./category-manager.component.scss'],
+    standalone: false,
 })
 export class CategoryManagerComponent implements OnInit {
     public showPage = false;

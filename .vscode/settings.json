@@ -17,5 +17,6 @@
     "editor.fontSize": 11,
     "files.autoSave": "afterDelay",
     "angular.view-engine": false,
-    "js/ts.implicitProjectConfig.experimentalDecorators": true
+    "js/ts.implicitProjectConfig.experimentalDecorators": true,
+    "nxConsole.generateAiAgentRules": true
 }

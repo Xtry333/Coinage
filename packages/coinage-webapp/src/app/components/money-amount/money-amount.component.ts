@@ -26,6 +26,7 @@ export namespace MoneyAmountComponentData {
     selector: 'app-money-amount',
     templateUrl: './money-amount.component.html',
     styleUrls: ['./money-amount.component.scss'],
+    standalone: false,
 })
 export class MoneyAmountComponent {
     @Input() public transferData?: MoneyAmountComponentData.TransferData;

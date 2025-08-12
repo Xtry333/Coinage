@@ -12,6 +12,7 @@ import { WindowService } from '../core/services/window-service/window-service.se
     selector: 'app-transfers-list',
     templateUrl: './transfers-list.component.html',
     styleUrls: ['./transfers-list.component.scss'],
+    standalone: false,
 })
 export class TransfersListComponent implements OnInit, OnDestroy {
     public static REFRESH_INTERVAL = 10000;

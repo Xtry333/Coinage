@@ -23,6 +23,7 @@ type PageNumber =
     selector: 'app-pagination',
     templateUrl: './pagination.component.html',
     styleUrls: ['./pagination.component.scss'],
+    standalone: false,
 })
 export class PaginationComponent implements OnInit, OnChanges, OnDestroy {
     @Input() public firstPage = 1;

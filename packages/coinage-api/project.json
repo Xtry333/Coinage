@@ -6,7 +6,7 @@
     "tags": [],
     "targets": {
         "build": {
-            "executor": "@nrwl/webpack:webpack",
+            "executor": "@nx/webpack:webpack",
             "outputs": ["{options.outputPath}"],
             "options": {
                 "target": "node",
@@ -32,14 +32,13 @@
             }
         },
         "serve": {
-            "executor": "@nrwl/js:node",
+            "executor": "@nx/js:node",
             "options": {
                 "buildTarget": "coinage-api:build"
             },
             "configurations": {
                 "production": {
-                    "buildTarget": "coinage-api:build:production",
-                    "disableHostCheck": true
+                    "buildTarget": "coinage-api:build:production"
                 }
             }
         },

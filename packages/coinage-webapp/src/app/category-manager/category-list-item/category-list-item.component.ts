@@ -6,6 +6,7 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons';
     selector: 'app-category-list-item',
     templateUrl: './category-list-item.component.html',
     styleUrls: ['./category-list-item.component.scss'],
+    standalone: false,
 })
 export class CategoryListItemComponent {
     public editIcon = faEdit;

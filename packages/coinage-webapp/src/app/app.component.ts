@@ -17,6 +17,7 @@ import { TransfersListComponent } from './transfers-list/transfers-list.componen
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    standalone: false,
 })
 export class AppComponent implements OnInit, OnDestroy {
     public static readonly KEY_LAST_USER_VISIT_DATE = 'last-visit-date';

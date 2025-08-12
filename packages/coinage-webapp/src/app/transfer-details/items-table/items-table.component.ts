@@ -20,6 +20,7 @@ export class UiTransferItemDTO extends TransferItemDTO {
     selector: 'app-items-table',
     templateUrl: './items-table.component.html',
     styleUrls: ['./items-table.component.scss'],
+    standalone: false,
 })
 export class ItemsTableComponent implements OnChanges {
     public readonly CoinageRoutes = CoinageRoutes;

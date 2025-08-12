@@ -7,6 +7,7 @@ import { AuthService } from '../auth.service';
     selector: 'app-login',
     templateUrl: './login.component.html',
     styleUrls: ['./login.component.scss'],
+    standalone: false,
 })
 export class LoginComponent {
     public username: string;

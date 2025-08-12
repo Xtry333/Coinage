@@ -9,6 +9,7 @@ import { NotificationService } from '../../services/notification.service';
     selector: 'app-item-shopping-list',
     templateUrl: './item-shopping-list.component.html',
     styleUrls: ['./item-shopping-list.component.scss'],
+    standalone: false,
 })
 export class ItemShoppingListComponent implements OnInit, OnChanges {
     public removeIcon = faTrash;

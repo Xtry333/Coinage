@@ -4,6 +4,7 @@ import { Component, EventEmitter, HostListener, Output } from '@angular/core';
     selector: 'app-auto-pagination',
     templateUrl: './auto-pagination.component.html',
     styleUrls: ['./auto-pagination.component.scss'],
+    standalone: false,
 })
 export class AutoPaginationComponent {
     @Output() public endOfPage = new EventEmitter<void>();

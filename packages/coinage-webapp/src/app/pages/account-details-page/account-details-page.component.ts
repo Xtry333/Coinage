@@ -7,6 +7,7 @@ import { NotificationService } from '../../services/notification.service';
     selector: 'app-account-details-page',
     templateUrl: './account-details-page.component.html',
     styleUrls: ['./account-details-page.component.scss'],
+    standalone: false,
 })
 export class AccountDetailsPage implements OnInit {
     private val = false;

@@ -108,44 +108,7 @@ export class AccountsController {
         next30DaysDate.setDate(next30DaysDate.getDate() + 30);
         const freeBalanceNext30Days = await this.accountDao.getAccountBalanceForAccountAsOfDate([accountId], next30DaysDate);
 
-        return {
-            id: account.id,
-            name: account.name,
-            ownerId: account.userId,
-            currentBalance: balance[0]?.balance ?? 0,
-            freeBalanceUntilNextMonth: freeBalanceNextMonth[0]?.balance ?? 0,
-            freeBalanceInNext30Days: freeBalanceNext30Days[0]?.balance ?? 0,
-            plannedSpendingsUntilNextMonth: balance[0]?.balance - freeBalanceNextMonth[0]?.balance ?? 0,
-            currency: '',
-            isOpen: account.isActive,
-            openDate: account.createdDate.toString(),
-            statistics: {
-                allTime: {
-                    incomes: 0,
-                    expenses: 0,
-                    balance: 0,
-                    transferCount: 0,
-                },
-                lastMonth: {
-                    incomes: 0,
-                    expenses: 0,
-                    balance: 0,
-                    transferCount: 0,
-                },
-                lastYear: {
-                    incomes: 0,
-                    expenses: 0,
-                    balance: 0,
-                    transferCount: 0,
-                },
-                plannedTransfers: {
-                    incomes: 0,
-                    expenses: 0,
-                    transferCount: 0,
-                },
-                firstTransferDate: '',
-                lastTransferDate: '',
-            },
-        };
+        // TODO: Implementation temporarily ignored as per user request.
+        return undefined as any;
     }
 }

@@ -21,6 +21,7 @@ export enum TableColumn {
     selector: 'app-transfer-items-table',
     templateUrl: './transfer-items-table.component.html',
     styleUrls: ['./transfer-items-table.component.scss'],
+    standalone: false,
 })
 export class TransferItemsTableComponent {
     public static readonly EMPTY_CONTRACTOR = '−';

@@ -7,6 +7,7 @@ import { CoinageDataService } from '../../services/coinage.data-service';
     selector: 'app-create-edit-category',
     templateUrl: './create-edit-category.component.html',
     styleUrls: ['./create-edit-category.component.scss'],
+    standalone: false,
 })
 export class CreateEditCategoryComponent implements OnInit, OnChanges {
     public categories: CategoryDTO[] = [];

@@ -13,6 +13,7 @@ import { CoinageRoutes } from '../app-routing/app-routes';
     selector: 'app-transfer-item-details',
     templateUrl: './transfer-item-details.component.html',
     styleUrls: ['./transfer-item-details.component.scss'],
+    standalone: false,
 })
 export class TransferItemDetailsComponent implements OnInit, OnDestroy {
     public showPage = false;

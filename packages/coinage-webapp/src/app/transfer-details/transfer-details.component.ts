@@ -15,6 +15,7 @@ import { CoinageRoutes } from '../app-routing/app-routes';
     selector: 'app-transfer-details',
     templateUrl: './transfer-details.component.html',
     styleUrls: ['./transfer-details.component.scss'],
+    standalone: false,
 })
 export class TransferDetailsComponent implements OnInit, OnDestroy {
     public plannedIcon: IconDefinition = faClock;

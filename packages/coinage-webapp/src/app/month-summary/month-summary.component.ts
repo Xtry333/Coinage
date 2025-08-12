@@ -19,6 +19,7 @@ export interface UiTotalInMonthByCategory {
     selector: 'app-summary',
     templateUrl: './month-summary.component.html',
     styleUrls: ['./month-summary.component.scss'],
+    standalone: false,
 })
 export class MonthSummaryComponent implements OnInit, OnDestroy {
     public showPage = false;

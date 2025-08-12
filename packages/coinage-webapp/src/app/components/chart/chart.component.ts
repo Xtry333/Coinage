@@ -11,6 +11,7 @@ export const enum CoinageChartType {
     selector: 'app-chart[datasets][labels]',
     templateUrl: './chart.component.html',
     styleUrls: ['./chart.component.scss'],
+    standalone: false,
 })
 export class ChartComponent {
     @Input() public showLegend = true;

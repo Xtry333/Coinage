@@ -2,6 +2,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
     name: 'ifNull',
+    standalone: false,
 })
 export class NullTransformPipe implements PipeTransform {
     public static readonly DEFAULT_SYMBOL = '−';

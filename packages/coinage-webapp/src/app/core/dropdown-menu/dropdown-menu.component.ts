@@ -4,6 +4,7 @@ import { Component, ElementRef, HostListener } from '@angular/core';
     selector: 'app-dropdown-menu',
     templateUrl: './dropdown-menu.component.html',
     styleUrls: ['./dropdown-menu.component.scss'],
+    standalone: false,
 })
 export class DropdownMenuComponent {
     public isDropdownOpen = false;

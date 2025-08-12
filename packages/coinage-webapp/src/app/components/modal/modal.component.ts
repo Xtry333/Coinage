@@ -5,6 +5,7 @@ import { faTimes } from '@fortawesome/free-solid-svg-icons';
     selector: 'app-modal',
     templateUrl: './modal.component.html',
     styleUrls: ['./modal.component.scss'],
+    standalone: false,
 })
 export class ModalComponent implements OnInit, OnChanges {
     private modalElement!: HTMLElement;

@@ -34,6 +34,7 @@ export interface NewTransferObject {
     selector: 'app-create-transfer',
     templateUrl: './create-edit-transfer.component.html',
     styleUrls: ['./create-edit-transfer.component.scss'],
+    standalone: false,
 })
 export class CreateEditTransferComponent implements OnInit {
     public static FUEL_TEMPLATE = 'Paliwo x,xx PLN/L Miejsce';

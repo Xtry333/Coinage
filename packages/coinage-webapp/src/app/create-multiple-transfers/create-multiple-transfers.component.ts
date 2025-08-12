@@ -20,6 +20,8 @@ import { StorageScope } from '../core/services/storage-service/storage-scope.enu
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
+import { SectionComponent } from '../components/section/section.component';
+import { CommonComponentsModule } from '../components/common-components.module';
 
 export interface NewTransferObject {
     description: string;
@@ -34,6 +36,7 @@ export interface NewTransferObject {
     selector: 'app-create-multiple-transfers',
     templateUrl: './create-multiple-transfers.component.html',
     styleUrls: ['./create-multiple-transfers.component.scss'],
+    standalone: false
 })
 export class CreateMultipleTransfersComponent implements OnInit {
     public static readonly SAVED_ITEMS = 'createTransfers.selectedItems';

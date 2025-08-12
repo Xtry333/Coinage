@@ -69,7 +69,8 @@ export type UiTableRow = UiTransfer | { isTodayMarkerRow: boolean };
     selector: 'app-transfers-table[transfers]',
     templateUrl: './transfers-table.component.html',
     styleUrls: ['./transfers-table.component.scss'],
-})
+    standalone: false,
+    })
 export class TransfersTableComponent implements OnInit, OnChanges {
     public static readonly EMPTY_CONTRACTOR = '−';
     public static readonly EMPTY_DESCRIPTION = '−';

@@ -11,6 +11,7 @@ import { NavigatorService } from '../app-routing/navigator.service';
     selector: 'app-receipt-details',
     templateUrl: './receipt-details.component.html',
     styleUrls: ['./receipt-details.component.scss'],
+    standalone: false,
 })
 export class ReceiptDetailsComponent implements OnInit {
     public receiptDetails?: ReceiptDetailsDTO;

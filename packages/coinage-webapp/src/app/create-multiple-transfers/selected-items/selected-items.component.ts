@@ -9,6 +9,7 @@ import { SelectedTransferItemDetails } from '../item-details-for-transfer/item-d
     selector: 'app-selected-items',
     templateUrl: './selected-items.component.html',
     styleUrls: ['./selected-items.component.scss'],
+    standalone: false,
 })
 export class SelectedItemsComponent implements OnChanges {
     public removeIcon = faTrash;
