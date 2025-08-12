@@ -1,12 +1,14 @@
 <nav id="sidebarMenu" class="bg-secondary-subtle sidebar w-inherit">
     <div class="position-sticky pt-3 sidebar-sticky">
         <ul class="nav flex-column mb-auto">
-            <li class="nav-item" *ngFor="let link of links">
-                <a class="nav-link" [routerLink]="link.url" routerLinkActive="active" ariaCurrentWhenActive="page">
-                    <i class="pe-none me-2" [class]="link.icon"></i>
-                    <span>{{ link.text }}</span>
-                </a>
-            </li>
+            @for (link of links; track link) {
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="link.url" routerLinkActive="active" ariaCurrentWhenActive="page">
+                        <i class="pe-none me-2" [class]="link.icon"></i>
+                        <span>{{ link.text }}</span>
+                    </a>
+                </li>
+            }
         </ul>
         <hr />
         <div class="ms-2 dropdown">

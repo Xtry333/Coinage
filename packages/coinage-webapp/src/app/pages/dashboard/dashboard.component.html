@@ -30,52 +30,55 @@
         </div>
     </div>
     <div>
-        <div *ngIf="showPage">
-            <div class="table-container">
-                <app-dashboard-counters></app-dashboard-counters>
-                <!-- <div class="counters-container">
-                    app-big-counter [value]="balanceMainAccount" [upperLabel]="'PLN'" [lowerLabel]="'Konto PKO'"></app-big-counter>
-                    app-big-counter [value]="balanceSecondary" [upperLabel]="'PLN'" [lowerLabel]="'Portfel'"></app-big-counter>
-                </div> -->
-
-                <app-transfers-table [transfers]="lastTransactions" [header]="'Recently Edited Transfers'" [showTodayMarker]="false"></app-transfers-table>
-                <div>
-                    <p>Average Income ({{ this.averageAmountLimit }} months): {{ rollingAverageIncomes | plnCurrency }}</p>
-                    <p>Average Outcome ({{ this.averageAmountLimit }} months): {{ rollingAverageOutcomes | plnCurrency }}</p>
+        @if (showPage) {
+            <div>
+                <div class="table-container">
+                    <app-dashboard-counters></app-dashboard-counters>
+                    <!-- <div class="counters-container">
+        app-big-counter [value]="balanceMainAccount" [upperLabel]="'PLN'" [lowerLabel]="'Konto PKO'"></app-big-counter>
+      app-big-counter [value]="balanceSecondary" [upperLabel]="'PLN'" [lowerLabel]="'Portfel'"></app-big-counter>
+    </div> -->
+                    <app-transfers-table [transfers]="lastTransactions" [header]="'Recently Edited Transfers'" [showTodayMarker]="false"></app-transfers-table>
+                    <div>
+                        <p>Average Income ({{ this.averageAmountLimit }} months): {{ rollingAverageIncomes | plnCurrency }}</p>
+                        <p>Average Outcome ({{ this.averageAmountLimit }} months): {{ rollingAverageOutcomes | plnCurrency }}</p>
+                    </div>
+                    <app-chart [datasets]="accountStatsChartData" [labels]="accountStatsChartLabels"></app-chart>
+                    <table class="last-transactions-table">
+                        <caption>
+                            <span>Total In/Outcomes per Month</span>
+                        </caption>
+                        <thead>
+                            <tr>
+                                <th class="align-left">Date</th>
+                                <th class="align-right">Outcomes</th>
+                                <th class="align-right">Incomes</th>
+                                <th class="align-right">Savings</th>
+                                <th class="align-right">Cost Per Day</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (outcome of totalAmountPerMonth; track totalOutcomesTracker($index, outcome)) {
+                                <tr>
+                                    <td class="month-name">
+                                        <!-- <a [routerLink]="NavigatorPages.Summary(outcome.partedDate)">{{ outcome.monthName }} {{ outcome.year }}</a> -->
+                                        {{ outcome.monthName }} {{ outcome.year }}
+                                    </td>
+                                    <td class="currency">{{ outcome.outcomes | plnCurrency }}</td>
+                                    <td class="currency">{{ outcome.incomes | plnCurrency }}</td>
+                                    <td class="currency">{{ outcome.profit | plnCurrency | replace: '-' : '− ' }}</td>
+                                    <td class="currency">{{ outcome.profitPerDay | plnCurrency }}</td>
+                                </tr>
+                            }
+                            <tr>
+                                <td colspan="3"></td>
+                                <td class="currency">{{ totalChange | plnCurrency }}</td>
+                                <td colspan="1"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <app-chart [datasets]="accountStatsChartData" [labels]="accountStatsChartLabels"></app-chart>
-                <table class="last-transactions-table">
-                    <caption>
-                        <span>Total In/Outcomes per Month</span>
-                    </caption>
-                    <thead>
-                        <tr>
-                            <th class="align-left">Date</th>
-                            <th class="align-right">Outcomes</th>
-                            <th class="align-right">Incomes</th>
-                            <th class="align-right">Savings</th>
-                            <th class="align-right">Cost Per Day</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr *ngFor="let outcome of totalAmountPerMonth; trackBy: totalOutcomesTracker">
-                            <td class="month-name">
-                                <!-- <a [routerLink]="NavigatorPages.Summary(outcome.partedDate)">{{ outcome.monthName }} {{ outcome.year }}</a> -->
-                                {{ outcome.monthName }} {{ outcome.year }}
-                            </td>
-                            <td class="currency">{{ outcome.outcomes | plnCurrency }}</td>
-                            <td class="currency">{{ outcome.incomes | plnCurrency }}</td>
-                            <td class="currency">{{ outcome.profit | plnCurrency | replace: '-' : '− ' }}</td>
-                            <td class="currency">{{ outcome.profitPerDay | plnCurrency }}</td>
-                        </tr>
-                        <tr>
-                            <td colspan="3"></td>
-                            <td class="currency">{{ totalChange | plnCurrency }}</td>
-                            <td colspan="1"></td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
-        </div>
+        }
     </div>
 </main>

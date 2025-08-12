@@ -1,7 +1,5 @@
 <div class="notifications-container">
-    <app-notification
-        *ngFor="let notification of notificationsList"
-        [content]="notification"
-        (dismissedEvent)="onNotificationDismiss($event)"
-    ></app-notification>
+    @for (notification of notificationsList; track notification) {
+        <app-notification [content]="notification" (dismissedEvent)="onNotificationDismiss($event)"></app-notification>
+    }
 </div>

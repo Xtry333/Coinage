@@ -1,11 +1,13 @@
-<div *ngIf="showPage">
-    <app-transfers-table
-        [transfers]="transfers"
-        [header]="'All Transfers'"
-        [showFilters]="true"
-        [filterCachePath]="TRANSFERS_FILTER_CACHE_PATH"
-        [lastPageNumber]="lastPageNumber"
-        (tableFilter)="onPerformFilter($event)"
-    ></app-transfers-table>
-    <app-auto-pagination (endOfPage)="onEndOfPage()"></app-auto-pagination>
-</div>
+@if (showPage) {
+    <div>
+        <app-transfers-table
+            [transfers]="transfers"
+            [header]="'All Transfers'"
+            [showFilters]="true"
+            [filterCachePath]="TRANSFERS_FILTER_CACHE_PATH"
+            [lastPageNumber]="lastPageNumber"
+            (tableFilter)="onPerformFilter($event)"
+        ></app-transfers-table>
+        <app-auto-pagination (endOfPage)="onEndOfPage()"></app-auto-pagination>
+    </div>
+}

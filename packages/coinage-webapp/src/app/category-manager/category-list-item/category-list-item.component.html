@@ -3,11 +3,11 @@
         <span>{{ category.name }}</span>
         <span (click)="onSelectCategoryForEdit(category)"><fa-icon class="edit-icon" [icon]="editIcon" [fixedWidth]="true"></fa-icon></span>
     </span>
-    <ul *ngIf="category.children">
-        <app-category-list-item
-            *ngFor="let children of category.children"
-            [category]="children"
-            (editCategory)="onSelectCategoryForEdit($event)"
-        ></app-category-list-item>
-    </ul>
+    @if (category.children) {
+        <ul>
+            @for (children of category.children; track children) {
+                <app-category-list-item [category]="children" (editCategory)="onSelectCategoryForEdit($event)"></app-category-list-item>
+            }
+        </ul>
+    }
 </li>

@@ -1,6 +1,8 @@
 <div clas="coinage-chart-container">
-    <header *ngIf="header">
-        <span>{{ header }}</span>
-    </header>
+    @if (header) {
+        <header>
+            <span>{{ header }}</span>
+        </header>
+    }
     <canvas baseChart [datasets]="datasets" [labels]="labels" [options]="options" [legend]="showLegend" [type]="chartType"></canvas>
 </div>

@@ -1,49 +1,61 @@
 <div class="selected-items">
     <ul class="list-group list-group-flush w-100">
-        <li class="list-group-item p-0" *ngFor="let category of categorisedItemList">
-            <div class="px-2 pt-2 d-flex justify-content-between">
-                <div class="fw-bold">{{ category.name }}</div>
-                <span class="badge bg-primary rounded-pill">{{ category.items.length }}</span>
-            </div>
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item p-2" *ngFor="let item of category.items">
-                    <div class="row">
-                        <div class="col-6">
-                            <div class="d-flex justify-content-between">
-                                <span>{{ item.name }}</span>
-                                <fa-icon
-                                    class="remove-icon"
-                                    (click)="removeItem(item)"
-                                    [icon]="removeIcon"
-                                    [fixedWidth]="true"
-                                    [ariaLabel]="'Remove item from list'"
-                                ></fa-icon>
+        @for (category of categorisedItemList; track category) {
+            <li class="list-group-item p-0">
+                <div class="px-2 pt-2 d-flex justify-content-between">
+                    <div class="fw-bold">{{ category.name }}</div>
+                    <span class="badge bg-primary rounded-pill">{{ category.items.length }}</span>
+                </div>
+                <ul class="list-group list-group-flush">
+                    @for (item of category.items; track item) {
+                        <li class="list-group-item p-2">
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="d-flex justify-content-between">
+                                        <span>{{ item.name }}</span>
+                                        <fa-icon
+                                            class="remove-icon"
+                                            (click)="removeItem(item)"
+                                            [icon]="removeIcon"
+                                            [fixedWidth]="true"
+                                            [ariaLabel]="'Remove item from list'"
+                                        ></fa-icon>
+                                    </div>
+                                </div>
+                                <div class="col text-end">
+                                    <span>{{ item.unitPrice | plnCurrency }} x {{ item.amount }}</span>
+                                </div>
+                                <div class="col text-end">
+                                    <div>
+                                        <span>{{ getItemTotalPrice(item) | plnCurrency }}</span>
+                                    </div>
+                                    @if (item.setDiscount && item.setDiscount > 0) {
+                                        <div>
+                                            <span [title]="getItemTotalPriceWithDiscount(item) | plnCurrency">{{ -item.setDiscount | plnCurrency }}</span>
+                                        </div>
+                                    }
+                                </div>
                             </div>
-                        </div>
-                        <div class="col text-end">
-                            <span>{{ item.unitPrice | plnCurrency }} x {{ item.amount }}</span>
-                        </div>
-                        <div class="col text-end">
-                            <div>
-                                <span>{{ getItemTotalPrice(item) | plnCurrency }}</span>
-                            </div>
-                            <div *ngIf="item.setDiscount && item.setDiscount > 0">
-                                <span [title]="getItemTotalPriceWithDiscount(item) | plnCurrency">{{ -item.setDiscount | plnCurrency }}</span>
-                            </div>
-                        </div>
-                    </div>
-                </li>
-                <li *ngIf="categorisedItemList.length > 1" class="category-sum list-group-item p-2">
-                    <div class="text-end">{{ getTotalCategoryCost(category.items) | plnCurrency }}</div>
-                </li>
-            </ul>
-        </li>
+                        </li>
+                    }
+                    @if (categorisedItemList.length > 1) {
+                        <li class="category-sum list-group-item p-2">
+                            <div class="text-end">{{ getTotalCategoryCost(category.items) | plnCurrency }}</div>
+                        </li>
+                    }
+                </ul>
+            </li>
+        }
         <li class="list-group-item p-2">
             <div class="row">
-                <div *ngIf="items.length === 0">There are no items added.</div>
-                <div *ngIf="items.length > 0" class="col">
-                    <span class="fw-bold">Grand Total</span>
-                </div>
+                @if (items.length === 0) {
+                    <div>There are no items added.</div>
+                }
+                @if (items.length > 0) {
+                    <div class="col">
+                        <span class="fw-bold">Grand Total</span>
+                    </div>
+                }
                 <div class="col text-end">{{ getItemsCost(items) | plnCurrency }}</div>
             </div>
         </li>

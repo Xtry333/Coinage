@@ -1,162 +1,169 @@
-<div class="add-items-to-transfer ml-5" *ngIf="itemsLoaded">
-    <div class="row g-3 pb-3">
-        <div class="col-md-4">
-            <label for="selectedItemInput">Item</label>
-            <ng-select
-                #itemSelect
-                name="itemId"
-                labelForId="selectedItemInput"
-                placeholder="Search"
-                [(ngModel)]="selectedItemDetails.id"
-                (change)="onItemSelected($event)"
-                [clearable]="true"
-                [editableSearchTerm]="true"
-                [items]="allItems"
-                [searchable]="true"
-                [notFoundText]="'No items found'"
-                [required]="true"
-                bindValue="id"
-                bindLabel="name"
-                aria-label="Search for item"
-            ></ng-select>
+@if (itemsLoaded) {
+    <div class="add-items-to-transfer ml-5">
+        <div class="row g-3 pb-3">
+            <div class="col-md-4">
+                <label for="selectedItemInput">Item</label>
+                <ng-select
+                    #itemSelect
+                    name="itemId"
+                    labelForId="selectedItemInput"
+                    placeholder="Search"
+                    [(ngModel)]="selectedItemDetails.id"
+                    (change)="onItemSelected($event)"
+                    [clearable]="true"
+                    [editableSearchTerm]="true"
+                    [items]="allItems"
+                    [searchable]="true"
+                    [notFoundText]="'No items found'"
+                    [required]="true"
+                    bindValue="id"
+                    bindLabel="name"
+                    aria-label="Search for item"
+                ></ng-select>
+            </div>
+            <div class="col-md-4">
+                <label for="selectedItemContainerInput">Container</label>
+                <ng-select
+                    #containerSelect
+                    name="containerId"
+                    labelForId="selectedItemContainerInput"
+                    placeholder="Search"
+                    [(ngModel)]="selectedItemDetails.id"
+                    (change)="onContainerSelected($event)"
+                    [clearable]="true"
+                    [editableSearchTerm]="true"
+                    [items]="allContainers"
+                    [required]="false"
+                    [searchable]="true"
+                    [notFoundText]="'No containers found'"
+                    bindValue="id"
+                    bindLabel="name"
+                    aria-label="Search for container"
+                ></ng-select>
+            </div>
+            <div class="col-md">
+                <label for="setDiscountInput">Set discount</label>
+                <div class="input-group">
+                    <input
+                        id="setDiscountInput"
+                        class="form-control pe-1"
+                        type="number"
+                        [(ngModel)]="selectedItemDetails.setDiscount"
+                        (change)="onItemDetailsChanged()"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        aria-describedby="setDiscountInput"
+                    />
+                    <span class="input-group-text" id="setDiscountInput">zł</span>
+                </div>
+            </div>
         </div>
-        <div class="col-md-4">
-            <label for="selectedItemContainerInput">Container</label>
-            <ng-select
-                #containerSelect
-                name="containerId"
-                labelForId="selectedItemContainerInput"
-                placeholder="Search"
-                [(ngModel)]="selectedItemDetails.id"
-                (change)="onContainerSelected($event)"
-                [clearable]="true"
-                [editableSearchTerm]="true"
-                [items]="allContainers"
-                [required]="false"
-                [searchable]="true"
-                [notFoundText]="'No containers found'"
-                bindValue="id"
-                bindLabel="name"
-                aria-label="Search for container"
-            ></ng-select>
+        <div class="row g-3 mb-3">
+            <div class="col-md">
+                <label for="unitPriceInput" class="d-flex justify-content-between">
+                    <span>Unit Price</span>
+                    @if (canAutoAdjustUnitPrice) {
+                        <fa-icon
+                            class="auto-adjust-icon"
+                            [icon]="autoAdjustIcon"
+                            [fixedWidth]="true"
+                            [title]="autoAdjustTitleText"
+                            [ariaLabel]="autoAdjustTitleText"
+                        ></fa-icon>
+                    }
+                </label>
+                <div class="input-group">
+                    <input
+                        id="unitPriceInput"
+                        class="form-control pe-1"
+                        type="number"
+                        [(ngModel)]="selectedItemDetails.unitPrice"
+                        (change)="onUnitPriceChanged()"
+                        (focus)="onUnitPriceChanged()"
+                        required="true"
+                        min="0"
+                        step="0.01"
+                        placeholder="1.00"
+                        autocomplete="off"
+                        aria-describedby="unitPriceInputAddon"
+                    />
+                    <span id="unitPriceInputAddon" class="input-group-text">zł</span>
+                </div>
+            </div>
+            <div class="col-md">
+                <label for="amountInput" class="d-flex justify-content-between">
+                    <span>Amount</span>
+                    @if (canAutoAdjustAmount) {
+                        <fa-icon
+                            class="auto-adjust-icon"
+                            [icon]="autoAdjustIcon"
+                            [fixedWidth]="true"
+                            [title]="autoAdjustTitleText"
+                            [ariaLabel]="autoAdjustTitleText"
+                        ></fa-icon>
+                    }
+                </label>
+                <div class="input-group">
+                    <input
+                        id="amountInput"
+                        class="form-control pe-1"
+                        type="number"
+                        [(ngModel)]="selectedItemDetails.amount"
+                        (change)="onAmountChanged()"
+                        (focus)="onAmountChanged()"
+                        required="true"
+                        min="0"
+                        value="1"
+                        placeholder="1.00"
+                        aria-describedby="amountInputAddon"
+                    />
+                    <span id="amountInputAddon" class="input-group-text">X</span>
+                </div>
+            </div>
+            <div class="col-md">
+                <label for="totalPriceInput" class="d-flex justify-content-between">
+                    <span>Total Price <span class="text-muted">(not including discount)</span></span>
+                    @if (canAutoAdjustTotalPrice) {
+                        <fa-icon
+                            class="auto-adjust-icon"
+                            [icon]="autoAdjustIcon"
+                            [fixedWidth]="true"
+                            [title]="autoAdjustTitleText"
+                            [ariaLabel]="autoAdjustTitleText"
+                        ></fa-icon>
+                    }
+                </label>
+                <div class="input-group">
+                    <input
+                        id="totalPriceInput"
+                        class="form-control pe-1"
+                        type="number"
+                        [(ngModel)]="selectedItemDetails.totalPrice"
+                        (change)="onTotalPriceChanged()"
+                        (focus)="onTotalPriceChanged()"
+                        required="true"
+                        min="0"
+                        step="0.01"
+                        placeholder="1.00"
+                        autocomplete="off"
+                        aria-describedby="totalPriceInputAddon"
+                    />
+                    <span id="totalPriceInputAddon" class="input-group-text">zł</span>
+                </div>
+            </div>
         </div>
-        <div class="col-md">
-            <label for="setDiscountInput">Set discount</label>
-            <div class="input-group">
-                <input
-                    id="setDiscountInput"
-                    class="form-control pe-1"
-                    type="number"
-                    [(ngModel)]="selectedItemDetails.setDiscount"
-                    (change)="onItemDetailsChanged()"
-                    min="0"
-                    step="0.01"
-                    placeholder="0.00"
-                    aria-describedby="setDiscountInput"
-                />
-                <span class="input-group-text" id="setDiscountInput">zł</span>
+        <div class="row g-3 mb-3">
+            <div class="d-grid col-md-6 mx-auto">
+                @if (selectedItemDetails.name) {
+                    <span class="text-muted">{{ itemDetailsInfo }}</span>
+                }
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="d-grid col-md-6 mx-auto">
+                <button type="button" class="btn btn-outline-secondary" (click)="onClickAddNewItemToList()">Add</button>
             </div>
         </div>
     </div>
-    <div class="row g-3 mb-3">
-        <div class="col-md">
-            <label for="unitPriceInput" class="d-flex justify-content-between">
-                <span>Unit Price</span>
-                <fa-icon
-                    *ngIf="canAutoAdjustUnitPrice"
-                    class="auto-adjust-icon"
-                    [icon]="autoAdjustIcon"
-                    [fixedWidth]="true"
-                    [title]="autoAdjustTitleText"
-                    [ariaLabel]="autoAdjustTitleText"
-                ></fa-icon>
-            </label>
-            <div class="input-group">
-                <input
-                    id="unitPriceInput"
-                    class="form-control pe-1"
-                    type="number"
-                    [(ngModel)]="selectedItemDetails.unitPrice"
-                    (change)="onUnitPriceChanged()"
-                    (focus)="onUnitPriceChanged()"
-                    required="true"
-                    min="0"
-                    step="0.01"
-                    placeholder="1.00"
-                    autocomplete="off"
-                    aria-describedby="unitPriceInputAddon"
-                />
-                <span id="unitPriceInputAddon" class="input-group-text">zł</span>
-            </div>
-        </div>
-        <div class="col-md">
-            <label for="amountInput" class="d-flex justify-content-between">
-                <span>Amount</span>
-                <fa-icon
-                    *ngIf="canAutoAdjustAmount"
-                    class="auto-adjust-icon"
-                    [icon]="autoAdjustIcon"
-                    [fixedWidth]="true"
-                    [title]="autoAdjustTitleText"
-                    [ariaLabel]="autoAdjustTitleText"
-                ></fa-icon>
-            </label>
-            <div class="input-group">
-                <input
-                    id="amountInput"
-                    class="form-control pe-1"
-                    type="number"
-                    [(ngModel)]="selectedItemDetails.amount"
-                    (change)="onAmountChanged()"
-                    (focus)="onAmountChanged()"
-                    required="true"
-                    min="0"
-                    value="1"
-                    placeholder="1.00"
-                    aria-describedby="amountInputAddon"
-                />
-                <span id="amountInputAddon" class="input-group-text">X</span>
-            </div>
-        </div>
-        <div class="col-md">
-            <label for="totalPriceInput" class="d-flex justify-content-between">
-                <span>Total Price <span class="text-muted">(not including discount)</span></span>
-                <fa-icon
-                    *ngIf="canAutoAdjustTotalPrice"
-                    class="auto-adjust-icon"
-                    [icon]="autoAdjustIcon"
-                    [fixedWidth]="true"
-                    [title]="autoAdjustTitleText"
-                    [ariaLabel]="autoAdjustTitleText"
-                ></fa-icon>
-            </label>
-            <div class="input-group">
-                <input
-                    id="totalPriceInput"
-                    class="form-control pe-1"
-                    type="number"
-                    [(ngModel)]="selectedItemDetails.totalPrice"
-                    (change)="onTotalPriceChanged()"
-                    (focus)="onTotalPriceChanged()"
-                    required="true"
-                    min="0"
-                    step="0.01"
-                    placeholder="1.00"
-                    autocomplete="off"
-                    aria-describedby="totalPriceInputAddon"
-                />
-                <span id="totalPriceInputAddon" class="input-group-text">zł</span>
-            </div>
-        </div>
-    </div>
-    <div class="row g-3 mb-3">
-        <div class="d-grid col-md-6 mx-auto">
-            <span *ngIf="selectedItemDetails.name" class="text-muted">{{ itemDetailsInfo }}</span>
-        </div>
-    </div>
-    <div class="row g-3">
-        <div class="d-grid col-md-6 mx-auto">
-            <button type="button" class="btn btn-outline-secondary" (click)="onClickAddNewItemToList()">Add</button>
-        </div>
-    </div>
-</div>
+}

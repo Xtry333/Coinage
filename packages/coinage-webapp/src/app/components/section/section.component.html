@@ -1,6 +1,8 @@
 <div class="section" [ngClass]="class">
-    <div *ngIf="header" class="mb-2">
-        <span class="h4">{{ header }}</span>
-    </div>
+    @if (header) {
+        <div class="mb-2">
+            <span class="h4">{{ header }}</span>
+        </div>
+    }
     <ng-content></ng-content>
 </div>

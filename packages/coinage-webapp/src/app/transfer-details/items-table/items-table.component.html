@@ -19,22 +19,28 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let item of tableItems; trackBy: idTracker">
-            <td class="align-left">
-                <a [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })">
-                    {{ item.itemName }}
-                </a>
-            </td>
-            <td class="align-right">{{ item.unitPrice | plnCurrency }}</td>
-            <td class="align-right">{{ item.amount }}</td>
-            <td class="align-right">{{ item.totalPrice - item.setDiscount | plnCurrency }}</td>
-        </tr>
-        <tr *ngIf="!noRowsFound">
-            <td colspan="3"></td>
-            <td class="align-right">{{ totalSum | plnCurrency }}</td>
-        </tr>
-        <tr *ngIf="noRowsFound">
-            <td colspan="6">No items found.</td>
-        </tr>
+        @for (item of tableItems; track idTracker($index, item)) {
+            <tr>
+                <td class="align-left">
+                    <a [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })">
+                        {{ item.itemName }}
+                    </a>
+                </td>
+                <td class="align-right">{{ item.unitPrice | plnCurrency }}</td>
+                <td class="align-right">{{ item.amount }}</td>
+                <td class="align-right">{{ item.totalPrice - item.setDiscount | plnCurrency }}</td>
+            </tr>
+        }
+        @if (!noRowsFound) {
+            <tr>
+                <td colspan="3"></td>
+                <td class="align-right">{{ totalSum | plnCurrency }}</td>
+            </tr>
+        }
+        @if (noRowsFound) {
+            <tr>
+                <td colspan="6">No items found.</td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -1,19 +1,22 @@
-<div *ngIf="selectedCategory && editedCategory">
-    <form (ngSubmit)="onSaveCategory()">
-        <input name="category-name" type="text" [(ngModel)]="editedCategory.name" />
-        <textarea name="category-description" type="text" [(ngModel)]="editedCategory.description"></textarea>
-        <ng-select
-            *ngIf="categories"
-            #parentCategorySelect
-            name="category-parent"
-            [(ngModel)]="editedCategory.parentId"
-            [clearable]="true"
-            [editableSearchTerm]="true"
-            [items]="categories"
-            bindLabel="name"
-            bindValue="id"
-        ></ng-select>
-        <input name="category-tag" type="text" [disabled]="true" [ngModel]="selectedCategory.systemTag" />
-        <button type="submit">Save</button>
-    </form>
-</div>
+@if (selectedCategory && editedCategory) {
+    <div>
+        <form (ngSubmit)="onSaveCategory()">
+            <input name="category-name" type="text" [(ngModel)]="editedCategory.name" />
+            <textarea name="category-description" type="text" [(ngModel)]="editedCategory.description"></textarea>
+            @if (categories) {
+                <ng-select
+                    #parentCategorySelect
+                    name="category-parent"
+                    [(ngModel)]="editedCategory.parentId"
+                    [clearable]="true"
+                    [editableSearchTerm]="true"
+                    [items]="categories"
+                    bindLabel="name"
+                    bindValue="id"
+                ></ng-select>
+            }
+            <input name="category-tag" type="text" [disabled]="true" [ngModel]="selectedCategory.systemTag" />
+            <button type="submit">Save</button>
+        </form>
+    </div>
+}

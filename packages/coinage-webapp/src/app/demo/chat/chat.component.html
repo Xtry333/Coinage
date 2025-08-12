@@ -1,7 +1,9 @@
 <div>
-    <div *ngFor="let message of messages">
-        <span>{{ message.sender }}: {{ message.message }}</span>
-    </div>
+    @for (message of messages; track message) {
+        <div>
+            <span>{{ message.sender }}: {{ message.message }}</span>
+        </div>
+    }
 
     <div class="message-container">
         <input id="chatMessageInput" [(ngModel)]="chatMessageInput" />

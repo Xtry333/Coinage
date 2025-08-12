@@ -7,10 +7,12 @@
         </tr>
     </thead>
     <tbody>
-        <tr *ngFor="let account of accounts">
-            <td>
-                <span>{{ account.name }}</span>
-            </td>
-        </tr>
+        @for (account of accounts; track account) {
+            <tr>
+                <td>
+                    <span>{{ account.name }}</span>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

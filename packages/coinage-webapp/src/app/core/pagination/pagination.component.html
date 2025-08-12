@@ -1,12 +1,9 @@
 <div>
     <div class="page-numbers">
-        <button
-            *ngFor="let number of pageNumbers"
-            [ngClass]="{ active: number.isActive, spacer: number.isSpacer }"
-            class="page-number-button"
-            (click)="onClickChangePage($event, number)"
-        >
-            {{ number.value ?? '...' }}
-        </button>
+        @for (number of pageNumbers; track number) {
+            <button [ngClass]="{ active: number.isActive, spacer: number.isSpacer }" class="page-number-button" (click)="onClickChangePage($event, number)">
+                {{ number.value ?? '...' }}
+            </button>
+        }
     </div>
 </div>

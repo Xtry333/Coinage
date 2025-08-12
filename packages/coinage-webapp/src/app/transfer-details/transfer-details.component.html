@@ -1,137 +1,159 @@
-<div *ngIf="showPage" class="transfer-details-component">
-    <h4>
-        <ul class="category-path-list">
-            <li>Root</li>
-            <li *ngFor="let category of transfer?.categoryPath">
-                {{ category.name }}
-            </li>
-        </ul>
-    </h4>
-    <hr class="divider" />
-    <div class="transfers-items-table">
-        <div class="flex-item mr-2">
-            <table class="transfer-details-table">
-                <caption>
-                    <span>Transfer Details</span>
-                </caption>
-                <tr>
-                    <th>Description</th>
-                    <td>
-                        <span>{{ transfer.description }}</span>
-                        <span *ngIf="transfer.isEthereal" (click)="onClickCommit()" class="planned-icon btn">
-                            <fa-icon [icon]="etherealIcon" [fixedWidth]="true" title="Transfer has not been commited"></fa-icon>
-                        </span>
-                    </td>
-                </tr>
-                <tr *ngIf="transfer.receipt">
-                    <th>Receipt</th>
-                    <td>
-                        <a [routerLink]="receiptDetailsLink">
-                            {{ transfer.receipt.description }}
-                        </a>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Amount</th>
-                    <td>
-                        <span> {{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</span>
-                        <span class="planned-icon" *ngIf="transfer.receipt">
-                            <a [routerLink]="receiptDetailsLink">
-                                <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
-                            </a>
-                        </span>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Type</th>
-                    <td>{{ transferTypeDisplayName }}</td>
-                </tr>
-                <tr>
-                    <th>Date</th>
-                    <td>
-                        <span>
-                            <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time>
-                        </span>
-                        <span *ngIf="transfer.isPlanned" class="planned-icon">
-                            <fa-icon [icon]="plannedIcon" [fixedWidth]="true" title="Transfer is planned"></fa-icon>
-                        </span>
-                        <span *ngIf="transfer.refundedBy" class="planned-icon">
-                            <a [routerLink]="refundedByLink">
-                                ({{ transfer.refundedOn | date }} <fa-icon [icon]="refundedIcon" [fixedWidth]="true" title="Refunded"></fa-icon>)
-                            </a>
-                        </span>
-                    </td>
-                </tr>
-                <tr *ngIf="!transfer.isPlanned">
-                    <th>Accounting Date</th>
-                    <td>
-                        <time [dateTime]="transfer.accountingDate?.toJSON()">{{ transfer.accountingDate | date | ifNull }}</time>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Contractor</th>
-                    <td>{{ transfer.contractor | ifNull }}</td>
-                </tr>
-                <tr>
-                    <th>Total {{ totalPaymentToContractor < 0 ? 'payed to' : 'received from' }} {{ transfer.contractor }}</th>
-                    <td>
-                        <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time
-                        >: {{ totalPaymentToContractor | mathAbs | plnCurrency }}
-                    </td>
-                </tr>
-                <tr>
-                    <th>Category</th>
-                    <td>
-                        <ul class="category-path-list">
-                            <li *ngFor="let category of transfer?.categoryPath">
-                                {{ category.name }}
-                            </li>
-                        </ul>
-                    </td>
-                </tr>
-                <tr>
-                    <th>Account</th>
-                    <td>{{ transfer.account.name }} → {{ transfer.targetAccount.name }}</td>
-                </tr>
-                <tr>
-                    <th>Internal</th>
-                    <td>{{ transfer.isInternal ? 'Yes' : 'No' }}</td>
-                </tr>
-            </table>
+@if (showPage) {
+    <div class="transfer-details-component">
+        <h4>
+            <ul class="category-path-list">
+                <li>Root</li>
+                @for (category of transfer?.categoryPath; track category) {
+                    <li>
+                        {{ category.name }}
+                    </li>
+                }
+            </ul>
+        </h4>
+        <hr class="divider" />
+        <div class="transfers-items-table">
+            <div class="flex-item mr-2">
+                <table class="transfer-details-table">
+                    <caption>
+                        <span>Transfer Details</span>
+                    </caption>
+                    <tr>
+                        <th>Description</th>
+                        <td>
+                            <span>{{ transfer.description }}</span>
+                            @if (transfer.isEthereal) {
+                                <span (click)="onClickCommit()" class="planned-icon btn">
+                                    <fa-icon [icon]="etherealIcon" [fixedWidth]="true" title="Transfer has not been commited"></fa-icon>
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                    @if (transfer.receipt) {
+                        <tr>
+                            <th>Receipt</th>
+                            <td>
+                                <a [routerLink]="receiptDetailsLink">
+                                    {{ transfer.receipt.description }}
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <th>Amount</th>
+                        <td>
+                            <span> {{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</span>
+                            @if (transfer.receipt) {
+                                <span class="planned-icon">
+                                    <a [routerLink]="receiptDetailsLink">
+                                        <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
+                                    </a>
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Type</th>
+                        <td>{{ transferTypeDisplayName }}</td>
+                    </tr>
+                    <tr>
+                        <th>Date</th>
+                        <td>
+                            <span>
+                                <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time>
+                            </span>
+                            @if (transfer.isPlanned) {
+                                <span class="planned-icon">
+                                    <fa-icon [icon]="plannedIcon" [fixedWidth]="true" title="Transfer is planned"></fa-icon>
+                                </span>
+                            }
+                            @if (transfer.refundedBy) {
+                                <span class="planned-icon">
+                                    <a [routerLink]="refundedByLink">
+                                        ({{ transfer.refundedOn | date }} <fa-icon [icon]="refundedIcon" [fixedWidth]="true" title="Refunded"></fa-icon>)
+                                    </a>
+                                </span>
+                            }
+                        </td>
+                    </tr>
+                    @if (!transfer.isPlanned) {
+                        <tr>
+                            <th>Accounting Date</th>
+                            <td>
+                                <time [dateTime]="transfer.accountingDate?.toJSON()">{{ transfer.accountingDate | date | ifNull }}</time>
+                            </td>
+                        </tr>
+                    }
+                    <tr>
+                        <th>Contractor</th>
+                        <td>{{ transfer.contractor | ifNull }}</td>
+                    </tr>
+                    <tr>
+                        <th>Total {{ totalPaymentToContractor < 0 ? 'payed to' : 'received from' }} {{ transfer.contractor }}</th>
+                        <td>
+                            <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time
+                            >: {{ totalPaymentToContractor | mathAbs | plnCurrency }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td>
+                            <ul class="category-path-list">
+                                @for (category of transfer?.categoryPath; track category) {
+                                    <li>
+                                        {{ category.name }}
+                                    </li>
+                                }
+                            </ul>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Account</th>
+                        <td>{{ transfer.account.name }} → {{ transfer.targetAccount.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Internal</th>
+                        <td>{{ transfer.isInternal ? 'Yes' : 'No' }}</td>
+                    </tr>
+                </table>
+            </div>
+            <div class="flex-item ml-2">
+                <app-items-table [items]="transfer.items"></app-items-table>
+            </div>
         </div>
-        <div class="flex-item ml-2">
-            <app-items-table [items]="transfer.items"></app-items-table>
+        <br />
+        <div class="button-group">
+            <button (click)="onClickEditMode()">Edit</button>
+            @if (isSplittable) {
+                <button (click)="onToggleShowSplit()">Show Split Transfer</button>
+            }
+            @if (transfer.isRefundable) {
+                <button (click)="onClickRefundTransfer()" type="button">Refund</button>
+            }
+            <button (click)="onClickDuplicateTransfer()" type="button">Duplicate</button>
         </div>
+        @if (shouldShowSplit && isSplittable) {
+            <div class="split-transaction-form">
+                <div>
+                    <label for="description">Description</label>
+                    <input id="description" type="text" [(ngModel)]="splitTransfer.description" required />
+                </div>
+                <div>
+                    <label for="amount">Price</label>
+                    <input id="amount" type="number" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer.amount - 0.01" step=".01" required />
+                </div>
+                <div>
+                    <label for="category">Category</label>
+                    <select id="category" [(ngModel)]="splitTransfer.categoryId" required>
+                        @for (category of categories; track category) {
+                            <option [ngValue]="category.id">{{ category.name }}</option>
+                        }
+                    </select>
+                </div>
+                <button (click)="onClickSplitTransfer()">Split</button>
+            </div>
+        }
+        @if (transfer.otherTransfers.length > 0) {
+            <app-transfers-table [header]="'All Transfers This Day'" [transfers]="transfer.otherTransfers" [showTodayMarker]="false"></app-transfers-table>
+        }
     </div>
-    <br />
-    <div class="button-group">
-        <button (click)="onClickEditMode()">Edit</button>
-        <button *ngIf="isSplittable" (click)="onToggleShowSplit()">Show Split Transfer</button>
-        <button *ngIf="transfer.isRefundable" (click)="onClickRefundTransfer()" type="button">Refund</button>
-        <button (click)="onClickDuplicateTransfer()" type="button">Duplicate</button>
-    </div>
-    <div *ngIf="shouldShowSplit && isSplittable" class="split-transaction-form">
-        <div>
-            <label for="description">Description</label>
-            <input id="description" type="text" [(ngModel)]="splitTransfer.description" required />
-        </div>
-        <div>
-            <label for="amount">Price</label>
-            <input id="amount" type="number" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer.amount - 0.01" step=".01" required />
-        </div>
-        <div>
-            <label for="category">Category</label>
-            <select id="category" [(ngModel)]="splitTransfer.categoryId" required>
-                <option *ngFor="let category of categories" [ngValue]="category.id">{{ category.name }}</option>
-            </select>
-        </div>
-        <button (click)="onClickSplitTransfer()">Split</button>
-    </div>
-
-    <app-transfers-table
-        *ngIf="transfer.otherTransfers.length > 0"
-        [header]="'All Transfers This Day'"
-        [transfers]="transfer.otherTransfers"
-        [showTodayMarker]="false"
-    ></app-transfers-table>
-</div>
+}

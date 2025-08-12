@@ -2,87 +2,102 @@
     <button class="filter-icon-btn" (click)="onToggleOpenHide()">
         <fa-icon class="icon" [icon]="filterIcon"></fa-icon>
     </button>
-    <div *ngIf="isPopupDisplayed" class="filter-popup" [ngClass]="popupSideClass">
-        <form (ngSubmit)="onPerformFilter()">
-            <div *ngIf="filterValue.filterType === FilterType.TextBox">
-                <input
-                    #autofocusedFilterInput
-                    list="filterInputValues"
-                    name="filterValue"
-                    [(ngModel)]="filterValue.value"
-                    [autocomplete]="filterDataProvided ? 'off' : ''"
-                />
-                <datalist *ngIf="filterDataProvided" id="filterInputValues">
-                    <option *ngFor="let opt of datalist" [value]="opt"></option>
-                </datalist>
-            </div>
-            <div *ngIf="filterValue.filterType === FilterType.NumericRange" class="numeric-range">
-                <input
-                    #autofocusedFilterInput
-                    name="filterRangeFrom"
-                    type="number"
-                    min="0"
-                    [max]="filterValue.range.to ?? 0"
-                    [(ngModel)]="filterValue.range.from"
-                    autocomplete="off"
-                />
-                <input name="filterRangeTo" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
-            </div>
-            <div *ngIf="filterValue.filterType === FilterType.DateRange" class="date-range-filter-container">
-                <input
-                    #autofocusedFilterInput
-                    name="filterDateFrom"
-                    type="date"
-                    [(ngModel)]="filterValue.range.from"
-                    autocomplete="off"
-                    (change)="onChangeFilterRangeFrom()"
-                />
-                <input name="filterDateTo" type="date" [(ngModel)]="filterValue.range.to" autocomplete="off" (change)="onChangeFilterRangeTo()" />
-            </div>
-            <div *ngIf="filterValue.filterType === FilterType.MultiCheckbox" class="multi-checkbox-filter-container">
-                <div *ngIf="shouldDisplaySearchBox" class="filter-option-search-container">
-                    <input
-                        #autofocusedFilterInput
-                        name="optionSearch"
-                        class="filter-option-search-value"
-                        [ngModel]="optionSearchValue"
-                        (ngModelChange)="onChangeOptionSearchValue($event)"
-                        autocomplete="off"
-                        placeholder="Search..."
-                    />
-                    <button type="button" class="clear-button" (click)="onClearOptionsSearchValue()" title="Clear Search">X</button>
-                    <button
-                        *ngIf="shouldShowCheckVisibleButton"
-                        type="button"
-                        class="check-visible-button"
-                        (click)="onCheckVisibleOptions()"
-                        title="Check Visible"
-                    >
-                        +
-                    </button>
-                </div>
-
-                <div class="filter-options">
-                    <div *ngIf="noOptionDisplayed">
-                        <span>No options found</span>
+    @if (isPopupDisplayed) {
+        <div class="filter-popup" [ngClass]="popupSideClass">
+            <form (ngSubmit)="onPerformFilter()">
+                @if (filterValue.filterType === FilterType.TextBox) {
+                    <div>
+                        <input
+                            #autofocusedFilterInput
+                            list="filterInputValues"
+                            name="filterValue"
+                            [(ngModel)]="filterValue.value"
+                            [autocomplete]="filterDataProvided ? 'off' : ''"
+                        />
+                        @if (filterDataProvided) {
+                            <datalist id="filterInputValues">
+                                @for (opt of datalist; track opt) {
+                                    <option [value]="opt"></option>
+                                }
+                            </datalist>
+                        }
                     </div>
-                    <div *ngFor="let option of filterOptions" class="filter-option">
-                        <div *ngIf="option.isDisplayed">
-                            <input
-                                [id]="'filter-option-checkbox-' + option.id"
-                                [name]="'filter-option-checkbox-' + option.id"
-                                type="checkbox"
-                                [(ngModel)]="option.isSelected"
-                            />
-                            <label [for]="'filter-option-checkbox-' + option.id">{{ option.uiText }}</label>
+                }
+                @if (filterValue.filterType === FilterType.NumericRange) {
+                    <div class="numeric-range">
+                        <input
+                            #autofocusedFilterInput
+                            name="filterRangeFrom"
+                            type="number"
+                            min="0"
+                            [max]="filterValue.range.to ?? 0"
+                            [(ngModel)]="filterValue.range.from"
+                            autocomplete="off"
+                        />
+                        <input name="filterRangeTo" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
+                    </div>
+                }
+                @if (filterValue.filterType === FilterType.DateRange) {
+                    <div class="date-range-filter-container">
+                        <input
+                            #autofocusedFilterInput
+                            name="filterDateFrom"
+                            type="date"
+                            [(ngModel)]="filterValue.range.from"
+                            autocomplete="off"
+                            (change)="onChangeFilterRangeFrom()"
+                        />
+                        <input name="filterDateTo" type="date" [(ngModel)]="filterValue.range.to" autocomplete="off" (change)="onChangeFilterRangeTo()" />
+                    </div>
+                }
+                @if (filterValue.filterType === FilterType.MultiCheckbox) {
+                    <div class="multi-checkbox-filter-container">
+                        @if (shouldDisplaySearchBox) {
+                            <div class="filter-option-search-container">
+                                <input
+                                    #autofocusedFilterInput
+                                    name="optionSearch"
+                                    class="filter-option-search-value"
+                                    [ngModel]="optionSearchValue"
+                                    (ngModelChange)="onChangeOptionSearchValue($event)"
+                                    autocomplete="off"
+                                    placeholder="Search..."
+                                />
+                                <button type="button" class="clear-button" (click)="onClearOptionsSearchValue()" title="Clear Search">X</button>
+                                @if (shouldShowCheckVisibleButton) {
+                                    <button type="button" class="check-visible-button" (click)="onCheckVisibleOptions()" title="Check Visible">+</button>
+                                }
+                            </div>
+                        }
+                        <div class="filter-options">
+                            @if (noOptionDisplayed) {
+                                <div>
+                                    <span>No options found</span>
+                                </div>
+                            }
+                            @for (option of filterOptions; track option) {
+                                <div class="filter-option">
+                                    @if (option.isDisplayed) {
+                                        <div>
+                                            <input
+                                                [id]="'filter-option-checkbox-' + option.id"
+                                                [name]="'filter-option-checkbox-' + option.id"
+                                                type="checkbox"
+                                                [(ngModel)]="option.isSelected"
+                                            />
+                                            <label [for]="'filter-option-checkbox-' + option.id">{{ option.uiText }}</label>
+                                        </div>
+                                    }
+                                </div>
+                            }
                         </div>
                     </div>
+                }
+                <div class="filter-buttons">
+                    <button type="submit">Apply</button>
+                    <button type="reset" (click)="onClear()">Clear</button>
                 </div>
-            </div>
-            <div class="filter-buttons">
-                <button type="submit">Apply</button>
-                <button type="reset" (click)="onClear()">Clear</button>
-            </div>
-        </form>
-    </div>
+            </form>
+        </div>
+    }
 </div>
