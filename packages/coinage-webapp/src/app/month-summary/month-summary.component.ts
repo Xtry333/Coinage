@@ -1,5 +1,5 @@
 import { ActivatedRoute, Router } from '@angular/router';
-import { BalanceDTO, TransferDTO, TransferTypeEnum } from '@coinage-app/interfaces';
+import { BalanceDTO, TransferDTO, TransferTypeEnum } from '@app/interfaces';
 import { ChartDataset, ChartOptions } from 'chart.js';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { DateParserService, PartedDate } from '../services/date-parser.service';

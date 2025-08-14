@@ -2,7 +2,7 @@ import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren
 import { faMagicWandSparkles, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
 
-import { ItemWithLastUsedPriceDTO, ShoppingListItem } from '@coinage-app/interfaces';
+import { ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
 
 import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../../services/coinage.data-service';

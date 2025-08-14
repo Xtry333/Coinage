@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { CategoryDTO } from '@coinage-app/interfaces';
+import { CategoryDTO } from '@app/interfaces';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { finalize } from 'rxjs/operators';
 

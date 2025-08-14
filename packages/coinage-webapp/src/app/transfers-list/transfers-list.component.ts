@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { GetFilteredTransfersRequest, Range, TransferDTO } from '@coinage-app/interfaces';
+import { GetFilteredTransfersRequest, Range, TransferDTO } from '@app/interfaces';
 
 import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';

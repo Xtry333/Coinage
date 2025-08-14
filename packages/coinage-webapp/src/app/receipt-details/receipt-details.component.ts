@@ -1,7 +1,7 @@
 import * as Rx from 'rxjs';
 
 import { Component, OnInit } from '@angular/core';
-import { ReceiptDetailsDTO, TransferType } from '@coinage-app/interfaces';
+import { ReceiptDetailsDTO, TransferType } from '@app/interfaces';
 
 import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';

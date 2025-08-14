@@ -10,7 +10,7 @@ import {
     CreateEditTransferModelDTO,
     TransferType,
     CreateMultipleTransfersDTO,
-} from '@coinage-app/interfaces';
+} from '@app/interfaces';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -200,7 +200,7 @@ export class TransferController {
         const account = await this.accountDao.getById(requestBody.accountId);
 
         // Create transfers from items
-        const itemCategoriesIds = [...new Set(items.filter(v => v !== null).map((i) => i.categoryId) as number[])];
+        const itemCategoriesIds = [...new Set(items.filter((v) => v !== null).map((i) => i.categoryId) as number[])];
         for (const categoryId of itemCategoriesIds) {
             const itemsForCategory = items.filter((item) => item.categoryId === categoryId);
 

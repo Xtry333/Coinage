@@ -1,7 +1,7 @@
 import { Component, Input, OnChanges, OnInit } from '@angular/core';
 
 import { IconDefinition, faReceipt } from '@fortawesome/free-solid-svg-icons';
-import { ItemDetailsDTO, TransferDTO, TransferItemDTO, TransferWithItemDetailsDTO } from '@coinage-app/interfaces';
+import { ItemDetailsDTO, TransferDTO, TransferItemDTO, TransferWithItemDetailsDTO } from '@app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';

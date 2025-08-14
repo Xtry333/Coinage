@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { TransferTypeEnum } from '@coinage-app/interfaces';
+import { TransferTypeEnum } from '@app/interfaces';
 
 export namespace MoneyAmountComponentData {
     export type TransferData = {

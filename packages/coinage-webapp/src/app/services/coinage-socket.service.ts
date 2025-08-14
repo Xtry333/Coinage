@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { CoinageSocketNamespace } from '@coinage-app/common';
+import { CoinageSocketNamespace } from '@app/common';
 import { Socket } from 'ngx-socket-io';
 
 @Injectable({

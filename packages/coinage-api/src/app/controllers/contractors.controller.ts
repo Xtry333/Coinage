@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 
-import { BaseResponseDTO, ContractorDTO, CreateEditContractorDTO } from '@coinage-app/interfaces';
+import { BaseResponseDTO, ContractorDTO, CreateEditContractorDTO } from '@app/interfaces';
 
 import { ContractorDao } from '../daos/contractor.dao';
 import { Contractor } from '../entities/Contractor.entity';

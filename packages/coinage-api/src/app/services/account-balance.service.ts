@@ -1,4 +1,4 @@
-import { NewMonthlyUserStatsDTO } from '@coinage-app/interfaces';
+import { NewMonthlyUserStatsDTO } from '@app/interfaces';
 import { Injectable } from '@nestjs/common';
 import { AccountDao } from '../daos/account.dao';
 import { AccountMonthlySubChange } from '../daos/daoDtos/AccountMonthlySubBalance.dto';

@@ -1,8 +1,13 @@
-# CoinageApp
+# Coinage App
 
 Coinage is a personal project for keeping track of all expenses and incomes for multiple accounts.
 
-It is based on Nx, written on Angular in TypeScript.
+## Core Libraries
+
+-   NX
+-   Angular
+-   NestJS
+-   TypeScript
 
 ## Features
 
@@ -33,7 +38,7 @@ Features planned for the future (far or near):
 
 ## Quick Start
 
-```
+```bash
 yarn
 yarn build
 yarn docker:up
@@ -41,19 +46,20 @@ yarn docker:up
 
 ## Development server
 
-```
+```bash
 yarn
-yarn dev
+yarn dev:api # Starts the API server
+yarn dev:webapp # Starts the web application
 ```
 
 ## Creating a migration for SQL
 
-```
+```bash
 yarn migration:create <migration_name>
 ```
 
 ## Formatting the codebase
 
-```
+```bash
 yarn format
 ```

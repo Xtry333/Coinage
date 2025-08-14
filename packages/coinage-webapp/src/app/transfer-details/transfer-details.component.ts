@@ -4,7 +4,7 @@ import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 import { faClock, faFeatherAlt, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
 
-import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
+import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NavigatorService } from '../app-routing/navigator.service';

@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { TransferItemDTO } from '@coinage-app/interfaces';
+import { TransferItemDTO } from '@app/interfaces';
 import { CoinageRoutes } from '../../app-routing/app-routes';
 
 export class UiTransferItemDTO extends TransferItemDTO {

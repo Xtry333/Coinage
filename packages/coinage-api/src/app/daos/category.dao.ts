@@ -1,4 +1,4 @@
-import { TotalInMonthByCategory } from '@coinage-app/interfaces';
+import { TotalInMonthByCategory } from '@app/interfaces';
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteResult, Equal, InsertResult, Repository } from 'typeorm';

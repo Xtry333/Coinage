@@ -2,7 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as Rx from 'rxjs';
 
-import { ItemDetailsDTO } from '@coinage-app/interfaces';
+import { ItemDetailsDTO } from '@app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NavigatorService } from '../app-routing/navigator.service';

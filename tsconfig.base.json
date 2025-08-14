@@ -9,15 +9,14 @@
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "importHelpers": true,
-        "target": "ES2022",
+        "target": "ESNEXT",
         "module": "CommonJS",
-        "lib": ["ES2018", "dom"],
+        "lib": ["ESNEXT", "dom"],
         "skipLibCheck": true,
-        "skipDefaultLibCheck": true,
         "baseUrl": ".",
         "paths": {
-            "@coinage-app/common": ["libs/common/src/index.ts"],
-            "@coinage-app/interfaces": ["libs/interfaces/src/index.ts"],
+            "@app/common": ["libs/common/src/index.ts"],
+            "@app/interfaces": ["libs/interfaces/src/index.ts"],
             "lang": ["libs/lang/src/index.ts"]
         }
     },
@@ -27,7 +26,6 @@
         "strictInjectionParameters": true,
         "strictInputAccessModifiers": true,
         "strictTemplates": true,
-        "fullTemplateTypeCheck": true,
-        "enableIvy": true
+        "fullTemplateTypeCheck": true
     }
 }

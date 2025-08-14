@@ -2,7 +2,7 @@ import { Component, EventEmitter, OnInit, Output, QueryList, ViewChildren } from
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { finalize, zip } from 'rxjs';
 
-import { AccountDTO, ContractorDTO } from '@coinage-app/interfaces';
+import { AccountDTO, ContractorDTO } from '@app/interfaces';
 
 import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 import { StorageScope } from '../../core/services/storage-service/storage-scope.enum';
@@ -21,7 +21,7 @@ export interface SelectedDetails {
     selector: 'app-new-transfer-details',
     templateUrl: './new-transfer-details.component.html',
     styleUrls: ['./new-transfer-details.component.scss'],
-    standalone: false
+    standalone: false,
 })
 export class NewTransferDetailsComponent implements OnInit {
     public static LAST_USED_CONTRACTOR = 'createTransfers.lastUsedContractorId';

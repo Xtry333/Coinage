@@ -1,6 +1,6 @@
 import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
 
-import { AccountDetailsDTOResponse, AccountDTO, BalanceDTO, BaseResponseDTO, NewMonthlyUserStatsDTO } from '@coinage-app/interfaces';
+import { AccountDetailsDTOResponse, AccountDTO, BalanceDTO, BaseResponseDTO, NewMonthlyUserStatsDTO } from '@app/interfaces';
 
 import { AccountDao } from '../daos/account.dao';
 import { User } from '../entities/User.entity';

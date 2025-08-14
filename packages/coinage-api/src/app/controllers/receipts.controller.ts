@@ -1,4 +1,4 @@
-import { ReceiptDetailsDTO, TransferDTO, TransferType } from '@coinage-app/interfaces';
+import { ReceiptDetailsDTO, TransferDTO, TransferType } from '@app/interfaces';
 import { Controller, Get, Param } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';

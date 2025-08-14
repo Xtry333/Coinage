@@ -7,7 +7,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { MonthSummaryComponent } from './month-summary.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { TransferDetailsDTO } from '@coinage-app/interfaces';
+import { TransferDetailsDTO } from '@app/interfaces';
 
 describe('Summary Component', () => {
     let component: MonthSummaryComponent;

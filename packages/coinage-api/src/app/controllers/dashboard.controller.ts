@@ -1,7 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 
-import { BalanceDTO } from '@coinage-app/interfaces';
+import { BalanceDTO } from '@app/interfaces';
 
 import { AccountDao } from '../daos/account.dao';
 import { User } from '../entities/User.entity';

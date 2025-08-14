@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { CategoryDTO } from '@coinage-app/interfaces';
+import { CategoryDTO } from '@app/interfaces';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 @Component({

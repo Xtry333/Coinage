@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { CreateEditItemDTO, ItemDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@coinage-app/interfaces';
+import { CreateEditItemDTO, ItemDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { CoinageDataService } from '../../services/coinage.data-service';

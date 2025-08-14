@@ -6,8 +6,8 @@
         "types": ["jest", "node"],
         "baseUrl": ".",
         "paths": {
-            "@coinage-app/common": ["../../libs/common/src/index.ts"],
-            "@coinage-app/interfaces": ["../../libs/interfaces/src/index.ts"],
+            "@app/common": ["../../libs/common/src/index.ts"],
+            "@app/interfaces": ["../../libs/interfaces/src/index.ts"],
             "@coinage-app/test/*": ["src/test/*"]
         }
     },

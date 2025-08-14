@@ -8,7 +8,7 @@ import {
     ItemDetailsDTO,
     ItemWithLastUsedPriceDTO,
     TransferWithItemDetailsDTO,
-} from '@coinage-app/interfaces';
+} from '@app/interfaces';
 
 import { ItemDao } from '../daos/item.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
@@ -42,7 +42,9 @@ export class ItemsController {
         const transfersWithItems = await Promise.all(transferItems.map(async (transferItem) => this.toTransfersWithItemsDTO(transferItem)));
         // filter only the unique containers
         const uniqueContainers = new Set(transferItems.map((transferItem) => transferItem.containerId));
-        const itemContainers = (await Promise.all(transferItems.filter((transferItem) => transferItem.itemId === itemId).map(async (transferItem) => transferItem.container))).map((container) => {
+        const itemContainers = (
+            await Promise.all(transferItems.filter((transferItem) => transferItem.itemId === itemId).map(async (transferItem) => transferItem.container))
+        ).map((container) => {
             const advancedContainer = new AdvancedItemContainer();
             advancedContainer.weight = container?.weight ?? undefined;
             advancedContainer.weightUnit = container?.weightUnit ?? undefined;
@@ -82,7 +84,7 @@ export class ItemsController {
 
     private async toTransfersWithItemsDTO(transferItem: TransferItem): Promise<TransferWithItemDetailsDTO> {
         const transfer = await transferItem.transfer;
-         if (transferItem.containerId !== null) {
+        if (transferItem.containerId !== null) {
             const container = await transferItem.container;
         }
         return {

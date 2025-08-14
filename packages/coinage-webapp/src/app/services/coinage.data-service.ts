@@ -25,7 +25,7 @@ import {
     ItemDetailsDTO,
     NewMonthlyUserStatsDTO,
     CreateMultipleTransfersDTO,
-} from '@coinage-app/interfaces';
+} from '@app/interfaces';
 
 @Injectable({
     providedIn: 'root',

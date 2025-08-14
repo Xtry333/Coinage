@@ -1,7 +1,7 @@
 import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
-import { CategoryDTO } from '@coinage-app/interfaces';
+import { CategoryDTO } from '@app/interfaces';
 
 import { SelectedTransferItemDetails } from '../item-details-for-transfer/item-details-for-transfer.component';
 

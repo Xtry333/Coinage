@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, IsNull, LessThanOrEqual, Repository } from 'typeorm';
 
-import { GetFilteredTransfersRequest, Range, TransferType } from '@coinage-app/interfaces';
+import { GetFilteredTransfersRequest, Range, TransferType } from '@app/interfaces';
 
 import { BaseDao } from './base.dao';
 import { Transfer } from '../entities/Transfer.entity';

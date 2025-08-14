@@ -1,7 +1,7 @@
 import { DeleteResult, Equal, Repository, DataSource, In } from 'typeorm';
 
 import { Account } from '../entities/Account.entity';
-import { BalanceDTO } from '@coinage-app/interfaces';
+import { BalanceDTO } from '@app/interfaces';
 import { DateParserService } from '../services/date-parser.service';
 import { Injectable } from '@nestjs/common';
 import { TransferType } from '../entities/Category.entity';

@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, In, Repository } from 'typeorm';
 
-import { ItemWithLastUsedPriceDTO } from '@coinage-app/interfaces';
+import { ItemWithLastUsedPriceDTO } from '@app/interfaces';
 
 import { BaseDao } from './base.dao';
 import { Item } from '../entities/Item.entity';

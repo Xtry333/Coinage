@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { PartialDate } from '@coinage-app/interfaces';
+import { PartialDate } from '@app/interfaces';
 import { Router } from '@angular/router';
 import { CoinageRoutes } from './app-routes';
 

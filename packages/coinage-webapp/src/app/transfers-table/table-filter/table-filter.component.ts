@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Outpu
 import { IconDefinition, faCaretDown, faEdit, faFilter } from '@fortawesome/free-solid-svg-icons';
 import { deepCopy } from 'deep-copy-ts';
 
-import { Range } from '@coinage-app/interfaces';
+import { Range } from '@app/interfaces';
 
 import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 

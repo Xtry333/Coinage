@@ -11,7 +11,7 @@ import {
     ExistingItem,
     ItemWithLastUsedPriceDTO,
     TransferDetailsDTO,
-} from '@coinage-app/interfaces';
+} from '@app/interfaces';
 
 import { SelectedTransferItemDetails } from './item-details-for-transfer/item-details-for-transfer.component';
 import { NewTransferDetailsComponent, SelectedDetails } from './new-transfer-details/new-transfer-details.component';
@@ -36,7 +36,7 @@ export interface NewTransferObject {
     selector: 'app-create-multiple-transfers',
     templateUrl: './create-multiple-transfers.component.html',
     styleUrls: ['./create-multiple-transfers.component.scss'],
-    standalone: false
+    standalone: false,
 })
 export class CreateMultipleTransfersComponent implements OnInit {
     public static readonly SAVED_ITEMS = 'createTransfers.selectedItems';

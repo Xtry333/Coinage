@@ -4,15 +4,7 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
-import {
-    AccountDTO,
-    CategoryDTO,
-    ContractorDTO,
-    CreateEditTransferModelDTO,
-    ShoppingListItem,
-    TransferDetailsDTO,
-    TransferItemDTO,
-} from '@coinage-app/interfaces';
+import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, ShoppingListItem, TransferDetailsDTO, TransferItemDTO } from '@app/interfaces';
 
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../services/coinage.data-service';

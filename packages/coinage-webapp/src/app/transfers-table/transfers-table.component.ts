@@ -13,7 +13,7 @@ import {
     TableFilterComponent,
 } from './table-filter/table-filter.component';
 import { IconDefinition, faReceipt, faFlag, faFlagCheckered } from '@fortawesome/free-solid-svg-icons';
-import { TransferDTO, TransferType, TransferTypeEnum } from '@coinage-app/interfaces';
+import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
@@ -70,7 +70,7 @@ export type UiTableRow = UiTransfer | { isTodayMarkerRow: boolean };
     templateUrl: './transfers-table.component.html',
     styleUrls: ['./transfers-table.component.scss'],
     standalone: false,
-    })
+})
 export class TransfersTableComponent implements OnInit, OnChanges {
     public static readonly EMPTY_CONTRACTOR = '−';
     public static readonly EMPTY_DESCRIPTION = '−';
