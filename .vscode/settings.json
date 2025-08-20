@@ -16,7 +16,10 @@
     },
     "editor.fontSize": 11,
     "files.autoSave": "afterDelay",
-    "angular.view-engine": false,
     "js/ts.implicitProjectConfig.experimentalDecorators": true,
-    "nxConsole.generateAiAgentRules": true
+    "nxConsole.generateAiAgentRules": true,
+    "stylelint.packageManager": "yarn",
+    "scss.validate": false,
+    "stylelint.snippet": ["css", "less", "postcss", "scss"],
+    "stylelint.validate": ["css", "less", "postcss", "scss"]
 }

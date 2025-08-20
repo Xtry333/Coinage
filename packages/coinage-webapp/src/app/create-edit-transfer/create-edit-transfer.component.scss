@@ -1,4 +1,4 @@
-$borderColor: #5d5d5d;
+$borderColor: #d1d1d1;
 
 .category-path-list {
     padding: 0;
@@ -6,78 +6,266 @@ $borderColor: #5d5d5d;
     list-style: none;
 
     li {
-        padding: 5px;
+        padding: 8px 12px;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 6px;
+        margin-right: 8px;
+        font-weight: 500;
+        color: #495057;
 
         + ::before {
-            margin-right: 5px;
+            margin-right: 8px;
             content: '>';
+            color: #6c757d;
         }
     }
 }
 
 .edit-transfer-container {
     display: flex;
+    width: 100%;
+    background: #f8f9fa;
+    min-height: 100vh;
+    padding: 16px 20px;
+    gap: 24px;
+    
+    @media (width <= 768px) {
+        flex-direction: column;
+        padding: 12px 16px;
+        gap: 20px;
+    }
+    
+    @media (width <= 480px) {
+        padding: 8px 12px;
+        gap: 16px;
+    }
 
     .v-divider {
-        border-left: 1px solid $borderColor;
+        background: white;
+        border: 1px solid #d1d1d1;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+        flex: 1;
+        
+        input[type="checkbox"] {
+            margin-right: 8px;
+            transform: scale(1.1);
+        }
+        
+        label {
+            margin-bottom: 0;
+            font-weight: 500;
+            cursor: pointer;
+            color: #495057;
+        }
+    }
+}
+
+form {
+    background: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+    flex: 1;
+    min-width: 400px;
+    
+    @media (width <= 768px) {
+        min-width: auto;
+        padding: 20px;
     }
 }
 
 .transaction-form {
-    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 
-    input,
-    button,
-    select {
-        display: block;
-        padding: 10px;
-        height: 40px;
-        width: 300px;
-        margin: 10px;
+    > div {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        
+        label {
+            font-weight: 600;
+            color: #495057;
+            font-size: 14px;
+            margin-bottom: 0;
+        }
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="date"] {
+        height: 38px;
+        padding: 8px 12px;
+        border-radius: 6px;
+        border: 1px solid #d1d1d1;
+        background: white;
+        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        font-size: 14px;
+        color: #495057;
+        
+        &:focus {
+            outline: none;
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 3px rgb(13 110 253 / 25%);
+        }
+        
+        &:invalid {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgb(220 53 69 / 25%);
+        }
     }
 
     .ng-select ::ng-deep {
-        height: 40px;
-        width: 300px;
-        margin: 10px;
-
         .ng-select-container {
-            height: 40px;
-            border-radius: 2px;
-            border-color: $borderColor;
+            height: 38px;
+            border-radius: 6px;
+            border-color: #d1d1d1;
+            box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+
+            .ng-value-container {
+                padding-left: 12px;
+
+                .ng-input {
+                    padding-left: 0;
+                    top: 2px;
+
+                    input {
+                        font-size: 14px;
+                        color: #495057;
+                    }
+                }
+            }
+        }
+
+        &.ng-select-focused:not(.ng-select-opened) {
+            .ng-select-container {
+                border-color: #86b7fe !important;
+                box-shadow: 0 0 0 3px rgb(13 110 253 / 25%) !important;
+            }
+        }
+
+        &.ng-select-opened.ng-select-bottom {
+            .ng-select-container {
+                border-bottom-right-radius: 0;
+                border-bottom-left-radius: 0;
+            }
         }
 
         .ng-arrow {
-            border-color: #444 transparent transparent;
-        }
-
-        .ng-input {
-            padding: 10px;
-            top: 0;
-
-            input {
-                font-size: 16px;
-            }
+            border-color: #6c757d transparent transparent;
         }
 
         .ng-dropdown-panel {
-            border-color: $borderColor;
+            border-color: #d1d1d1;
+            border-radius: 0 0 6px 6px;
+            box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
 
             &.ng-select-bottom {
-                border-top-color: #b8b8b8;
+                border-top-color: #d1d1d1;
             }
 
             &.ng-select-top {
-                border-bottom-color: #b8b8b8;
+                border-bottom-color: #d1d1d1;
+                border-radius: 6px 6px 0 0;
             }
 
             .ng-dropdown-panel-items {
                 max-height: 300px;
 
                 .ng-option {
-                    padding: 10px;
+                    padding: 12px;
+                    color: #495057;
+                    
+                    &:hover {
+                        background: #f8f9fa;
+                    }
+                    
+                    &.ng-option-selected {
+                        background: #e7f3ff;
+                        color: #0d6efd;
+                    }
                 }
             }
         }
+    }
+    
+    button {
+        height: 42px;
+        padding: 10px 20px;
+        border-radius: 6px;
+        border: 1px solid #d1d1d1;
+        background: #f8f9fa;
+        color: #495057;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.15s ease;
+        margin-top: 8px;
+        
+        &[type="submit"] {
+            background: #0d6efd;
+            border-color: #0d6efd;
+            color: white;
+            
+            &:hover {
+                background: #0b5ed7;
+                border-color: #0a58ca;
+            }
+        }
+        
+        &:not([type="submit"]) {
+            &:hover {
+                background: #e9ecef;
+                border-color: #adb5bd;
+                color: #212529;
+            }
+        }
+        
+        &[type="button"]:last-of-type {
+            background: #dc3545;
+            border-color: #dc3545;
+            color: white;
+            
+            &:hover {
+                background: #bb2d3b;
+                border-color: #b02a37;
+            }
+        }
+        
+        &:active {
+            transform: translateY(1px);
+        }
+    }
+}
+
+// Open shopping list button
+button:not(form button) {
+    background: #f8f9fa;
+    border: 1px solid #d1d1d1;
+    border-radius: 6px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    color: #495057;
+    font-weight: 600;
+    
+    &:hover {
+        background: #e9ecef;
+        border-color: #adb5bd;
+        color: #212529;
+    }
+    
+    &:active {
+        transform: translateY(1px);
     }
 }

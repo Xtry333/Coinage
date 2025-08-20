@@ -1,5 +1,5 @@
 <main class="ms-sm-auto px-md-4">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 mb-3 border-bottom">
         <h2 class="h2">Dashboard</h2>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
@@ -39,7 +39,7 @@
       app-big-counter [value]="balanceSecondary" [upperLabel]="'PLN'" [lowerLabel]="'Portfel'"></app-big-counter>
     </div> -->
                     <app-transfers-table [transfers]="lastTransactions" [header]="'Recently Edited Transfers'" [showTodayMarker]="false"></app-transfers-table>
-                    <div>
+                    <div class="statistics-section">
                         <p>Average Income ({{ this.averageAmountLimit }} months): {{ rollingAverageIncomes | plnCurrency }}</p>
                         <p>Average Outcome ({{ this.averageAmountLimit }} months): {{ rollingAverageOutcomes | plnCurrency }}</p>
                     </div>

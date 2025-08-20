@@ -1,22 +1,30 @@
-// Variable overrides first
-//$primary: rgb(200, 0, 0);
+@use 'sass:map';
+
+// variable overrides first
+// $primary: rgb(200, 0, 0);
 $enable-shadows: true;
+
 // $prefix: 'mo-';
 
+
+/* Keep Bootstrap imports after Tailwind base so Bootstrap utilities can override where needed */
 @import 'bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-icons/font/bootstrap-icons';
 
-//@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-
+// @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+@import 'bootstrap';
 @import 'bootstrap/scss/functions';
 @import 'bootstrap/scss/variables';
 @import 'bootstrap/scss/utilities';
-$utilities: map-merge(
+
+/* Tailwind base/utilities */
+@import 'tailwindcss';
+
+$utilities: map.merge(
     $utilities,
     (
-        'width':
-            map-merge(
-                map-get($utilities, 'width'),
+        'width': map.merge(
+                map.get($utilities, 'width'),
                 (
                     values: (
                         25: 25%,
@@ -162,12 +170,13 @@ body {
 }
 
 @import '~@ng-select/ng-select/themes/default.theme.css';
+
 .ng-select {
     .ng-select-container {
         height: 38px;
         border-radius: 5px;
-        border-color: rgb(206, 212, 218);
-        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.075);
+        border-color: rgb(206 212 218);
+        box-shadow: inset 0 1px 2px rgb(0 0 0 / 7.5%);
         transition:
             border-color 0.15s ease-in-out,
             box-shadow 0.15s ease-in-out;
@@ -177,8 +186,9 @@ body {
 
             .ng-input {
                 padding-left: 12px;
+
                 input {
-                    //font-size: 16px;
+                    // font-size: 16px;
                 }
             }
         }
@@ -186,10 +196,10 @@ body {
 
     &.ng-select-focused:not(.ng-select-opened) {
         > .ng-select-container {
-            border-color: rgb(134, 183, 254) !important;
+            border-color: rgb(134 183 254) !important;
             box-shadow:
-                inset 0 1px 2px rgba(0, 0, 0, 0.075),
-                0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+                inset 0 1px 2px rgb(0 0 0 / 7.5%),
+                0 0 0 0.25rem rgb(13 110 253 / 25%) !important;
         }
     }
 

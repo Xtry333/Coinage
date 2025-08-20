@@ -30,10 +30,10 @@
     display: block;
     width: 20px;
     height: 20px;
-    background: rgb(224, 221, 0);
+    background: rgb(224 221 0);
     border-radius: 50%;
     margin: 0 5px;
-    box-shadow: 0 2px 2px rgb(0, 0, 0, 20%);
+    box-shadow: 0 2px 2px rgb(0 0 0 / 20%);
 }
 
 .loader span:not(:last-child) {

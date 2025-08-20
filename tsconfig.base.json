@@ -16,6 +16,7 @@
         "baseUrl": ".",
         "paths": {
             "@app/common": ["libs/common/src/index.ts"],
+            "@app/common-units": ["libs/common/src/lib/units/index.ts"],
             "@app/interfaces": ["libs/interfaces/src/index.ts"],
             "lang": ["libs/lang/src/index.ts"]
         }

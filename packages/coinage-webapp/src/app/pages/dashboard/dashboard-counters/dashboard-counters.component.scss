@@ -1,6 +1,45 @@
 .counters-container {
     display: flex;
     flex-flow: row wrap;
-    justify-content: space-around;
-    margin-top: 25px;
+    justify-content: space-between;
+    gap: 16px;
+    background: white;
+    border: 1px solid #d1d1d1;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+    width: 100%;
+    
+    // Make counters grow to fill available space
+    app-big-counter {
+        flex: 1;
+        min-width: 260px;
+        max-width: 400px;
+    }
+    
+    @media (width <= 1200px) {
+        justify-content: center;
+        
+        app-big-counter {
+            flex: 0 0 auto;
+            min-width: 240px;
+            max-width: 320px;
+        }
+    }
+    
+    @media (width <= 768px) {
+        flex-direction: column;
+        align-items: stretch;
+        
+        app-big-counter {
+            max-width: none;
+            min-width: 280px;
+        }
+    }
+    
+    @media (width <= 480px) {
+        app-big-counter {
+            min-width: 240px;
+        }
+    }
 }

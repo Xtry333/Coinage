@@ -15,7 +15,7 @@
     left: 0;
     z-index: 100; /* Behind the navbar */
     padding: 48px 0 0; /* Height of navbar */
-    box-shadow: inset -1px 0 0 rgb(0, 0, 0, 10%);
+    box-shadow: inset -1px 0 0 rgb(0 0 0 / 10%);
 }
 
 @media (width <= 767.98px) {

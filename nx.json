@@ -40,12 +40,15 @@
             }
         },
         "@nx/eslint:lint": {
-            "inputs": ["default", "{workspaceRoot}/.eslintrc.json"],
+            "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"],
             "cache": true
         }
     },
     "useInferencePlugins": false,
     "defaultBase": "master",
     "nxCloudId": "689bc435b0c1aa692565e89c",
-    "useLegacyCache": true
+    "useLegacyCache": true,
+    "tui": {
+        "enabled": false
+    }
 }

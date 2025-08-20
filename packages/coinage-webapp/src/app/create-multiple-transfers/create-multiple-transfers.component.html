@@ -1,15 +1,18 @@
-<main class="ms-sm-auto px-md-4">
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+<main>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
         <h2 class="h2">Create Multiple Transfer from Items</h2>
     </div>
-    <div class="mx-2">
-        <app-section [header]="'Details'" class="border-bottom">
+    
+    <div class="content-container">
+        <app-section [header]="'Details'">
             <app-new-transfer-details #newTransferDetails (detailsChanged)="onCommonDetailsChanged($event)"></app-new-transfer-details>
         </app-section>
-        <app-section [header]="'Add Items to Transfer'" class="mt-3 border-bottom">
+        
+        <app-section [header]="'Add Items to Transfer'">
             <app-item-details-for-transfer #itemDetailsForTranfer (itemAdded)="onItemAdded($event)"></app-item-details-for-transfer>
         </app-section>
-        <app-section class="mt-3">
+        
+        <app-section [header]="'Selected Items'">
             <app-selected-items
                 #selectedItemsList
                 [items]="itemsInTransfers"
@@ -17,16 +20,17 @@
                 (removeItemClicked)="onItemRemoved($event)"
             ></app-selected-items>
         </app-section>
-        <div class="row p-3">
-            <div class="d-grid col-md-6 mx-auto">
-                <button type="button" class="btn btn-outline-secondary" (click)="onClickCreateTransfer()">Create</button>
-            </div>
-            <div class="d-grid col-md-6 mx-auto">
-                <button type="button" class="btn btn-outline-danger" (click)="onClickClearItemList()">Clear</button>
+        
+        <div class="actions-container">
+            <div class="button-group">
+                <button type="button" class="btn btn-primary" (click)="onClickCreateTransfer()">Create Transfer</button>
+                <button type="button" class="btn btn-outline-danger" (click)="onClickClearItemList()">Clear All</button>
             </div>
         </div>
-    </div>
-    <div>
-        <textarea class="form-control" rows="16" [readonly]="true" [(ngModel)]="transfersJsonData" aria-label="Transfer Details JSON"> </textarea>
+        
+        <div class="json-preview-container">
+            <h3>Transfer Preview</h3>
+            <textarea class="form-control" rows="16" [readonly]="true" [(ngModel)]="transfersJsonData" aria-label="Transfer Details JSON"></textarea>
+        </div>
     </div>
 </main>
