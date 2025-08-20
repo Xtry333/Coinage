@@ -1,31 +1,31 @@
 <div class="selected-items">
-    <ul class="list-group list-group-flush w-100">
+    <ul class="w-full overflow-hidden rounded-md border border-gray-200">
         @for (category of categorisedItemList; track category) {
-            <li class="list-group-item p-0">
-                <div class="px-2 pt-2 d-flex justify-content-between">
-                    <div class="fw-bold">{{ category.name }}</div>
-                    <span class="badge bg-primary rounded-pill">{{ category.items.length }}</span>
+            <li class="border-b border-gray-200 p-0">
+                <div class="flex justify-between px-2 pt-2">
+                    <div class="font-bold">{{ category.name }}</div>
+                    <span class="rounded-full bg-blue-500 px-2 py-1 text-sm text-white">{{ category.items.length }}</span>
                 </div>
-                <ul class="list-group list-group-flush">
+                <ul class="border-t border-gray-200">
                     @for (item of category.items; track item) {
-                        <li class="list-group-item p-2">
-                            <div class="row">
-                                <div class="col-6">
-                                    <div class="d-flex justify-content-between">
+                        <li class="border-b border-gray-200 p-2">
+                            <div class="grid grid-cols-12 gap-2">
+                                <div class="col-span-6">
+                                    <div class="flex justify-between">
                                         <span>{{ item.name }}</span>
                                         <fa-icon
                                             class="remove-icon"
-                                            (click)="removeItem(item)"
                                             [icon]="removeIcon"
                                             [fixedWidth]="true"
                                             [ariaLabel]="'Remove item from list'"
+                                            (click)="removeItem(item)"
                                         ></fa-icon>
                                     </div>
                                 </div>
-                                <div class="col text-end">
+                                <div class="col text-right">
                                     <span>{{ item.unitPrice | plnCurrency }} x {{ item.amount }}</span>
                                 </div>
-                                <div class="col text-end">
+                                <div class="col text-right">
                                     <div>
                                         <span>{{ getItemTotalPrice(item) | plnCurrency }}</span>
                                     </div>
@@ -39,24 +39,24 @@
                         </li>
                     }
                     @if (categorisedItemList.length > 1) {
-                        <li class="category-sum list-group-item p-2">
-                            <div class="text-end">{{ getTotalCategoryCost(category.items) | plnCurrency }}</div>
+                        <li class="category-sum border-b border-gray-200 p-2">
+                            <div class="text-right">{{ getTotalCategoryCost(category.items) | plnCurrency }}</div>
                         </li>
                     }
                 </ul>
             </li>
         }
-        <li class="list-group-item p-2">
-            <div class="row">
+        <li class="border-b border-gray-200 p-2">
+            <div class="grid grid-cols-12 gap-2">
                 @if (items.length === 0) {
                     <div>There are no items added.</div>
                 }
                 @if (items.length > 0) {
-                    <div class="col">
-                        <span class="fw-bold">Grand Total</span>
+                    <div class="col-span-6">
+                        <span class="font-bold">Grand Total</span>
                     </div>
                 }
-                <div class="col text-end">{{ getItemsCost(items) | plnCurrency }}</div>
+                <div class="col text-right">{{ getItemsCost(items) | plnCurrency }}</div>
             </div>
         </li>
     </ul>

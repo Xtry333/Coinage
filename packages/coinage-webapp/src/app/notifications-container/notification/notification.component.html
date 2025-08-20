@@ -1,8 +1,18 @@
 <div class="notification">
-    <div class="btn-group">
-        <button class="btn btn-dismiss" (click)="dismiss()"><fa-icon [icon]="closeIcon"></fa-icon></button>
+    <div class="flex gap-1">
+        <button
+            class="btn-dismiss rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            (click)="dismiss()"
+        >
+            <fa-icon [icon]="closeIcon"></fa-icon>
+        </button>
         @if (displayGoToIcon) {
-            <button class="btn btn-goto" [routerLink]="content.linkTo"><fa-icon [icon]="gotoIcon"></fa-icon></button>
+            <button
+                class="btn-goto rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [routerLink]="content.linkTo"
+            >
+                <fa-icon [icon]="gotoIcon"></fa-icon>
+            </button>
         }
     </div>
     <div class="title">{{ content.title }}</div>

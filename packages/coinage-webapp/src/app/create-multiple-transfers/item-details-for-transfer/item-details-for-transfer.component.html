@@ -1,67 +1,67 @@
 @if (itemsLoaded) {
     <div class="add-items-to-transfer ml-5">
-        <div class="row g-3 pb-3">
-            <div class="col-md-4">
-                <label for="selectedItemInput">Item</label>
+        <div class="grid grid-cols-1 gap-3 pb-3 md:grid-cols-3">
+            <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700" for="selectedItemInput">Item</label>
                 <ng-select
                     #itemSelect
-                    name="itemId"
-                    labelForId="selectedItemInput"
-                    placeholder="Search"
                     [(ngModel)]="selectedItemDetails.id"
-                    (change)="onItemSelected($event)"
                     [clearable]="true"
                     [editableSearchTerm]="true"
                     [items]="allItems"
                     [searchable]="true"
                     [notFoundText]="'No items found'"
                     [required]="true"
+                    (change)="onItemSelected($event)"
+                    name="itemId"
+                    labelForId="selectedItemInput"
+                    placeholder="Search"
                     bindValue="id"
                     bindLabel="name"
                     aria-label="Search for item"
                 ></ng-select>
             </div>
-            <div class="col-md-4">
-                <label for="selectedItemContainerInput">Container</label>
+            <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700" for="selectedItemContainerInput">Container</label>
                 <ng-select
                     #containerSelect
-                    name="containerId"
-                    labelForId="selectedItemContainerInput"
-                    placeholder="Search"
                     [(ngModel)]="selectedItemDetails.id"
-                    (change)="onContainerSelected($event)"
                     [clearable]="true"
                     [editableSearchTerm]="true"
                     [items]="allContainers"
                     [required]="false"
                     [searchable]="true"
                     [notFoundText]="'No containers found'"
+                    (change)="onContainerSelected($event)"
+                    name="containerId"
+                    labelForId="selectedItemContainerInput"
+                    placeholder="Search"
                     bindValue="id"
                     bindLabel="name"
                     aria-label="Search for container"
                 ></ng-select>
             </div>
-            <div class="col-md">
-                <label for="setDiscountInput">Set discount</label>
-                <div class="input-group">
+            <div>
+                <label class="mb-2 block text-sm font-medium text-gray-700" for="setDiscountInput">Set discount</label>
+                <div class="flex">
                     <input
+                        class="flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         id="setDiscountInput"
-                        class="form-control pe-1"
-                        type="number"
                         [(ngModel)]="selectedItemDetails.setDiscount"
                         (change)="onItemDetailsChanged()"
+                        type="number"
                         min="0"
                         step="0.01"
                         placeholder="0.00"
                         aria-describedby="setDiscountInput"
                     />
-                    <span class="input-group-text" id="setDiscountInput">zł</span>
+                    <span class="rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500" id="setDiscountInput">zł</span>
                 </div>
             </div>
         </div>
-        <div class="row g-3 mb-3">
-            <div class="col-md">
-                <label for="unitPriceInput" class="d-flex justify-content-between">
+        <div class="mb-3 grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div>
+                <label class="mb-2 flex items-center justify-between text-sm font-medium text-gray-700" for="unitPriceInput">
                     <span>Unit Price</span>
                     @if (canAutoAdjustUnitPrice) {
                         <fa-icon
@@ -73,14 +73,14 @@
                         ></fa-icon>
                     }
                 </label>
-                <div class="input-group">
+                <div class="flex">
                     <input
+                        class="flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         id="unitPriceInput"
-                        class="form-control pe-1"
-                        type="number"
                         [(ngModel)]="selectedItemDetails.unitPrice"
                         (change)="onUnitPriceChanged()"
                         (focus)="onUnitPriceChanged()"
+                        type="number"
                         required="true"
                         min="0"
                         step="0.01"
@@ -88,11 +88,11 @@
                         autocomplete="off"
                         aria-describedby="unitPriceInputAddon"
                     />
-                    <span id="unitPriceInputAddon" class="input-group-text">zł</span>
+                    <span class="rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500" id="unitPriceInputAddon">zł</span>
                 </div>
             </div>
-            <div class="col-md">
-                <label for="amountInput" class="d-flex justify-content-between">
+            <div>
+                <label class="mb-2 flex items-center justify-between text-sm font-medium text-gray-700" for="amountInput">
                     <span>Amount</span>
                     @if (canAutoAdjustAmount) {
                         <fa-icon
@@ -104,26 +104,26 @@
                         ></fa-icon>
                     }
                 </label>
-                <div class="input-group">
+                <div class="flex">
                     <input
+                        class="flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         id="amountInput"
-                        class="form-control pe-1"
-                        type="number"
                         [(ngModel)]="selectedItemDetails.amount"
                         (change)="onAmountChanged()"
                         (focus)="onAmountChanged()"
+                        type="number"
                         required="true"
                         min="0"
                         value="1"
                         placeholder="1.00"
                         aria-describedby="amountInputAddon"
                     />
-                    <span id="amountInputAddon" class="input-group-text">X</span>
+                    <span class="rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500" id="amountInputAddon">X</span>
                 </div>
             </div>
-            <div class="col-md">
-                <label for="totalPriceInput" class="d-flex justify-content-between">
-                    <span>Total Price <span class="text-muted">(not including discount)</span></span>
+            <div>
+                <label class="mb-2 flex items-center justify-between text-sm font-medium text-gray-700" for="totalPriceInput">
+                    <span>Total Price <span class="text-gray-500">(not including discount)</span></span>
                     @if (canAutoAdjustTotalPrice) {
                         <fa-icon
                             class="auto-adjust-icon"
@@ -134,14 +134,14 @@
                         ></fa-icon>
                     }
                 </label>
-                <div class="input-group">
+                <div class="flex">
                     <input
+                        class="flex-1 rounded-l-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                         id="totalPriceInput"
-                        class="form-control pe-1"
-                        type="number"
                         [(ngModel)]="selectedItemDetails.totalPrice"
                         (change)="onTotalPriceChanged()"
                         (focus)="onTotalPriceChanged()"
+                        type="number"
                         required="true"
                         min="0"
                         step="0.01"
@@ -149,20 +149,26 @@
                         autocomplete="off"
                         aria-describedby="totalPriceInputAddon"
                     />
-                    <span id="totalPriceInputAddon" class="input-group-text">zł</span>
+                    <span class="rounded-r-md border border-l-0 border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-500" id="totalPriceInputAddon">zł</span>
                 </div>
             </div>
         </div>
-        <div class="row g-3 mb-3">
-            <div class="d-grid col-md-6 mx-auto">
+        <div class="mb-3">
+            <div class="flex justify-center">
                 @if (selectedItemDetails.name) {
-                    <span class="text-muted">{{ itemDetailsInfo }}</span>
+                    <span class="text-gray-500">{{ itemDetailsInfo }}</span>
                 }
             </div>
         </div>
-        <div class="row g-3">
-            <div class="d-grid col-md-6 mx-auto">
-                <button type="button" class="btn btn-outline-secondary" (click)="onClickAddNewItemToList()">Add</button>
+        <div class="flex justify-center">
+            <div class="w-full max-w-md">
+                <button
+                    class="w-full rounded-md border border-gray-300 bg-white px-4 py-2 text-gray-700 transition duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    (click)="onClickAddNewItemToList()"
+                    type="button"
+                >
+                    Add
+                </button>
             </div>
         </div>
     </div>

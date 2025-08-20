@@ -1,23 +1,15 @@
 $borderColor: #d1d1d1;
 
 .category-path-list {
-    padding: 0;
-    display: flex;
-    list-style: none;
+    @apply flex list-none p-0;
 
     li {
-        padding: 8px 12px;
-        background: #f8f9fa;
-        border: 1px solid #e9ecef;
-        border-radius: 6px;
-        margin-right: 8px;
-        font-weight: 500;
-        color: #495057;
+        @apply mr-2 rounded-md border border-gray-200 bg-gray-50 px-3 py-2 font-medium text-gray-700;
 
         + ::before {
-            margin-right: 8px;
+            @apply mr-2 text-gray-500;
+
             content: '>';
-            color: #6c757d;
         }
     }
 }
@@ -29,13 +21,13 @@ $borderColor: #d1d1d1;
     min-height: 100vh;
     padding: 16px 20px;
     gap: 24px;
-    
+
     @media (width <= 768px) {
         flex-direction: column;
         padding: 12px 16px;
         gap: 20px;
     }
-    
+
     @media (width <= 480px) {
         padding: 8px 12px;
         gap: 16px;
@@ -48,12 +40,12 @@ $borderColor: #d1d1d1;
         padding: 20px;
         box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
         flex: 1;
-        
-        input[type="checkbox"] {
+
+        input[type='checkbox'] {
             margin-right: 8px;
             transform: scale(1.1);
         }
-        
+
         label {
             margin-bottom: 0;
             font-weight: 500;
@@ -71,7 +63,7 @@ form {
     box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
     flex: 1;
     min-width: 400px;
-    
+
     @media (width <= 768px) {
         min-width: auto;
         padding: 20px;
@@ -87,7 +79,7 @@ form {
         display: flex;
         flex-direction: column;
         gap: 6px;
-        
+
         label {
             font-weight: 600;
             color: #495057;
@@ -96,24 +88,26 @@ form {
         }
     }
 
-    input[type="text"],
-    input[type="number"],
-    input[type="date"] {
+    input[type='text'],
+    input[type='number'],
+    input[type='date'] {
         height: 38px;
         padding: 8px 12px;
         border-radius: 6px;
         border: 1px solid #d1d1d1;
         background: white;
-        transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        transition:
+            border-color 0.15s ease,
+            box-shadow 0.15s ease;
         font-size: 14px;
         color: #495057;
-        
+
         &:focus {
             outline: none;
             border-color: #86b7fe;
             box-shadow: 0 0 0 3px rgb(13 110 253 / 25%);
         }
-        
+
         &:invalid {
             border-color: #dc3545;
             box-shadow: 0 0 0 3px rgb(220 53 69 / 25%);
@@ -126,7 +120,9 @@ form {
             border-radius: 6px;
             border-color: #d1d1d1;
             box-shadow: 0 1px 2px rgb(0 0 0 / 5%);
-            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+            transition:
+                border-color 0.15s ease,
+                box-shadow 0.15s ease;
 
             .ng-value-container {
                 padding-left: 12px;
@@ -181,11 +177,11 @@ form {
                 .ng-option {
                     padding: 12px;
                     color: #495057;
-                    
+
                     &:hover {
                         background: #f8f9fa;
                     }
-                    
+
                     &.ng-option-selected {
                         background: #e7f3ff;
                         color: #0d6efd;
@@ -194,7 +190,7 @@ form {
             }
         }
     }
-    
+
     button {
         height: 42px;
         padding: 10px 20px;
@@ -207,37 +203,37 @@ form {
         cursor: pointer;
         transition: all 0.15s ease;
         margin-top: 8px;
-        
-        &[type="submit"] {
+
+        &[type='submit'] {
             background: #0d6efd;
             border-color: #0d6efd;
             color: white;
-            
+
             &:hover {
                 background: #0b5ed7;
                 border-color: #0a58ca;
             }
         }
-        
-        &:not([type="submit"]) {
+
+        &:not([type='submit']) {
             &:hover {
                 background: #e9ecef;
                 border-color: #adb5bd;
                 color: #212529;
             }
         }
-        
-        &[type="button"]:last-of-type {
+
+        &[type='button']:last-of-type {
             background: #dc3545;
             border-color: #dc3545;
             color: white;
-            
+
             &:hover {
                 background: #bb2d3b;
                 border-color: #b02a37;
             }
         }
-        
+
         &:active {
             transform: translateY(1px);
         }
@@ -258,13 +254,13 @@ button:not(form button) {
     transition: all 0.15s ease;
     color: #495057;
     font-weight: 600;
-    
+
     &:hover {
         background: #e9ecef;
         border-color: #adb5bd;
         color: #212529;
     }
-    
+
     &:active {
         transform: translateY(1px);
     }

@@ -1,17 +1,17 @@
 <main>
-    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center">
-        <h2 class="h2">Create Multiple Transfer from Items</h2>
+    <div class="flex flex-wrap items-center justify-between md:flex-nowrap">
+        <h2 class="text-2xl font-bold">Create Multiple Transfer from Items</h2>
     </div>
-    
+
     <div class="content-container">
         <app-section [header]="'Details'">
             <app-new-transfer-details #newTransferDetails (detailsChanged)="onCommonDetailsChanged($event)"></app-new-transfer-details>
         </app-section>
-        
+
         <app-section [header]="'Add Items to Transfer'">
             <app-item-details-for-transfer #itemDetailsForTranfer (itemAdded)="onItemAdded($event)"></app-item-details-for-transfer>
         </app-section>
-        
+
         <app-section [header]="'Selected Items'">
             <app-selected-items
                 #selectedItemsList
@@ -20,17 +20,35 @@
                 (removeItemClicked)="onItemRemoved($event)"
             ></app-selected-items>
         </app-section>
-        
+
         <div class="actions-container">
             <div class="button-group">
-                <button type="button" class="btn btn-primary" (click)="onClickCreateTransfer()">Create Transfer</button>
-                <button type="button" class="btn btn-outline-danger" (click)="onClickClearItemList()">Clear All</button>
+                <button
+                    class="rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    (click)="onClickCreateTransfer()"
+                    type="button"
+                >
+                    Create Transfer
+                </button>
+                <button
+                    class="rounded-md border border-red-300 bg-white px-4 py-2 text-red-700 hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500"
+                    (click)="onClickClearItemList()"
+                    type="button"
+                >
+                    Clear All
+                </button>
             </div>
         </div>
-        
+
         <div class="json-preview-container">
             <h3>Transfer Preview</h3>
-            <textarea class="form-control" rows="16" [readonly]="true" [(ngModel)]="transfersJsonData" aria-label="Transfer Details JSON"></textarea>
+            <textarea
+                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                [(ngModel)]="transfersJsonData"
+                [readonly]="true"
+                rows="16"
+                aria-label="Transfer Details JSON"
+            ></textarea>
         </div>
     </div>
 </main>

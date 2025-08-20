@@ -2,17 +2,17 @@
     @if (showFilters) {
         <div class="header-filters-container">
             <div>
-                <input id="showAllCheckbox" type="checkbox" [ngModel]="filter.showPlanned" (ngModelChange)="showAllChecked($event)" />
+                <input id="showAllCheckbox" [ngModel]="filter.showPlanned" (ngModelChange)="showAllChecked($event)" type="checkbox" />
                 <label for="showAllCheckbox">Show planned transfers</label>
             </div>
             <div>
-                <input id="showFlaggedCheckbox" type="checkbox" [ngModel]="filter.showFlagged" (ngModelChange)="showFlaggedChecked($event)" />
+                <input id="showFlaggedCheckbox" [ngModel]="filter.showFlagged" (ngModelChange)="showFlaggedChecked($event)" type="checkbox" />
                 <label for="showFlaggedCheckbox">Only flagged transfers</label>
             </div>
         </div>
     }
     @if (showFilters && lastPageNumber) {
-        <app-pagination class="pull-right" [lastPage]="lastPageNumber" (pageChange)="onPageChanged($event)"></app-pagination>
+        <app-pagination class="float-right" [lastPage]="lastPageNumber" (pageChange)="onPageChanged($event)"></app-pagination>
     }
     <table class="transfers-table">
         @if (isHeaderDisplayed) {
@@ -22,16 +22,16 @@
         }
         <thead>
             <tr>
-                <th class="align-left">
+                <th class="text-left">
                     <span>Category</span>
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="TableColumn.Category"
-                            (filterEvent)="onPerformFilter($event)"
                             [filterType]="FilterType.MultiCheckbox"
                             [filterOptions]="optionsForCheckboxFilters.categories"
                             [popupSide]="PopupSide.ToRight"
                             [cachedFilterValue]="filter.category"
+                            (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>
                     }
                 </th>
@@ -40,34 +40,34 @@
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="TableColumn.Description"
-                            (filterEvent)="onPerformFilter($event)"
                             [filterType]="FilterType.TextBox"
                             [popupSide]="PopupSide.ToLeft"
                             [cachedFilterValue]="filter.description"
+                            (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>
                     }
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Account</span>
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="TableColumn.Account"
-                            (filterEvent)="onPerformFilter($event)"
                             [filterType]="FilterType.MultiCheckbox"
                             [filterOptions]="optionsForCheckboxFilters.accounts"
                             [popupSide]="PopupSide.ToLeft"
                             [cachedFilterValue]="filter.account"
+                            (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>
                     }
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Amount</span>
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="TableColumn.Amount"
-                            (filterEvent)="onPerformFilter($event)"
                             [filterType]="FilterType.NumericRange"
                             [popupSide]="PopupSide.ToLeft"
+                            (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>
                     }
                 </th>
@@ -76,22 +76,22 @@
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="TableColumn.Contractor"
-                            (filterEvent)="onPerformFilter($event)"
                             [filterType]="FilterType.MultiCheckbox"
                             [filterOptions]="optionsForCheckboxFilters.contractors"
                             [popupSide]="PopupSide.ToLeft"
                             [cachedFilterValue]="filter.contractor"
+                            (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>
                     }
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Date</span>
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="TableColumn.Date"
-                            (filterEvent)="onPerformFilter($event)"
                             [filterType]="FilterType.DateRange"
                             [popupSide]="PopupSide.ToLeft"
+                            (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>
                     }
                 </th>
@@ -120,7 +120,7 @@
                             }
                         </td>
                         <td>{{ transfer.accountName }}</td>
-                        <td class="nowrap currency">
+                        <td class="currency whitespace-nowrap">
                             <app-money-amount
                                 [transferData]="getTransferValueDetails(transfer)"
                                 [transferAccounts]="getTransferAccountDetails(transfer)"
@@ -132,7 +132,7 @@
                         <!-- <td colspan="2">
             <app-money-amount [accountToAccountTransfer]="getTransferValueDetails(transfer)"></app-money-amount>
           </td> -->
-                        <td class="nowrap align-right">
+                        <td class="whitespace-nowrap text-right">
                             <a [routerLink]="getSummaryPageUrl(transfer)">{{ transfer.date | date }}</a>
                         </td>
                     }
@@ -167,6 +167,6 @@
         </tbody>
     </table>
     @if (showFilters && lastPageNumber) {
-        <app-pagination class="pull-right mt-1" [lastPage]="lastPageNumber" [currentPage]="currentPage"></app-pagination>
+        <app-pagination class="float-right mt-2" [lastPage]="lastPageNumber" [currentPage]="currentPage"></app-pagination>
     }
 </div>

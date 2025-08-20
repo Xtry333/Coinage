@@ -22,7 +22,7 @@
                         <td>
                             <span>{{ transfer.description }}</span>
                             @if (transfer.isEthereal) {
-                                <span (click)="onClickCommit()" class="planned-icon btn">
+                                <span class="planned-icon cursor-pointer rounded bg-gray-200 px-2 py-1 hover:bg-gray-300" (click)="onClickCommit()">
                                     <fa-icon [icon]="etherealIcon" [fixedWidth]="true" title="Transfer has not been commited"></fa-icon>
                                 </span>
                             }
@@ -135,11 +135,11 @@
             <div class="split-transaction-form">
                 <div>
                     <label for="description">Description</label>
-                    <input id="description" type="text" [(ngModel)]="splitTransfer.description" required />
+                    <input id="description" [(ngModel)]="splitTransfer.description" type="text" required />
                 </div>
                 <div>
                     <label for="amount">Price</label>
-                    <input id="amount" type="number" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer.amount - 0.01" step=".01" required />
+                    <input id="amount" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer.amount - 0.01" type="number" step=".01" required />
                 </div>
                 <div>
                     <label for="category">Category</label>

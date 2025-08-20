@@ -1,42 +1,7 @@
-@use 'sass:map';
-
-// variable overrides first
-// $primary: rgb(200, 0, 0);
-$enable-shadows: true;
-
-// $prefix: 'mo-';
-
-/* Keep Bootstrap imports after Tailwind base so Bootstrap utilities can override where needed */
-@import 'bootstrap/scss/bootstrap';
-@import 'node_modules/bootstrap-icons/font/bootstrap-icons';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 @import '~@ng-select/ng-select/themes/default.theme.css';
-
-// @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
-@import 'bootstrap';
-@import 'bootstrap/scss/functions';
-@import 'bootstrap/scss/variables';
-@import 'bootstrap/scss/utilities';
-
-/* Tailwind base/utilities */
-@import 'tailwindcss';
-
-$utilities: map.merge(
-    $utilities,
-    (
-        'width': map.merge(
-                map.get($utilities, 'width'),
-                (
-                    values: (
-                        25: 25%,
-                        33: 33%,
-                        50: 50%,
-                        66: 66%,
-                        75: 75%,
-                    ),
-                )
-            ),
-    )
-);
 
 html {
     overflow-y: scroll;
@@ -47,190 +12,41 @@ body {
     padding: 0;
 }
 
-// * {
-//     //font-family: 'Roboto', sans-serif;
-//     box-sizing: border-box;
-// }
-
-// // a,
-// // a:link,
-// // a:visited {
-// //     text-decoration: none;
-// //     color: inherit;
-// // }
-
-// .pull-right {
-//     float: right;
-// }
-
-// table.default-table {
-//     // width: 100%;
-//     border-collapse: collapse;
-
-//     caption {
-//         font-weight: bold;
-//         font-size: 20px;
-//         padding: 5px;
-//     }
-
-//     thead tr {
-//         background-color: rgb(225, 225, 225);
-//         border: gray 2px solid;
-//         th {
-//             padding: 15px;
-//             white-space: nowrap;
-//         }
-//     }
-
-//     tr.sum-row {
-//         &.top-border {
-//             border-top: gray 2px solid;
-//         }
-//         background-color: rgb(225, 225, 225);
-//         font-weight: bold;
-//     }
-
-//     tr.today-marker-row {
-//         border-bottom: #65aafa 1px solid;
-//         height: 1px;
-//     }
-
-//     tbody tr:nth-child(even) {
-//         background-color: rgb(240, 240, 240);
-//     }
-
-//     td {
-//         padding: 10px 15px;
-//         &.currency {
-//             text-align: right;
-//         }
-//         &.month-name {
-//             text-transform: capitalize;
-//         }
-//         &.nowrap {
-//             white-space: nowrap;
-//         }
-//     }
-
-//     .align-left {
-//         text-align: left;
-//     }
-
-//     .align-right {
-//         text-align: right;
-//     }
-// }
-
-// @for $i from 1 through 5 {
-//     .ml-#{$i} {
-//         margin-left: #{$i * 2}px;
-//     }
-
-//     .mr-#{$i} {
-//         margin-right: #{$i * 2}px;
-//     }
-
-//     .mt-#{$i} {
-//         margin-top: #{$i * 2}px;
-//     }
-
-//     .mb-#{$i} {
-//         margin-bottom: #{$i * 2}px;
-//     }
-
-//     .mv-#{$i} {
-//         margin-top: #{$i * 2}px;
-//         margin-bottom: #{$i * 2}px;
-//     }
-
-//     .mh-#{$i} {
-//         margin-left: #{$i * 2}px;
-//         margin-right: #{$i * 2}px;
-//     }
-// }
-
-// .nowrap {
-//     white-space: nowrap;
-// }
-
-// .align-left {
-//     text-align: left;
-// }
-
-// .align-right {
-//     text-align: right;
-// }
-
-// .d-block {
-//     display: block;
-// }
-
 .w-inherit {
     width: inherit;
 }
 
+/* Custom ng-select styling */
 .ng-select {
     .ng-select-container {
-        height: 38px;
-        border-radius: 5px;
-        border-color: rgb(206 212 218);
-        box-shadow: inset 0 1px 2px rgb(0 0 0 / 7.5%);
+        @apply h-9 rounded-md border-gray-300 shadow-sm;
+
         transition:
             border-color 0.15s ease-in-out,
             box-shadow 0.15s ease-in-out;
 
         .ng-value-container {
-            padding-left: 12px;
+            @apply pl-3;
 
             .ng-input {
-                padding-left: 12px;
-
-                input {
-                    // font-size: 16px;
-                }
+                @apply pl-3;
             }
         }
     }
 
     &.ng-select-focused:not(.ng-select-opened) {
         > .ng-select-container {
-            border-color: rgb(134 183 254) !important;
-            box-shadow:
-                inset 0 1px 2px rgb(0 0 0 / 7.5%),
-                0 0 0 0.25rem rgb(13 110 253 / 25%) !important;
+            @apply border-blue-400 ring-2 ring-blue-500/25;
         }
     }
 
     &.ng-select-opened.ng-select-bottom {
         > .ng-select-container {
-            border-bottom-right-radius: 0 !important;
-            border-bottom-left-radius: 0 !important;
+            @apply rounded-b-none;
         }
     }
 
     .ng-dropdown-panel.ng-select-bottom {
-        border-bottom-right-radius: 5px;
-        border-bottom-left-radius: 5px;
+        @apply rounded-b-md;
     }
-
-    //         .ng-arrow {
-    //             border-color: #444444 transparent transparent;
-    //         }
-
-    //         .ng-dropdown-panel {
-    //             border-color: gray;
-    //             &.ng-select-bottom {
-    //                 border-top-color: #b8b8b8;
-    //             }
-    //             &.ng-select-top {
-    //                 border-bottom-color: #b8b8b8;
-    //             }
-    //             .ng-dropdown-panel-items {
-    //                 max-height: 300px;
-
-    //                 .ng-option {
-    //                     padding: 10px;
-    //                 }
-    //             }
-    //         }
 }

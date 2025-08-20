@@ -5,7 +5,6 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Chart } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
@@ -30,6 +29,7 @@ import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
 import { MonthSummaryComponent } from './month-summary/month-summary.component';
 import { NotificationComponent } from './notifications-container/notification/notification.component';
 import { NotificationsContainerComponent } from './notifications-container/notifications-container.component';
+import { AccountDetailsPage } from './pages/account-details-page/account-details-page.component';
 import { AccountSettingsPageComponent } from './pages/account-settings-page/account-settings-page.component';
 import { DashboardCountersComponent } from './pages/dashboard/dashboard-counters/dashboard-counters.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -42,7 +42,6 @@ import { TransferItemsTableComponent } from './transfer-item-details/transfer-it
 import { TransfersListComponent } from './transfers-list/transfers-list.component';
 import { TableFilterComponent } from './transfers-table/table-filter/table-filter.component';
 import { TransfersTableComponent } from './transfers-table/transfers-table.component';
-import { AccountDetailsPage } from './pages/account-details-page/account-details-page.component';
 
 const socketIoConfig: SocketIoConfig = {
     url: '/',
@@ -63,7 +62,6 @@ Chart.register(zoomPlugin);
         AuthModule,
         ItemizedTransfersModule,
         NgxPopperjsModule,
-        NgbModule,
         BrowserModule,
         HttpClientModule,
         BrowserAnimationsModule,

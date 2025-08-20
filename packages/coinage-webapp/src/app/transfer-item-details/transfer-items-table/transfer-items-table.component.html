@@ -7,7 +7,7 @@
         }
         <thead>
             <tr>
-                <th class="align-left">
+                <th class="text-left">
                     <span>Transfer</span>
                 </th>
                 <th>
@@ -16,22 +16,22 @@
                 <th>
                     <span>Container</span>
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Unit Price</span>
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Standard Price</span>
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Quantity</span>
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Total</span>
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Account</span>
                 </th>
-                <th class="align-right">
+                <th class="text-right">
                     <span>Date</span>
                 </th>
             </tr>
@@ -57,12 +57,12 @@
                     <td>
                         {{ formatContainer(details) }}
                     </td>
-                    <td class="nowrap currency">{{ details.unitPrice | plnCurrency }}</td>
+                    <td class="currency whitespace-nowrap">{{ details.unitPrice | plnCurrency }}</td>
                     <td>{{ getStandardPrice(details) }}</td>
                     <td>{{ details.quantity }}</td>
-                    <td class="nowrap currency">{{ details.unitPrice * details.quantity | plnCurrency }}</td>
+                    <td class="currency whitespace-nowrap">{{ details.unitPrice * details.quantity | plnCurrency }}</td>
                     <td>{{ details.accountName }}</td>
-                    <td class="nowrap align-right">
+                    <td class="whitespace-nowrap text-right">
                         {{ details.date | date }}
                         <!-- <a [routerLink]="CoinageRoutes.SummaryFullDate(details.date)">{{ details.date | date }}</a> -->
                     </td>

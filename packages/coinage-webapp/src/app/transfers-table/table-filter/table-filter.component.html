@@ -1,4 +1,4 @@
-<div #tableFilterElement class="coinage-app-table-filter">
+<div class="coinage-app-table-filter" #tableFilterElement>
     <button class="filter-icon-btn" (click)="onToggleOpenHide()">
         <fa-icon class="icon" [icon]="filterIcon"></fa-icon>
     </button>
@@ -6,18 +6,29 @@
         <div class="filter-popup" [ngClass]="popupSideClass">
             <form (ngSubmit)="onPerformFilter()">
                 @if (filterValue.filterType === FilterType.TextBox) {
-                    <div class="textbox-with-buttons" style="display:flex;gap:6px;align-items:center;">
+                    <div class="textbox-with-buttons" style="display: flex; gap: 6px; align-items: center">
                         <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             #autofocusedFilterInput
-                            list="filterInputValues"
-                            name="filterValue"
-                            class="form-control"
                             [(ngModel)]="filterValue.value"
                             [autocomplete]="filterDataProvided ? 'off' : ''"
+                            list="filterInputValues"
+                            name="filterValue"
                         />
                         <div class="inline-filter-buttons">
-                            <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
-                            <button type="reset" class="btn btn-outline-secondary btn-sm" (click)="onClear()">Clear</button>
+                            <button
+                                class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                type="submit"
+                            >
+                                Apply
+                            </button>
+                            <button
+                                class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                (click)="onClear()"
+                                type="reset"
+                            >
+                                Clear
+                            </button>
                         </div>
                         @if (filterDataProvided) {
                             <datalist id="filterInputValues">
@@ -31,30 +42,44 @@
                 @if (filterValue.filterType === FilterType.NumericRange) {
                     <div class="numeric-range">
                         <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             #autofocusedFilterInput
+                            [(ngModel)]="filterValue.range.from"
+                            [max]="filterValue.range.to ?? 0"
                             name="filterRangeFrom"
-                            class="form-control"
                             type="number"
                             min="0"
-                            [max]="filterValue.range.to ?? 0"
-                            [(ngModel)]="filterValue.range.from"
                             autocomplete="off"
                         />
-                        <input name="filterRangeTo" class="form-control" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
+                        <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            [(ngModel)]="filterValue.range.to"
+                            [min]="filterValue.range.from ?? 0"
+                            name="filterRangeTo"
+                            type="number"
+                            autocomplete="off"
+                        />
                     </div>
                 }
                 @if (filterValue.filterType === FilterType.DateRange) {
                     <div class="date-range-filter-container">
                         <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             #autofocusedFilterInput
-                            name="filterDateFrom"
-                            class="form-control"
-                            type="date"
                             [(ngModel)]="filterValue.range.from"
-                            autocomplete="off"
                             (change)="onChangeFilterRangeFrom()"
+                            name="filterDateFrom"
+                            type="date"
+                            autocomplete="off"
                         />
-                        <input name="filterDateTo" class="form-control" type="date" [(ngModel)]="filterValue.range.to" autocomplete="off" (change)="onChangeFilterRangeTo()" />
+                        <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            [(ngModel)]="filterValue.range.to"
+                            (change)="onChangeFilterRangeTo()"
+                            name="filterDateTo"
+                            type="date"
+                            autocomplete="off"
+                        />
                     </div>
                 }
                 @if (filterValue.filterType === FilterType.MultiCheckbox) {
@@ -62,17 +87,17 @@
                         @if (shouldDisplaySearchBox) {
                             <div class="filter-option-search-container">
                                 <input
+                                    class="filter-option-search-value w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     #autofocusedFilterInput
-                                    name="optionSearch"
-                                    class="form-control filter-option-search-value"
                                     [ngModel]="optionSearchValue"
                                     (ngModelChange)="onChangeOptionSearchValue($event)"
+                                    name="optionSearch"
                                     autocomplete="off"
                                     placeholder="Search..."
                                 />
-                                <button type="button" class="clear-button" (click)="onClearOptionsSearchValue()" title="Clear Search">X</button>
+                                <button class="clear-button" (click)="onClearOptionsSearchValue()" type="button" title="Clear Search">X</button>
                                 @if (shouldShowCheckVisibleButton) {
-                                    <button type="button" class="check-visible-button" (click)="onCheckVisibleOptions()" title="Check Visible">+</button>
+                                    <button class="check-visible-button" (click)="onCheckVisibleOptions()" type="button" title="Check Visible">+</button>
                                 }
                             </div>
                         }
@@ -87,10 +112,10 @@
                                     @if (option.isDisplayed) {
                                         <div>
                                             <input
+                                                [(ngModel)]="option.isSelected"
                                                 [id]="'filter-option-checkbox-' + option.id"
                                                 [name]="'filter-option-checkbox-' + option.id"
                                                 type="checkbox"
-                                                [(ngModel)]="option.isSelected"
                                             />
                                             <label [for]="'filter-option-checkbox-' + option.id">{{ option.uiText }}</label>
                                         </div>
@@ -102,8 +127,19 @@
                 }
                 @if (filterValue.filterType !== FilterType.TextBox) {
                     <div class="filter-buttons">
-                        <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
-                        <button type="reset" class="btn btn-outline-secondary btn-sm" (click)="onClear()">Clear</button>
+                        <button
+                            class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            type="submit"
+                        >
+                            Apply
+                        </button>
+                        <button
+                            class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            (click)="onClear()"
+                            type="reset"
+                        >
+                            Clear
+                        </button>
                     </div>
                 }
             </form>

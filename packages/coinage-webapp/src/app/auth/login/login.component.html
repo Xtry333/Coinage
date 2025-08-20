@@ -1,28 +1,41 @@
-<div class="container">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3>Login</h3>
+<div class="container mx-auto max-w-7xl px-4">
+    <div class="flex justify-center">
+        <div class="w-full md:w-1/2">
+            <div class="rounded-lg border border-gray-200 bg-white shadow-md">
+                <div class="border-b border-gray-200 px-6 py-4">
+                    <h3 class="text-lg font-semibold">Login</h3>
                 </div>
-                <div class="card-body">
+                <div class="p-6">
                     <form>
-                        <div class="form-group">
-                            <label for="username">Username</label>
-                            <input type="text" name="username" class="form-control" id="username" placeholder="Enter your username" [(ngModel)]="username" />
-                        </div>
-                        <div class="form-group">
-                            <label for="password">Password</label>
+                        <div class="mb-4">
+                            <label class="mb-2 block text-sm font-medium text-gray-700" for="username">Username</label>
                             <input
-                                type="password"
-                                name="password"
-                                class="form-control"
-                                id="password"
-                                placeholder="Enter your password"
-                                [(ngModel)]="password"
+                                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                id="username"
+                                [(ngModel)]="username"
+                                type="text"
+                                name="username"
+                                placeholder="Enter your username"
                             />
                         </div>
-                        <button type="submit" class="btn btn-primary" (click)="onClickLogin()">Login</button>
+                        <div class="mb-6">
+                            <label class="mb-2 block text-sm font-medium text-gray-700" for="password">Password</label>
+                            <input
+                                class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                id="password"
+                                [(ngModel)]="password"
+                                type="password"
+                                name="password"
+                                placeholder="Enter your password"
+                            />
+                        </div>
+                        <button
+                            class="w-full rounded-md bg-blue-600 px-4 py-2 text-white transition duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            (click)="onClickLogin()"
+                            type="submit"
+                        >
+                            Login
+                        </button>
                     </form>
                 </div>
             </div>

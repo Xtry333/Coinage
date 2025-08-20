@@ -1,9 +1,14 @@
-<div #modalContainer id="fresh-modal-container" class="modal-container" [ngClass]="{ hidden: !isDisplayed, moveable: moveable }">
+<div class="modal-container" id="fresh-modal-container" #modalContainer [ngClass]="{ hidden: !isDisplayed, moveable: moveable }">
     @if (isDisplayed) {
         <div class="modal">
             @if (closeable) {
                 <div class="float-right">
-                    <button class="btn-close" (click)="hideModal()"><fa-icon [icon]="closeIcon"></fa-icon></button>
+                    <button
+                        class="rounded-md border border-gray-300 bg-white px-2 py-1 text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        (click)="hideModal()"
+                    >
+                        <fa-icon [icon]="closeIcon"></fa-icon>
+                    </button>
                 </div>
             }
             <ng-content></ng-content>

@@ -1,27 +1,32 @@
-<nav id="sidebarMenu" class="bg-secondary-subtle sidebar w-inherit">
-    <div class="position-sticky pt-3 sidebar-sticky">
-        <ul class="nav flex-column mb-auto">
+<nav class="sidebar w-inherit bg-gray-100" id="sidebarMenu">
+    <div class="sidebar-sticky sticky top-0 pt-3">
+        <ul class="mb-auto flex flex-col">
             @for (link of links; track link) {
-                <li class="nav-item">
-                    <a class="nav-link" [routerLink]="link.url" routerLinkActive="active" ariaCurrentWhenActive="page">
-                        <i class="pe-none me-2" [class]="link.icon"></i>
+                <li>
+                    <a
+                        class="block rounded px-3 py-2 text-gray-700 hover:bg-gray-200"
+                        [routerLink]="link.url"
+                        routerLinkActive="active"
+                        ariaCurrentWhenActive="page"
+                    >
+                        <i class="pointer-events-none mr-2" [class]="link.icon"></i>
                         <span>{{ link.text }}</span>
                     </a>
                 </li>
             }
         </ul>
         <hr />
-        <div class="ms-2 dropdown">
-            <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                <img [src]="avatarLink" alt="" width="32" height="32" class="rounded-circle me-2" />
+        <div class="relative ml-2">
+            <a class="flex items-center no-underline" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                <img class="mr-2 rounded-full" [src]="avatarLink" alt="" width="32" height="32" />
                 <strong>{{ username | ifNull: 'User' }}</strong>
             </a>
-            <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
-                <li><a class="dropdown-item" href="#">New project...</a></li>
-                <li><a class="dropdown-item" href="#">Settings</a></li>
-                <li><a class="dropdown-item" href="#">Profile</a></li>
-                <li><hr class="dropdown-divider" /></li>
-                <li><a class="dropdown-item" href="#">Sign out</a></li>
+            <ul class="absolute mt-1 min-w-48 rounded-md bg-gray-800 py-1 text-sm text-white shadow-lg">
+                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">New project...</a></li>
+                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">Settings</a></li>
+                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">Profile</a></li>
+                <li><hr class="my-1 border-gray-600" /></li>
+                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">Sign out</a></li>
             </ul>
         </div>
     </div>
