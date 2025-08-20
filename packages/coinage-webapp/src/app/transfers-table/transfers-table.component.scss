@@ -1,8 +1,6 @@
 div.transfers-table-container {
-    max-width: 1000px;
     margin: auto;
     margin-top: 24px;
-    padding: 0 16px;
     
     .header-filters-container {
         background: white;
@@ -16,7 +14,6 @@ div.transfers-table-container {
             display: inline-flex;
             align-items: center;
             margin-right: 20px;
-            margin-bottom: 8px;
             
             input[type="checkbox"] {
                 margin-right: 8px;
