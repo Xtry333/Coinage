@@ -2,6 +2,7 @@ table.items-table {
     width: 100%;
     border-collapse: collapse;
     border: 1px solid #ccc;
+
     caption {
         font-weight: bold;
         font-size: 15px;
@@ -14,6 +15,7 @@ table.items-table {
 
     thead tr {
         background-color: rgb(225, 225, 225);
+
         th {
             padding: 10px;
             white-space: nowrap;
@@ -22,9 +24,11 @@ table.items-table {
 
     td {
         padding: 10px 15px;
+
         &.currency {
             text-align: right;
         }
+
         &.month-name {
             text-transform: capitalize;
         }

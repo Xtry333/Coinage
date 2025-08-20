@@ -2,7 +2,7 @@ div.notification {
     z-index: 99;
     position: relative;
     border-radius: 5px;
-    background-color: rgb(252, 252, 252);
+    background-color: rgb(252 252 252);
     border: gray 2px solid;
     padding: 10px;
     width: 350px;
@@ -13,16 +13,20 @@ div.notification {
         position: absolute;
         top: 4px;
         right: 4px;
+
         .btn-dismiss {
             display: block;
             cursor: pointer;
-            //padding: 0px 5.5px;
+
+            // padding: 0px 5.5px;
             text-align: center;
             border-radius: 5px;
-            //border: gray 2px solid;
+
+            // border: gray 2px solid;
             border: 0;
             width: 21px;
             height: 21px;
+
             // &::after {
             //     content: '\00d7';
             //     font-size: 19px;
@@ -38,14 +42,17 @@ div.notification {
         .btn-goto {
             display: block;
             cursor: pointer;
-            //padding: 0px 5.5px;
+
+            // padding: 0px 5.5px;
             text-align: center;
             border-radius: 5px;
             margin-top: 5px;
-            //border: gray 2px solid;
+
+            // border: gray 2px solid;
             border: 0;
             width: 21px;
             height: 21px;
+
             // &::after {
             //     content: '\00d7';
             //     font-size: 19px;

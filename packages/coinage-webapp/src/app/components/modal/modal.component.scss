@@ -1,6 +1,7 @@
 div.modal-container {
     z-index: 99;
     position: fixed;
+
     // border-radius: 5px;
     // transform: translateX(-50%) translateY(-50%);
     background-color: rgb(252, 252, 252);
@@ -21,16 +22,20 @@ div.modal-container {
 
     div.modal {
         cursor: default;
+
         .float-right {
             text-align: right;
+
             .btn-close {
                 cursor: pointer;
-                //padding: 0px 5.5px;
+
+                // padding: 0px 5.5px;
                 text-align: center;
                 border-radius: 0;
                 border: gray 2px solid;
                 width: 27px;
                 height: 27px;
+
                 // &::after {
                 //     content: '\00d7';
                 //     font-size: 19px;

@@ -9,6 +9,7 @@ import {
     ItemWithLastUsedPriceDTO,
     TransferWithItemDetailsDTO,
 } from '@app/interfaces';
+import { parseUnit } from '@app/common-units';
 
 import { ItemDao } from '../daos/item.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
@@ -35,23 +36,36 @@ export class ItemsController {
 
         if (container && item.containerSizeUnit) {
             container.size = item.containerSize ?? undefined;
-            container.unit = item.containerSizeUnit;
+            container.unit = parseUnit(item.containerSizeUnit) ?? null;
         }
 
         const transferItems = await this.transferItemDao.findByItemId(itemId);
         const transfersWithItems = await Promise.all(transferItems.map(async (transferItem) => this.toTransfersWithItemsDTO(transferItem)));
         // filter only the unique containers
         const uniqueContainers = new Set(transferItems.map((transferItem) => transferItem.containerId));
-        const itemContainers = (
-            await Promise.all(transferItems.filter((transferItem) => transferItem.itemId === itemId).map(async (transferItem) => transferItem.container))
-        ).map((container) => {
+        // collect transfer-level containers (unique by id)
+        const containers = await Promise.all(
+            transferItems
+                .filter((transferItem) => transferItem.itemId === itemId && transferItem.containerId !== null)
+                .map(async (transferItem) => ({ id: transferItem.containerId, container: await transferItem.container })),
+        );
+
+        const seen = new Set<number>();
+        const itemContainers: AdvancedItemContainer[] = [];
+        for (const entry of containers) {
+            if (!entry || entry.id === null) continue;
+            if (seen.has(entry.id)) continue;
+            seen.add(entry.id);
+            const container = entry.container;
             const advancedContainer = new AdvancedItemContainer();
+            advancedContainer.id = entry.id;
+            advancedContainer.name = container?.name ?? null;
             advancedContainer.weight = container?.weight ?? undefined;
-            advancedContainer.weightUnit = container?.weightUnit ?? undefined;
+            advancedContainer.weightUnit = parseUnit(container?.weightUnit ?? null) ?? undefined;
             advancedContainer.volume = container?.volume ?? undefined;
-            advancedContainer.volumeUnit = container?.volumeUnit ?? undefined;
-            return advancedContainer;
-        });
+            advancedContainer.volumeUnit = parseUnit(container?.volumeUnit ?? null) ?? undefined;
+            itemContainers.push(advancedContainer);
+        }
 
         return {
             id: item.id,
@@ -84,8 +98,21 @@ export class ItemsController {
 
     private async toTransfersWithItemsDTO(transferItem: TransferItem): Promise<TransferWithItemDetailsDTO> {
         const transfer = await transferItem.transfer;
+    let containerName: string | null = null;
+    let containerWeight: number | null = null;
+    let containerWeightUnit: any | null = null;
+    let containerVolume: number | null = null;
+    let containerVolumeUnit: any | null = null;
+
         if (transferItem.containerId !== null) {
             const container = await transferItem.container;
+            if (container) {
+                containerName = container.name ?? null;
+                containerWeight = container.weight ?? null;
+                containerWeightUnit = parseUnit(container.weightUnit ?? null) ?? null;
+                containerVolume = container.volume ?? null;
+                containerVolumeUnit = parseUnit(container.volumeUnit ?? null) ?? null;
+            }
         }
         return {
             transferId: transfer.id,
@@ -102,6 +129,11 @@ export class ItemsController {
             receiptId: transfer.receiptId ?? null,
             quantity: transferItem.quantity,
             unitPrice: transferItem.unitPrice,
+            containerName: containerName,
+            containerWeight: containerWeight,
+            containerWeightUnit: containerWeightUnit,
+            containerVolume: containerVolume,
+            containerVolumeUnit: containerVolumeUnit,
         };
     }
 }

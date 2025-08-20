@@ -21,6 +21,7 @@
 
     .ng-select ::ng-deep {
         $borderColor: #5d5d5d;
+
         height: 40px;
         width: 300px;
         margin: 10px;
@@ -32,12 +33,13 @@
         }
 
         .ng-arrow {
-            border-color: #444444 transparent transparent;
+            border-color: #444 transparent transparent;
         }
 
         .ng-input {
             padding: 5px;
             top: 0;
+
             input {
                 font: 13.3333px Arial;
             }
@@ -45,12 +47,15 @@
 
         .ng-dropdown-panel {
             border-color: $borderColor;
+
             &.ng-select-bottom {
                 border-top-color: #b8b8b8;
             }
+
             &.ng-select-top {
                 border-bottom-color: #b8b8b8;
             }
+
             .ng-dropdown-panel-items {
                 max-height: 300px;
 

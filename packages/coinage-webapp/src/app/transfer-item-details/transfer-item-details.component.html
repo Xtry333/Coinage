@@ -28,7 +28,32 @@
                             </td>
                         </tr>
                     }
-                    @if (item.container) {
+                    @if (item.itemContainers && item.itemContainers.length > 0) {
+                        <tr>
+                            <th>Containers used</th>
+                            <td>
+                                @for (c of item.itemContainers; track c.id) {
+                                    @if (c && (c.name || c.weight || c.volume)) {
+                                        <span>
+                                            @if (c.name) {
+                                                <strong>{{ c.name }}</strong>
+                                                @if (c.weight || c.volume) { <span> — </span> }
+                                            }
+                                            @if (c.weight) {
+                                                <span>{{ c.weight }} {{ c.weightUnit }}</span>
+                                            }
+                                            @if (c.weight && c.volume) {
+                                                <span> · </span>
+                                            }
+                                            @if (c.volume) {
+                                                <span>{{ c.volume }} {{ c.volumeUnit }}</span>
+                                            }
+                                        </span><br>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    } @else if (item.container) {
                         <tr>
                             <th>Container</th>
                             <td>

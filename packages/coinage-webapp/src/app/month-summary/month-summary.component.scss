@@ -2,8 +2,10 @@
     padding: 0;
     display: flex;
     list-style: none;
+
     li {
         padding: 5px;
+
         + ::before {
             margin-right: 5px;
             content: '/';
@@ -28,11 +30,13 @@ table.last-transactions-table {
 
     td,
     th {
-        //border-bottom: 1px solid black;
+        // border-bottom: 1px solid black;
         padding: 10px;
+
         &.currency {
             text-align: right;
         }
+
         &.month-name {
             text-transform: capitalize;
         }

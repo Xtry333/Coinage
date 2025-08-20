@@ -13,6 +13,9 @@
                 <th>
                     <span>Contractor</span>
                 </th>
+                <th>
+                    <span>Container</span>
+                </th>
                 <th class="align-right">
                     <span>Unit Price</span>
                 </th>
@@ -51,6 +54,9 @@
                     <td>
                         {{ details.transferContractorName | ifNull: EMPTY_CONTRACTOR }}
                     </td>
+                    <td>
+                        {{ formatContainer(details) }}
+                    </td>
                     <td class="nowrap currency">{{ details.unitPrice | plnCurrency }}</td>
                     <td>{{ getStandardPrice(details) }}</td>
                     <td>{{ details.quantity }}</td>
@@ -66,6 +72,7 @@
                 <tr class="sum-row total-price top-border">
                     <td>Total</td>
                     <td></td>
+                    <td></td>
                     <td>{{ totalItems }}</td>
                     <td>Avg: {{ (totalQuantity / totalItems).toFixed(3) }}/T</td>
                     <td>{{ totalQuantity }}</td>
@@ -75,7 +82,7 @@
             }
             @if (!hasAnyRows) {
                 <tr>
-                    <td colspan="6">Item has not been registered in any transfer.</td>
+                    <td colspan="9">Item has not been registered in any transfer.</td>
                 </tr>
             }
         </tbody>

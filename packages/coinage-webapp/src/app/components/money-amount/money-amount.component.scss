@@ -1,5 +1,5 @@
 $outgoingArrowColor: #ff8b8b;
-$internalArrowColor: #bbbbbb;
+$internalArrowColor: #bbb;
 $incomingArrowColor: #69cb7e;
 
 .account-label {
@@ -36,9 +36,11 @@ $incomingArrowColor: #69cb7e;
         &.outgoing {
             border-bottom-color: $outgoingArrowColor;
         }
+
         &.internal {
             border-bottom-color: $internalArrowColor;
         }
+
         &.incoming {
             border-bottom-color: $incomingArrowColor;
         }
@@ -59,9 +61,11 @@ $incomingArrowColor: #69cb7e;
         &.outgoing::after {
             border-left-color: $outgoingArrowColor;
         }
+
         &.internal::after {
             border-left-color: $internalArrowColor;
         }
+
         &.incoming::after {
             border-left-color: $incomingArrowColor;
         }
@@ -93,6 +97,7 @@ $incomingArrowColor: #69cb7e;
     .currency {
         font-size: 12px;
         text-align: center;
-        //padding-bottom: 4px;
+
+        // padding-bottom: 4px;
     }
 }

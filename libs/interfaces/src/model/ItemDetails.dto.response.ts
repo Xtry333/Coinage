@@ -1,4 +1,5 @@
 import { Type } from 'class-transformer';
+import { Unit } from '@app/common-units';
 
 export class ItemDetailsDTO {
     public id!: number;
@@ -6,6 +7,10 @@ export class ItemDetailsDTO {
     public itemName!: string;
     public categoryId!: number | null;
     public categoryName!: string | null;
+    /**
+     * @deprecated Prefer transfer-level container fields on TransferWithItemDetailsDTO.
+     * Kept for backward compatibility.
+     */
     @Type(() => ItemContainer) public container!: ItemContainer | null;
     @Type(() => Date) public createdDate!: Date;
     @Type(() => Date) public editedDate!: Date;
@@ -23,17 +28,26 @@ export class TransferWithItemDetailsDTO {
     public receiptId!: number | null;
     public quantity!: number;
     public unitPrice!: number;
+    public containerName!: string | null;
+    public containerWeight!: number | null;
+    public containerWeightUnit!: Unit | null;
+    public containerVolume!: number | null;
+    public containerVolumeUnit!: Unit | null;
     @Type(() => Date) public date!: Date;
 }
 
 export class ItemContainer {
+    /** @deprecated Prefer transfer-level container fields */
     public size?: number;
-    public unit!: string;
+    /** @deprecated Prefer transfer-level container fields */
+    public unit!: Unit | null;
 }
 
 export class AdvancedItemContainer {
+    public id?: number;
+    public name?: string | null;
     public weight?: number;
-    public weightUnit?: string;
+    public weightUnit?: Unit;
     public volume?: number;
-    public volumeUnit?: string;
+    public volumeUnit?: Unit;
 }

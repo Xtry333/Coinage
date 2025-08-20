@@ -4,8 +4,10 @@ $borderColor: #5d5d5d;
     padding: 0;
     display: flex;
     list-style: none;
+
     li {
         padding: 5px;
+
         + ::before {
             margin-right: 5px;
             content: '>';
@@ -46,12 +48,13 @@ $borderColor: #5d5d5d;
         }
 
         .ng-arrow {
-            border-color: #444444 transparent transparent;
+            border-color: #444 transparent transparent;
         }
 
         .ng-input {
             padding: 10px;
             top: 0;
+
             input {
                 font-size: 16px;
             }
@@ -59,12 +62,15 @@ $borderColor: #5d5d5d;
 
         .ng-dropdown-panel {
             border-color: $borderColor;
+
             &.ng-select-bottom {
                 border-top-color: #b8b8b8;
             }
+
             &.ng-select-top {
                 border-bottom-color: #b8b8b8;
             }
+
             .ng-dropdown-panel-items {
                 max-height: 300px;
 

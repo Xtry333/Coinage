@@ -6,14 +6,19 @@
         <div class="filter-popup" [ngClass]="popupSideClass">
             <form (ngSubmit)="onPerformFilter()">
                 @if (filterValue.filterType === FilterType.TextBox) {
-                    <div>
+                    <div class="textbox-with-buttons" style="display:flex;gap:6px;align-items:center;">
                         <input
                             #autofocusedFilterInput
                             list="filterInputValues"
                             name="filterValue"
+                            class="form-control"
                             [(ngModel)]="filterValue.value"
                             [autocomplete]="filterDataProvided ? 'off' : ''"
                         />
+                        <div class="inline-filter-buttons">
+                            <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
+                            <button type="reset" class="btn btn-outline-secondary btn-sm" (click)="onClear()">Clear</button>
+                        </div>
                         @if (filterDataProvided) {
                             <datalist id="filterInputValues">
                                 @for (opt of datalist; track opt) {
@@ -28,13 +33,14 @@
                         <input
                             #autofocusedFilterInput
                             name="filterRangeFrom"
+                            class="form-control"
                             type="number"
                             min="0"
                             [max]="filterValue.range.to ?? 0"
                             [(ngModel)]="filterValue.range.from"
                             autocomplete="off"
                         />
-                        <input name="filterRangeTo" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
+                        <input name="filterRangeTo" class="form-control" type="number" [min]="filterValue.range.from ?? 0" [(ngModel)]="filterValue.range.to" autocomplete="off" />
                     </div>
                 }
                 @if (filterValue.filterType === FilterType.DateRange) {
@@ -42,12 +48,13 @@
                         <input
                             #autofocusedFilterInput
                             name="filterDateFrom"
+                            class="form-control"
                             type="date"
                             [(ngModel)]="filterValue.range.from"
                             autocomplete="off"
                             (change)="onChangeFilterRangeFrom()"
                         />
-                        <input name="filterDateTo" type="date" [(ngModel)]="filterValue.range.to" autocomplete="off" (change)="onChangeFilterRangeTo()" />
+                        <input name="filterDateTo" class="form-control" type="date" [(ngModel)]="filterValue.range.to" autocomplete="off" (change)="onChangeFilterRangeTo()" />
                     </div>
                 }
                 @if (filterValue.filterType === FilterType.MultiCheckbox) {
@@ -57,7 +64,7 @@
                                 <input
                                     #autofocusedFilterInput
                                     name="optionSearch"
-                                    class="filter-option-search-value"
+                                    class="form-control filter-option-search-value"
                                     [ngModel]="optionSearchValue"
                                     (ngModelChange)="onChangeOptionSearchValue($event)"
                                     autocomplete="off"
@@ -93,10 +100,12 @@
                         </div>
                     </div>
                 }
-                <div class="filter-buttons">
-                    <button type="submit">Apply</button>
-                    <button type="reset" (click)="onClear()">Clear</button>
-                </div>
+                @if (filterValue.filterType !== FilterType.TextBox) {
+                    <div class="filter-buttons">
+                        <button type="submit" class="btn btn-outline-secondary btn-sm">Apply</button>
+                        <button type="reset" class="btn btn-outline-secondary btn-sm" (click)="onClear()">Clear</button>
+                    </div>
+                }
             </form>
         </div>
     }

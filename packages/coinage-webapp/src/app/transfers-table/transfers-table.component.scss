@@ -1,53 +1,198 @@
 div.transfers-table-container {
-    // width: 60%;
     max-width: 1000px;
     margin: auto;
-    margin-top: 35px;
+    margin-top: 24px;
+    padding: 0 16px;
+    
+    .header-filters-container {
+        background: white;
+        border: 1px solid #d1d1d1;
+        border-radius: 8px;
+        padding: 12px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 3px rgb(0, 0, 0, 10%);
+        
+        > div {
+            display: inline-flex;
+            align-items: center;
+            margin-right: 20px;
+            margin-bottom: 8px;
+            
+            input[type="checkbox"] {
+                margin-right: 8px;
+                transform: scale(1.1);
+            }
+            
+            label {
+                margin-bottom: 0;
+                font-weight: 500;
+                cursor: pointer;
+            }
+        }
+    }
+    
     table.transfers-table {
         width: 100%;
-        border-collapse: collapse;
+        border-collapse: separate;
+        border-spacing: 0;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
+        overflow: hidden;
+        
         caption {
-            font-weight: bold;
+            font-weight: 600;
             font-size: 20px;
-            padding: 5px;
+            padding: 16px;
+            text-align: center;
+            caption-side: top;
+            background: #f8f9fa;
+            border: 1px solid #d1d1d1;
+            border-bottom: 1px solid #d1d1d1;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            margin: 0;
         }
 
         thead tr {
-            background-color: rgb(225, 225, 225);
-            border: gray 2px solid;
+            background-color: #f8f9fa;
+            
             th {
-                padding: 15px;
+                padding: 12px 16px;
                 white-space: nowrap;
+                font-weight: 600;
+                border-right: 1px solid #e9ecef;
+                border-bottom: 1px solid #d1d1d1;
+                border-left: 1px solid #d1d1d1;
+                border-top: 1px solid #d1d1d1;
+                
+                span {
+                    display: inline-block;
+                    margin-right: 4px;
+                }
+                
+                &:first-child {
+                    border-left: 1px solid #d1d1d1;
+                }
+                
+                &:last-child {
+                    border-right: 1px solid #d1d1d1;
+                }
+            }
+        }
+        
+        // When there's no caption, header row should have top corners
+        thead:first-child tr:first-child {
+            th {
+                &:first-child {
+                    border-top-left-radius: 8px;
+                }
+                
+                &:last-child {
+                    border-top-right-radius: 8px;
+                }
+            }
+        }
+        
+        // When caption exists, header has no top corners
+        caption + thead tr:first-child {
+            th {
+                border-top: none;
+                
+                &:first-child {
+                    border-top-left-radius: 0;
+                }
+                
+                &:last-child {
+                    border-top-right-radius: 0;
+                }
             }
         }
 
         tr.sum-row {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            
             &.top-border {
-                border-top: gray 2px solid;
+                td {
+                    border-top: 3px solid #d1d1d1 !important;
+                }
             }
-            background-color: rgb(225, 225, 225);
-            font-weight: bold;
         }
 
         tr.today-marker-row {
-            border-bottom: #65aafa 2px solid;
-            height: 0px;
+            border-bottom: 2px solid #0d6efd;
+            height: 0;
         }
 
-        tbody tr.transfer-row:nth-child(even) {
-            background-color: rgb(240, 240, 240);
+        tbody tr.transfer-row {
+            border-bottom: 1px solid #e9ecef;
+            transition: background-color 0.15s ease;
+            
+            &:hover {
+                background-color: #f8f9fa;
+            }
+            
+            &:nth-child(even) {
+                background-color: #fdfdfe;
+            }
+            
+            &:last-child {
+                border-bottom: none;
+            }
         }
 
+        // General tbody row styling (including no-data rows)
+        tbody tr {
+            &:last-child {
+                td {
+                    border-bottom: 1px solid #d1d1d1;
+                    
+                    &:first-child {
+                        border-bottom-left-radius: 8px;
+                    }
+                    
+                    &:last-child {
+                        border-bottom-right-radius: 8px;
+                    }
+                }
+            }
+        }
+        
         td {
-            padding: 5px 10px;
+            padding: 12px 16px;
+            border-right: 1px solid #e9ecef;
+            border-left: 1px solid #d1d1d1;
+            vertical-align: middle;
+            
+            &:first-child {
+                border-left: 1px solid #d1d1d1;
+            }
+            
+            &:last-child {
+                border-right: 1px solid #d1d1d1;
+            }
+            
             &.currency {
                 text-align: right;
+                font-variant-numeric: tabular-nums;
             }
+            
             &.month-name {
                 text-transform: capitalize;
             }
+            
             &.nowrap {
                 white-space: nowrap;
+            }
+            
+            a {
+                color: #0d6efd;
+                text-decoration: none;
+                
+                &:hover {
+                    text-decoration: underline;
+                }
             }
         }
 
@@ -58,12 +203,13 @@ div.transfers-table-container {
         .align-right {
             text-align: right;
         }
-    }
-
-    .header-filters-container {
-        > div {
-            display: inline;
-            margin-left: 10px;
+        
+        .planned-icon {
+            margin-left: 8px;
+            
+            fa-icon {
+                color: #6c757d;
+            }
         }
     }
 }

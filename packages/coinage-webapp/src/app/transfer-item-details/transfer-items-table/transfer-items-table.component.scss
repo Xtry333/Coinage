@@ -3,9 +3,11 @@ div.transfer-items-table-container {
     max-width: 1000px;
     margin: auto;
     margin-top: 35px;
+
     table.transfer-items-table {
         width: 100%;
         border-collapse: collapse;
+
         caption {
             font-weight: bold;
             font-size: 20px;
@@ -15,6 +17,7 @@ div.transfer-items-table-container {
         thead tr {
             background-color: rgb(225, 225, 225);
             border: gray 2px solid;
+
             th {
                 padding: 15px;
                 white-space: nowrap;
@@ -25,6 +28,7 @@ div.transfer-items-table-container {
             &.top-border {
                 border-top: gray 2px solid;
             }
+
             background-color: rgb(225, 225, 225);
             font-weight: bold;
         }
@@ -40,12 +44,15 @@ div.transfer-items-table-container {
 
         td {
             padding: 10px 15px;
+
             &.currency {
                 text-align: right;
             }
+
             &.month-name {
                 text-transform: capitalize;
             }
+
             &.nowrap {
                 white-space: nowrap;
             }
