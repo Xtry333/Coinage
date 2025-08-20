@@ -6,10 +6,10 @@ $enable-shadows: true;
 
 // $prefix: 'mo-';
 
-
 /* Keep Bootstrap imports after Tailwind base so Bootstrap utilities can override where needed */
 @import 'bootstrap/scss/bootstrap';
 @import 'node_modules/bootstrap-icons/font/bootstrap-icons';
+@import '~@ng-select/ng-select/themes/default.theme.css';
 
 // @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
 @import 'bootstrap';
@@ -168,8 +168,6 @@ body {
 .w-inherit {
     width: inherit;
 }
-
-@import '~@ng-select/ng-select/themes/default.theme.css';
 
 .ng-select {
     .ng-select-container {

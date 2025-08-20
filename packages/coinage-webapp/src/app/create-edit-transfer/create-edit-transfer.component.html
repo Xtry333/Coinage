@@ -5,16 +5,16 @@
                 <div class="transaction-form">
                     <div>
                         <label for="description">Description</label>
-                        <input id="description" name="description" [(ngModel)]="selectedTransferInputs.description" minlength="3" required />
+                        <input id="description" [(ngModel)]="selectedTransferInputs.description" name="description" type="text" minlength="3" required />
                     </div>
                     <div>
                         <label for="amount">Price</label>
                         <input
                             id="amount"
-                            name="amount"
-                            type="number"
                             [(ngModel)]="selectedTransferInputs.amount"
                             [min]="0"
+                            name="amount"
+                            type="number"
                             step=".01"
                             required
                             autocomplete="off"
@@ -24,18 +24,18 @@
                         <label for="category">Category</label>
                         <ng-select
                             #categorySelect
-                            name="category"
-                            labelForId="category"
                             [(ngModel)]="selectedTransferInputs.categoryId"
                             [clearable]="false"
                             [required]="true"
                             [editableSearchTerm]="true"
                             [items]="categories"
+                            [addTag]="onAddNewCategory.bind(this)"
+                            (change)="onChangeCategory()"
+                            name="category"
+                            labelForId="category"
                             bindValue="id"
                             bindLabel="name"
-                            [addTag]="onAddNewCategory.bind(this)"
                             addTagText="Add category"
-                            (change)="onChangeCategory()"
                         >
                         </ng-select>
                     </div>
@@ -43,15 +43,15 @@
                         <label for="contractor">Contractor</label>
                         <ng-select
                             #contractorSelect
-                            name="contractor"
-                            labelForId="contractor"
                             [(ngModel)]="selectedTransferInputs.contractorId"
                             [clearable]="true"
                             [editableSearchTerm]="true"
                             [items]="contractors"
+                            [addTag]="onAddNewContractor.bind(this)"
+                            name="contractor"
+                            labelForId="contractor"
                             bindValue="id"
                             bindLabel="name"
-                            [addTag]="onAddNewContractor.bind(this)"
                             addTagText="Add contractor"
                         >
                         </ng-select>
@@ -59,12 +59,12 @@
                     <div>
                         <label for="account">Virtual Account</label>
                         <ng-select
-                            name="account"
-                            labelForId="account"
                             [(ngModel)]="selectedTransferInputs.accountId"
                             [clearable]="false"
                             [editableSearchTerm]="true"
                             [items]="accounts"
+                            name="account"
+                            labelForId="account"
                             bindValue="id"
                             bindLabel="name"
                         >
@@ -73,12 +73,12 @@
                     <div>
                         <label for="targetAccount">Target Account</label>
                         <ng-select
-                            name="targetAccount"
-                            labelForId="targetAccount"
                             [(ngModel)]="selectedTransferInputs.targetAccountId"
                             [clearable]="false"
                             [editableSearchTerm]="true"
                             [items]="accounts"
+                            name="targetAccount"
+                            labelForId="targetAccount"
                             bindValue="id"
                             bindLabel="name"
                         >
@@ -86,7 +86,7 @@
                     </div>
                     <div>
                         <label for="date">Date</label>
-                        <input id="date" name="date" type="date" [(ngModel)]="selectedTransferInputs.date" />
+                        <input id="date" [(ngModel)]="selectedTransferInputs.date" name="date" type="date" />
                     </div>
                     <button type="submit">
                         @if (editMode) {
@@ -115,12 +115,12 @@
             @if (shouldDisplayShoppingList) {
                 <div class="v-divider">
                     <app-item-shopping-list
-                        (totalCostChanged)="onTotalCostChanged($event)"
-                        (itemListChanged)="onItemListChanged($event)"
                         [selectedCategoryId]="selectedTransferInputs.categoryId ?? null"
                         [preselectedItems]="itemsInTransfer"
+                        (totalCostChanged)="onTotalCostChanged($event)"
+                        (itemListChanged)="onItemListChanged($event)"
                     ></app-item-shopping-list>
-                    <input id="overrideTotalCostOnChange" type="checkbox" [(ngModel)]="shouldOverrideTotalCostOnChange" />
+                    <input id="overrideTotalCostOnChange" [(ngModel)]="shouldOverrideTotalCostOnChange" type="checkbox" />
                     <label for="overrideTotalCostOnChange">Override Total Cost On Item Change</label>
                 </div>
             }
