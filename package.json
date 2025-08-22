@@ -18,8 +18,8 @@
         "build:api": "ng build coinage-api --prod",
         "build:webapp": "ng build coinage-webapp --prod",
         "build:docker": "run-s docker:build-api docker:build-webapp",
-        "docker:build-api": "docker image build -t coinage-api -f api.Dockerfile .",
-        "docker:build-webapp": "docker image build -t coinage-webapp -f webapp.Dockerfile .",
+        "docker:build-api": "docker image build -t coinage-api -f docker/api.Dockerfile .",
+        "docker:build-webapp": "docker image build -t coinage-webapp -f docker/webapp.Dockerfile .",
         "docker:up": "docker-compose up -d",
         "docker:down": "docker-compose down",
         "test": "run-s test:api test:webapp",
@@ -178,7 +178,7 @@
         "ora": "5.4.1"
     },
     "engines": {
-        "node": ">=18.0.0",
+        "node": ">=22.18.0",
         "yarn": ">=3.3.1"
     }
 }

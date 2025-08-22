@@ -47,8 +47,8 @@ Run from repository root:
 
 ### Docker
 
-- `yarn docker:build-api` - Build API Docker image
-- `yarn docker:build-webapp` - Build webapp Docker image
+- `yarn docker:build-api` - Build API Docker image (docker/api.Dockerfile)
+- `yarn docker:build-webapp` - Build webapp Docker image (docker/webapp.Dockerfile)
 - `yarn docker:up` - Start docker-compose services
 - `yarn docker:down` - Stop docker-compose services
 
@@ -75,9 +75,9 @@ Run from repository root:
 
 ### Frontend (coinage-webapp)
 
-- Angular application with standalone: false components
+- Angular v20 application with standalone: false components
 - WebSocket client using ngx-socket-io
-- Styling: SCSS with Bootstrap 5 and custom styles
+- Styling: SCSS with Tailwind CSS (migrated from Bootstrap)
 - Charts: ng2-charts with Chart.js
 - Proxy configuration: `packages/coinage-webapp/proxy.conf.json`
 
@@ -137,6 +137,14 @@ Required environment variables for API:
 - `MYSQL_PASSWORD` - Database password
 - `MYSQL_DATABASE` - Database name
 - `COINAGE_MYSQL_PORT` - Database port (default: 3306)
+
+## Dependencies & Versions
+
+- **Node.js**: >=18.0.0 (current: v20.1.0)
+- **Yarn**: >=3.3.1 (current: 3.3.1)
+- **Angular**: v20.1.6
+- **NestJS**: v10.4.1
+- **TypeORM**: v0.3.20
 
 ## Maintenance
 
