@@ -77,7 +77,7 @@ Run from repository root:
 
 - Angular v20 application with standalone: false components
 - WebSocket client using ngx-socket-io
-- Styling: SCSS with Tailwind CSS (migrated from Bootstrap)
+- Styling: SCSS with Tailwind CSS v3 (migrated from Bootstrap)
 - Charts: ng2-charts with Chart.js
 - Proxy configuration: `packages/coinage-webapp/proxy.conf.json`
 
