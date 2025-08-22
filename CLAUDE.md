@@ -126,7 +126,7 @@ Run from repository root:
 
 ## Project Planning & Roadmap
 
-- `roadmap.md` - Detailed roadmap with planned features, UI improvements, and technical enhancements
+- `roadmap.md` - Detailed roadmap with planned features, UI improvements, and technical enhancements (@roadmap.md)
 
 ## Environment Setup
 
