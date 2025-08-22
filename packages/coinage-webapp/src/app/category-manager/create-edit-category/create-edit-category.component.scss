@@ -16,11 +16,13 @@
 
     textarea {
         min-height: 80px;
-        font: 13.3333px Arial;
+        font:
+            13.3333px Arial,
+            sans-serif;
     }
 
     .ng-select ::ng-deep {
-        $borderColor: #5d5d5d;
+        $border-color: #5d5d5d;
 
         height: 40px;
         width: 300px;
@@ -29,7 +31,7 @@
         .ng-select-container {
             height: 40px;
             border-radius: 2px;
-            border-color: $borderColor;
+            border-color: $border-color;
         }
 
         .ng-arrow {
@@ -41,12 +43,14 @@
             top: 0;
 
             input {
-                font: 13.3333px Arial;
+                font:
+                    13.3333px Arial,
+                    sans-serif;
             }
         }
 
         .ng-dropdown-panel {
-            border-color: $borderColor;
+            border-color: $border-color;
 
             &.ng-select-bottom {
                 border-top-color: #b8b8b8;

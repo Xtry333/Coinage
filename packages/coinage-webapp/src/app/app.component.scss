@@ -1,3 +1,5 @@
+@use 'sass:color';
+
 /*
  * Remove template code below
  */
@@ -73,7 +75,7 @@ nav {
             }
 
             &:hover {
-                background-color: lighten($color: #3a3a3a, $amount: 5);
+                background-color: color.adjust(#3a3a3a, $lightness: 5%);
             }
         }
     }
