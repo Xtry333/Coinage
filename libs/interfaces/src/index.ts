@@ -2,6 +2,7 @@ export * from './lib/AccountDetailsDTO.response';
 export * from './lib/BalanceDTO.response';
 export * from './lib/BaseResponseDTO.response';
 export * from './lib/CategoryDTO.response';
+export * from './lib/ContainerDTO.response';
 export * from './lib/ContractorDTO';
 export * from './lib/CreateEditCategoryDTO.request';
 export * from './lib/CreateEditContractorDTO.request';

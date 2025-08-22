@@ -4,12 +4,12 @@ import { IconDefinition } from '@fortawesome/fontawesome-common-types';
 import { faClock, faFeatherAlt, faReceipt, faReply } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
 
-import { CategoryDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
+import { CategoryDTO, ContainerDTO, SplitTransferDTO, TransferDetailsDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 
-import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorService } from '../app-routing/navigator.service';
-import { NotificationService } from '../services/notification.service';
 import { CoinageRoutes } from '../app-routing/app-routes';
+import { NavigatorService } from '../app-routing/navigator.service';
+import { CoinageDataService } from '../services/coinage.data-service';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
     selector: 'app-transfer-details',
@@ -32,6 +32,7 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
     public routeSubscription!: Rx.Subscription;
 
     public categories: CategoryDTO[] = [];
+    public containers: ContainerDTO[] = [];
 
     public constructor(
         private readonly route: ActivatedRoute,
@@ -58,10 +59,10 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
     }
 
     private loadTransferDetails(id: number): void {
-        this.coinageData
-            .getTransferDetails(id)
-            .then((transfer) => {
+        Promise.all([this.coinageData.getTransferDetails(id), Rx.lastValueFrom(this.coinageData.getContainerList())])
+            .then(([transfer, containers]) => {
                 this.transfer = transfer;
+                this.containers = containers;
                 this.totalPaymentToContractor =
                     // transfer.amount * TransferType[transfer.type].mathSymbol +
                     transfer.otherTransfers

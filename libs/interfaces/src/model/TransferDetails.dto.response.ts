@@ -1,7 +1,7 @@
 import { AccountDTO, CategoryPathDTO, ReceiptDTO } from '../lib/interfaces';
 
-import { TransferDTO } from '../lib/FilteredTransferDTO.response';
 import { Type } from 'class-transformer';
+import { TransferDTO } from '../lib/FilteredTransferDTO.response';
 
 export class TransferItemDTO {
     // public constructor(transferItem: TransferItemDTO) {
@@ -19,6 +19,7 @@ export class TransferItemDTO {
     public unitPrice!: number;
     public totalPrice!: number;
     public setDiscount!: number;
+    public containerId?: number | null;
 }
 
 export class TransferDetailsDTO {

@@ -8,23 +8,24 @@ import {
     BalanceDTO,
     BaseResponseDTO,
     CategoryDTO,
+    ContainerDTO,
     ContractorDTO,
     CreateEditCategoryDTO,
     CreateEditContractorDTO,
+    CreateEditItemDTO,
     CreateEditTransferModelDTO,
+    CreateMultipleTransfersDTO,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
+    ItemDetailsDTO,
+    ItemWithLastUsedPriceDTO,
+    NewMonthlyUserStatsDTO,
     ReceiptDetailsDTO,
     RefundTransferDTO,
     SplitTransferDTO,
     TotalInMonthByCategory,
     TransferDTO,
     TransferDetailsDTO,
-    ItemWithLastUsedPriceDTO,
-    CreateEditItemDTO,
-    ItemDetailsDTO,
-    NewMonthlyUserStatsDTO,
-    CreateMultipleTransfersDTO,
 } from '@app/interfaces';
 
 @Injectable({
@@ -112,6 +113,10 @@ export class CoinageDataService {
 
     public getContractorList(): Observable<ContractorDTO[]> {
         return this.http.get<ContractorDTO[]>(`${CoinageDataService.API_URL}contractor/list`);
+    }
+
+    public getContainerList(): Observable<ContainerDTO[]> {
+        return this.http.get<ContainerDTO[]>(`${CoinageDataService.API_URL}containers`);
     }
 
     public getAllAvailableAccounts(): Observable<AccountDTO[]> {

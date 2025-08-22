@@ -1,5 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { CreateEditItemDTO, ItemDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { ContainerDTO, CreateEditItemDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { CoinageDataService } from '../../services/coinage.data-service';
@@ -21,11 +21,19 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
 
     @Input() public selectedCategoryId: number | null = null;
     @Input() public preselectedItems: ShoppingListItem[] = [];
+    @Input() public containers: ContainerDTO[] = [];
+
+    public get containersWithDisplayNames(): (ContainerDTO & { displayName: string })[] {
+        return this.containers.map((container) => ({
+            ...container,
+            displayName: this.getContainerDisplayName(container),
+        }));
+    }
 
     @Output() public itemListChanged = new EventEmitter<ShoppingListItem[]>();
     @Output() public totalCostChanged = new EventEmitter<number>();
 
-    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0, 0);
+    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0, 0, null);
     public itemList: ShoppingListItem[] = [];
 
     public constructor(
@@ -57,6 +65,52 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
 
     public get itemsLoaded(): boolean {
         return this.allItems.length > 0;
+    }
+
+    public getContainerDetails(containerId: number | null | undefined): string {
+        if (!containerId) return '';
+
+        const container = this.containers.find((c) => c.id === containerId);
+        if (!container) return '';
+
+        const parts: string[] = [];
+
+        if (container.name) {
+            parts.push(container.name);
+        }
+
+        if (container.weight && container.weightUnit) {
+            parts.push(`${container.weight}${container.weightUnit}`);
+        }
+
+        if (container.volume && container.volumeUnit) {
+            parts.push(`${container.volume}${container.volumeUnit}`);
+        }
+
+        return parts.length > 0 ? ` [${parts.join(', ')}]` : '';
+    }
+
+    public getContainerDisplayName(container: ContainerDTO): string {
+        const parts: string[] = [];
+
+        if (container.name) {
+            parts.push(container.name);
+        }
+
+        const specs: string[] = [];
+        if (container.weight && container.weightUnit) {
+            specs.push(`${container.weight}${container.weightUnit}`);
+        }
+
+        if (container.volume && container.volumeUnit) {
+            specs.push(`${container.volume}${container.volumeUnit}`);
+        }
+
+        if (specs.length > 0) {
+            parts.push(`(${specs.join(', ')})`);
+        }
+
+        return parts.join(' ');
     }
 
     private filterItems(): void {

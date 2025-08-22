@@ -50,8 +50,8 @@
                         >
                         </ng-select>
                     </div>
-                    <div>
-                        <label for="contractor">Contractor</label>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="contractor">Contractor</label>
                         <ng-select
                             #contractorSelect
                             [(ngModel)]="selectedTransferInputs.contractorId"
@@ -67,8 +67,8 @@
                         >
                         </ng-select>
                     </div>
-                    <div>
-                        <label for="account">Virtual Account</label>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="account">Virtual Account</label>
                         <ng-select
                             [(ngModel)]="selectedTransferInputs.accountId"
                             [clearable]="false"
@@ -81,8 +81,8 @@
                         >
                         </ng-select>
                     </div>
-                    <div>
-                        <label for="targetAccount">Target Account</label>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="targetAccount">Target Account</label>
                         <ng-select
                             [(ngModel)]="selectedTransferInputs.targetAccountId"
                             [clearable]="false"
@@ -95,9 +95,16 @@
                         >
                         </ng-select>
                     </div>
-                    <div>
-                        <label for="date">Date</label>
-                        <input id="date" [(ngModel)]="selectedTransferInputs.date" name="date" type="date" />
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="date">Date</label>
+                        <input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            id="date"
+                            [(ngModel)]="selectedTransferInputs.date"
+                            name="date"
+                            type="date"
+                            required
+                        />
                     </div>
                 </div>
 
@@ -144,23 +151,39 @@
 
         <!-- Shopping List Section -->
         @if (!shouldDisplayShoppingList) {
-            <div class="mt-6">
-                <button
-                    class="inline-flex items-center rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 transition-colors duration-200 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                    (click)="openShoppingList()"
-                >
-                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                    </svg>
-                    Add Items to Transfer
-                </button>
-            </div>
+            <app-section class="mt-6" header="Transfer Items">
+                <div class="py-4 text-center">
+                    <div class="mb-4">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                            ></path>
+                        </svg>
+                    </div>
+                    <h3 class="mb-2 text-sm font-medium text-gray-900">No items added yet</h3>
+                    <p class="mb-6 text-sm text-gray-500">Add individual items with quantities and prices to create a detailed itemized transfer.</p>
+                    <button
+                        class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        (click)="openShoppingList()"
+                        type="button"
+                    >
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        Add Itemized Details
+                    </button>
+                </div>
+            </app-section>
         }
         @if (shouldDisplayShoppingList) {
             <app-section class="mt-6" header="Transfer Items">
                 <app-item-shopping-list
                     [selectedCategoryId]="selectedTransferInputs.categoryId ?? null"
                     [preselectedItems]="itemsInTransfer"
+                    [containers]="containers"
                     (totalCostChanged)="onTotalCostChanged($event)"
                     (itemListChanged)="onItemListChanged($event)"
                 ></app-item-shopping-list>

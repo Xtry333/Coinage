@@ -1,9 +1,9 @@
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
-import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
+import { Container } from './Container.entity';
 import { Item } from './Item.entity';
 import { Transfer } from './Transfer.entity';
-import { Container } from './Container.entity';
+import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 
 @Entity()
 export class TransferItem {
@@ -37,7 +37,7 @@ export class TransferItem {
     public item!: Item;
 
     @Column({ nullable: true })
-    public containerId!: number;
+    public containerId!: number | null;
 
     @ManyToOne(() => Container, { eager: true, nullable: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
     @JoinColumn({ name: 'container_id' })

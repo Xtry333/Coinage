@@ -11,6 +11,7 @@ import { AddContainerTable1745336625326 } from './1745336625326-AddContainerTabl
 import { AddItemsWithContainersView1745754622461 } from './1745754622461-AddItemsWithContainersView';
 import { AddItemCount1751894045445 } from './1751894045445-AddItemCount';
 import { AdjustItemView1754863716132 } from './1754863716132-migration';
+import { UpdateContainersView1755864881273 } from './1755864881273-UpdateContainersView';
 
 export default [
     CreateTables1000000000000,
@@ -25,5 +26,6 @@ export default [
     AddContainerTable1745336625326,
     AddItemsWithContainersView1745754622461,
     AddItemCount1751894045445,
-    AdjustItemView1754863716132
+    AdjustItemView1754863716132,
+    UpdateContainersView1755864881273,
 ];

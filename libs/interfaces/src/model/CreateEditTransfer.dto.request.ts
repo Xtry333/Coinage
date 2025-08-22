@@ -1,5 +1,5 @@
-import { IsDate, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 import { Type } from 'class-transformer';
+import { IsDate, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class ShoppingListItem {
     public constructor(
@@ -10,6 +10,7 @@ export class ShoppingListItem {
         public totalPrice: number,
         public setDiscount: number | undefined,
         public categoryId: number | null,
+        public containerId?: number | null,
     ) {}
 }
 

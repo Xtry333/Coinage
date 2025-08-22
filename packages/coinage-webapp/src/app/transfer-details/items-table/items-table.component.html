@@ -18,6 +18,7 @@
                         >
                             {{ item.itemName }}
                         </a>
+                        <span class="text-xs italic text-gray-500">{{ getContainerDetails(item.containerId) }}</span>
                     </td>
                     <td class="px-4 py-3 text-right font-mono text-sm text-gray-900">{{ item.unitPrice | plnCurrency }}</td>
                     <td class="px-4 py-3 text-right text-sm text-gray-900">{{ item.amount }}</td>

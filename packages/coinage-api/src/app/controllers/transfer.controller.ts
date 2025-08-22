@@ -2,14 +2,14 @@ import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, 
 
 import {
     BaseResponseDTO,
+    CreateEditTransferModelDTO,
+    CreateMultipleTransfersDTO,
     ReceiptDTO,
     RefundTransferDTO,
     SplitTransferDTO,
     TransferDetailsDTO,
     TransferDTO,
-    CreateEditTransferModelDTO,
     TransferType,
-    CreateMultipleTransfersDTO,
 } from '@app/interfaces';
 
 import { AccountDao } from '../daos/account.dao';
@@ -26,8 +26,8 @@ import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { ItemsService } from '../services/items.service';
 import { TransferItemsService } from '../services/transfer-items.service';
-import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 import { TransfersService } from '../services/transfers.service';
+import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfer')
@@ -131,6 +131,7 @@ export class TransferController {
                     unitPrice: item.unitPrice,
                     totalPrice: item.totalSetPrice,
                     setDiscount: item.totalSetDiscount,
+                    containerId: item.containerId,
                 };
             }),
             isPlanned: transfer.date > new Date(),
@@ -313,6 +314,7 @@ export class TransferController {
                 transferItem.quantity = item.amount;
                 transferItem.transferId = inserted.id;
                 transferItem.unitPrice = item.price;
+                transferItem.containerId = item.containerId ?? null;
                 transferItems.push(transferItem);
                 await this.transferItemsService.save(transferItem);
             }

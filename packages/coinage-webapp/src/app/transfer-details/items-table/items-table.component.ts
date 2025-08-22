@@ -1,5 +1,5 @@
 import { Component, Input, OnChanges } from '@angular/core';
-import { TransferItemDTO } from '@app/interfaces';
+import { ContainerDTO, TransferItemDTO } from '@app/interfaces';
 import { CoinageRoutes } from '../../app-routing/app-routes';
 
 export class UiTransferItemDTO extends TransferItemDTO {
@@ -13,6 +13,7 @@ export class UiTransferItemDTO extends TransferItemDTO {
         this.amount = transferItem.amount;
         this.totalPrice = transferItem.totalPrice;
         this.setDiscount = transferItem.setDiscount;
+        this.containerId = transferItem.containerId;
     }
 }
 
@@ -26,6 +27,7 @@ export class ItemsTableComponent implements OnChanges {
     public readonly CoinageRoutes = CoinageRoutes;
 
     @Input() public items: TransferItemDTO[] = [];
+    @Input() public containers: ContainerDTO[] = [];
 
     public tableItems: UiTransferItemDTO[] = [];
     public totalSum = 0;
@@ -45,5 +47,28 @@ export class ItemsTableComponent implements OnChanges {
 
     public get noRowsFound(): boolean {
         return this.tableItems.length === 0;
+    }
+
+    public getContainerDetails(containerId: number | null | undefined): string {
+        if (!containerId) return '';
+
+        const container = this.containers.find((c) => c.id === containerId);
+        if (!container) return '';
+
+        const parts: string[] = [];
+
+        if (container.name) {
+            parts.push(container.name);
+        }
+
+        if (container.weight && container.weightUnit) {
+            parts.push(`${container.weight}${container.weightUnit}`);
+        }
+
+        if (container.volume && container.volumeUnit) {
+            parts.push(`${container.volume}${container.volumeUnit}`);
+        }
+
+        return parts.length > 0 ? ` [${parts.join(', ')}]` : '';
     }
 }

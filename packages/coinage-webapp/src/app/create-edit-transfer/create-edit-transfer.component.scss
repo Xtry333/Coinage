@@ -80,39 +80,10 @@ form {
         flex-direction: column;
         gap: 6px;
 
-        label {
-            font-weight: 600;
-            color: #495057;
-            font-size: 14px;
-            margin-bottom: 0;
-        }
+        // Labels now use Tailwind classes for consistent styling
     }
 
-    input[type='text'],
-    input[type='number'],
-    input[type='date'] {
-        height: 38px;
-        padding: 8px 12px;
-        border-radius: 6px;
-        border: 1px solid #d1d1d1;
-        background: white;
-        transition:
-            border-color 0.15s ease,
-            box-shadow 0.15s ease;
-        font-size: 14px;
-        color: #495057;
-
-        &:focus {
-            outline: none;
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 3px rgb(13 110 253 / 25%);
-        }
-
-        &:invalid {
-            border-color: #dc3545;
-            box-shadow: 0 0 0 3px rgb(220 53 69 / 25%);
-        }
-    }
+    // Form inputs now use Tailwind classes for consistent styling
 
     .ng-select ::ng-deep {
         .ng-select-container {
@@ -191,77 +162,7 @@ form {
         }
     }
 
-    button {
-        height: 42px;
-        padding: 10px 20px;
-        border-radius: 6px;
-        border: 1px solid #d1d1d1;
-        background: #f8f9fa;
-        color: #495057;
-        font-weight: 500;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.15s ease;
-        margin-top: 8px;
-
-        &[type='submit'] {
-            background: #0d6efd;
-            border-color: #0d6efd;
-            color: white;
-
-            &:hover {
-                background: #0b5ed7;
-                border-color: #0a58ca;
-            }
-        }
-
-        &:not([type='submit']) {
-            &:hover {
-                background: #e9ecef;
-                border-color: #adb5bd;
-                color: #212529;
-            }
-        }
-
-        &[type='button']:last-of-type {
-            background: #dc3545;
-            border-color: #dc3545;
-            color: white;
-
-            &:hover {
-                background: #bb2d3b;
-                border-color: #b02a37;
-            }
-        }
-
-        &:active {
-            transform: translateY(1px);
-        }
-    }
+    // Form action buttons now use Tailwind classes, no custom SCSS needed
 }
 
-// Open shopping list button
-button:not(form button) {
-    background: #f8f9fa;
-    border: 1px solid #d1d1d1;
-    border-radius: 6px;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    color: #495057;
-    font-weight: 600;
-
-    &:hover {
-        background: #e9ecef;
-        border-color: #adb5bd;
-        color: #212529;
-    }
-
-    &:active {
-        transform: translateY(1px);
-    }
-}
+// Remove this rule as it conflicts with Tailwind button styling

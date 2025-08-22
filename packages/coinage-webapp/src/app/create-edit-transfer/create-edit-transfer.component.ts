@@ -4,13 +4,22 @@ import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
 
-import { AccountDTO, CategoryDTO, ContractorDTO, CreateEditTransferModelDTO, ShoppingListItem, TransferDetailsDTO, TransferItemDTO } from '@app/interfaces';
+import {
+    AccountDTO,
+    CategoryDTO,
+    ContainerDTO,
+    ContractorDTO,
+    CreateEditTransferModelDTO,
+    ShoppingListItem,
+    TransferDetailsDTO,
+    TransferItemDTO,
+} from '@app/interfaces';
 
+import { CoinageRoutes } from '../app-routing/app-routes';
+import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorService } from '../app-routing/navigator.service';
 import { NotificationService } from '../services/notification.service';
-import { CoinageRoutes } from '../app-routing/app-routes';
 
 export interface NewTransferObject {
     description: string;
@@ -35,6 +44,7 @@ export class CreateEditTransferComponent implements OnInit {
     public totalPayment = 0;
     public categories: CategoryDTO[] = [];
     public contractors: ContractorDTO[] = [];
+    public containers: ContainerDTO[] = [];
     public accounts: AccountDTO[] = [];
     public editMode = false;
     public transferDTO?: TransferDetailsDTO;
@@ -91,15 +101,21 @@ export class CreateEditTransferComponent implements OnInit {
                 });
             }
         });
-        Rx.zip(this.coinageData.getCategoryList(), this.coinageData.getContractorList(), this.coinageData.getAllAvailableAccounts())
+        Rx.zip(
+            this.coinageData.getCategoryList(),
+            this.coinageData.getContractorList(),
+            this.coinageData.getContainerList(),
+            this.coinageData.getAllAvailableAccounts(),
+        )
             .pipe(
                 finalize(() => {
                     this.showPage = true;
                 }),
             )
-            .subscribe(([categories, contractors, accounts]) => {
+            .subscribe(([categories, contractors, containers, accounts]) => {
                 this.categories = categories;
                 this.contractors = contractors;
+                this.containers = containers;
                 this.accounts = accounts;
             });
     }
@@ -252,6 +268,7 @@ export class CreateEditTransferComponent implements OnInit {
                 totalPrice: item.unitPrice * item.amount,
                 setDiscount: undefined,
                 categoryId: 0,
+                containerId: item.containerId,
             };
         });
     }
