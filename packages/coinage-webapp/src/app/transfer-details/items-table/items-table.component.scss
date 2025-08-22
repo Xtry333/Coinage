@@ -1,36 +1,4 @@
-table.items-table {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1px solid #ccc;
-
-    caption {
-        font-weight: bold;
-        font-size: 15px;
-        padding: 5px;
-    }
-
-    tr {
-        border: 1px solid #ccc;
-    }
-
-    thead tr {
-        background-color: rgb(225 225 225);
-
-        th {
-            padding: 10px;
-            white-space: nowrap;
-        }
-    }
-
-    td {
-        padding: 10px 15px;
-
-        &.currency {
-            text-align: right;
-        }
-
-        &.month-name {
-            text-transform: capitalize;
-        }
-    }
+// Styling moved to Tailwind classes in template
+:host {
+    display: block;
 }

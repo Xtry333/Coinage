@@ -1,69 +1,82 @@
 @if (showPage) {
-    <div class="item-details-component">
-        <div class="flex-item ml-2 mt-5">
-            <table class="item-details-table">
-                <caption>
-                    <span>Item Details</span>
-                </caption>
-                <tbody>
+    <main class="min-h-screen bg-gray-50 p-4 sm:ml-auto md:px-4">
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Item Details -->
+            <app-section header="Item Details">
+                <dl class="space-y-4">
                     @if (item.brand) {
-                        <tr>
-                            <th>Brand</th>
-                            <td>
-                                <span>{{ item.brand }}</span>
-                            </td>
-                        </tr>
+                        <div class="flex items-start justify-between">
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">Brand</dt>
+                            <dd class="w-2/3 text-sm text-gray-900">{{ item.brand }}</dd>
+                        </div>
                     }
-                    <tr>
-                        <th>Name</th>
-                        <td>
-                            <span>{{ item.itemName }}</span>
-                        </td>
-                    </tr>
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Name</dt>
+                        <dd class="w-2/3 text-sm font-semibold text-gray-900">{{ item.itemName }}</dd>
+                    </div>
+
                     @if (item.categoryId) {
-                        <tr>
-                            <th>Category</th>
-                            <td>
-                                <span>{{ item.categoryName }}</span>
-                            </td>
-                        </tr>
+                        <div class="flex items-start justify-between">
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">Category</dt>
+                            <dd class="w-2/3 text-sm text-gray-900">
+                                <span class="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-blue-700">
+                                    {{ item.categoryName }}
+                                </span>
+                            </dd>
+                        </div>
                     }
+
                     @if (item.itemContainers && item.itemContainers.length > 0) {
-                        <tr>
-                            <th>Containers used</th>
-                            <td>
-                                @for (c of item.itemContainers; track c.id) {
-                                    @if (c && (c.name || c.weight || c.volume)) {
-                                        <span>
-                                            @if (c.name) {
-                                                <strong>{{ c.name }}</strong>
-                                                @if (c.weight || c.volume) { <span> — </span> }
-                                            }
-                                            @if (c.weight) {
-                                                <span>{{ c.weight }} {{ c.weightUnit }}</span>
-                                            }
-                                            @if (c.weight && c.volume) {
-                                                <span> · </span>
-                                            }
-                                            @if (c.volume) {
-                                                <span>{{ c.volume }} {{ c.volumeUnit }}</span>
-                                            }
-                                        </span><br>
+                        <div class="flex items-start justify-between">
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">Containers used</dt>
+                            <dd class="w-2/3 text-sm text-gray-900">
+                                <div class="space-y-2">
+                                    @for (c of item.itemContainers; track c.id) {
+                                        @if (c && (c.name || c.weight || c.volume)) {
+                                            <div class="inline-flex items-center gap-2 rounded-lg bg-gray-100 px-3 py-1">
+                                                @if (c.name) {
+                                                    <span class="font-medium">{{ c.name }}</span>
+                                                    @if (c.weight || c.volume) {
+                                                        <span class="text-gray-400">—</span>
+                                                    }
+                                                }
+                                                @if (c.weight) {
+                                                    <span class="text-xs text-gray-600">{{ c.weight }} {{ c.weightUnit }}</span>
+                                                }
+                                                @if (c.weight && c.volume) {
+                                                    <span class="text-gray-400">·</span>
+                                                }
+                                                @if (c.volume) {
+                                                    <span class="text-xs text-gray-600">{{ c.volume }} {{ c.volumeUnit }}</span>
+                                                }
+                                            </div>
+                                        }
                                     }
-                                }
-                            </td>
-                        </tr>
+                                </div>
+                            </dd>
+                        </div>
                     } @else if (item.container) {
-                        <tr>
-                            <th>Container</th>
-                            <td>
-                                <span>{{ item.container.size }} {{ item.container.unit }}</span>
-                            </td>
-                        </tr>
+                        <div class="flex items-start justify-between">
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">Container</dt>
+                            <dd class="w-2/3 text-sm text-gray-900">
+                                <span class="inline-flex items-center rounded-lg bg-gray-100 px-3 py-1">
+                                    <span class="font-medium">{{ item.container.size }} {{ item.container.unit }}</span>
+                                </span>
+                            </dd>
+                        </div>
                     }
-                </tbody>
-            </table>
+                </dl>
+            </app-section>
+
+            <!-- Transfers with Item Table -->
+            <div class="lg:col-span-1">
+                <app-transfer-items-table
+                    [header]="'Transfers with Item'"
+                    [transfersWithItem]="item.transfersWithItems"
+                    [item]="item"
+                ></app-transfer-items-table>
+            </div>
         </div>
-        <app-transfer-items-table [header]="'Transfers with Item'" [transfersWithItem]="item.transfersWithItems" [item]="item"></app-transfer-items-table>
-    </div>
+    </main>
 }

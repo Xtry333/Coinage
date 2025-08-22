@@ -1,7 +1,22 @@
-<div class="counters-container">
+<div class="flex w-full flex-wrap justify-between gap-4 rounded-lg border border-gray-300 bg-white p-5 shadow-sm md:justify-center lg:justify-between">
     @for (item of balance; track trackByAccountId($index, item)) {
-        <app-big-counter [value]="item.balance" [upperLabel]="item.currencySymbol" [lowerLabel]="item.name"></app-big-counter>
+        <app-big-counter
+            class="min-w-[260px] max-w-[400px] flex-1 sm:min-w-[280px] sm:max-w-none md:min-w-[240px] md:max-w-[320px] md:flex-none lg:min-w-[240px] lg:max-w-[320px] lg:flex-auto"
+            [value]="item.balance"
+            [upperLabel]="item.currencySymbol"
+            [lowerLabel]="item.name"
+        ></app-big-counter>
     }
-    <app-big-counter [value]="sumPkoWilla" [upperLabel]="'PLN'" [lowerLabel]="'PKO+'"></app-big-counter>
-    <app-big-counter [value]="todaySpendings" [upperLabel]="'PLN'" [lowerLabel]="'Today'"></app-big-counter>
+    <app-big-counter
+        class="min-w-[260px] max-w-[400px] flex-1 sm:min-w-[280px] sm:max-w-none md:min-w-[240px] md:max-w-[320px] md:flex-none lg:min-w-[240px] lg:max-w-[320px] lg:flex-auto"
+        [value]="sumPkoWilla"
+        [upperLabel]="'PLN'"
+        [lowerLabel]="'PKO+'"
+    ></app-big-counter>
+    <app-big-counter
+        class="min-w-[260px] max-w-[400px] flex-1 sm:min-w-[280px] sm:max-w-none md:min-w-[240px] md:max-w-[320px] md:flex-none lg:min-w-[240px] lg:max-w-[320px] lg:flex-auto"
+        [value]="todaySpendings"
+        [upperLabel]="'PLN'"
+        [lowerLabel]="'Today'"
+    ></app-big-counter>
 </div>

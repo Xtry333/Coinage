@@ -1,9 +1,8 @@
-import { Component, ElementRef, EventEmitter, HostListener, OnInit, Output, ViewChild } from '@angular/core';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { faBars, faBell, faUser, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { CurrentUserDataService } from '../../services/current-user.service';
 import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component';
-import { CoinageRoutes } from '../../app-routing/app-routes';
 
 @Component({
     selector: 'app-top-nav-bar',
@@ -15,22 +14,23 @@ export class TopNavBarComponent implements OnInit {
     public title = 'Coinage';
 
     public userIcon = faUser;
+    public menuIcon = faBars;
+    public closeIcon = faXmark;
+    public bellIcon = faBell;
     public username = 'User';
     public dateTime = new Date().toLocaleString();
     public logo = 'assets/images/coin.png';
 
     public isMobileNavMenuOpen = false;
     public isUserMenuOpen = false;
+    public isSidebarOpen = false;
 
     @Output() public toggleOpenSidebar = new EventEmitter<boolean>(false);
 
     @ViewChild('dropdownUserMenuComponent')
     private dropdownUserMenuComponent?: DropdownMenuComponent;
 
-    public constructor(
-        private eRef: ElementRef,
-        private readonly userDataService: CurrentUserDataService,
-    ) {}
+    public constructor(private readonly userDataService: CurrentUserDataService) {}
 
     public ngOnInit(): void {
         this.userDataService.userData$.subscribe((user) => {
@@ -41,7 +41,8 @@ export class TopNavBarComponent implements OnInit {
     }
 
     public onToggleOpenSidebar(): void {
-        this.toggleOpenSidebar.emit(true);
+        this.isSidebarOpen = !this.isSidebarOpen;
+        this.toggleOpenSidebar.emit(this.isSidebarOpen);
     }
 
     public openUserMenuDropdown(): void {

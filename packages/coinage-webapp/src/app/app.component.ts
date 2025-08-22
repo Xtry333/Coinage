@@ -1,9 +1,9 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { Socket } from 'ngx-socket-io';
 
-import { StorageScope } from './core/services/storage-service/storage-scope.enum';
 import { CoinageStorageService } from './core/services/storage-service/coinage-storage.service';
+import { StorageScope } from './core/services/storage-service/storage-scope.enum';
 import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-transfer.component';
 import { LoadingService } from './loaderGadget/loading.service';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
@@ -40,7 +40,8 @@ export class AppComponent implements OnInit, OnDestroy {
     public transfersListComponent?: TransfersListComponent;
 
     public isTrinketDisplayed = false;
-    public isSidebarDisplayed = false;
+    public isSidebarDisplayed = true; // Default to open on desktop
+    public isMobileView = false;
 
     public constructor(
         private readonly loader: LoadingService,
@@ -55,6 +56,7 @@ export class AppComponent implements OnInit, OnDestroy {
     public ngOnInit(): void {
         console.log(this.langService);
         console.log(this);
+        this.checkScreenSize();
         this.socket.on('connect', () => {
             this.notificationService.push({ message: 'Connection estabilished.', title: 'Server' });
 
@@ -140,4 +142,28 @@ export class AppComponent implements OnInit, OnDestroy {
     public onToggleOpenSidebar() {
         this.isSidebarDisplayed = !this.isSidebarDisplayed;
     }
+
+    @HostListener('window:resize')
+    public onResize() {
+        this.checkScreenSize();
+    }
+
+    private checkScreenSize() {
+        this.isMobileView = window.innerWidth < 768;
+        if (this.isMobileView) {
+            this.isSidebarDisplayed = false; // Default to closed on mobile
+        }
+    }
+
+    public get sidebarClasses(): { [key: string]: boolean } {
+        return {};
+    }
+
+    public closeSidebar(): void {
+        if (this.isMobileView) {
+            this.isSidebarDisplayed = false;
+        }
+    }
+
+    // Removed contentMarginLeft - now using flex layout instead of fixed positioning
 }

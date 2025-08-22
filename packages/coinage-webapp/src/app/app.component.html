@@ -1,16 +1,49 @@
+<!-- Top Navigation Bar -->
 <app-top-nav-bar (toggleOpenSidebar)="onToggleOpenSidebar()"></app-top-nav-bar>
-<div class="flex">
-    <app-sidebar-nav class="hidden w-1/4 md:block lg:w-1/6" [class.block]="isSidebarDisplayed" [class.hidden]="!isSidebarDisplayed"></app-sidebar-nav>
-    <app-modal [isDisplayed]="isTrinketDisplayed" (hideModalEvent)="hideTrinketModal()">
-        <div>
-            <app-create-transfer [redirectAfterSave]="false" (saveSuccess)="hideTrinketModal(); forceDashboardRefresh()"></app-create-transfer>
-        </div>
-    </app-modal>
-    <div class="flex-1">
-        <router-outlet (activate)="onActivateRoute($event)"></router-outlet>
+
+<!-- Main Layout Container -->
+<div class="flex h-[calc(100vh-3.75rem)]">
+    <!-- Mobile overlay -->
+    @if (isMobileView && isSidebarDisplayed) {
+        <div
+            class="fixed bottom-0 left-0 right-0 top-[3.75rem] z-30 bg-gray-900 bg-opacity-50 transition-opacity duration-300 md:hidden"
+            (click)="closeSidebar()"
+        ></div>
+    }
+
+    <!-- Sidebar -->
+    <div
+        class="transition-all duration-300 ease-in-out"
+        [class.w-0]="!isSidebarDisplayed"
+        [class.w-64]="isSidebarDisplayed && !isMobileView"
+        [class.overflow-hidden]="!isSidebarDisplayed"
+    >
+        <app-sidebar-nav
+            class="h-full"
+            [class.show]="isSidebarDisplayed"
+            [class.hidden]="!isSidebarDisplayed"
+            [class.fixed]="isMobileView"
+            [class.z-40]="isMobileView"
+            [class.top-[3.75rem]]="isMobileView"
+        ></app-sidebar-nav>
     </div>
-    <app-notifications-container></app-notifications-container>
+
+    <!-- Main content -->
+    <div class="flex flex-1 flex-col overflow-hidden">
+        <main class="flex-1 overflow-auto">
+            <router-outlet (activate)="onActivateRoute($event)"></router-outlet>
+        </main>
+    </div>
 </div>
+
+<!-- Modals and notifications -->
+<app-modal [isDisplayed]="isTrinketDisplayed" (hideModalEvent)="hideTrinketModal()">
+    <div>
+        <app-create-transfer [redirectAfterSave]="false" (saveSuccess)="hideTrinketModal(); forceDashboardRefresh()"></app-create-transfer>
+    </div>
+</app-modal>
+
+<app-notifications-container></app-notifications-container>
 
 <div class="loader-transition" [ngClass]="{ hidden: !isPageLoading }">
     <app-spinner></app-spinner>

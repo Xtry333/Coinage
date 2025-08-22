@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Project Overview
 
 Coinage is a personal expense/income tracking application built as an Nx monorepo with two main packages:
+
 - `coinage-api`: NestJS backend with TypeORM + MySQL
 - `coinage-webapp`: Angular frontend with WebSocket support
 
@@ -13,33 +14,39 @@ Coinage is a personal expense/income tracking application built as an Nx monorep
 Run from repository root:
 
 ### Development
+
 - `yarn dev` - Start both API and webapp servers simultaneously
 - `yarn dev:api` - Start only the NestJS API server (port varies, see nx serve output)
 - `yarn dev:webapp` - Start only the Angular webapp (port varies, see nx serve output)
 
 ### Building
+
 - `yarn build` - Build both API and webapp for production
 - `yarn build:api` - Build only the API
 - `yarn build:webapp` - Build only the webapp
 
 ### Testing
+
 - `yarn test` - Run tests for both packages
 - `nx test coinage-api` - Run API tests only
 - `nx test coinage-webapp` - Run webapp tests only
 
 ### Linting & Formatting
+
 - `yarn lint` - Run workspace lint + Angular linting
 - `yarn eslint` - Run ESLint on TypeScript files
 - `yarn lint:styles` - Run stylelint on SCSS files
 - `yarn format` - Format code using Nx formatter
 
 ### Database Migrations
+
 - `yarn migration:create <name>` - Create new migration file
 - `yarn migration:generate` - Auto-generate migration from entity changes
 - `yarn migration:run` - Run pending migrations
 - `yarn typeorm` - Direct TypeORM CLI access
 
 ### Docker
+
 - `yarn docker:build-api` - Build API Docker image
 - `yarn docker:build-webapp` - Build webapp Docker image
 - `yarn docker:up` - Start docker-compose services
@@ -48,14 +55,16 @@ Run from repository root:
 ## Architecture
 
 ### Monorepo Structure
+
 - Uses Nx workspace with Yarn v3 workspaces
 - Main applications in `packages/` directory
 - Shared libraries in `libs/` directory:
-  - `libs/interfaces` - DTOs and type definitions
-  - `libs/common` - Shared constants and utilities
-  - `libs/lang` - Language/localization support
+    - `libs/interfaces` - DTOs and type definitions
+    - `libs/common` - Shared constants and utilities
+    - `libs/lang` - Language/localization support
 
 ### Backend (coinage-api)
+
 - NestJS application with TypeORM
 - Database: MySQL with custom SnakeNamingStrategy
 - Configuration: `packages/coinage-api/src/app/typeorm.config.ts`
@@ -65,6 +74,7 @@ Run from repository root:
 - WebSocket Gateway: `packages/coinage-api/src/app/events/events.gateway.ts` (path: `/ws/`)
 
 ### Frontend (coinage-webapp)
+
 - Angular application with standalone: false components
 - WebSocket client using ngx-socket-io
 - Styling: SCSS with Bootstrap 5 and custom styles
@@ -72,12 +82,14 @@ Run from repository root:
 - Proxy configuration: `packages/coinage-webapp/proxy.conf.json`
 
 ### Database
+
 - TypeORM with `synchronize: false` - migrations are source of truth
-- Custom naming strategy with prefixed constraints (FK_, UQ_, IDX_)
+- Custom naming strategy with prefixed constraints (FK*, UQ*, IDX\_)
 - Migration files: `packages/coinage-api/src/database/migrations/`
 - Environment variables required: MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, COINAGE_MYSQL_PORT
 
 ### WebSocket Integration
+
 - Server path: `/ws/` (configured in events.gateway.ts)
 - Client configuration in app.module.ts
 - Socket services in `packages/coinage-webapp/src/app/services/`
@@ -85,6 +97,7 @@ Run from repository root:
 ## Development Patterns
 
 ### Adding Features
+
 1. Define DTOs in `libs/interfaces` if API changes are needed
 2. Create/update entities and generate migrations for database changes
 3. Implement backend controllers/services in `coinage-api`
@@ -92,12 +105,14 @@ Run from repository root:
 5. Update WebSocket contracts in both API gateway and frontend services if needed
 
 ### Database Schema Changes
+
 1. Modify entities in `packages/coinage-api/src/app/entities/`
 2. Generate migration: `yarn migration:generate`
 3. Review and adjust generated migration if needed
 4. Run migration: `yarn migration:run`
 
 ### Running Single Tests
+
 - `nx test coinage-api --testNamePattern="specific test"` - Run specific API test
 - `nx test coinage-webapp --testNamePattern="specific test"` - Run specific webapp test
 
@@ -109,12 +124,17 @@ Run from repository root:
 - `packages/coinage-webapp/proxy.conf.json` - Development proxy settings
 - `.github/copilot-instructions.md` - Additional AI assistant guidance
 
+## Project Planning & Roadmap
+
+- `roadmap.md` - Detailed roadmap with planned features, UI improvements, and technical enhancements
+
 ## Environment Setup
 
 Required environment variables for API:
+
 - `MYSQL_HOST` - Database host (default: localhost)
 - `MYSQL_USER` - Database username
-- `MYSQL_PASSWORD` - Database password  
+- `MYSQL_PASSWORD` - Database password
 - `MYSQL_DATABASE` - Database name
 - `COINAGE_MYSQL_PORT` - Database port (default: 3306)
 

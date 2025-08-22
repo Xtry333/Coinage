@@ -1,0 +1,30 @@
+/* Ensure the search component has proper positioning context */
+:host {
+    display: block;
+    position: relative;
+    z-index: 10;
+}
+
+/* Custom scrollbar for results dropdown */
+:host ::ng-deep .max-h-96 {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+:host ::ng-deep .max-h-96::-webkit-scrollbar {
+    width: 6px;
+}
+
+:host ::ng-deep .max-h-96::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+:host ::ng-deep .max-h-96::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+:host ::ng-deep .max-h-96::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

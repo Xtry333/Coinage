@@ -1,33 +1,50 @@
-<nav class="sidebar w-inherit bg-gray-100" id="sidebarMenu">
-    <div class="sidebar-sticky sticky top-0 pt-3">
-        <ul class="mb-auto flex flex-col">
-            @for (link of links; track link) {
-                <li>
-                    <a
-                        class="block rounded px-3 py-2 text-gray-700 hover:bg-gray-200"
-                        [routerLink]="link.url"
-                        routerLinkActive="active"
-                        ariaCurrentWhenActive="page"
-                    >
-                        <i class="pointer-events-none mr-2" [class]="link.icon"></i>
-                        <span>{{ link.text }}</span>
-                    </a>
-                </li>
-            }
-        </ul>
-        <hr />
-        <div class="relative ml-2">
-            <a class="flex items-center no-underline" href="#" data-bs-toggle="dropdown" aria-expanded="false">
-                <img class="mr-2 rounded-full" [src]="avatarLink" alt="" width="32" height="32" />
-                <strong>{{ username | ifNull: 'User' }}</strong>
-            </a>
-            <ul class="absolute mt-1 min-w-48 rounded-md bg-gray-800 py-1 text-sm text-white shadow-lg">
-                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">New project...</a></li>
-                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">Settings</a></li>
-                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">Profile</a></li>
-                <li><hr class="my-1 border-gray-600" /></li>
-                <li><a class="block px-4 py-2 hover:bg-gray-700" href="#">Sign out</a></li>
+<nav class="sidebar border-r border-gray-200 bg-white shadow-sm" id="sidebarMenu">
+    <div class="sidebar-sticky sticky top-0 pt-6">
+        <!-- App Logo/Title -->
+        <div class="border-b border-gray-200 px-6 pb-6">
+            <div class="flex items-center">
+                <img class="mr-3 h-8 w-8" [src]="logo" alt="Coinage" />
+                <h1 class="text-xl font-bold text-gray-900">{{ title }}</h1>
+            </div>
+        </div>
+
+        <!-- Navigation Links -->
+        <div class="px-3 py-6">
+            <ul class="space-y-1">
+                @for (link of links; track link) {
+                    <li>
+                        <a
+                            class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
+                            [routerLink]="link.url"
+                            routerLinkActive="bg-primary-50 border-primary-200 text-primary-700 border"
+                            ariaCurrentWhenActive="page"
+                        >
+                            <i class="pointer-events-none mr-3 text-lg group-hover:text-gray-900" [class]="link.icon"></i>
+                            <span>{{ link.text }}</span>
+                        </a>
+                    </li>
+                }
             </ul>
+        </div>
+
+        <!-- User Profile Section -->
+        <div class="mt-auto px-3 pb-6">
+            <div class="border-t border-gray-200 pt-6">
+                <div class="rounded-lg bg-gray-50 p-3">
+                    <div class="flex items-center">
+                        <img class="mr-3 h-8 w-8 rounded-full border-2 border-white shadow-sm" [src]="avatarLink" alt="User Avatar" />
+                        <div class="min-w-0 flex-1">
+                            <p class="truncate text-sm font-medium text-gray-900">
+                                {{ username | ifNull: 'User' }}
+                            </p>
+                            <p class="truncate text-xs text-gray-500">Online</p>
+                        </div>
+                        <button class="text-gray-400 transition-colors duration-200 hover:text-gray-600">
+                            <i class="bi-three-dots-vertical"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </nav>

@@ -1,7 +1,7 @@
-<div class="section" [ngClass]="class">
+<div class="w-full rounded-lg border border-gray-300 bg-white p-5 shadow-sm" [ngClass]="class">
     @if (header) {
-        <div class="mb-2">
-            <span class="text-xl font-semibold">{{ header }}</span>
+        <div class="mb-4 border-b border-gray-200 pb-3">
+            <h3 class="m-0 text-xl font-semibold text-gray-900">{{ header }}</h3>
         </div>
     }
     <ng-content></ng-content>

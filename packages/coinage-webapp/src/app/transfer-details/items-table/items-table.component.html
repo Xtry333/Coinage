@@ -1,46 +1,54 @@
-<table class="items-table">
-    <caption>
-        <span>Item List</span>
-    </caption>
-    <thead>
-        <tr>
-            <th class="align-left">
-                <span>Name</span>
-            </th>
-            <th class="align-right">
-                <span>Est. Unit Price</span>
-            </th>
-            <th class="align-right">
-                <span>Amount</span>
-            </th>
-            <th class="align-right">
-                <span>Total Price</span>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @for (item of tableItems; track idTracker($index, item)) {
-            <tr>
-                <td class="align-left">
-                    <a [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })">
-                        {{ item.itemName }}
-                    </a>
-                </td>
-                <td class="align-right">{{ item.unitPrice | plnCurrency }}</td>
-                <td class="align-right">{{ item.amount }}</td>
-                <td class="align-right">{{ item.totalPrice - item.setDiscount | plnCurrency }}</td>
+<div class="overflow-x-auto">
+    <table class="w-full border-collapse">
+        <thead class="bg-gray-50">
+            <tr class="border-b border-gray-200">
+                <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Name</th>
+                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Est. Unit Price</th>
+                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Amount</th>
+                <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Total Price</th>
             </tr>
-        }
-        @if (!noRowsFound) {
-            <tr>
-                <td colspan="3"></td>
-                <td class="align-right">{{ totalSum | plnCurrency }}</td>
-            </tr>
-        }
-        @if (noRowsFound) {
-            <tr>
-                <td colspan="6">No items found.</td>
-            </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            @for (item of tableItems; track idTracker($index, item)) {
+                <tr class="transition-colors duration-200 hover:bg-gray-50">
+                    <td class="px-4 py-3 text-sm">
+                        <a
+                            class="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                            [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })"
+                        >
+                            {{ item.itemName }}
+                        </a>
+                    </td>
+                    <td class="px-4 py-3 text-right font-mono text-sm text-gray-900">{{ item.unitPrice | plnCurrency }}</td>
+                    <td class="px-4 py-3 text-right text-sm text-gray-900">{{ item.amount }}</td>
+                    <td class="px-4 py-3 text-right font-mono text-sm text-gray-900">{{ item.totalPrice - item.setDiscount | plnCurrency }}</td>
+                </tr>
+            }
+            @if (!noRowsFound) {
+                <tr class="border-t-2 border-gray-300 bg-gray-50 font-semibold">
+                    <td class="px-4 py-3 text-sm text-gray-900">Total</td>
+                    <td class="px-4 py-3 text-sm text-gray-900"></td>
+                    <td class="px-4 py-3 text-sm text-gray-900"></td>
+                    <td class="px-4 py-3 text-right font-mono text-sm font-bold text-gray-900">{{ totalSum | plnCurrency }}</td>
+                </tr>
+            }
+            @if (noRowsFound) {
+                <tr>
+                    <td class="px-4 py-8 text-center text-sm text-gray-500" colspan="4">
+                        <div class="flex flex-col items-center gap-2">
+                            <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    stroke-linecap="round"
+                                    stroke-linejoin="round"
+                                    stroke-width="2"
+                                    d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                                ></path>
+                            </svg>
+                            <span>No items found.</span>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

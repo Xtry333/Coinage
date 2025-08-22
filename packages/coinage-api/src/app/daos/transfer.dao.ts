@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, IsNull, LessThanOrEqual, Repository } from 'typeorm';
+import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, LessThanOrEqual, Repository } from 'typeorm';
 
 import { GetFilteredTransfersRequest, Range, TransferType } from '@app/interfaces';
 
-import { BaseDao } from './base.dao';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
 import { Writeable } from '../types/Writeable.type';
+import { BaseDao } from './base.dao';
 
 type KeysOfType<O, T> = {
     [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;
@@ -175,5 +175,22 @@ export class TransferDao extends BaseDao {
             return TransferType.OUTCOME;
         }
         return TransferType.INCOME;
+    }
+
+    public async searchByDescription(query: string, userAccountIds: number[], limit: number): Promise<Transfer[]> {
+        return this.transferRepository.find({
+            where: [
+                {
+                    description: ILike(`%${query}%`),
+                    originAccountId: In(userAccountIds),
+                },
+                {
+                    description: ILike(`%${query}%`),
+                    targetAccountId: In(userAccountIds),
+                },
+            ],
+            order: { date: 'DESC' },
+            take: limit,
+        });
     }
 }

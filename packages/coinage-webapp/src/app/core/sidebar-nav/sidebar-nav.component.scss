@@ -1,55 +1,43 @@
 :host {
-    // display: block;
+    display: block;
+    height: 100%;
 }
 
 .sidebar {
-    position: fixed;
-    top: 0;
+    height: 100%;
+    width: 100%;
+    transition: transform 0.3s ease-in-out;
 
-    /* rtl:raw:
-    right: 0;
-    */
-    bottom: 0;
+    // Mobile: Fixed positioning and overlay
+    &.fixed {
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 16rem; /* 64 tailwind units = 256px */
+        z-index: 40;
+        height: calc(100vh - 3.75rem);
+        transform: translateX(-100%);
 
-    /* rtl:remove */
-    left: 0;
-    z-index: 100; /* Behind the navbar */
-    padding: 48px 0 0; /* Height of navbar */
-    box-shadow: inset -1px 0 0 rgb(0 0 0 / 10%);
-}
+        &.show {
+            transform: translateX(0);
+        }
+    }
 
-@media (width <= 767.98px) {
-    .sidebar {
-        top: 5rem;
+    // Desktop: Part of flex layout, no fixed positioning
+    &:not(.fixed) {
+        position: relative;
+    }
+
+    &.hidden:not(.fixed) {
+        display: none;
     }
 }
 
 .sidebar-sticky {
-    height: calc(100vh - 48px);
-    overflow: hidden auto; /* Scrollable contents if viewport is shorter than content. */
-}
-
-.sidebar .nav-link {
-    font-weight: 500;
-    color: #333;
-}
-
-.sidebar .nav-link .feather {
-    margin-right: 4px;
-    color: #727272;
-}
-
-.sidebar .nav-link.active {
-    color: #2470dc;
-}
-
-.sidebar .nav-link:hover .feather,
-.sidebar .nav-link.active .feather {
-    color: inherit;
-}
-
-.sidebar-heading {
-    font-size: 0.75rem;
+    height: 100%;
+    overflow: hidden auto;
+    display: flex;
+    flex-direction: column;
 }
 
 // .top-nav-container {

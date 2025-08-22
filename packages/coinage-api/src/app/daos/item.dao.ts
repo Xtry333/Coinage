@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, In, Repository } from 'typeorm';
+import { Equal, ILike, In, Repository } from 'typeorm';
 
 import { ItemWithLastUsedPriceDTO } from '@app/interfaces';
 
-import { BaseDao } from './base.dao';
 import { Item } from '../entities/Item.entity';
+import { BaseDao } from './base.dao';
 
 interface ItemWithLastUsedPriceDBObject {
     id: number;
@@ -72,5 +72,13 @@ export class ItemDao extends BaseDao {
 
     public save(entity: Item): Promise<Item> {
         return this.itemRepository.save(entity);
+    }
+
+    public async searchByNameOrBrand(query: string, limit: number): Promise<Item[]> {
+        return this.itemRepository.find({
+            where: [{ name: ILike(`%${query}%`) }, { brand: ILike(`%${query}%`) }],
+            order: { name: 'ASC' },
+            take: limit,
+        });
     }
 }

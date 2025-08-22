@@ -1,0 +1,135 @@
+<!-- Search Container -->
+<div class="relative" [class.w-full]="showResults">
+    <!-- Search Input -->
+    <div class="relative">
+        <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+            <fa-icon class="text-gray-400" [icon]="searchIcon" size="sm"> </fa-icon>
+        </div>
+
+        <input
+            class="block w-full rounded-lg border border-gray-300 bg-gray-50 py-2.5 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-500 transition-colors duration-200 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            #searchInput
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput($event)"
+            (focus)="onSearchFocus()"
+            type="text"
+            placeholder="Search items and transfers..."
+            autocomplete="off"
+        />
+
+        <!-- Clear button -->
+        @if (searchQuery) {
+            <button class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-gray-600" (click)="clearSearch()" type="button">
+                <fa-icon [icon]="clearIcon" size="sm"></fa-icon>
+            </button>
+        }
+
+        <!-- Loading indicator -->
+        @if (isLoading) {
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3">
+                <div class="h-4 w-4 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+            </div>
+        }
+    </div>
+
+    <!-- Search Results Dropdown -->
+    @if (showResults) {
+        <div
+            class="absolute left-0 right-0 top-full z-[9999] mt-1 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-xl ring-1 ring-black ring-opacity-5"
+        >
+            <!-- Loading State -->
+            @if (isLoading) {
+                <div class="p-4 text-center text-sm text-gray-500">
+                    <div class="mb-2 flex justify-center">
+                        <div class="h-6 w-6 animate-spin rounded-full border-2 border-blue-500 border-t-transparent"></div>
+                    </div>
+                    <div>Searching...</div>
+                </div>
+            }
+
+            <!-- Error State -->
+            @else if (searchError) {
+                <div class="p-4 text-center text-sm text-amber-600">
+                    <fa-icon class="mb-2 text-amber-400" [icon]="searchIcon" size="lg"></fa-icon>
+                    <div>{{ searchError }}</div>
+                </div>
+            }
+
+            <!-- Results -->
+            @else if (searchResults) {
+                <!-- Items Section -->
+                @if (searchResults.items && searchResults.items.length > 0) {
+                    <div class="p-2">
+                        <h3 class="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Items</h3>
+                        @for (item of searchResults.items; track item.id) {
+                            <button
+                                class="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                                (click)="onItemClick(item.id)"
+                                type="button"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">
+                                            @if (item.brand) {
+                                                <span class="text-gray-600">{{ item.brand }}</span>
+                                            }
+                                            {{ item.name }}
+                                        </div>
+                                        @if (item.categoryName) {
+                                            <div class="text-xs text-gray-500">{{ item.categoryName }}</div>
+                                        }
+                                    </div>
+                                    <fa-icon class="text-gray-400" [icon]="itemIcon" size="sm"></fa-icon>
+                                </div>
+                            </button>
+                        }
+                    </div>
+                }
+
+                <!-- Transfers Section -->
+                @if (searchResults.transfers && searchResults.transfers.length > 0) {
+                    @if (searchResults.items && searchResults.items.length > 0) {
+                        <hr class="border-gray-200" />
+                    }
+                    <div class="p-2">
+                        <h3 class="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Transfers</h3>
+                        @for (transfer of searchResults.transfers; track transfer.id) {
+                            <button
+                                class="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                                (click)="onTransferClick(transfer.id)"
+                                type="button"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div class="flex-1">
+                                        <div class="font-medium text-gray-900">{{ transfer.description }}</div>
+                                        <div class="flex items-center gap-2 text-xs text-gray-500">
+                                            <span>{{ transfer.date | date: 'dd/MM/yyyy' }}</span>
+                                            @if (transfer.contractorName) {
+                                                <span>•</span>
+                                                <span>{{ transfer.contractorName }}</span>
+                                            }
+                                            <span>•</span>
+                                            <span>{{ transfer.categoryName }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-semibold text-gray-900">{{ transfer.amount | number: '1.2-2' }} {{ transfer.currencySymbol }}</div>
+                                    </div>
+                                    <fa-icon class="ml-2 text-gray-400" [icon]="transferIcon" size="sm"></fa-icon>
+                                </div>
+                            </button>
+                        }
+                    </div>
+                }
+
+                <!-- No results -->
+                @if ((!searchResults.items || searchResults.items.length === 0) && (!searchResults.transfers || searchResults.transfers.length === 0)) {
+                    <div class="p-4 text-center text-sm text-gray-500">
+                        <fa-icon class="mb-2 text-gray-300" [icon]="searchIcon" size="lg"></fa-icon>
+                        <div>No results found for "{{ searchQuery }}"</div>
+                    </div>
+                }
+            }
+        </div>
+    }
+</div>

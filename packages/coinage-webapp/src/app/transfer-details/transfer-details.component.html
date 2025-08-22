@@ -1,159 +1,300 @@
 @if (showPage) {
-    <div class="transfer-details-component">
-        <h4>
-            <ul class="category-path-list">
-                <li>Root</li>
-                @for (category of transfer?.categoryPath; track category) {
-                    <li>
-                        {{ category.name }}
+    <main class="min-h-screen bg-gray-50 p-4 sm:ml-auto md:px-4">
+        <!-- Breadcrumb -->
+        <div class="mb-6">
+            <nav class="flex rounded-lg border border-gray-300 bg-white p-3 shadow-sm">
+                <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                    <li class="inline-flex items-center">
+                        <span class="text-sm font-medium text-gray-500">Root</span>
                     </li>
-                }
-            </ul>
-        </h4>
-        <hr class="divider" />
-        <div class="transfers-items-table">
-            <div class="flex-item mr-2">
-                <table class="transfer-details-table">
-                    <caption>
-                        <span>Transfer Details</span>
-                    </caption>
-                    <tr>
-                        <th>Description</th>
-                        <td>
+                    @for (category of transfer.categoryPath; track category) {
+                        <li>
+                            <div class="flex items-center">
+                                <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        fill-rule="evenodd"
+                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                        clip-rule="evenodd"
+                                    ></path>
+                                </svg>
+                                <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">{{ category.name }}</span>
+                            </div>
+                        </li>
+                    }
+                </ol>
+            </nav>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <!-- Transfer Details -->
+            <app-section header="Transfer Details">
+                <dl class="space-y-4">
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Description</dt>
+                        <dd class="flex w-2/3 items-center gap-2 text-sm text-gray-900">
                             <span>{{ transfer.description }}</span>
                             @if (transfer.isEthereal) {
-                                <span class="planned-icon cursor-pointer rounded bg-gray-200 px-2 py-1 hover:bg-gray-300" (click)="onClickCommit()">
-                                    <fa-icon [icon]="etherealIcon" [fixedWidth]="true" title="Transfer has not been commited"></fa-icon>
-                                </span>
+                                <button
+                                    class="inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    (click)="onClickCommit()"
+                                >
+                                    <fa-icon class="mr-1" [icon]="etherealIcon" title="Transfer has not been commited"></fa-icon>
+                                    Not committed
+                                </button>
                             }
-                        </td>
-                    </tr>
+                        </dd>
+                    </div>
+
                     @if (transfer.receipt) {
-                        <tr>
-                            <th>Receipt</th>
-                            <td>
-                                <a [routerLink]="receiptDetailsLink">
+                        <div class="flex items-start justify-between">
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">Receipt</dt>
+                            <dd class="w-2/3 text-sm text-gray-900">
+                                <a class="text-blue-600 hover:text-blue-700 hover:underline" [routerLink]="receiptDetailsLink">
                                     {{ transfer.receipt.description }}
                                 </a>
-                            </td>
-                        </tr>
+                            </dd>
+                        </div>
                     }
-                    <tr>
-                        <th>Amount</th>
-                        <td>
-                            <span> {{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</span>
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Amount</dt>
+                        <dd class="flex w-2/3 items-center gap-2 text-sm text-gray-900">
+                            <span class="font-semibold"> {{ transferTypeDisplaySymbol }} {{ transfer.amount | plnCurrency }}</span>
                             @if (transfer.receipt) {
-                                <span class="planned-icon">
-                                    <a [routerLink]="receiptDetailsLink">
-                                        <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
-                                    </a>
-                                </span>
+                                <a class="text-blue-600 hover:text-blue-700" [routerLink]="receiptDetailsLink">
+                                    <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
+                                </a>
                             }
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Type</th>
-                        <td>{{ transferTypeDisplayName }}</td>
-                    </tr>
-                    <tr>
-                        <th>Date</th>
-                        <td>
-                            <span>
-                                <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time>
-                            </span>
+                        </dd>
+                    </div>
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Type</dt>
+                        <dd class="w-2/3 text-sm text-gray-900">{{ transferTypeDisplayName }}</dd>
+                    </div>
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Date</dt>
+                        <dd class="flex w-2/3 items-center gap-2 text-sm text-gray-900">
+                            <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time>
                             @if (transfer.isPlanned) {
-                                <span class="planned-icon">
-                                    <fa-icon [icon]="plannedIcon" [fixedWidth]="true" title="Transfer is planned"></fa-icon>
+                                <span
+                                    class="inline-flex items-center rounded-md border border-orange-200 bg-orange-100 px-2 py-1 text-xs font-medium text-orange-700"
+                                >
+                                    <fa-icon class="mr-1" [icon]="plannedIcon" title="Transfer is planned"></fa-icon>
+                                    Planned
                                 </span>
                             }
                             @if (transfer.refundedBy) {
-                                <span class="planned-icon">
-                                    <a [routerLink]="refundedByLink">
-                                        ({{ transfer.refundedOn | date }} <fa-icon [icon]="refundedIcon" [fixedWidth]="true" title="Refunded"></fa-icon>)
-                                    </a>
-                                </span>
+                                <a
+                                    class="inline-flex items-center rounded-md border border-red-200 bg-red-100 px-2 py-1 text-xs font-medium text-red-700 transition-colors duration-200 hover:bg-red-200"
+                                    [routerLink]="refundedByLink"
+                                >
+                                    <fa-icon class="mr-1" [icon]="refundedIcon" title="Refunded"></fa-icon>
+                                    Refunded {{ transfer.refundedOn | date }}
+                                </a>
                             }
-                        </td>
-                    </tr>
+                        </dd>
+                    </div>
+
                     @if (!transfer.isPlanned) {
-                        <tr>
-                            <th>Accounting Date</th>
-                            <td>
+                        <div class="flex items-start justify-between">
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">Accounting Date</dt>
+                            <dd class="w-2/3 text-sm text-gray-900">
                                 <time [dateTime]="transfer.accountingDate?.toJSON()">{{ transfer.accountingDate | date | ifNull }}</time>
-                            </td>
-                        </tr>
+                            </dd>
+                        </div>
                     }
-                    <tr>
-                        <th>Contractor</th>
-                        <td>{{ transfer.contractor | ifNull }}</td>
-                    </tr>
-                    <tr>
-                        <th>Total {{ totalPaymentToContractor < 0 ? 'payed to' : 'received from' }} {{ transfer.contractor }}</th>
-                        <td>
-                            <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time
-                            >: {{ totalPaymentToContractor | mathAbs | plnCurrency }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Category</th>
-                        <td>
-                            <ul class="category-path-list">
-                                @for (category of transfer?.categoryPath; track category) {
-                                    <li>
-                                        {{ category.name }}
-                                    </li>
-                                }
-                            </ul>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>Account</th>
-                        <td>{{ transfer.account.name }} → {{ transfer.targetAccount.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Internal</th>
-                        <td>{{ transfer.isInternal ? 'Yes' : 'No' }}</td>
-                    </tr>
-                </table>
-            </div>
-            <div class="flex-item ml-2">
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Contractor</dt>
+                        <dd class="w-2/3 text-sm text-gray-900">{{ transfer.contractor | ifNull }}</dd>
+                    </div>
+
+                    @if (transfer.contractor) {
+                        <div class="flex items-start justify-between">
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">
+                                Total {{ totalPaymentToContractor < 0 ? 'paid to' : 'received from' }} {{ transfer.contractor }}
+                            </dt>
+                            <dd class="w-2/3 text-sm text-gray-900">
+                                <time [dateTime]="transfer.date.toJSON()">{{ transfer.date | date }}</time
+                                >:
+                                <span class="font-medium">{{ totalPaymentToContractor | mathAbs | plnCurrency }}</span>
+                            </dd>
+                        </div>
+                    }
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Category</dt>
+                        <dd class="w-2/3 text-sm text-gray-900">
+                            <nav class="flex" aria-label="Category breadcrumb">
+                                <ol class="inline-flex items-center space-x-1">
+                                    @for (category of transfer.categoryPath; track category; let last = $last) {
+                                        <li class="inline-flex items-center">
+                                            @if (!last) {
+                                                <span>{{ category.name }}</span>
+                                                <svg class="mx-1 h-3 w-3 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path
+                                                        fill-rule="evenodd"
+                                                        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                                                        clip-rule="evenodd"
+                                                    ></path>
+                                                </svg>
+                                            } @else {
+                                                <span class="font-medium">{{ category.name }}</span>
+                                            }
+                                        </li>
+                                    }
+                                </ol>
+                            </nav>
+                        </dd>
+                    </div>
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Account</dt>
+                        <dd class="w-2/3 text-sm text-gray-900">{{ transfer.account.name }} → {{ transfer.targetAccount.name }}</dd>
+                    </div>
+
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Internal</dt>
+                        <dd class="w-2/3 text-sm text-gray-900">
+                            <span
+                                class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+                                [class.bg-green-100]="transfer.isInternal"
+                                [class.text-green-700]="transfer.isInternal"
+                                [class.bg-gray-100]="!transfer.isInternal"
+                                [class.text-gray-700]="!transfer.isInternal"
+                            >
+                                {{ transfer.isInternal ? 'Yes' : 'No' }}
+                            </span>
+                        </dd>
+                    </div>
+                </dl>
+            </app-section>
+
+            <!-- Items Table -->
+            <app-section header="Items">
                 <app-items-table [items]="transfer.items"></app-items-table>
+            </app-section>
+        </div>
+
+        <!-- Action Buttons -->
+        <app-section class="mb-6">
+            <div class="flex flex-wrap gap-3">
+                <button
+                    class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    (click)="onClickEditMode()"
+                >
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
+                        ></path>
+                    </svg>
+                    Edit
+                </button>
+                @if (isSplittable) {
+                    <button
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        (click)="onToggleShowSplit()"
+                    >
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                        Show Split Transfer
+                    </button>
+                }
+                @if (transfer.isRefundable) {
+                    <button
+                        class="inline-flex items-center rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors duration-200 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        (click)="onClickRefundTransfer()"
+                        type="button"
+                    >
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                        </svg>
+                        Refund
+                    </button>
+                }
+                <button
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    (click)="onClickDuplicateTransfer()"
+                    type="button"
+                >
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
+                        ></path>
+                    </svg>
+                    Duplicate
+                </button>
             </div>
-        </div>
-        <br />
-        <div class="button-group">
-            <button (click)="onClickEditMode()">Edit</button>
-            @if (isSplittable) {
-                <button (click)="onToggleShowSplit()">Show Split Transfer</button>
-            }
-            @if (transfer.isRefundable) {
-                <button (click)="onClickRefundTransfer()" type="button">Refund</button>
-            }
-            <button (click)="onClickDuplicateTransfer()" type="button">Duplicate</button>
-        </div>
+        </app-section>
+
+        <!-- Split Transaction Form -->
         @if (shouldShowSplit && isSplittable) {
-            <div class="split-transaction-form">
-                <div>
-                    <label for="description">Description</label>
-                    <input id="description" [(ngModel)]="splitTransfer.description" type="text" required />
+            <app-section header="Split Transaction">
+                <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700" for="description">Description</label>
+                        <input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            id="description"
+                            [(ngModel)]="splitTransfer.description"
+                            type="text"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700" for="amount">Price</label>
+                        <input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            id="amount"
+                            [(ngModel)]="splitTransfer.amount"
+                            [min]="0"
+                            [max]="transfer.amount - 0.01"
+                            type="number"
+                            step=".01"
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label class="mb-1 block text-sm font-medium text-gray-700" for="category">Category</label>
+                        <select
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            id="category"
+                            [(ngModel)]="splitTransfer.categoryId"
+                            required
+                        >
+                            @for (category of categories; track category) {
+                                <option [ngValue]="category.id">{{ category.name }}</option>
+                            }
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label for="amount">Price</label>
-                    <input id="amount" [(ngModel)]="splitTransfer.amount" [min]="0" [max]="transfer.amount - 0.01" type="number" step=".01" required />
+                <div class="mt-4">
+                    <button
+                        class="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                        (click)="onClickSplitTransfer()"
+                    >
+                        <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"></path>
+                        </svg>
+                        Split Transfer
+                    </button>
                 </div>
-                <div>
-                    <label for="category">Category</label>
-                    <select id="category" [(ngModel)]="splitTransfer.categoryId" required>
-                        @for (category of categories; track category) {
-                            <option [ngValue]="category.id">{{ category.name }}</option>
-                        }
-                    </select>
-                </div>
-                <button (click)="onClickSplitTransfer()">Split</button>
-            </div>
+            </app-section>
         }
+
+        <!-- Related Transfers -->
         @if (transfer.otherTransfers.length > 0) {
             <app-transfers-table [header]="'All Transfers This Day'" [transfers]="transfer.otherTransfers" [showTodayMarker]="false"></app-transfers-table>
         }
-    </div>
+    </main>
 }

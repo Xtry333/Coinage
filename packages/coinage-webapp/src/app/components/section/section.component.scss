@@ -1,5 +1,4 @@
-.section {
-    border-radius: 8px;
-    border: 1px solid #d1d1d1;
-    padding: 8px;
+/* Most styling moved to Tailwind classes in template */
+:host {
+    display: block;
 }

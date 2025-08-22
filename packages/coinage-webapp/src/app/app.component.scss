@@ -18,21 +18,21 @@
     grid-column: span 2;
 }
 
-.flex {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+// .flex {
+//     display: flex;
+//     align-items: center;
+//     justify-content: center;
 
-    .datetime {
-        margin-left: auto;
-        padding-right: 20px;
+//     .datetime {
+//         margin-left: auto;
+//         padding-right: 20px;
 
-        .username {
-            margin-left: 5px;
-            margin-right: 10px;
-        }
-    }
-}
+//         .username {
+//             margin-left: 5px;
+//             margin-right: 10px;
+//         }
+//     }
+// }
 
 nav {
     display: flex;

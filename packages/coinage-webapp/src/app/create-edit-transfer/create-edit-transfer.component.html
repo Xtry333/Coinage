@@ -1,15 +1,25 @@
 @if (showPage) {
-    <div>
-        <div class="edit-transfer-container">
-            <form (ngSubmit)="onClickSaveTransfer()">
-                <div class="transaction-form">
-                    <div>
-                        <label for="description">Description</label>
-                        <input id="description" [(ngModel)]="selectedTransferInputs.description" name="description" type="text" minlength="3" required />
-                    </div>
-                    <div>
-                        <label for="amount">Price</label>
+    <main class="min-h-screen bg-gray-50 p-4 sm:ml-auto md:px-4">
+        <app-section header="Transfer Form">
+            <form class="space-y-6" (ngSubmit)="onClickSaveTransfer()">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="description">Description</label>
                         <input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            id="description"
+                            [(ngModel)]="selectedTransferInputs.description"
+                            name="description"
+                            type="text"
+                            minlength="3"
+                            required
+                            placeholder="Enter transfer description"
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="amount">Price</label>
+                        <input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
                             id="amount"
                             [(ngModel)]="selectedTransferInputs.amount"
                             [min]="0"
@@ -18,10 +28,11 @@
                             step=".01"
                             required
                             autocomplete="off"
+                            placeholder="0.00"
                         />
                     </div>
-                    <div>
-                        <label for="category">Category</label>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="category">Category</label>
                         <ng-select
                             #categorySelect
                             [(ngModel)]="selectedTransferInputs.categoryId"
@@ -88,42 +99,81 @@
                         <label for="date">Date</label>
                         <input id="date" [(ngModel)]="selectedTransferInputs.date" name="date" type="date" />
                     </div>
-                    <button type="submit">
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex flex-wrap gap-3 border-t border-gray-200 pt-6">
+                    <button
+                        class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        type="submit"
+                    >
                         @if (editMode) {
-                            <div>Save</div>
-                        }
-                        @if (!editMode) {
-                            <div>Create</div>
+                            <span>Save Changes</span>
+                        } @else {
+                            <span>Create Transfer</span>
                         }
                     </button>
                     @if (!editMode) {
-                        <button (click)="clearInputData()" type="button">
-                            <div>Clear</div>
+                        <button
+                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            (click)="clearInputData()"
+                            type="button"
+                        >
+                            Clear Form
                         </button>
                     }
                     @if (editMode) {
-                        <button (click)="onClickDeleteTransfer()" type="button">Delete</button>
-                    }
-                    @if (editMode) {
-                        <button (click)="onClickCancelEdit()" type="button">Cancel</button>
+                        <button
+                            class="inline-flex items-center rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors duration-200 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            (click)="onClickDeleteTransfer()"
+                            type="button"
+                        >
+                            Delete
+                        </button>
+                        <button
+                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            (click)="onClickCancelEdit()"
+                            type="button"
+                        >
+                            Cancel
+                        </button>
                     }
                 </div>
             </form>
-            @if (!shouldDisplayShoppingList) {
-                <button (click)="openShoppingList()">{{ '>' }}</button>
-            }
-            @if (shouldDisplayShoppingList) {
-                <div class="v-divider">
-                    <app-item-shopping-list
-                        [selectedCategoryId]="selectedTransferInputs.categoryId ?? null"
-                        [preselectedItems]="itemsInTransfer"
-                        (totalCostChanged)="onTotalCostChanged($event)"
-                        (itemListChanged)="onItemListChanged($event)"
-                    ></app-item-shopping-list>
-                    <input id="overrideTotalCostOnChange" [(ngModel)]="shouldOverrideTotalCostOnChange" type="checkbox" />
-                    <label for="overrideTotalCostOnChange">Override Total Cost On Item Change</label>
+        </app-section>
+
+        <!-- Shopping List Section -->
+        @if (!shouldDisplayShoppingList) {
+            <div class="mt-6">
+                <button
+                    class="inline-flex items-center rounded-md border border-blue-600 px-4 py-2 text-sm font-medium text-blue-600 transition-colors duration-200 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    (click)="openShoppingList()"
+                >
+                    <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                    </svg>
+                    Add Items to Transfer
+                </button>
+            </div>
+        }
+        @if (shouldDisplayShoppingList) {
+            <app-section class="mt-6" header="Transfer Items">
+                <app-item-shopping-list
+                    [selectedCategoryId]="selectedTransferInputs.categoryId ?? null"
+                    [preselectedItems]="itemsInTransfer"
+                    (totalCostChanged)="onTotalCostChanged($event)"
+                    (itemListChanged)="onItemListChanged($event)"
+                ></app-item-shopping-list>
+                <div class="mt-4 flex items-center">
+                    <input
+                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        id="overrideTotalCostOnChange"
+                        [(ngModel)]="shouldOverrideTotalCostOnChange"
+                        type="checkbox"
+                    />
+                    <label class="ml-2 text-sm text-gray-900" for="overrideTotalCostOnChange">Override Total Cost On Item Change</label>
                 </div>
-            }
-        </div>
-    </div>
+            </app-section>
+        }
+    </main>
 }

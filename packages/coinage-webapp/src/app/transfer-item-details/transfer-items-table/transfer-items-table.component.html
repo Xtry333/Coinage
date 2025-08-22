@@ -1,90 +1,91 @@
-<div class="transfer-items-table-container">
-    <table class="transfer-items-table">
-        @if (isHeaderDisplayed) {
-            <caption>
-                <span>{{ header }}</span>
-            </caption>
-        }
-        <thead>
-            <tr>
-                <th class="text-left">
-                    <span>Transfer</span>
-                </th>
-                <th>
-                    <span>Contractor</span>
-                </th>
-                <th>
-                    <span>Container</span>
-                </th>
-                <th class="text-right">
-                    <span>Unit Price</span>
-                </th>
-                <th class="text-right">
-                    <span>Standard Price</span>
-                </th>
-                <th class="text-right">
-                    <span>Quantity</span>
-                </th>
-                <th class="text-right">
-                    <span>Total</span>
-                </th>
-                <th class="text-right">
-                    <span>Account</span>
-                </th>
-                <th class="text-right">
-                    <span>Date</span>
-                </th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (details of transfersWithItem; track transferWithItemIdTracker($index, details)) {
-                <tr>
-                    <td>
-                        <a [routerLink]="CoinageRoutes.TransferDetailsPage.getUrl({ id: details.transferId })">
-                            {{ details.transferName }}
-                        </a>
-                        @if (details.receiptId) {
-                            <span class="planned-icon">
-                                <a [routerLink]="CoinageRoutes.ReceiptDetailsPage.getUrl({ id: details.receiptId })">
-                                    <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
-                                </a>
-                            </span>
-                        }
-                    </td>
-                    <td>
-                        {{ details.transferContractorName | ifNull: EMPTY_CONTRACTOR }}
-                    </td>
-                    <td>
-                        {{ formatContainer(details) }}
-                    </td>
-                    <td class="currency whitespace-nowrap">{{ details.unitPrice | plnCurrency }}</td>
-                    <td>{{ getStandardPrice(details) }}</td>
-                    <td>{{ details.quantity }}</td>
-                    <td class="currency whitespace-nowrap">{{ details.unitPrice * details.quantity | plnCurrency }}</td>
-                    <td>{{ details.accountName }}</td>
-                    <td class="whitespace-nowrap text-right">
-                        {{ details.date | date }}
-                        <!-- <a [routerLink]="CoinageRoutes.SummaryFullDate(details.date)">{{ details.date | date }}</a> -->
-                    </td>
-                </tr>
-            }
-            @if (showSummary && hasAnyRows && totalPrice > 0) {
-                <tr class="sum-row total-price top-border">
-                    <td>Total</td>
-                    <td></td>
-                    <td></td>
-                    <td>{{ totalItems }}</td>
-                    <td>Avg: {{ (totalQuantity / totalItems).toFixed(3) }}/T</td>
-                    <td>{{ totalQuantity }}</td>
-                    <td class="currency">{{ totalPrice | plnCurrency }}</td>
-                    <td colspan="2"></td>
-                </tr>
-            }
-            @if (!hasAnyRows) {
-                <tr>
-                    <td colspan="9">Item has not been registered in any transfer.</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</div>
+<app-section [header]="isHeaderDisplayed ? header : undefined">
+    <div class="overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse">
+                <thead class="bg-gray-50">
+                    <tr class="border-b border-gray-200">
+                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Transfer</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Contractor</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">Container</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Unit Price</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Standard Price</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Quantity</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Total</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Account</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">Date</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 bg-white">
+                    @for (details of transfersWithItem; track transferWithItemIdTracker($index, details)) {
+                        <tr class="transition-colors duration-200 hover:bg-gray-50">
+                            <td class="px-4 py-3 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <a
+                                        class="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                                        [routerLink]="CoinageRoutes.TransferDetailsPage.getUrl({ id: details.transferId })"
+                                    >
+                                        {{ details.transferName }}
+                                    </a>
+                                    @if (details.receiptId) {
+                                        <a
+                                            class="text-gray-400 transition-colors duration-200 hover:text-gray-600"
+                                            [routerLink]="CoinageRoutes.ReceiptDetailsPage.getUrl({ id: details.receiptId })"
+                                        >
+                                            <fa-icon [icon]="receiptIcon" [fixedWidth]="true" title="View receipt"></fa-icon>
+                                        </a>
+                                    }
+                                </div>
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                {{ details.transferContractorName | ifNull: EMPTY_CONTRACTOR }}
+                            </td>
+                            <td class="px-4 py-3 text-sm text-gray-900">
+                                {{ formatContainer(details) }}
+                            </td>
+                            <td class="px-4 py-3 text-right font-mono text-sm text-gray-900">{{ details.unitPrice | plnCurrency }}</td>
+                            <td class="px-4 py-3 text-right text-sm text-gray-900">{{ getStandardPrice(details) }}</td>
+                            <td class="px-4 py-3 text-right text-sm text-gray-900">{{ details.quantity }}</td>
+                            <td class="px-4 py-3 text-right font-mono text-sm font-medium text-gray-900">
+                                {{ details.unitPrice * details.quantity | plnCurrency }}
+                            </td>
+                            <td class="px-4 py-3 text-right text-sm text-gray-900">{{ details.accountName }}</td>
+                            <td class="whitespace-nowrap px-4 py-3 text-right text-sm text-gray-900">
+                                {{ details.date | date }}
+                            </td>
+                        </tr>
+                    }
+                    @if (showSummary && hasAnyRows && totalPrice > 0) {
+                        <tr class="border-t-2 border-gray-300 bg-gray-50 font-semibold">
+                            <td class="px-4 py-3 text-sm text-gray-900">Total</td>
+                            <td class="px-4 py-3 text-sm text-gray-900"></td>
+                            <td class="px-4 py-3 text-sm text-gray-900"></td>
+                            <td class="px-4 py-3 text-right text-sm text-gray-900">{{ totalItems }}</td>
+                            <td class="px-4 py-3 text-right text-sm text-gray-900">Avg: {{ (totalQuantity / totalItems).toFixed(3) }}/T</td>
+                            <td class="px-4 py-3 text-right text-sm text-gray-900">{{ totalQuantity }}</td>
+                            <td class="px-4 py-3 text-right font-mono text-sm font-bold text-gray-900">{{ totalPrice | plnCurrency }}</td>
+                            <td class="px-4 py-3 text-sm text-gray-900"></td>
+                            <td class="px-4 py-3 text-sm text-gray-900"></td>
+                        </tr>
+                    }
+                    @if (!hasAnyRows) {
+                        <tr>
+                            <td class="px-4 py-8 text-center text-sm text-gray-500" colspan="9">
+                                <div class="flex flex-col items-center gap-2">
+                                    <svg class="h-8 w-8 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"
+                                        ></path>
+                                    </svg>
+                                    <span>Item has not been registered in any transfer.</span>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</app-section>

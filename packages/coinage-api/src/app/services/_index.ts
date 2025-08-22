@@ -1,3 +1,4 @@
+import { AuthService } from '../auth/auth.service';
 import { AccountBalanceService } from './account-balance.service';
 import { AccountsService } from './accounts/accounts.service';
 import { AuthGuard } from './auth.guard';
@@ -6,11 +7,11 @@ import { DatabaseSourceService } from './database-source.service';
 import { DateParserService } from './date-parser.service';
 import { EtherealTransferService } from './ethereal-transfer.service';
 import { ItemsService } from './items.service';
+import { SearchService } from './search.service';
 import { TemplateNameMapperService } from './template-name-mapper.service';
 import { TransferItemsService } from './transfer-items.service';
-import { SaveTransfersService } from './transfers/save-transfers.service';
 import { TransfersService } from './transfers.service';
-import { AuthService } from '../auth/auth.service';
+import { SaveTransfersService } from './transfers/save-transfers.service';
 
 export default [
     DatabaseSourceService,
@@ -25,5 +26,6 @@ export default [
     TransferItemsService,
     AccountsService,
     ItemsService,
+    SearchService,
     AuthService,
 ];
