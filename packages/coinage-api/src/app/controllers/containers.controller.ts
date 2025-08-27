@@ -3,6 +3,7 @@ import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, 
 import { BaseResponseDTO } from '@app/interfaces';
 
 import { ContainerDao } from '../daos/container.dao';
+import { ItemsWithContainersDao } from '../daos/itemsWithContainers.dao';
 import { Container } from '../entities/Container.entity';
 import { AuthGuard } from '../services/auth.guard';
 
@@ -31,12 +32,43 @@ export interface CreateEditContainerDTO {
 export class ContainersController {
     private static INVALID_ID_MESSAGE = 'Invalid ID provided.';
 
-    public constructor(private readonly containerDao: ContainerDao) {}
+    public constructor(
+        private readonly containerDao: ContainerDao,
+        private readonly itemsWithContainersDao: ItemsWithContainersDao,
+    ) {}
 
     @Get()
     public async getAllContainers(): Promise<ContainerDTO[]> {
         const containers = await this.containerDao.getAllContainers();
         return containers.map((container) => this.toContainerDTO(container));
+    }
+
+    @Get('used-with-item/:itemId')
+    public async getContainersUsedWithItem(@Param('itemId') itemId: number): Promise<ContainerDTO[]> {
+        if (!itemId || itemId < 1) {
+            throw new BadRequestException(ContainersController.INVALID_ID_MESSAGE);
+        }
+
+        const itemContainerPairs = await this.itemsWithContainersDao.getContainersUsedWithItem(itemId);
+
+        // Convert the view data to container DTOs, removing duplicates
+        const containersMap = new Map<number, ContainerDTO>();
+
+        itemContainerPairs.forEach((pair) => {
+            if (!containersMap.has(pair.containerId)) {
+                containersMap.set(pair.containerId, {
+                    id: pair.containerId,
+                    name: pair.containerName,
+                    weight: pair.containerWeight,
+                    weightUnit: pair.containerWeightUnit,
+                    volume: pair.containerVolume,
+                    volumeUnit: pair.containerVolumeUnit,
+                    itemCount: pair.containerItemCount,
+                });
+            }
+        });
+
+        return Array.from(containersMap.values());
     }
 
     @Get(':containerId')

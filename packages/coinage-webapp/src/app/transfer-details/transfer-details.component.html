@@ -26,7 +26,7 @@
         </div>
 
         <!-- Main Content Grid -->
-        <div class="mb-6 grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div class="mb-6 grid grid-cols-1 gap-6" [class.lg:grid-cols-2]="hasItems">
             <!-- Transfer Details -->
             <app-section header="Transfer Details">
                 <dl class="space-y-4">
@@ -174,9 +174,11 @@
             </app-section>
 
             <!-- Items Table -->
-            <app-section header="Items">
-                <app-items-table [items]="transfer.items" [containers]="containers"></app-items-table>
-            </app-section>
+            @if (hasItems) {
+                <app-section header="Items">
+                    <app-items-table [items]="transfer.items" [containers]="containers"></app-items-table>
+                </app-section>
+            }
         </div>
 
         <!-- Action Buttons -->

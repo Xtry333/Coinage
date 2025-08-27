@@ -31,10 +31,12 @@ export class ItemsTableComponent implements OnChanges {
 
     public tableItems: UiTransferItemDTO[] = [];
     public totalSum = 0;
+    public totalAmount = 0;
 
     public ngOnChanges(): void {
         this.tableItems = this.items.map((item) => new UiTransferItemDTO(item));
         this.totalSum = this.items.reduce((sum, item) => sum + item.totalPrice - item.setDiscount, 0);
+        this.totalAmount = this.items.reduce((sum, item) => sum + item.amount, 0);
     }
 
     public idTracker(_index: number, item: TransferItemDTO): string {

@@ -11,6 +11,7 @@
             #searchInput
             [(ngModel)]="searchQuery"
             (input)="onSearchInput($event)"
+            (keydown)="onSearchKeyDown($event)"
             (focus)="onSearchFocus()"
             type="text"
             placeholder="Search items and transfers..."

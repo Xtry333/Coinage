@@ -119,6 +119,10 @@ export class CoinageDataService {
         return this.http.get<ContainerDTO[]>(`${CoinageDataService.API_URL}containers`);
     }
 
+    public getContainersUsedWithItem(itemId: number): Promise<ContainerDTO[]> {
+        return lastValueFrom(this.http.get<ContainerDTO[]>(`${CoinageDataService.API_URL}containers/used-with-item/${itemId}`));
+    }
+
     public getAllAvailableAccounts(): Observable<AccountDTO[]> {
         return this.http.get<AccountDTO[]>(`${CoinageDataService.API_URL}account/all`);
     }

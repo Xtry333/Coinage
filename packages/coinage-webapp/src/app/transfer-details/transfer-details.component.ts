@@ -185,4 +185,8 @@ export class TransferDetailsComponent implements OnInit, OnDestroy {
     public get isSplittable(): boolean {
         return this.transfer.amount > 0;
     }
+
+    public get hasItems(): boolean {
+        return this.transfer?.items && this.transfer.items.length > 0;
+    }
 }

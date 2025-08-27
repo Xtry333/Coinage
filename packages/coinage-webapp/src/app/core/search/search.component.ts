@@ -29,6 +29,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     public transferIcon = faExchangeAlt;
 
     private searchSubject = new Subject<string>();
+    private instantSearchSubject = new Subject<string>();
     private subscription = new Subscription();
 
     constructor(
@@ -38,54 +39,30 @@ export class SearchComponent implements OnInit, OnDestroy {
     ) {}
 
     public ngOnInit(): void {
+        // Debounced search stream
         this.subscription.add(
             this.searchSubject
                 .pipe(
-                    debounceTime(1000), // 1 second debounce
+                    debounceTime(1000),
                     distinctUntilChanged(),
-                    switchMap((query) => {
-                        const trimmedQuery = query.trim();
-
-                        // Reset states
-                        this.searchError = null;
-                        this.searchResults = null;
-
-                        if (trimmedQuery.length === 0) {
-                            // Empty query - hide results
-                            this.isLoading = false;
-                            this.showResults = false;
-                            return [];
-                        } else if (trimmedQuery.length < 2) {
-                            // Too short - show warning
-                            this.isLoading = false;
-                            this.showResults = true;
-                            this.searchError = 'Please enter at least 2 characters to search';
-                            return [];
-                        } else {
-                            // Valid query - start loading
-                            this.isLoading = true;
-                            this.showResults = true;
-                            return this.searchService.globalSearch(trimmedQuery);
-                        }
-                    }),
+                    switchMap((query) => this.performSearch(query)),
                 )
                 .subscribe({
-                    next: (results) => {
-                        if (Array.isArray(results) && results.length === 0) {
-                            // Empty array from short query or empty query
-                            return;
-                        }
+                    next: (results) => this.handleSearchResults(results),
+                    error: (error) => this.handleSearchError(error),
+                }),
+        );
 
-                        this.searchResults = results;
-                        this.isLoading = false;
-                        this.searchError = null;
-                    },
-                    error: (error) => {
-                        console.error('Search error:', error);
-                        this.searchResults = null;
-                        this.isLoading = false;
-                        this.searchError = 'An error occurred while searching. Please try again.';
-                    },
+        // Instant search stream for Enter key
+        this.subscription.add(
+            this.instantSearchSubject
+                .pipe(
+                    distinctUntilChanged(),
+                    switchMap((query) => this.performSearch(query)),
+                )
+                .subscribe({
+                    next: (results) => this.handleSearchResults(results),
+                    error: (error) => this.handleSearchError(error),
                 }),
         );
 
@@ -104,6 +81,14 @@ export class SearchComponent implements OnInit, OnDestroy {
 
         // Always trigger the search subject, let the pipeline handle the logic
         this.searchSubject.next(query);
+    }
+
+    public onSearchKeyDown(event: KeyboardEvent): void {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            // Trigger instant search on Enter
+            this.instantSearchSubject.next(this.searchQuery);
+        }
     }
 
     public onItemClick(itemId: number): void {
@@ -130,6 +115,50 @@ export class SearchComponent implements OnInit, OnDestroy {
 
     private hideResults(): void {
         this.showResults = false;
+    }
+
+    private performSearch(query: string) {
+        const trimmedQuery = query.trim();
+
+        // Reset states
+        this.searchError = null;
+        this.searchResults = null;
+
+        if (trimmedQuery.length === 0) {
+            // Empty query - hide results
+            this.isLoading = false;
+            this.showResults = false;
+            return [];
+        } else if (trimmedQuery.length < 2) {
+            // Too short - show warning
+            this.isLoading = false;
+            this.showResults = true;
+            this.searchError = 'Please enter at least 2 characters to search';
+            return [];
+        } else {
+            // Valid query - start loading
+            this.isLoading = true;
+            this.showResults = true;
+            return this.searchService.globalSearch(trimmedQuery);
+        }
+    }
+
+    private handleSearchResults(results: any) {
+        if (Array.isArray(results) && results.length === 0) {
+            // Empty array from short query or empty query
+            return;
+        }
+
+        this.searchResults = results;
+        this.isLoading = false;
+        this.searchError = null;
+    }
+
+    private handleSearchError(error: any) {
+        console.error('Search error:', error);
+        this.searchResults = null;
+        this.isLoading = false;
+        this.searchError = 'An error occurred while searching. Please try again.';
     }
 
     private onDocumentClick(event: Event): void {

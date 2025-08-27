@@ -27,9 +27,9 @@
             }
             @if (!noRowsFound) {
                 <tr class="border-t-2 border-gray-300 bg-gray-50 font-semibold">
-                    <td class="px-4 py-3 text-sm text-gray-900">Total</td>
+                    <td class="px-4 py-3 text-sm text-gray-900">Total ({{ tableItems.length }} items)</td>
                     <td class="px-4 py-3 text-sm text-gray-900"></td>
-                    <td class="px-4 py-3 text-sm text-gray-900"></td>
+                    <td class="px-4 py-3 text-right text-sm font-bold text-gray-900">{{ totalAmount }}</td>
                     <td class="px-4 py-3 text-right font-mono text-sm font-bold text-gray-900">{{ totalSum | plnCurrency }}</td>
                 </tr>
             }
