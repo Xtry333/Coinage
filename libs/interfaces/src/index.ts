@@ -20,6 +20,7 @@ export * from './lib/SaveTransferDTO.request';
 export * from './lib/SaveTransferDTO.response';
 export * from './lib/SplitTransferDTO.request';
 export * from './lib/TotalInMonthByCategory.response';
+export * from './model/BulkEditTransfer.dto.request';
 export * from './model/CreateEditItem.dto.request';
 export * from './model/CreateEditTransfer.dto.request';
 export * from './model/CreateMultipleTransfers.dto.request';

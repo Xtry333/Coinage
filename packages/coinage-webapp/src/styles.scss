@@ -3,10 +3,7 @@
 @tailwind utilities;
 @import '~@ng-select/ng-select/themes/default.theme.css';
 
-html {
-    overflow-y: scroll;
-}
-
+html,
 body {
     margin: 0;
     padding: 0;

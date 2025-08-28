@@ -1,7 +1,5 @@
 <div class="coinage-app-table-filter" #tableFilterElement>
-    <button class="filter-icon-btn" (click)="onToggleOpenHide()">
-        <fa-icon class="icon" [icon]="filterIcon"></fa-icon>
-    </button>
+    <app-button-icon [icon]="filterIcon" [ariaLabel]="getFilterButtonAriaLabel()" (clicked)="onToggleOpenHide()" size="sm" variant="ghost"></app-button-icon>
     @if (isPopupDisplayed) {
         <div class="filter-popup" [ngClass]="popupSideClass">
             <form (ngSubmit)="onPerformFilter()">
@@ -95,9 +93,21 @@
                                     autocomplete="off"
                                     placeholder="Search..."
                                 />
-                                <button class="clear-button" (click)="onClearOptionsSearchValue()" type="button" title="Clear Search">X</button>
+                                <app-button-icon
+                                    [icon]="clearIcon"
+                                    (clicked)="onClearOptionsSearchValue()"
+                                    size="sm"
+                                    variant="ghost"
+                                    ariaLabel="Clear search"
+                                ></app-button-icon>
                                 @if (shouldShowCheckVisibleButton) {
-                                    <button class="check-visible-button" (click)="onCheckVisibleOptions()" type="button" title="Check Visible">+</button>
+                                    <app-button-icon
+                                        [icon]="checkIcon"
+                                        (clicked)="onCheckVisibleOptions()"
+                                        size="sm"
+                                        variant="ghost"
+                                        ariaLabel="Check visible options"
+                                    ></app-button-icon>
                                 }
                             </div>
                         }

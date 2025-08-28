@@ -73,12 +73,51 @@
         </button>
         <div class="shopping-list">
             <ol>
-                @for (item of itemList; track item) {
-                    <li class="shopping-item">
-                        <span>
-                            {{ item.name | ifNull: 'Unnamed' }} x {{ item.amount }} | {{ item.amount * item.price | plnCurrency }}
-                            <span class="container-details">{{ getContainerDetails(item.containerId) }}</span>
-                        </span>
+                @for (item of itemList; track item; let i = $index) {
+                    <li class="shopping-item inline-editable">
+                        <div class="item-details">
+                            <div class="item-name">{{ item.name | ifNull: 'Unnamed' }}</div>
+                            <div class="item-inputs">
+                                <label class="sr-only">Quantity</label>
+                                <input
+                                    class="quantity-input"
+                                    [(ngModel)]="item.amount"
+                                    (ngModelChange)="onItemQuantityChanged(item)"
+                                    type="number"
+                                    min="0.01"
+                                    step="0.01"
+                                    placeholder="Qty"
+                                />
+                                <span class="multiply-symbol">×</span>
+                                <label class="sr-only">Price</label>
+                                <input
+                                    class="price-input"
+                                    [(ngModel)]="item.price"
+                                    (ngModelChange)="onItemPriceChanged(item)"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="Price"
+                                />
+                                <span class="equals-symbol">=</span>
+                                <span class="total-price">{{ item.amount * item.price | plnCurrency }}</span>
+                            </div>
+                            <div class="container-selection">
+                                <label class="sr-only">Container</label>
+                                <ng-select
+                                    class="container-select"
+                                    [(ngModel)]="item.containerId"
+                                    [clearable]="true"
+                                    [searchable]="false"
+                                    [items]="containersWithDisplayNames"
+                                    (ngModelChange)="onItemContainerChanged(item)"
+                                    bindValue="id"
+                                    bindLabel="displayName"
+                                    placeholder="Container (optional)"
+                                >
+                                </ng-select>
+                            </div>
+                        </div>
                         <span (click)="onRemoveItemFromList(item)"><fa-icon class="remove-icon" [icon]="removeIcon" [fixedWidth]="true"></fa-icon></span>
                     </li>
                 }

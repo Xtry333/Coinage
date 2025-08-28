@@ -10,7 +10,9 @@ import { NullTransformPipe } from '../pipes/null-transform.pipe';
 import { PlnCurrencyPipe } from '../pipes/pln-currency.pipe';
 import { ReplacePipe } from '../pipes/replace.pipe';
 import { BigCounterComponent } from './big-counter/big-counter.component';
+import { ButtonIconComponent } from './button-icon/button-icon.component';
 import { DropdownMenuComponent } from './dropdown-menu/dropdown-menu.component';
+import { NotificationsDropdownComponent } from './notifications-dropdown/notifications-dropdown.component';
 import { PaginationComponent } from './pagination/pagination.component';
 import { SearchComponent } from './search/search.component';
 import { CoinageStorageService } from './services/storage-service/coinage-storage.service';
@@ -26,6 +28,8 @@ const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe, CurrencyPipe];
         ...pipes,
         NullTransformPipe,
         BigCounterComponent,
+        ButtonIconComponent,
+        NotificationsDropdownComponent,
         PaginationComponent,
         TopNavBarComponent,
         SidebarNavComponent,
@@ -37,6 +41,8 @@ const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe, CurrencyPipe];
         ...pipes,
         NullTransformPipe,
         BigCounterComponent,
+        ButtonIconComponent,
+        NotificationsDropdownComponent,
         PaginationComponent,
         TopNavBarComponent,
         SidebarNavComponent,

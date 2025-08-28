@@ -10,6 +10,8 @@ import {
     ContainerDTO,
     ContractorDTO,
     CreateEditTransferModelDTO,
+    GranularCreateEditTransferModelDTO,
+    GranularTransferItemChanges,
     ShoppingListItem,
     TransferDetailsDTO,
     TransferItemDTO,
@@ -29,6 +31,7 @@ export interface NewTransferObject {
     contractorId?: number | null;
     accountId?: number;
     targetAccountId?: number;
+    items?: ShoppingListItem[];
 }
 
 @Component({
@@ -51,6 +54,7 @@ export class CreateEditTransferComponent implements OnInit {
     public transferId!: number;
 
     public itemsInTransfer: ShoppingListItem[] = [];
+    public originalItemsInTransfer: ShoppingListItem[] = [];
 
     public shouldDisplayShoppingList = false;
     public shouldOverrideTotalCostOnChange = true;
@@ -63,6 +67,7 @@ export class CreateEditTransferComponent implements OnInit {
 
     @Input() public redirectAfterSave = true;
     @Input() public selectedTransferInputs!: NewTransferObject;
+    @Input() public initialData?: NewTransferObject;
 
     @Output() public saveSuccess = new EventEmitter<void>();
 
@@ -85,6 +90,7 @@ export class CreateEditTransferComponent implements OnInit {
                 this.coinageData.getTransferDetails(id).then((transfer) => {
                     this.transferDTO = transfer;
                     this.itemsInTransfer = this.mapToTransferItems(transfer.items);
+                    this.originalItemsInTransfer = JSON.parse(JSON.stringify(this.itemsInTransfer)); // Deep copy
                     this.shouldDisplayShoppingList = transfer.items.length > 0;
                     this.editMode = true;
                     this.shouldOverrideTotalCostOnChange = false;
@@ -99,6 +105,20 @@ export class CreateEditTransferComponent implements OnInit {
                         targetAccountId: transfer.targetAccount.id,
                     };
                 });
+            } else if (this.initialData) {
+                this.selectedTransferInputs = {
+                    description: this.initialData.description || '',
+                    amount: this.initialData.amount || 0,
+                    date: this.initialData.date || this.todayInputFormat,
+                    categoryId: this.initialData.categoryId,
+                    contractorId: this.initialData.contractorId,
+                    accountId: this.initialData.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
+                    targetAccountId: this.initialData.targetAccountId,
+                };
+                if (this.initialData.items && this.initialData.items.length > 0) {
+                    this.itemsInTransfer = [...this.initialData.items];
+                    this.shouldDisplayShoppingList = true;
+                }
             }
         });
         Rx.zip(
@@ -121,45 +141,63 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     public onClickSaveTransfer(): void {
-        const newTransfer = new CreateEditTransferModelDTO(
-            this.transferId,
-            this.selectedTransferInputs.description,
-            parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
-            this.selectedTransferInputs.categoryId ?? 0,
-            this.selectedTransferInputs.contractorId ?? null,
-            this.selectedTransferInputs.accountId ?? 0,
-            new Date(this.selectedTransferInputs.date),
-            this.transferDTO?.receipt?.id ?? null,
-            this.itemsInTransfer,
-        );
-        console.log(newTransfer);
-        this.coinageData.postCreateSaveTransfer(newTransfer).subscribe((result) => {
-            console.log(result);
-            const cat = this.categories.find((c) => c.id === newTransfer.categoryId);
-            if (result.error) {
-                this.notificationService.error(`Error saving transfer:\n${result.error}`);
-            }
-            if (result.insertedId && cat) {
-                this.saveSuccess.emit();
-                //     {
-                //     ...newTransfer,
-                //     id: result.insertedId,
-                //     categoryName: cat.name,
-                //     type: TransferTypeEnum.OUTCOME,
-                //     accountName: this.accounts.find((a) => a.id === newTransfer.accountId)?.name ?? '',
-                // }
-                this.notificationService.push({
-                    title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`,
-                    message: newTransfer.description ?? this.categories.find((c) => c.id === newTransfer.categoryId)?.name ?? 'Saved Transfer',
-                    linkTo: CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }),
-                });
-                this.clearInputData();
-            }
-            if (this.redirectAfterSave && result.insertedId) {
-                this.navigator.goTo(CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }));
-            }
-        });
+        if (this.editMode && this.transferId) {
+            // Use granular saving for existing transfers
+            const itemChanges = this.calculateItemChanges();
+            const granularTransfer = new GranularCreateEditTransferModelDTO(
+                this.transferId,
+                this.selectedTransferInputs.description,
+                parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
+                this.selectedTransferInputs.categoryId ?? 0,
+                this.selectedTransferInputs.contractorId ?? null,
+                this.selectedTransferInputs.accountId ?? 0,
+                new Date(this.selectedTransferInputs.date),
+                this.transferDTO?.receipt?.id ?? null,
+                itemChanges,
+            );
+            console.log('Granular save:', granularTransfer);
+            this.coinageData.postGranularSaveTransfer(granularTransfer).subscribe((result) => {
+                this.handleSaveResult(result, granularTransfer.categoryId, granularTransfer.description);
+            });
+        } else {
+            // Use regular saving for new transfers
+            const newTransfer = new CreateEditTransferModelDTO(
+                this.transferId,
+                this.selectedTransferInputs.description,
+                parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
+                this.selectedTransferInputs.categoryId ?? 0,
+                this.selectedTransferInputs.contractorId ?? null,
+                this.selectedTransferInputs.accountId ?? 0,
+                new Date(this.selectedTransferInputs.date),
+                this.transferDTO?.receipt?.id ?? null,
+                this.itemsInTransfer,
+            );
+            console.log('Regular save:', newTransfer);
+            this.coinageData.postCreateSaveTransfer(newTransfer).subscribe((result) => {
+                this.handleSaveResult(result, newTransfer.categoryId, newTransfer.description);
+            });
+        }
         this.coinageLocalStorageService.setNumber('lastUsedAccountId', this.selectedTransferInputs.accountId);
+    }
+
+    private handleSaveResult(result: any, categoryId: number, description?: string): void {
+        console.log(result);
+        const cat = this.categories.find((c) => c.id === categoryId);
+        if (result.error) {
+            this.notificationService.error(`Error saving transfer:\n${result.error}`);
+        }
+        if (result.insertedId && cat) {
+            this.saveSuccess.emit();
+            this.notificationService.push({
+                title: `Transfer ${this.editMode ? 'Saved' : 'Added'}`,
+                message: description ?? this.categories.find((c) => c.id === categoryId)?.name ?? 'Saved Transfer',
+                linkTo: CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }),
+            });
+            this.clearInputData();
+        }
+        if (this.redirectAfterSave && result.insertedId) {
+            this.navigator.goTo(CoinageRoutes.TransferDetailsPage.getUrl({ id: result.insertedId }));
+        }
     }
 
     public onClickDeleteTransfer(): void {
@@ -214,20 +252,37 @@ export class CreateEditTransferComponent implements OnInit {
     }
 
     public clearInputData(): void {
-        // this.selectedTransferInputs.description = '';
-        // this.selectedTransferInputs.amount = 0;
-        // this.selectedTransferInputs.date = this.todayInputFormat;
-        this.selectedTransferInputs = {
-            description: '',
-            amount: 0,
-            date: this.todayInputFormat,
-            categoryId: this.selectedTransferInputs?.categoryId,
-            contractorId: this.selectedTransferInputs?.contractorId,
-            accountId: this.selectedTransferInputs?.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
-        };
+        if (this.initialData && !this.editMode) {
+            this.selectedTransferInputs = {
+                description: this.initialData.description || '',
+                amount: this.initialData.amount || 0,
+                date: this.initialData.date || this.todayInputFormat,
+                categoryId: this.initialData.categoryId,
+                contractorId: this.initialData.contractorId,
+                accountId: this.initialData.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
+                targetAccountId: this.initialData.targetAccountId,
+            };
+            if (this.initialData.items && this.initialData.items.length > 0) {
+                this.itemsInTransfer = [...this.initialData.items];
+                this.shouldDisplayShoppingList = true;
+            } else {
+                this.itemsInTransfer = [];
+                this.shouldDisplayShoppingList = false;
+            }
+        } else {
+            this.selectedTransferInputs = {
+                description: '',
+                amount: 0,
+                date: this.todayInputFormat,
+                categoryId: this.selectedTransferInputs?.categoryId,
+                contractorId: this.selectedTransferInputs?.contractorId,
+                accountId: this.selectedTransferInputs?.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
+            };
+            this.itemsInTransfer = [];
+            this.shouldDisplayShoppingList = false;
+        }
         this.categorySelect?.first.handleClearClick();
         this.contractorSelect?.first.handleClearClick();
-        this.shouldDisplayShoppingList = false;
     }
 
     public openShoppingList(): void {
@@ -259,17 +314,77 @@ export class CreateEditTransferComponent implements OnInit {
 
     private mapToTransferItems(items: TransferItemDTO[]): ShoppingListItem[] {
         return items.map((item) => {
-            return {
-                amount: item.amount,
-                id: item.id,
-                name: item.itemName,
-                quantity: item.amount,
-                price: item.unitPrice,
-                totalPrice: item.unitPrice * item.amount,
-                setDiscount: undefined,
-                categoryId: 0,
-                containerId: item.containerId,
-            };
+            return new ShoppingListItem(
+                undefined,
+                item.itemName,
+                item.amount,
+                item.unitPrice,
+                item.unitPrice * item.amount,
+                undefined,
+                0,
+                item.containerId,
+                item.id,
+            );
         });
+    }
+
+    private calculateItemChanges(): GranularTransferItemChanges {
+        const addedItems: ShoppingListItem[] = [];
+        const editedItems: ShoppingListItem[] = [];
+        const removedItemIds: number[] = [];
+
+        // Create maps for efficient lookups
+        const originalItemsMap = new Map<number | null, ShoppingListItem>();
+        const currentItemsMap = new Map<number | null, ShoppingListItem>();
+
+        // Map original items by their transferItemId
+        this.originalItemsInTransfer.forEach((item) => {
+            if (item.transferItemId) {
+                originalItemsMap.set(item.transferItemId, item);
+            }
+        });
+
+        // Map current items by their transferItemId
+        this.itemsInTransfer.forEach((item) => {
+            if (item.transferItemId) {
+                currentItemsMap.set(item.transferItemId, item);
+            }
+        });
+
+        // Find added items (no transferItemId or transferItemId not in original)
+        this.itemsInTransfer.forEach((item) => {
+            if (!item.transferItemId || !originalItemsMap.has(item.transferItemId)) {
+                addedItems.push(item);
+            }
+        });
+
+        // Find edited items (transferItemId exists in both, but data changed)
+        this.itemsInTransfer.forEach((item) => {
+            if (item.transferItemId && originalItemsMap.has(item.transferItemId)) {
+                const original = originalItemsMap.get(item.transferItemId)!;
+                if (this.hasItemChanged(original, item)) {
+                    editedItems.push(item);
+                }
+            }
+        });
+
+        // Find removed items (transferItemId in original but not in current)
+        this.originalItemsInTransfer.forEach((item) => {
+            if (item.transferItemId && !currentItemsMap.has(item.transferItemId)) {
+                removedItemIds.push(item.transferItemId);
+            }
+        });
+
+        return new GranularTransferItemChanges(addedItems, editedItems, removedItemIds);
+    }
+
+    private hasItemChanged(original: ShoppingListItem, current: ShoppingListItem): boolean {
+        return (
+            original.amount !== current.amount ||
+            original.price !== current.price ||
+            original.containerId !== current.containerId ||
+            original.name !== current.name ||
+            original.id !== current.id
+        );
     }
 }

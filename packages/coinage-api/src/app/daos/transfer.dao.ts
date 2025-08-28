@@ -193,4 +193,16 @@ export class TransferDao extends BaseDao {
             take: limit,
         });
     }
+
+    public async findByIds(ids: number[]): Promise<Transfer[]> {
+        return this.transferRepository.findBy({ id: In(ids) });
+    }
+
+    public async bulkUpdate(ids: number[], updateData: Partial<Transfer>): Promise<void> {
+        await this.transferRepository.update({ id: In(ids) }, updateData);
+    }
+
+    public async bulkDelete(ids: number[]): Promise<void> {
+        await this.transferRepository.delete({ id: In(ids) });
+    }
 }

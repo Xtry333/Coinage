@@ -25,11 +25,12 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     @Input() public selectedCategoryId: number | null = null;
     @Input() public preselectedItems: ShoppingListItem[] = [];
     @Input() public containers: ContainerDTO[] = [];
+    @Input() public shouldOverrideTotalCostOnChange: boolean = true;
 
     @Output() public itemListChanged = new EventEmitter<ShoppingListItem[]>();
     @Output() public totalCostChanged = new EventEmitter<number>();
 
-    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0, 0, null);
+    public selectedItem: ShoppingListItem = new ShoppingListItem(undefined, '', 1, 0, 0, 0, 0, null, null);
     public itemList: ShoppingListItem[] = [];
 
     public constructor(
@@ -149,9 +150,14 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             undefined,
             item?.categoryId ?? 0,
             this.selectedItem.containerId,
+            null,
         );
         this.itemList.push(shoppingItem);
-        this.recalculateAndEmitTotalCost();
+        if (this.shouldOverrideTotalCostOnChange) {
+            this.recalculateAndEmitTotalCost();
+        } else {
+            this.itemListChanged.emit(this.itemList);
+        }
         this.itemSelect?.first.handleClearClick();
         this.selectedItem.price = 0;
         this.selectedItem.amount = 1;
@@ -160,7 +166,30 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
 
     public onRemoveItemFromList(item: ShoppingListItem): void {
         this.itemList = this.itemList.filter((listItem) => listItem !== item);
-        this.recalculateAndEmitTotalCost();
+        if (this.shouldOverrideTotalCostOnChange) {
+            this.recalculateAndEmitTotalCost();
+        } else {
+            this.itemListChanged.emit(this.itemList);
+        }
+    }
+
+    public onItemQuantityChanged(item: ShoppingListItem): void {
+        item.totalPrice = item.amount * item.price;
+        if (this.shouldOverrideTotalCostOnChange) {
+            this.recalculateAndEmitTotalCost();
+        }
+    }
+
+    public onItemPriceChanged(item: ShoppingListItem): void {
+        item.totalPrice = item.amount * item.price;
+        if (this.shouldOverrideTotalCostOnChange) {
+            this.recalculateAndEmitTotalCost();
+        }
+    }
+
+    public onItemContainerChanged(item: ShoppingListItem): void {
+        // Container change doesn't affect pricing, just need to emit the updated item list
+        this.itemListChanged.emit(this.itemList);
     }
 
     public onItemSelected(selected: ShoppingListItem): void {
@@ -211,6 +240,11 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             this.prioritizedContainers = usedContainers;
             this.otherContainers = this.containers.filter((c) => !usedContainerIds.has(c.id));
             this.updateContainersWithDisplayNames();
+
+            // Only set default container if the item has been used with containers before
+            if (!this.selectedItem.containerId && usedContainers.length > 0) {
+                this.selectedItem.containerId = usedContainers[0].id;
+            }
         } catch (error) {
             console.error('Failed to load containers for item:', error);
             this.organizeContainers();

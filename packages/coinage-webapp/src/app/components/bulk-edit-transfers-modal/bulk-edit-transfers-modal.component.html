@@ -1,0 +1,121 @@
+<div class="min-w-[600px] space-y-6">
+    <div class="border-b border-gray-200 pb-4">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Bulk Edit Transfers</h3>
+        <p class="mt-1 text-sm text-gray-500">
+            Edit {{ selectedTransferIds.length }} selected transfer{{ selectedTransferIds.length === 1 ? '' : 's' }}. Only fields you fill in will be updated.
+        </p>
+    </div>
+
+    <form class="space-y-4" (ngSubmit)="onSave()">
+        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <!-- Description -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="bulkDescription"> Description </label>
+                <input
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    id="bulkDescription"
+                    [(ngModel)]="bulkEditData.description"
+                    name="description"
+                    type="text"
+                    placeholder="Leave blank to keep existing"
+                />
+            </div>
+
+            <!-- Category -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="bulkCategory"> Category </label>
+                <ng-select
+                    [(ngModel)]="bulkEditData.categoryId"
+                    [clearable]="true"
+                    [editableSearchTerm]="true"
+                    [items]="categories"
+                    [addTag]="onAddNewCategory.bind(this)"
+                    name="category"
+                    labelForId="bulkCategory"
+                    bindValue="id"
+                    bindLabel="name"
+                    addTagText="Add category"
+                    placeholder="Leave blank to keep existing"
+                >
+                </ng-select>
+            </div>
+
+            <!-- Contractor -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="bulkContractor"> Contractor </label>
+                <ng-select
+                    [(ngModel)]="bulkEditData.contractorId"
+                    [clearable]="true"
+                    [editableSearchTerm]="true"
+                    [items]="contractors"
+                    [addTag]="onAddNewContractor.bind(this)"
+                    name="contractor"
+                    labelForId="bulkContractor"
+                    bindValue="id"
+                    bindLabel="name"
+                    addTagText="Add contractor"
+                    placeholder="Leave blank to keep existing"
+                >
+                </ng-select>
+            </div>
+
+            <!-- Account -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="bulkAccount"> Account </label>
+                <ng-select
+                    [(ngModel)]="bulkEditData.accountId"
+                    [clearable]="true"
+                    [editableSearchTerm]="true"
+                    [items]="accounts"
+                    name="account"
+                    labelForId="bulkAccount"
+                    bindValue="id"
+                    bindLabel="name"
+                    placeholder="Leave blank to keep existing"
+                >
+                </ng-select>
+            </div>
+
+            <!-- Date -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="bulkDate"> Date </label>
+                <input
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    id="bulkDate"
+                    [(ngModel)]="bulkEditData.date"
+                    name="date"
+                    type="date"
+                    placeholder="Leave blank to keep existing"
+                />
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-end space-x-3 border-t border-gray-200 pt-6">
+            <button
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                (click)="onClose()"
+                type="button"
+            >
+                Cancel
+            </button>
+            <button
+                class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                [disabled]="!hasChanges() || isLoading"
+                type="submit"
+            >
+                @if (isLoading) {
+                    <svg class="mr-2 h-4 w-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                        ></path>
+                    </svg>
+                }
+                Update {{ selectedTransferIds.length }} Transfer{{ selectedTransferIds.length === 1 ? '' : 's' }}
+            </button>
+        </div>
+    </form>
+</div>

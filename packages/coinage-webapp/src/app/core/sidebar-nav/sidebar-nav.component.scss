@@ -1,21 +1,14 @@
 :host {
     display: block;
-    height: 100%;
-}
-
-.sidebar {
-    height: 100%;
-    width: 100%;
-    transition: transform 0.3s ease-in-out;
 
     // Mobile: Fixed positioning and overlay
     &.fixed {
         position: fixed;
         left: 0;
+        top: 3.75rem;
         bottom: 0;
         width: 16rem; /* 64 tailwind units = 256px */
         z-index: 40;
-        height: calc(100vh - 3.75rem);
         transform: translateX(-100%);
 
         &.show {
@@ -23,14 +16,24 @@
         }
     }
 
-    // Desktop: Part of flex layout, no fixed positioning
+    // Desktop: Fixed positioning on left side
     &:not(.fixed) {
-        position: relative;
+        position: fixed;
+        left: 0;
+        top: 3.75rem;
+        bottom: 0;
+        width: 16rem; /* 64 tailwind units = 256px */
+        z-index: 30;
     }
 
     &.hidden:not(.fixed) {
-        display: none;
+        transform: translateX(-100%);
     }
+}
+
+.sidebar {
+    height: 100%;
+    width: 100%;
 }
 
 .sidebar-sticky {

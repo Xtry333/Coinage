@@ -1,6 +1,8 @@
 import * as Rx from 'rxjs';
 
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
+import { IconDefinition, faEdit, faFlagCheckered, faReceipt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import {
     FilterOption,
     FilterType,
@@ -12,13 +14,11 @@ import {
     PopupSide,
     TableFilterComponent,
 } from './table-filter/table-filter.component';
-import { IconDefinition, faReceipt, faFlag, faFlagCheckered } from '@fortawesome/free-solid-svg-icons';
-import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 
-import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageRoutes } from '../app-routing/app-routes';
 import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
+import { CoinageDataService } from '../services/coinage.data-service';
 
 export enum TableColumn {
     Category = 'Category',
@@ -83,12 +83,19 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     public receiptIcon: IconDefinition = faReceipt;
     public flagIcon: IconDefinition = faFlagCheckered;
+    public editIcon: IconDefinition = faEdit;
+    public trashIcon: IconDefinition = faTrash;
 
     public filter: TableFilterFields = {};
     public outcomesSum = 0;
     public outcomesCount = 0;
     public incomesSum = 0;
     public incomesCount = 0;
+
+    public selectedTransferIds = new Set<number>();
+    public isBulkEditModalOpen = false;
+    public isBulkEditMode = false;
+    public readonly Array = Array;
 
     public transfersForTable: UiTransfer[] = [];
     public optionsForCheckboxFilters: OptionsForCheckboxFilters = {
@@ -107,6 +114,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     @Input() public showTodayMarker?: boolean = true;
     @Input() public filterCachePath?: string;
     @Input() public lastPageNumber?: number;
+    @Input() public enableBulkActions?: boolean = false;
 
     @Output() public tableFilter = new EventEmitter<TableFilterFields>();
 
@@ -334,5 +342,91 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     public getSummaryPageUrl(transfer: UiTransfer): string {
         return CoinageRoutes.SummaryPage.getUrl({ month: String(transfer.date) });
+    }
+
+    public get isAllSelected(): boolean {
+        const selectableTransfers = this.transfersForTable.filter((t) => !t.isTodayMarkerRow);
+        return selectableTransfers.length > 0 && selectableTransfers.every((t) => this.selectedTransferIds.has(t.id));
+    }
+
+    public get isPartiallySelected(): boolean {
+        const selectableTransfers = this.transfersForTable.filter((t) => !t.isTodayMarkerRow);
+        const selectedCount = selectableTransfers.filter((t) => this.selectedTransferIds.has(t.id)).length;
+        return selectedCount > 0 && selectedCount < selectableTransfers.length;
+    }
+
+    public isTransferSelected(transferId: number): boolean {
+        return this.selectedTransferIds.has(transferId);
+    }
+
+    public toggleSelectAll(event: Event): void {
+        const target = event.target as HTMLInputElement;
+        const selectableTransfers = this.transfersForTable.filter((t) => !t.isTodayMarkerRow);
+
+        if (target.checked) {
+            selectableTransfers.forEach((t) => this.selectedTransferIds.add(t.id));
+        } else {
+            this.selectedTransferIds.clear();
+        }
+    }
+
+    public toggleTransferSelection(transferId: number, event: Event): void {
+        const target = event.target as HTMLInputElement;
+
+        if (target.checked) {
+            this.selectedTransferIds.add(transferId);
+        } else {
+            this.selectedTransferIds.delete(transferId);
+        }
+    }
+
+    public clearSelection(): void {
+        this.selectedTransferIds.clear();
+    }
+
+    public onBulkEditModeChanged(): void {
+        if (!this.isBulkEditMode) {
+            this.selectedTransferIds.clear();
+        }
+    }
+
+    public openBulkEditModal(): void {
+        if (this.selectedTransferIds.size === 0) return;
+        this.isBulkEditModalOpen = true;
+    }
+
+    public onBulkEditModalClose(): void {
+        this.isBulkEditModalOpen = false;
+    }
+
+    public onBulkEditComplete(): void {
+        this.selectedTransferIds.clear();
+        this.isBulkEditModalOpen = false;
+        // Emit event to parent component to refresh data
+        this.tableFilter.emit(this.filter);
+    }
+
+    public async confirmBulkDelete(): Promise<void> {
+        if (this.selectedTransferIds.size === 0) return;
+
+        const count = this.selectedTransferIds.size;
+        if (confirm(`Are you sure you want to delete ${count} transfer${count === 1 ? '' : 's'}?`)) {
+            try {
+                const result = await this.dataService.postBulkDeleteTransfers({
+                    transferIds: Array.from(this.selectedTransferIds),
+                });
+
+                if (result.error) {
+                    alert(`Error deleting transfers: ${result.error}`);
+                } else {
+                    this.selectedTransferIds.clear();
+                    // Emit event to parent component to refresh data
+                    this.tableFilter.emit(this.filter);
+                }
+            } catch (error) {
+                console.error('Bulk delete error:', error);
+                alert('Failed to delete transfers');
+            }
+        }
     }
 }

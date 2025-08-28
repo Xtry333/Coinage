@@ -1,0 +1,32 @@
+.notifications-dropdown {
+    /* Component-specific styles can be added here if needed */
+}
+
+/* Ensure dropdown stays in view and has proper z-index */
+.dropdown-container {
+    position: relative;
+}
+
+/* Custom scrollbar for notifications list */
+.max-h-80 {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+.max-h-80::-webkit-scrollbar {
+    width: 6px;
+}
+
+.max-h-80::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+}
+
+.max-h-80::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+.max-h-80::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}

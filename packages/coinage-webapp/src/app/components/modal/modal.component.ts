@@ -27,16 +27,25 @@ export class ModalComponent implements OnInit, OnChanges {
         const el = document.getElementById('fresh-modal-container');
         if (el) {
             this.modalElement = el;
-            this.modalElement.style.left = this.getPageWidth() - 400 + 'px';
-            this.modalElement.style.top = '35px';
+            if (!this.centered) {
+                this.modalElement.style.left = this.getPageWidth() - 400 + 'px';
+                this.modalElement.style.top = '35px';
+            }
             this.modalElement.id = this.modalHolderId;
         }
     }
 
     public ngOnChanges(changes: SimpleChanges): void {
         if (changes['isDisplayed'] && changes['isDisplayed'].currentValue === false && changes['isDisplayed'].previousValue === true) {
-            this.modalElement.style.left = this.getPageWidth() - 400 + 'px';
-            this.modalElement.style.top = '35px';
+            if (!this.centered) {
+                this.modalElement.style.left = this.getPageWidth() - 400 + 'px';
+                this.modalElement.style.top = '35px';
+            } else {
+                // Reset centered modal positioning
+                this.modalElement.style.left = '';
+                this.modalElement.style.top = '';
+                this.modalElement.style.transform = '';
+            }
         }
     }
 
@@ -45,9 +54,13 @@ export class ModalComponent implements OnInit, OnChanges {
         if (event.target === this.modalElement && this.moveable) {
             this.isGrabbed = true;
             this.moveModalEvent.emit(true);
+
+            // Get the actual position of the modal on screen
+            const rect = this.modalElement.getBoundingClientRect();
+
             this.offset = {
-                x: event.clientX - (this.parsePx(this.modalElement.style.left) || event.clientX),
-                y: event.clientY - (this.parsePx(this.modalElement.style.top) || event.clientY),
+                x: event.clientX - rect.left,
+                y: event.clientY - rect.top,
             };
         }
     }
@@ -66,6 +79,12 @@ export class ModalComponent implements OnInit, OnChanges {
         if (this.isGrabbed && this.moveable) {
             this.modalElement.style.right = '';
             this.moveModalEvent.emit(true);
+
+            // Remove centering when dragging starts
+            if (this.centered) {
+                this.modalElement.style.transform = '';
+                this.modalElement.classList.remove('centered');
+            }
 
             if (event.clientX - this.offset.x > 0 && event.clientX - this.offset.x < this.getPageWidth() - this.modalElement.clientWidth) {
                 this.modalElement.style.left = event.clientX - this.offset.x + 'px';

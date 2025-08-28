@@ -9,10 +9,38 @@
                 <input id="showFlaggedCheckbox" [ngModel]="filter.showFlagged" (ngModelChange)="showFlaggedChecked($event)" type="checkbox" />
                 <label for="showFlaggedCheckbox">Only flagged transfers</label>
             </div>
+            @if (enableBulkActions) {
+                <div>
+                    <input id="bulkEditModeCheckbox" [(ngModel)]="isBulkEditMode" (ngModelChange)="onBulkEditModeChanged()" type="checkbox" />
+                    <label for="bulkEditModeCheckbox">Bulk edit mode</label>
+                </div>
+            }
         </div>
     }
     @if (showFilters && lastPageNumber) {
-        <app-pagination class="float-right" [lastPage]="lastPageNumber" (pageChange)="onPageChanged($event)"></app-pagination>
+        <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                @if (enableBulkActions && isBulkEditMode && selectedTransferIds.size > 0) {
+                    <div class="flex items-center space-x-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-1">
+                        <span class="text-sm font-medium text-blue-900">
+                            {{ selectedTransferIds.size }} transfer{{ selectedTransferIds.size === 1 ? '' : 's' }} selected
+                        </span>
+                        <button class="text-xs text-blue-600 underline hover:text-blue-800" (click)="clearSelection()">Clear</button>
+                        <div class="flex items-center space-x-1">
+                            <app-button-icon [icon]="editIcon" (clicked)="openBulkEditModal()" size="sm" ariaLabel="Bulk edit transfers"></app-button-icon>
+                            <app-button-icon
+                                [icon]="trashIcon"
+                                (clicked)="confirmBulkDelete()"
+                                size="sm"
+                                variant="ghost"
+                                ariaLabel="Delete selected transfers"
+                            ></app-button-icon>
+                        </div>
+                    </div>
+                }
+            </div>
+            <app-pagination [lastPage]="lastPageNumber" (pageChange)="onPageChanged($event)"></app-pagination>
+        </div>
     }
     <table class="transfers-table">
         @if (isHeaderDisplayed) {
@@ -22,6 +50,18 @@
         }
         <thead>
             <tr>
+                @if (enableBulkActions && isBulkEditMode) {
+                    <th class="w-12">
+                        <input
+                            class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            [checked]="isAllSelected"
+                            [indeterminate]="isPartiallySelected"
+                            (change)="toggleSelectAll($event)"
+                            type="checkbox"
+                            title="Select all transfers"
+                        />
+                    </th>
+                }
                 <th class="text-left">
                     <span>Category</span>
                     @if (showFilters) {
@@ -101,6 +141,16 @@
             @for (transfer of transfersForTable; track transferIdTracker($index, transfer)) {
                 <tr [ngClass]="getTransferRowClass(transfer)">
                     @if (!transfer.isTodayMarkerRow) {
+                        @if (enableBulkActions && isBulkEditMode) {
+                            <td>
+                                <input
+                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    [checked]="isTransferSelected(transfer.id)"
+                                    (change)="toggleTransferSelection(transfer.id, $event)"
+                                    type="checkbox"
+                                />
+                            </td>
+                        }
                         <td>{{ transfer.categoryName }}</td>
                         <td>
                             <a [routerLink]="CoinageRoutes.TransferDetailsPage.getUrl({ id: transfer.id })">
@@ -140,6 +190,9 @@
             }
             @if (showSummary && !noRows && outcomesCount > 0) {
                 <tr class="sum-row top-border">
+                    @if (enableBulkActions && isBulkEditMode) {
+                        <td></td>
+                    }
                     <td colspan="2">Expenses Sum</td>
                     <td>{{ outcomesCount }}</td>
                     <td class="currency">{{ outcomesSum | plnCurrency }}</td>
@@ -148,6 +201,9 @@
             }
             @if (showSummary && !noRows && incomesCount > 0) {
                 <tr class="sum-row">
+                    @if (enableBulkActions && isBulkEditMode) {
+                        <td></td>
+                    }
                     <td colspan="2">Incomes Sum</td>
                     <td>{{ incomesCount }}</td>
                     <td class="currency">{{ incomesSum | plnCurrency }}</td>
@@ -156,7 +212,7 @@
             }
             @if (noRowsFound) {
                 <tr>
-                    <td colspan="6">
+                    <td [attr.colspan]="enableBulkActions && isBulkEditMode ? 7 : 6">
                         <span>No transfers found.</span>
                         @if (isAnyFilterApplied && !noRows) {
                             <span> Please check filters, there are {{ transfers?.length }} unmatched transfers. </span>
@@ -167,6 +223,39 @@
         </tbody>
     </table>
     @if (showFilters && lastPageNumber) {
-        <app-pagination class="float-right mt-2" [lastPage]="lastPageNumber" [currentPage]="currentPage"></app-pagination>
+        <div class="mt-2 flex items-center justify-between">
+            <div class="flex items-center space-x-4">
+                @if (enableBulkActions && isBulkEditMode && selectedTransferIds.size > 0) {
+                    <div class="flex items-center space-x-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-1">
+                        <span class="text-sm font-medium text-blue-900">
+                            {{ selectedTransferIds.size }} transfer{{ selectedTransferIds.size === 1 ? '' : 's' }} selected
+                        </span>
+                        <button class="text-xs text-blue-600 underline hover:text-blue-800" (click)="clearSelection()">Clear</button>
+                        <div class="flex items-center space-x-1">
+                            <app-button-icon [icon]="editIcon" (clicked)="openBulkEditModal()" size="sm" ariaLabel="Bulk edit transfers"></app-button-icon>
+                            <app-button-icon
+                                [icon]="trashIcon"
+                                (clicked)="confirmBulkDelete()"
+                                size="sm"
+                                variant="ghost"
+                                ariaLabel="Delete selected transfers"
+                            ></app-button-icon>
+                        </div>
+                    </div>
+                }
+            </div>
+            <app-pagination [lastPage]="lastPageNumber" [currentPage]="currentPage"></app-pagination>
+        </div>
     }
 </div>
+
+<!-- Bulk Edit Modal -->
+<app-modal [isDisplayed]="isBulkEditModalOpen" [moveable]="true" [centered]="true" (hideModalEvent)="onBulkEditModalClose()">
+    <app-bulk-edit-transfers-modal
+        [isDisplayed]="isBulkEditModalOpen"
+        [selectedTransferIds]="Array.from(selectedTransferIds)"
+        [isInsideModal]="true"
+        (closeModal)="onBulkEditModalClose()"
+        (bulkEditComplete)="onBulkEditComplete()"
+    ></app-bulk-edit-transfers-modal>
+</app-modal>

@@ -1,5 +1,5 @@
 @if (showPage) {
-    <main class="min-h-screen bg-gray-50 p-4 sm:ml-auto md:px-4">
+    <div class="bg-gray-50 p-4 sm:ml-auto md:px-4">
         <!-- Breadcrumb -->
         <div class="mb-6">
             <nav class="flex rounded-lg border border-gray-300 bg-white p-3 shadow-sm">
@@ -298,5 +298,5 @@
         @if (transfer.otherTransfers.length > 0) {
             <app-transfers-table [header]="'All Transfers This Day'" [transfers]="transfer.otherTransfers" [showTodayMarker]="false"></app-transfers-table>
         }
-    </main>
+    </div>
 }

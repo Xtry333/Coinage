@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, In, Repository } from 'typeorm';
 import { Item } from '../entities/Item.entity';
-import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { Writeable } from '../types/Writeable.type';
 import { BaseDao } from './base.dao';
@@ -52,5 +51,20 @@ export class TransferItemDao extends BaseDao {
             },
         });
         return item;
+    }
+
+    public async findByTransferId(transferId: number): Promise<TransferItem[]> {
+        return await this.transferItemRepository.find({
+            where: { transferId: Equal(transferId) },
+            relations: {
+                item: true,
+                container: true,
+            },
+        });
+    }
+
+    public async deleteByIds(ids: number[]): Promise<number> {
+        if (ids.length === 0) return 0;
+        return (await this.transferItemRepository.delete({ id: In(ids) })).affected ?? 0;
     }
 }

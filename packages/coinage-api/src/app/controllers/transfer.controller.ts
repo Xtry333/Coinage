@@ -4,6 +4,7 @@ import {
     BaseResponseDTO,
     CreateEditTransferModelDTO,
     CreateMultipleTransfersDTO,
+    GranularCreateEditTransferModelDTO,
     ReceiptDTO,
     RefundTransferDTO,
     SplitTransferDTO,
@@ -303,11 +304,128 @@ export class TransferController {
         }
 
         const inserted = await this.transfersService.saveTransfer(entity);
-        await this.transferItemsService.removeTransferItemsForTransferId(inserted.id);
 
-        // This will save items async in case of any issues with items not appearing in the transfer details
-        const transferItems: TransferItem[] = [];
-        transfer.items.forEach(async (item) => {
+        // Get existing transfer items for comparison
+        const existingItems = await this.transferItemsService.getTransferItems(inserted.id);
+        const existingItemsMap = new Map(existingItems.map((item) => [item.id, item]));
+
+        // Track which items are being updated/preserved
+        const incomingTransferItemIds: number[] = [];
+
+        // Process incoming items
+        for (const item of transfer.items) {
+            if (item.id !== undefined) {
+                // Only process items with valid catalog item IDs
+                if (item.transferItemId && existingItemsMap.has(item.transferItemId)) {
+                    // Update existing transfer item
+                    const existingItem = existingItemsMap.get(item.transferItemId)!;
+                    existingItem.itemId = item.id;
+                    existingItem.quantity = item.amount;
+                    existingItem.unitPrice = item.price;
+                    existingItem.containerId = item.containerId ?? null;
+                    existingItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
+                    existingItem.totalSetDiscount = item.setDiscount ?? 0;
+
+                    await this.transferItemsService.save(existingItem);
+                    incomingTransferItemIds.push(item.transferItemId);
+                } else {
+                    // Create new transfer item
+                    const transferItem = new TransferItem();
+                    transferItem.itemId = item.id;
+                    transferItem.quantity = item.amount;
+                    transferItem.transferId = inserted.id;
+                    transferItem.unitPrice = item.price;
+                    transferItem.containerId = item.containerId ?? null;
+                    transferItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
+                    transferItem.totalSetDiscount = item.setDiscount ?? 0;
+
+                    await this.transferItemsService.save(transferItem);
+                }
+            }
+        }
+
+        // Delete items that are no longer present
+        const itemsToDelete = existingItems.filter((item) => !incomingTransferItemIds.includes(item.id)).map((item) => item.id);
+
+        if (itemsToDelete.length > 0) {
+            await this.transferItemsService.deleteTransferItems(itemsToDelete);
+        }
+
+        return { insertedId: inserted.id };
+    }
+
+    @Post('save-granular')
+    public async saveTransferObjectGranular(@RequestingUser() user: User, @Body() transfer: GranularCreateEditTransferModelDTO): Promise<BaseResponseDTO> {
+        if (!transfer.id) {
+            throw new BadRequestException('Transfer ID is required for granular save');
+        }
+
+        let entity: Transfer;
+        const category = await this.categoryDao.getById(transfer.categoryId);
+        const account = await this.accountDao.getById(transfer.accountId);
+        const contractor = transfer.contractorId !== null ? await this.contractorDao.getById(transfer.contractorId) : null;
+        const receipt = transfer.receiptId !== null ? await this.receiptDao.getById(transfer.receiptId) : null;
+
+        entity = await this.transferDao.getById(transfer.id);
+
+        // Update transfer basic properties
+        entity.description = transfer.description === undefined ? category?.name : transfer.description.trim();
+        entity.amount = transfer.amount;
+        entity.currency = account.currency;
+        entity.date = transfer.date;
+        entity.category = category;
+        entity.categoryId = category.id;
+        entity.type = category.type;
+
+        entity.originAccount = account;
+        entity.originAccountId = account.id;
+
+        entity.contractor = contractor;
+        entity.contractorId = contractor?.id ?? null;
+
+        entity.receiptId = receipt?.id ?? null;
+
+        if (entity.category.name === 'Paliwo') {
+            try {
+                entity.metadata = { unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')), location: entity.description.split(' ')[3] };
+            } catch (e) {
+                console.error('Could not set metadata for transfer on', entity.date);
+                console.error(e);
+            }
+        }
+
+        const inserted = await this.transfersService.saveTransfer(entity);
+
+        // Process granular item changes
+        const { addedItems, editedItems, removedItemIds } = transfer.itemChanges;
+
+        // Remove items first
+        if (removedItemIds.length > 0) {
+            await this.transferItemsService.deleteTransferItems(removedItemIds);
+        }
+
+        // Update existing items
+        for (const item of editedItems) {
+            if (item.transferItemId && item.id !== undefined) {
+                const existingItem = await this.transferItemsService
+                    .getTransferItems(inserted.id)
+                    .then((items) => items.find((ti) => ti.id === item.transferItemId));
+
+                if (existingItem) {
+                    existingItem.itemId = item.id;
+                    existingItem.quantity = item.amount;
+                    existingItem.unitPrice = item.price;
+                    existingItem.containerId = item.containerId ?? null;
+                    existingItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
+                    existingItem.totalSetDiscount = item.setDiscount ?? 0;
+
+                    await this.transferItemsService.save(existingItem);
+                }
+            }
+        }
+
+        // Add new items
+        for (const item of addedItems) {
             if (item.id !== undefined) {
                 const transferItem = new TransferItem();
                 transferItem.itemId = item.id;
@@ -315,10 +433,12 @@ export class TransferController {
                 transferItem.transferId = inserted.id;
                 transferItem.unitPrice = item.price;
                 transferItem.containerId = item.containerId ?? null;
-                transferItems.push(transferItem);
+                transferItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
+                transferItem.totalSetDiscount = item.setDiscount ?? 0;
+
                 await this.transferItemsService.save(transferItem);
             }
-        });
+        }
 
         return { insertedId: inserted.id };
     }

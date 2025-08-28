@@ -1,5 +1,5 @@
 @if (showPage) {
-    <main class="min-h-screen bg-gray-50 p-4 sm:ml-auto md:px-4">
+    <div class="bg-gray-50 p-4 sm:ml-auto md:px-4">
         <app-section header="Transfer Form">
             <form class="space-y-6" (ngSubmit)="onClickSaveTransfer()">
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -30,6 +30,17 @@
                             autocomplete="off"
                             placeholder="0.00"
                         />
+                        @if (shouldDisplayShoppingList) {
+                            <div class="flex items-center">
+                                <input
+                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    id="overrideTotalCostOnChange"
+                                    [(ngModel)]="shouldOverrideTotalCostOnChange"
+                                    type="checkbox"
+                                />
+                                <label class="ml-2 text-xs text-gray-600" for="overrideTotalCostOnChange">Auto-update from items</label>
+                            </div>
+                        }
                     </div>
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700" for="category">Category</label>
@@ -184,19 +195,11 @@
                     [selectedCategoryId]="selectedTransferInputs.categoryId ?? null"
                     [preselectedItems]="itemsInTransfer"
                     [containers]="containers"
+                    [shouldOverrideTotalCostOnChange]="shouldOverrideTotalCostOnChange"
                     (totalCostChanged)="onTotalCostChanged($event)"
                     (itemListChanged)="onItemListChanged($event)"
                 ></app-item-shopping-list>
-                <div class="mt-4 flex items-center">
-                    <input
-                        class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        id="overrideTotalCostOnChange"
-                        [(ngModel)]="shouldOverrideTotalCostOnChange"
-                        type="checkbox"
-                    />
-                    <label class="ml-2 text-sm text-gray-900" for="overrideTotalCostOnChange">Override Total Cost On Item Change</label>
-                </div>
             </app-section>
         }
-    </main>
+    </div>
 }

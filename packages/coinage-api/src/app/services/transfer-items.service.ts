@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { TransferItem } from '../entities/TransferItem.entity';
 import { TransferItemDao } from '../daos/transferItem.dao';
+import { TransferItem } from '../entities/TransferItem.entity';
 
 @Injectable()
 export class TransferItemsService {
@@ -24,6 +24,7 @@ export class TransferItemsService {
             entity.unitPrice = item.unitPrice;
             entity.totalSetPrice = item.totalSetPrice;
             entity.totalSetDiscount = item.totalSetDiscount;
+            entity.containerId = item.containerId;
 
             entity = await this.transferItemDao.save(entity);
 
@@ -36,5 +37,13 @@ export class TransferItemsService {
 
     public removeTransferItemsForTransferId(transferId: number) {
         return this.transferItemDao.removeTransferItemsForTransferId(transferId);
+    }
+
+    public async getTransferItems(transferId: number): Promise<TransferItem[]> {
+        return await this.transferItemDao.findByTransferId(transferId);
+    }
+
+    public async deleteTransferItems(ids: number[]): Promise<number> {
+        return await this.transferItemDao.deleteByIds(ids);
     }
 }

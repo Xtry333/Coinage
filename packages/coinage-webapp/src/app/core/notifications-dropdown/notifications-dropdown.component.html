@@ -1,0 +1,92 @@
+<!-- Dropdown Container -->
+<div class="relative" #dropdownContainer>
+    <!-- Trigger Button (projected content) -->
+    <ng-content></ng-content>
+
+    <!-- Dropdown Content -->
+    <div class="absolute right-0 z-50 mt-2 flex max-h-96 w-96 flex-col rounded-lg border border-gray-200 bg-white shadow-lg" *ngIf="isOpen">
+        <!-- Header -->
+        <div class="flex items-center justify-between rounded-t-lg border-b border-gray-200 bg-gray-50 p-4">
+            <div class="flex items-center gap-2">
+                <fa-icon class="text-gray-600" [icon]="historyIcon"></fa-icon>
+                <span class="font-semibold text-gray-900">Notifications</span>
+                <span class="text-sm text-gray-500">({{ historicalNotifications.length }})</span>
+            </div>
+            <div class="flex items-center gap-2">
+                @if (historicalNotifications.length > 0) {
+                    <app-button-icon
+                        [icon]="trashIcon"
+                        (clicked)="onClearHistory()"
+                        size="sm"
+                        variant="ghost"
+                        ariaLabel="Clear all notifications"
+                    ></app-button-icon>
+                }
+                <app-button-icon [icon]="closeIcon" (clicked)="close()" size="sm" variant="ghost" ariaLabel="Close notifications"></app-button-icon>
+            </div>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="flex-1 overflow-y-auto">
+            @if (historicalNotifications.length === 0) {
+                <div class="p-8 text-center text-gray-500">
+                    <fa-icon class="mb-4 text-4xl text-gray-300" [icon]="checkIcon"></fa-icon>
+                    <p class="text-lg font-medium">All caught up!</p>
+                    <p class="text-sm">No notifications to show.</p>
+                </div>
+            } @else {
+                <div class="max-h-80 overflow-y-auto">
+                    @for (notification of historicalNotifications; track notification.id) {
+                        <div class="border-b border-gray-100 last:border-b-0">
+                            <div
+                                class="p-4 hover:bg-gray-50 transition-colors {{ getNotificationLevelClass(notification) }} border-l-4"
+                                [class.opacity-60]="notification.isRead"
+                            >
+                                <!-- Header Row -->
+                                <div class="mb-2 flex items-start justify-between">
+                                    <div class="flex-1">
+                                        <h4 class="text-sm font-medium text-gray-900">{{ notification.title }}</h4>
+                                        <p class="mt-1 text-xs text-gray-500">{{ formatTimestamp(notification.timestamp) }}</p>
+                                    </div>
+                                    <div class="ml-2 flex items-center gap-1">
+                                        @if (notification.linkTo) {
+                                            <a
+                                                class="rounded p-1 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
+                                                [routerLink]="notification.linkTo"
+                                                (click)="close()"
+                                                title="Open link"
+                                            >
+                                                <fa-icon class="text-sm" [icon]="linkIcon"></fa-icon>
+                                            </a>
+                                        }
+                                        <button
+                                            [class]="
+                                                notification.isRead
+                                                    ? 'rounded bg-green-50 p-1 text-green-600'
+                                                    : 'rounded p-1 text-gray-400 transition-colors hover:bg-green-50 hover:text-green-600'
+                                            "
+                                            [title]="notification.isRead ? 'Marked as read' : 'Mark as read'"
+                                            [disabled]="notification.isRead"
+                                            (click)="onMarkAsRead(notification)"
+                                        >
+                                            <fa-icon class="text-sm" [icon]="checkIcon"></fa-icon>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Message -->
+                                <div class="text-sm text-gray-700">
+                                    @if (notification.level === 2) {
+                                        <pre class="whitespace-pre-wrap rounded border bg-red-100 p-2 font-mono text-xs">{{ notification.message }}</pre>
+                                    } @else {
+                                        <p class="whitespace-pre-wrap">{{ notification.message }}</p>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

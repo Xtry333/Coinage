@@ -7,6 +7,8 @@ import {
     AccountDTO,
     BalanceDTO,
     BaseResponseDTO,
+    BulkDeleteTransferDTO,
+    BulkEditTransferDTO,
     CategoryDTO,
     ContainerDTO,
     ContractorDTO,
@@ -17,6 +19,7 @@ import {
     CreateMultipleTransfersDTO,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
+    GranularCreateEditTransferModelDTO,
     ItemDetailsDTO,
     ItemWithLastUsedPriceDTO,
     NewMonthlyUserStatsDTO,
@@ -135,6 +138,10 @@ export class CoinageDataService {
         return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save`, request);
     }
 
+    public postGranularSaveTransfer(request: GranularCreateEditTransferModelDTO): Observable<BaseResponseDTO> {
+        return this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfer/save-granular`, request);
+    }
+
     public postRefundTransfer(transferId: number, date: Date) {
         const request: RefundTransferDTO = {
             refundTargetId: transferId,
@@ -188,5 +195,13 @@ export class CoinageDataService {
         const a = await lastValueFrom(this.http.get<Date>(`${CoinageDataService.API_URL}user/date`));
         console.log(a);
         return a;
+    }
+
+    public postBulkEditTransfers(request: BulkEditTransferDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfers/bulk-edit`, request));
+    }
+
+    public postBulkDeleteTransfers(request: BulkDeleteTransferDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfers/bulk-delete`, request));
     }
 }

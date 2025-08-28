@@ -13,13 +13,13 @@ Coinage is a personal expense/income tracking application built as an Nx monorep
 
 Run from repository root:
 
-### Development
+### Development (Dev Mode)
 
-- `yarn dev` - Start both API and webapp servers simultaneously
+- `yarn dev` - Start both API and webapp servers simultaneously (the default command when testing for issues)
 - `yarn dev:api` - Start only the NestJS API server (port varies, see nx serve output)
 - `yarn dev:webapp` - Start only the Angular webapp (port varies, see nx serve output)
 
-### Building
+### Building (Production Mode)
 
 - `yarn build` - Build both API and webapp for production
 - `yarn build:api` - Build only the API

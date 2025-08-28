@@ -1,5 +1,5 @@
 import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { IconDefinition, faCaretDown, faEdit, faFilter } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition, faCaretDown, faCheck, faEdit, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { deepCopy } from 'deep-copy-ts';
 
 import { Range } from '@app/interfaces';
@@ -67,6 +67,8 @@ export class TableFilterComponent implements OnInit {
     public filterDefaultIcon = faCaretDown;
     public filterOpenIcon = faEdit;
     public filterAppliedIcon = faFilter;
+    public clearIcon = faTimes;
+    public checkIcon = faCheck;
     public isPopupDisplayed = false;
 
     public lastFilterValue?: OnFilterEvent;
@@ -294,6 +296,13 @@ export class TableFilterComponent implements OnInit {
             return this.filterOpenIcon;
         }
         return this.isFilterApplied ? this.filterAppliedIcon : this.filterDefaultIcon;
+    }
+
+    public getFilterButtonAriaLabel(): string {
+        if (this.isPopupDisplayed) {
+            return `Close ${this.filterName} filter`;
+        }
+        return this.isFilterApplied ? `${this.filterName} filter applied` : `Open ${this.filterName} filter`;
     }
 
     public get shouldDisplaySearchBox(): boolean {

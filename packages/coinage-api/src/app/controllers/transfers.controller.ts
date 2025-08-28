@@ -1,18 +1,17 @@
 import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 
-import { FilteredTransfersDTO, GetFilteredTransfersRequest, TransferDTO } from '@app/interfaces';
+import { BaseResponseDTO, BulkDeleteTransferDTO, BulkEditTransferDTO, FilteredTransfersDTO, GetFilteredTransfersRequest, TransferDTO } from '@app/interfaces';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
-import { Transfer } from '../entities/Transfer.entity';
 import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 import { TransfersService } from '../services/transfers.service';
+import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfers')
@@ -115,4 +114,59 @@ export class TransfersController {
         const millisecsInDay = 86400000;
         return Math.ceil((((date as any) - (onejan as any)) / millisecsInDay + onejan.getDay() + 1) / 7);
     };
+
+    @Post('bulk-edit')
+    public async bulkEditTransfers(@RequestingUser('id') userId: number, @Body() request: BulkEditTransferDTO): Promise<BaseResponseDTO> {
+        try {
+            // Verify ownership of all transfers
+            const transfers = await this.transferDao.findByIds(request.transferIds);
+
+            // Filter transfers that belong to the user
+            const userAccountIds = (await (await this.userDao.getById(userId)).accounts).map((a) => a.id);
+            const userTransfers = transfers.filter((t) => userAccountIds.includes(t.originAccountId));
+
+            if (userTransfers.length !== request.transferIds.length) {
+                return { error: 'Some transfers not found or not owned by user' };
+            }
+
+            // Update transfers
+            const updateData: any = {};
+            if (request.description !== undefined) updateData.description = request.description;
+            if (request.categoryId !== undefined) updateData.categoryId = request.categoryId;
+            if (request.contractorId !== undefined) updateData.contractorId = request.contractorId;
+            if (request.accountId !== undefined) updateData.accountId = request.accountId;
+            if (request.date !== undefined) updateData.date = request.date;
+
+            await this.transferDao.bulkUpdate(request.transferIds, updateData);
+
+            return { insertedId: request.transferIds.length };
+        } catch (error) {
+            console.error('Bulk edit error:', error);
+            return { error: 'Failed to update transfers' };
+        }
+    }
+
+    @Post('bulk-delete')
+    public async bulkDeleteTransfers(@RequestingUser('id') userId: number, @Body() request: BulkDeleteTransferDTO): Promise<BaseResponseDTO> {
+        try {
+            // Verify ownership of all transfers
+            const transfers = await this.transferDao.findByIds(request.transferIds);
+
+            // Filter transfers that belong to the user
+            const userAccountIds = (await (await this.userDao.getById(userId)).accounts).map((a) => a.id);
+            const userTransfers = transfers.filter((t) => userAccountIds.includes(t.originAccountId));
+
+            if (userTransfers.length !== request.transferIds.length) {
+                return { error: 'Some transfers not found or not owned by user' };
+            }
+
+            // Delete transfers
+            await this.transferDao.bulkDelete(request.transferIds);
+
+            return { insertedId: request.transferIds.length };
+        } catch (error) {
+            console.error('Bulk delete error:', error);
+            return { error: 'Failed to delete transfers' };
+        }
+    }
 }

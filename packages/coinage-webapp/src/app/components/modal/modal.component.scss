@@ -1,19 +1,30 @@
 div.modal-container {
     z-index: 99;
     position: fixed;
+    background-color: rgb(255 255 255);
+    border: 1px solid rgb(229 231 235);
+    border-radius: 8px;
+    padding: 24px;
+    box-shadow:
+        0 20px 25px -5px rgba(0, 0, 0, 0.1),
+        0 10px 10px -5px rgba(0, 0, 0, 0.04);
 
-    // border-radius: 5px;
-    // transform: translateX(-50%) translateY(-50%);
-    background-color: rgb(252 252 252);
-    border: gray 2px solid;
-    padding: 15px;
+    &.centered {
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+    }
 
     &.hidden {
         display: none;
     }
 
     &.moveable {
-        cursor: all-scroll;
+        cursor: grab;
+
+        &:active {
+            cursor: grabbing;
+        }
     }
 
     &::selection {
@@ -25,28 +36,7 @@ div.modal-container {
 
         .float-right {
             text-align: right;
-
-            .btn-close {
-                cursor: pointer;
-
-                // padding: 0px 5.5px;
-                text-align: center;
-                border-radius: 0;
-                border: gray 2px solid;
-                width: 27px;
-                height: 27px;
-
-                // &::after {
-                //     content: '\00d7';
-                //     font-size: 19px;
-                //     // line-height: 19px;
-                //     display: inline-block;
-                // }
-
-                &:hover {
-                    background-color: lightgray;
-                }
-            }
+            margin-bottom: 16px;
         }
     }
 }
