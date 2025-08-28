@@ -1,4 +1,4 @@
-import { ReceiptDetailsDTO, TransferDTO, TransferType } from '@app/interfaces';
+import { ReceiptDTO, ReceiptDetailsDTO, TransferDTO, TransferType } from '@app/interfaces';
 import { Controller, Get, Param } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
@@ -19,6 +19,19 @@ export class ReceiptsController {
         private readonly accountDao: AccountDao,
         private readonly dateParserService: DateParserService,
     ) {}
+
+    @Get('all')
+    public async getAllReceipts(): Promise<ReceiptDTO[]> {
+        const receipts = await this.receiptDao.getAll();
+        return receipts.map((receipt) => ({
+            id: receipt.id,
+            description: receipt.description,
+            date: receipt.date,
+            amount: receipt.amount,
+            contractor: receipt.contractor?.name,
+            transferIds: receipt.transfers?.map((t) => t.id) || [],
+        }));
+    }
 
     @Get(':id/details')
     public async getReceiptDetails(@Param('id') id: number): Promise<ReceiptDetailsDTO> {

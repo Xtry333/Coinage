@@ -6,6 +6,7 @@ import { ContractorController } from './contractors.controller';
 import { DashboardComponent } from './dashboard.controller';
 import { ItemsController } from './items.controller';
 import { ReceiptsController } from './receipts.controller';
+import { SchedulesController } from './schedules.controller';
 import { SearchController } from './search.controller';
 import { TransferController } from './transfer.controller';
 import { TransfersController } from './transfers.controller';
@@ -18,6 +19,7 @@ export default [
     ContractorController,
     DashboardComponent,
     ReceiptsController,
+    SchedulesController,
     SearchController,
     TransfersController,
     TransferController,

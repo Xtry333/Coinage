@@ -34,8 +34,8 @@ export class Schedule extends WithDateEntity {
     @Column({ type: 'int', nullable: false })
     public count!: number;
 
-    @OneToMany(() => Transfer, (transfer) => transfer.receipt, { eager: true })
-    public transfers!: Transfer[];
+    @OneToMany(() => Transfer, (transfer) => transfer.schedule, { eager: false })
+    public transfers!: Promise<Transfer[]>;
 
     @Column({ type: 'json', nullable: true })
     public metadata!: { [key: string]: string | number | undefined } | null;

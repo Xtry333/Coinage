@@ -1,5 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
+import { Bit } from '../constants/booleanBuffer.const';
 import { Account } from './Account.entity';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
@@ -12,7 +13,6 @@ import { DateTransformer, DateTransformerType } from './transformers/date.transf
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 import { User } from './User.entity';
 import { WithDateEntity } from './WithDate.partialEntity';
-import { Bit } from '../constants/booleanBuffer.const';
 
 export enum TransferTypeEnum {
     INCOME = 'INCOME',
@@ -87,9 +87,12 @@ export class Transfer extends WithDateEntity {
     @Column({ type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
 
+    @Column({ name: 'schedule_id', nullable: true })
+    public scheduleId!: number | null;
+
     @ManyToOne(() => Schedule, { eager: false, onUpdate: 'CASCADE', onDelete: 'SET NULL' })
     @JoinColumn({ name: 'schedule_id' })
-    public scheduleId!: Promise<Schedule | null>;
+    public schedule!: Promise<Schedule | null>;
 
     @Column({ name: 'account_id', nullable: false })
     public originAccountId!: number;

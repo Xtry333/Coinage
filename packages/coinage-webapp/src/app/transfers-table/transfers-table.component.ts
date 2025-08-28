@@ -95,6 +95,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public selectedTransferIds = new Set<number>();
     public isBulkEditModalOpen = false;
     public isBulkEditMode = false;
+
+    private readonly BULK_EDIT_MODE_CACHE_KEY = 'transfers.table.bulkEditMode';
     public readonly Array = Array;
 
     public transfersForTable: UiTransfer[] = [];
@@ -124,6 +126,12 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     ) {}
 
     public ngOnInit(): void {
+        // Restore bulk edit mode state from local storage
+        const savedBulkEditMode = this.localStorage.getBoolean(this.BULK_EDIT_MODE_CACHE_KEY);
+        if (savedBulkEditMode !== undefined) {
+            this.isBulkEditMode = savedBulkEditMode;
+        }
+
         if (this.showFilters) {
             if (this.filterCachePath) {
                 const cachedFilters = this.localStorage.getObject<TableFilterFields>(this.filterCachePath);
@@ -385,6 +393,9 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     }
 
     public onBulkEditModeChanged(): void {
+        // Save bulk edit mode state to local storage
+        this.localStorage.setBoolean(this.BULK_EDIT_MODE_CACHE_KEY, this.isBulkEditMode);
+
         if (!this.isBulkEditMode) {
             this.selectedTransferIds.clear();
         }

@@ -30,6 +30,16 @@ export class BulkEditTransferDTO {
     @IsDate()
     @Type(() => Date)
     public date?: Date;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(1)
+    public scheduleId?: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(1)
+    public receiptId?: number;
 }
 
 export class BulkDeleteTransferDTO {

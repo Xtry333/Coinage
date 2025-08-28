@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccountDTO, BulkEditTransferDTO, CategoryDTO, ContractorDTO } from '@app/interfaces';
+import { AccountDTO, BulkEditTransferDTO, CategoryDTO, ContractorDTO, ReceiptDTO, ScheduleDTO } from '@app/interfaces';
 import * as Rx from 'rxjs';
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
@@ -21,6 +21,8 @@ export class BulkEditTransfersModalComponent implements OnInit {
     public categories: CategoryDTO[] = [];
     public contractors: ContractorDTO[] = [];
     public accounts: AccountDTO[] = [];
+    public schedules: ScheduleDTO[] = [];
+    public receipts: ReceiptDTO[] = [];
 
     public bulkEditData: Partial<BulkEditTransferDTO> = {};
     public isLoading = false;
@@ -35,13 +37,19 @@ export class BulkEditTransfersModalComponent implements OnInit {
     }
 
     private loadDropdownData(): void {
-        Rx.zip(this.coinageData.getCategoryList(), this.coinageData.getContractorList(), this.coinageData.getAllAvailableAccounts()).subscribe(
-            ([categories, contractors, accounts]) => {
-                this.categories = categories;
-                this.contractors = contractors;
-                this.accounts = accounts;
-            },
-        );
+        Rx.zip(
+            this.coinageData.getCategoryList(),
+            this.coinageData.getContractorList(),
+            this.coinageData.getAllAvailableAccounts(),
+            this.coinageData.getAllSchedules(),
+            this.coinageData.getAllReceipts(),
+        ).subscribe(([categories, contractors, accounts, schedules, receipts]) => {
+            this.categories = categories;
+            this.contractors = contractors;
+            this.accounts = accounts;
+            this.schedules = schedules;
+            this.receipts = receipts;
+        });
     }
 
     public get todayInputFormat(): string {

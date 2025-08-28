@@ -76,6 +76,47 @@
                 </ng-select>
             </div>
 
+            <!-- Schedule -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="bulkSchedule"> Schedule </label>
+                <ng-select
+                    [(ngModel)]="bulkEditData.scheduleId"
+                    [clearable]="true"
+                    [items]="schedules"
+                    name="schedule"
+                    labelForId="bulkSchedule"
+                    bindValue="id"
+                    bindLabel="name"
+                    placeholder="Leave blank to keep existing"
+                >
+                </ng-select>
+            </div>
+
+            <!-- Receipt -->
+            <div class="space-y-2">
+                <label class="block text-sm font-medium text-gray-700" for="bulkReceipt"> Receipt </label>
+                <ng-select
+                    [(ngModel)]="bulkEditData.receiptId"
+                    [clearable]="true"
+                    [items]="receipts"
+                    name="receipt"
+                    labelForId="bulkReceipt"
+                    bindValue="id"
+                    bindLabel="description"
+                    placeholder="Leave blank to keep existing"
+                >
+                    <ng-option *ngFor="let receipt of receipts" [value]="receipt.id">
+                        {{ receipt.description || 'Receipt #' + receipt.id }}
+                        @if (receipt.contractor) {
+                            ({{ receipt.contractor }})
+                        }
+                        @if (receipt.date) {
+                            - {{ receipt.date | date: 'short' }}
+                        }
+                    </ng-option>
+                </ng-select>
+            </div>
+
             <!-- Date -->
             <div class="space-y-2">
                 <label class="block text-sm font-medium text-gray-700" for="bulkDate"> Date </label>

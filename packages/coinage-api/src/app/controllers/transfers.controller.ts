@@ -4,6 +4,8 @@ import { BaseResponseDTO, BulkDeleteTransferDTO, BulkEditTransferDTO, FilteredTr
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
+import { ReceiptDao } from '../daos/receipt.dao';
+import { ScheduleDao } from '../daos/schedule.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
 import { AccountBalanceService } from '../services/account-balance.service';
@@ -26,6 +28,8 @@ export class TransfersController {
         private readonly dateParserService: DateParserService,
         private readonly saveTransfersService: SaveTransfersService,
         private readonly userDao: UserDao,
+        private readonly scheduleDao: ScheduleDao,
+        private readonly receiptDao: ReceiptDao,
     ) {}
 
     @Post('all')
@@ -129,6 +133,24 @@ export class TransfersController {
                 return { error: 'Some transfers not found or not owned by user' };
             }
 
+            // Validate schedule if provided
+            if (request.scheduleId !== undefined) {
+                try {
+                    await this.scheduleDao.getById(request.scheduleId);
+                } catch (error) {
+                    return { error: 'Schedule not found' };
+                }
+            }
+
+            // Validate receipt if provided
+            if (request.receiptId !== undefined) {
+                try {
+                    await this.receiptDao.getById(request.receiptId);
+                } catch (error) {
+                    return { error: 'Receipt not found' };
+                }
+            }
+
             // Update transfers
             const updateData: any = {};
             if (request.description !== undefined) updateData.description = request.description;
@@ -136,6 +158,8 @@ export class TransfersController {
             if (request.contractorId !== undefined) updateData.contractorId = request.contractorId;
             if (request.accountId !== undefined) updateData.accountId = request.accountId;
             if (request.date !== undefined) updateData.date = request.date;
+            if (request.scheduleId !== undefined) updateData.scheduleId = request.scheduleId;
+            if (request.receiptId !== undefined) updateData.receiptId = request.receiptId;
 
             await this.transferDao.bulkUpdate(request.transferIds, updateData);
 

@@ -19,6 +19,7 @@ export * from './lib/ReceiptDetailsDTO.response';
 export * from './lib/RefundTransferDTO.request';
 export * from './lib/SaveTransferDTO.request';
 export * from './lib/SaveTransferDTO.response';
+export * from './lib/ScheduleDTO.response';
 export * from './lib/SplitTransferDTO.request';
 export * from './lib/TotalInMonthByCategory.response';
 export * from './model/BulkEditTransfer.dto.request';

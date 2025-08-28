@@ -1,25 +1,25 @@
 div.transfers-table-container {
     margin: auto;
     margin-top: 24px;
-    
+
     .header-filters-container {
         background: white;
         border: 1px solid #d1d1d1;
         border-radius: 8px;
-        padding: 12px;
+        padding: 8px 12px;
         margin-bottom: 16px;
         box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
-        
+
         > div {
             display: inline-flex;
             align-items: center;
             margin-right: 20px;
-            
-            input[type="checkbox"] {
+
+            input[type='checkbox'] {
                 margin-right: 8px;
                 transform: scale(1.1);
             }
-            
+
             label {
                 margin-bottom: 0;
                 font-weight: 500;
@@ -27,7 +27,7 @@ div.transfers-table-container {
             }
         }
     }
-    
+
     table.transfers-table {
         width: 100%;
         border-collapse: separate;
@@ -36,11 +36,11 @@ div.transfers-table-container {
         border-radius: 8px;
         box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
         overflow: hidden;
-        
+
         caption {
             font-weight: 600;
-            font-size: 20px;
-            padding: 16px;
+            font-size: 18px;
+            padding: 12px;
             text-align: center;
             caption-side: top;
             background: #f8f9fa;
@@ -53,53 +53,57 @@ div.transfers-table-container {
 
         thead tr {
             background-color: #f8f9fa;
-            
+
             th {
-                padding: 12px 16px;
+                padding: 8px 12px;
                 white-space: nowrap;
-                font-weight: 600;
+                font-weight: 500;
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: 0.025em;
+                color: #6b7280;
                 border-right: 1px solid #e9ecef;
                 border-bottom: 1px solid #d1d1d1;
                 border-left: 1px solid #d1d1d1;
                 border-top: 1px solid #d1d1d1;
-                
+
                 span {
                     display: inline-block;
                     margin-right: 4px;
                 }
-                
+
                 &:first-child {
                     border-left: 1px solid #d1d1d1;
                 }
-                
+
                 &:last-child {
                     border-right: 1px solid #d1d1d1;
                 }
             }
         }
-        
+
         // When there's no caption, header row should have top corners
         thead:first-child tr:first-child {
             th {
                 &:first-child {
                     border-top-left-radius: 8px;
                 }
-                
+
                 &:last-child {
                     border-top-right-radius: 8px;
                 }
             }
         }
-        
+
         // When caption exists, header has no top corners
         caption + thead tr:first-child {
             th {
                 border-top: none;
-                
+
                 &:first-child {
                     border-top-left-radius: 0;
                 }
-                
+
                 &:last-child {
                     border-top-right-radius: 0;
                 }
@@ -109,7 +113,7 @@ div.transfers-table-container {
         tr.sum-row {
             background-color: #f8f9fa;
             font-weight: 600;
-            
+
             &.top-border {
                 td {
                     border-top: 3px solid #d1d1d1 !important;
@@ -125,15 +129,15 @@ div.transfers-table-container {
         tbody tr.transfer-row {
             border-bottom: 1px solid #e9ecef;
             transition: background-color 0.15s ease;
-            
+
             &:hover {
                 background-color: #f8f9fa;
             }
-            
+
             &:nth-child(even) {
                 background-color: #fdfdfe;
             }
-            
+
             &:last-child {
                 border-bottom: none;
             }
@@ -144,49 +148,50 @@ div.transfers-table-container {
             &:last-child {
                 td {
                     border-bottom: 1px solid #d1d1d1;
-                    
+
                     &:first-child {
                         border-bottom-left-radius: 8px;
                     }
-                    
+
                     &:last-child {
                         border-bottom-right-radius: 8px;
                     }
                 }
             }
         }
-        
+
         td {
-            padding: 12px 16px;
+            padding: 8px 12px;
+            font-size: 14px;
             border-right: 1px solid #e9ecef;
             border-left: 1px solid #d1d1d1;
             vertical-align: middle;
-            
+
             &:first-child {
                 border-left: 1px solid #d1d1d1;
             }
-            
+
             &:last-child {
                 border-right: 1px solid #d1d1d1;
             }
-            
+
             &.currency {
                 text-align: right;
                 font-variant-numeric: tabular-nums;
             }
-            
+
             &.month-name {
                 text-transform: capitalize;
             }
-            
+
             &.nowrap {
                 white-space: nowrap;
             }
-            
+
             a {
                 color: #0d6efd;
                 text-decoration: none;
-                
+
                 &:hover {
                     text-decoration: underline;
                 }
@@ -200,12 +205,40 @@ div.transfers-table-container {
         .align-right {
             text-align: right;
         }
-        
+
         .planned-icon {
             margin-left: 8px;
-            
+
             fa-icon {
                 color: #6c757d;
+            }
+        }
+    }
+}
+
+// Responsive design to match items table
+@media (width <= 768px) {
+    div.transfers-table-container {
+        .header-filters-container {
+            padding: 6px 8px;
+        }
+
+        table.transfers-table {
+            font-size: 12px;
+
+            caption {
+                font-size: 16px;
+                padding: 8px;
+            }
+
+            th {
+                padding: 6px 8px;
+                font-size: 10px;
+            }
+
+            td {
+                padding: 6px 8px;
+                font-size: 12px;
             }
         }
     }

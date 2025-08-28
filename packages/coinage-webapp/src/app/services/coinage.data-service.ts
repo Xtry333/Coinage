@@ -17,6 +17,7 @@ import {
     CreateEditItemDTO,
     CreateEditTransferModelDTO,
     CreateMultipleTransfersDTO,
+    CreateScheduleDTO,
     FilteredTransfersDTO,
     GetFilteredTransfersRequest,
     GranularCreateEditTransferModelDTO,
@@ -24,8 +25,10 @@ import {
     ItemWithContainerDTO,
     ItemWithLastUsedPriceDTO,
     NewMonthlyUserStatsDTO,
+    ReceiptDTO,
     ReceiptDetailsDTO,
     RefundTransferDTO,
+    ScheduleDTO,
     SplitTransferDTO,
     TotalInMonthByCategory,
     TransferDTO,
@@ -212,5 +215,27 @@ export class CoinageDataService {
 
     public postBulkDeleteTransfers(request: BulkDeleteTransferDTO): Promise<BaseResponseDTO> {
         return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}transfers/bulk-delete`, request));
+    }
+
+    // Schedule methods
+    public getAllSchedules(): Observable<ScheduleDTO[]> {
+        return this.http.get<ScheduleDTO[]>(`${CoinageDataService.API_URL}schedules/all`);
+    }
+
+    public getScheduleById(id: number): Promise<ScheduleDTO> {
+        return lastValueFrom(this.http.get<ScheduleDTO>(`${CoinageDataService.API_URL}schedules/${id}`));
+    }
+
+    public postCreateSchedule(request: CreateScheduleDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}schedules/create`, request));
+    }
+
+    public deleteSchedule(id: number): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.delete<BaseResponseDTO>(`${CoinageDataService.API_URL}schedules/${id}`));
+    }
+
+    // Receipt methods
+    public getAllReceipts(): Observable<ReceiptDTO[]> {
+        return this.http.get<ReceiptDTO[]>(`${CoinageDataService.API_URL}receipts/all`);
     }
 }

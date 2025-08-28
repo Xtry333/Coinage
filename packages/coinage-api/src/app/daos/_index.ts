@@ -6,6 +6,7 @@ import { ContractorDao } from './contractor.dao';
 import { ItemDao } from './item.dao';
 import { ItemsWithContainersDao } from './itemsWithContainers.dao';
 import { ReceiptDao } from './receipt.dao';
+import { ScheduleDao } from './schedule.dao';
 import { TransferDao } from './transfer.dao';
 import { TransferItemDao } from './transferItem.dao';
 import { UserDao } from './user.dao';
@@ -17,6 +18,7 @@ export default [
     ContainerDao,
     ContractorDao,
     ReceiptDao,
+    ScheduleDao,
     TransferDao,
     UserDao,
     ItemDao,
