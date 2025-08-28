@@ -20,6 +20,7 @@ export class TransferItemDTO {
     public totalPrice!: number;
     public setDiscount!: number;
     public containerId?: number | null;
+    public transferItemId!: number;
 }
 
 export class TransferDetailsDTO {

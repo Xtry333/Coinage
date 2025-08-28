@@ -67,4 +67,25 @@ export class TransferItemDao extends BaseDao {
         if (ids.length === 0) return 0;
         return (await this.transferItemRepository.delete({ id: In(ids) })).affected ?? 0;
     }
+
+    public async findAllWithItemAndContainer(): Promise<TransferItem[]> {
+        return await this.transferItemRepository.find({
+            relations: {
+                item: {
+                    category: true,
+                },
+                container: true,
+                transfer: {
+                    currency: true,
+                    originAccount: true,
+                    targetAccount: true,
+                },
+            },
+            order: {
+                transfer: {
+                    createdDate: 'DESC',
+                },
+            },
+        });
+    }
 }

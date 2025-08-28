@@ -133,6 +133,7 @@ export class TransferController {
                     totalPrice: item.totalSetPrice,
                     setDiscount: item.totalSetDiscount,
                     containerId: item.containerId,
+                    transferItemId: item.id,
                 };
             }),
             isPlanned: transfer.date > new Date(),

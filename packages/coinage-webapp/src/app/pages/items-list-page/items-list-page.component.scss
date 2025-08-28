@@ -1,0 +1,11 @@
+.items-list-page {
+    @apply min-h-screen bg-gray-50 py-6;
+}
+
+.page-header {
+    @apply mx-auto mb-6 max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.page-content {
+    @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}

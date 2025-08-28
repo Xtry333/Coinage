@@ -1,15 +1,16 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
+import { parseUnit } from '@app/common-units';
 import {
     AdvancedItemContainer,
     BaseResponseDTO,
     CreateEditItemDTO,
     ItemContainer,
     ItemDetailsDTO,
+    ItemWithContainerDTO,
     ItemWithLastUsedPriceDTO,
     TransferWithItemDetailsDTO,
 } from '@app/interfaces';
-import { parseUnit } from '@app/common-units';
 
 import { ItemDao } from '../daos/item.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
@@ -26,6 +27,76 @@ export class ItemsController {
     @Get('/all')
     public async getAllItems(): Promise<ItemWithLastUsedPriceDTO[]> {
         return this.itemDao.getAllWithLastUsedPrice();
+    }
+
+    @Get('/all/detailed')
+    public async getAllItemsWithDetails(): Promise<ItemDetailsDTO[]> {
+        const items = await this.itemDao.getAll();
+        const detailedItems = await Promise.all(items.map(async (item) => this.getItemById(item.id)));
+        return detailedItems;
+    }
+
+    @Get('/all/with-containers')
+    public async getAllItemsWithContainers(): Promise<ItemWithContainerDTO[]> {
+        // Get all transfer items with their containers and item details
+        const transferItems = await this.transferItemDao.findAllWithItemAndContainer();
+        const itemContainerMap = new Map<string, ItemWithContainerDTO>();
+
+        for (const transferItem of transferItems) {
+            const item = await transferItem.item;
+            const category = item ? await item.category : null;
+            const container = transferItem.containerId ? await transferItem.container : null;
+            const transfer = await transferItem.transfer;
+
+            // Create unique key for item + container combination
+            const key = `${item?.id || 0}-${transferItem.containerId || 'no-container'}`;
+
+            const existing = itemContainerMap.get(key);
+            const itemData: ItemWithContainerDTO = existing || {
+                id: item?.id || 0,
+                name: item?.name || '',
+                brand: item?.brand || null,
+                categoryId: category?.id || 0,
+                categoryName: category?.name || null,
+                // Deprecated fields marked
+                containerSize: item?.containerSize || null,
+                containerSizeUnit: item?.containerSizeUnit || null,
+                // Container entity information
+                containerId: container?.id || null,
+                containerName: container?.name || null,
+                containerWeight: container?.weight || null,
+                containerWeightUnit: parseUnit(container?.weightUnit || null) || null,
+                containerVolume: container?.volume || null,
+                containerVolumeUnit: parseUnit(container?.volumeUnit || null) || null,
+                // Initialize with this transfer item's data
+                lastUsedDate: transfer.createdDate,
+                lastUnitPrice: transferItem.unitPrice,
+                lastUnitPriceCurrency: transfer.currency.symbol,
+                transferItemId: transferItem.id,
+            };
+
+            // Update with most recent data if this transfer item is newer
+            if (!existing || (transfer.createdDate && itemData.lastUsedDate && transfer.createdDate > itemData.lastUsedDate)) {
+                itemData.lastUsedDate = transfer.createdDate;
+                itemData.lastUnitPrice = transferItem.unitPrice;
+                itemData.lastUnitPriceCurrency = transfer.currency.symbol;
+                itemData.transferItemId = transferItem.id;
+            }
+
+            itemContainerMap.set(key, itemData);
+        }
+
+        return Array.from(itemContainerMap.values()).sort((a, b) => {
+            // Primary sort: by last used date (newest first), null dates go to end
+            if (a.lastUsedDate && b.lastUsedDate) {
+                return b.lastUsedDate.getTime() - a.lastUsedDate.getTime();
+            }
+            if (a.lastUsedDate && !b.lastUsedDate) return -1;
+            if (!a.lastUsedDate && b.lastUsedDate) return 1;
+
+            // Secondary sort: by item name for items with same or no dates
+            return a.name.localeCompare(b.name);
+        });
     }
 
     @Get('/:itemId')
@@ -98,11 +169,11 @@ export class ItemsController {
 
     private async toTransfersWithItemsDTO(transferItem: TransferItem): Promise<TransferWithItemDetailsDTO> {
         const transfer = await transferItem.transfer;
-    let containerName: string | null = null;
-    let containerWeight: number | null = null;
-    let containerWeightUnit: any | null = null;
-    let containerVolume: number | null = null;
-    let containerVolumeUnit: any | null = null;
+        let containerName: string | null = null;
+        let containerWeight: number | null = null;
+        let containerWeightUnit: any | null = null;
+        let containerVolume: number | null = null;
+        let containerVolumeUnit: any | null = null;
 
         if (transferItem.containerId !== null) {
             const container = await transferItem.container;

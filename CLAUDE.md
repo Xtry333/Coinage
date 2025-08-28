@@ -15,11 +15,15 @@ Run from repository root:
 
 ### Development (Dev Mode)
 
+Use these when working on any features and testing for any issues
+
 - `yarn dev` - Start both API and webapp servers simultaneously (the default command when testing for issues)
 - `yarn dev:api` - Start only the NestJS API server (port varies, see nx serve output)
 - `yarn dev:webapp` - Start only the Angular webapp (port varies, see nx serve output)
 
 ### Building (Production Mode)
+
+Use these when trying to build for production deployment (slow process and running with different optimizations, discouraged for testing)
 
 - `yarn build` - Build both API and webapp for production
 - `yarn build:api` - Build only the API

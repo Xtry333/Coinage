@@ -24,6 +24,7 @@ import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-
 import { ItemShoppingListComponent } from './create-edit-transfer/item-shopping-list/item-shopping-list.component';
 import { ItemizedTransfersModule } from './create-multiple-transfers/itemized-transfer.module';
 import { ChatComponent } from './demo/chat/chat.component';
+import { ItemsListTableComponent } from './items-list-table/items-list-table.component';
 import { NetworkInterceptor } from './loaderGadget/network.interceptor';
 import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
 import { MonthSummaryComponent } from './month-summary/month-summary.component';
@@ -33,6 +34,7 @@ import { AccountDetailsPage } from './pages/account-details-page/account-details
 import { AccountSettingsPageComponent } from './pages/account-settings-page/account-settings-page.component';
 import { DashboardCountersComponent } from './pages/dashboard/dashboard-counters/dashboard-counters.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { ItemsListPageComponent } from './pages/items-list-page/items-list-page.component';
 import { ReceiptDetailsComponent } from './receipt-details/receipt-details.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { ItemsTableComponent } from './transfer-details/items-table/items-table.component';
@@ -96,6 +98,8 @@ Chart.register(zoomPlugin);
         AccountSettingsPageComponent,
         TransferItemDetailsComponent,
         TransferItemsTableComponent,
+        ItemsListPageComponent,
+        ItemsListTableComponent,
         ChatComponent,
         AccountDetailsPage,
     ],

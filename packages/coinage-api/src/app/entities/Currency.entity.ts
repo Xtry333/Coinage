@@ -8,6 +8,9 @@ export class Currency {
     @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
 
+    /*
+     * Shorthand is a formatting `<code>% zł</code>` or `<code>$%</code>`
+     */
     @Column({ type: 'varchar', length: 16, nullable: false })
     public shorthand!: string;
 }

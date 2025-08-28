@@ -21,6 +21,7 @@ import {
     GetFilteredTransfersRequest,
     GranularCreateEditTransferModelDTO,
     ItemDetailsDTO,
+    ItemWithContainerDTO,
     ItemWithLastUsedPriceDTO,
     NewMonthlyUserStatsDTO,
     ReceiptDetailsDTO,
@@ -181,6 +182,14 @@ export class CoinageDataService {
 
     public getAllItems(): Promise<ItemWithLastUsedPriceDTO[]> {
         return lastValueFrom(this.http.get<ItemWithLastUsedPriceDTO[]>(`${CoinageDataService.API_URL}items/all`));
+    }
+
+    public getItems(): Observable<ItemWithLastUsedPriceDTO[]> {
+        return this.http.get<ItemWithLastUsedPriceDTO[]>(`${CoinageDataService.API_URL}items/all`);
+    }
+
+    public getItemsWithContainers(): Observable<ItemWithContainerDTO[]> {
+        return this.http.get<ItemWithContainerDTO[]>(`${CoinageDataService.API_URL}items/all/with-containers`);
     }
 
     public getItemDetails(id: number): Promise<ItemDetailsDTO> {

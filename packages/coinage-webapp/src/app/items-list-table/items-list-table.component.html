@@ -1,0 +1,144 @@
+<div class="items-table-container">
+    @if (showFilters && lastPageNumber) {
+        <div class="mb-4 flex items-center justify-end">
+            <app-pagination [lastPage]="lastPageNumber" (pageChange)="onPageChanged($event)"></app-pagination>
+        </div>
+    }
+
+    <table class="items-table">
+        <caption>
+            <span class="flex items-center gap-2">
+                <fa-icon [icon]="boxesIcon"></fa-icon>
+                Items Overview
+            </span>
+        </caption>
+        <thead>
+            <tr>
+                <th class="text-left">
+                    <span>Item Name</span>
+                    @if (showFilters) {
+                        <app-table-filter
+                            [filterName]="ItemTableColumn.ItemName"
+                            [filterType]="FilterType.TextBox"
+                            [popupSide]="PopupSide.ToRight"
+                            (filterEvent)="onPerformFilter($event)"
+                        ></app-table-filter>
+                    }
+                </th>
+                <th class="text-left">
+                    <span>Category</span>
+                    @if (showFilters) {
+                        <app-table-filter
+                            [filterName]="ItemTableColumn.Category"
+                            [filterType]="FilterType.MultiCheckbox"
+                            [filterOptions]="optionsForCheckboxFilters.categories"
+                            [popupSide]="PopupSide.ToRight"
+                            (filterEvent)="onPerformFilter($event)"
+                        ></app-table-filter>
+                    }
+                </th>
+                <th class="text-right">
+                    <span>Container</span>
+                    @if (showFilters) {
+                        <app-table-filter
+                            [filterName]="ItemTableColumn.Container"
+                            [filterType]="FilterType.MultiCheckbox"
+                            [filterOptions]="optionsForCheckboxFilters.containers"
+                            [popupSide]="PopupSide.ToLeft"
+                            (filterEvent)="onPerformFilter($event)"
+                        ></app-table-filter>
+                    }
+                </th>
+                <th class="text-right">
+                    <span>Last Unit Price</span>
+                    @if (showFilters) {
+                        <app-table-filter
+                            [filterName]="ItemTableColumn.LastPrice"
+                            [filterType]="FilterType.NumericRange"
+                            [popupSide]="PopupSide.ToLeft"
+                            (filterEvent)="onPerformFilter($event)"
+                        ></app-table-filter>
+                    }
+                </th>
+                <th class="text-right">
+                    <span>Standard Price/L</span>
+                </th>
+                <th class="text-right">
+                    <span>Standard Price/kg</span>
+                </th>
+                <th class="text-right">
+                    <span>Last Used</span>
+                    @if (showFilters) {
+                        <app-table-filter
+                            [filterName]="ItemTableColumn.LastUsed"
+                            [filterType]="FilterType.DateRange"
+                            [popupSide]="PopupSide.ToLeft"
+                            (filterEvent)="onPerformFilter($event)"
+                        ></app-table-filter>
+                    }
+                </th>
+                <th class="text-center">
+                    <span>Actions</span>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (item of itemsForTable; track itemIdTracker($index, item)) {
+                <tr class="transition-colors hover:bg-gray-50">
+                    <td class="font-medium">
+                        <a
+                            class="text-blue-600 hover:text-blue-800 hover:underline"
+                            [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })"
+                        >
+                            {{ getDisplayName(item) }}
+                        </a>
+                    </td>
+                    <td>{{ getCategoryName(item) }}</td>
+                    <td class="text-right font-mono">{{ formatContainer(item) }}</td>
+                    <td class="text-right font-mono">
+                        {{ item.lastUnitPrice | appCurrency: getCurrencyCode(item) }}
+                    </td>
+                    <td class="text-right font-mono text-gray-600">
+                        {{ calculateStandardPricePerLiter(item) }}
+                    </td>
+                    <td class="text-right font-mono text-gray-600">
+                        {{ calculateStandardPricePerKg(item) }}
+                    </td>
+                    <td class="text-right">
+                        @if (item.lastUsedDate) {
+                            {{ item.lastUsedDate | date }}
+                        } @else {
+                            <span class="text-gray-400">Never</span>
+                        }
+                    </td>
+                    <td class="text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <app-button-icon [icon]="editIcon" size="sm" variant="ghost" ariaLabel="Edit item" title="Edit item"></app-button-icon>
+                        </div>
+                    </td>
+                </tr>
+            }
+            @if (noRowsFound) {
+                <tr>
+                    <td class="py-8 text-center text-gray-500" colspan="8">
+                        <div class="flex flex-col items-center gap-2">
+                            <fa-icon class="text-4xl text-gray-300" [icon]="boxesIcon"></fa-icon>
+                            <span class="font-medium">No items found</span>
+                            @if (isAnyFilterApplied && !noRows) {
+                                <span class="text-sm">Please check filters, there are {{ items.length }} unmatched items.</span>
+                            } @else {
+                                <span class="text-sm">No items have been registered yet.</span>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (showFilters && lastPageNumber) {
+        <div class="mt-4 flex items-center justify-end">
+            <app-pagination [lastPage]="lastPageNumber" [currentPage]="currentPage"></app-pagination>
+        </div>
+    }
+</div>

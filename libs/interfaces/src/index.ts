@@ -12,6 +12,7 @@ export * from './lib/GlobalSearch.request';
 export * from './lib/GlobalSearch.response';
 export * from './lib/interfaces';
 export * from './lib/ItemDTO.response';
+export * from './lib/ItemWithContainerDTO.response';
 export * from './lib/ItemWithLastUsedPriceDTO.response';
 export * from './lib/MonthlyUserStatsDTO.response';
 export * from './lib/ReceiptDetailsDTO.response';

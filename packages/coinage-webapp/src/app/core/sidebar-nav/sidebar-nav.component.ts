@@ -1,9 +1,9 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
+import { CoinageRoutes } from '../../app-routing/app-routes';
 import { CurrentUserDataService } from '../../services/current-user.service';
 import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component';
-import { CoinageRoutes } from '../../app-routing/app-routes';
 
 interface UiNavLink {
     text: string;
@@ -40,6 +40,11 @@ export class SidebarNavComponent implements OnInit {
             text: 'Transfers',
             icon: 'bi-card-list',
             url: CoinageRoutes.TransfersListPage.getUrl({}),
+        },
+        {
+            text: 'Items',
+            icon: 'bi-box',
+            url: CoinageRoutes.ItemsListPage.getUrl({}),
         },
         {
             text: 'Categories',

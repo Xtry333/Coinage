@@ -8,6 +8,7 @@ import { MonthSummaryComponent } from '../month-summary/month-summary.component'
 import { AccountDetailsPage } from '../pages/account-details-page/account-details-page.component';
 import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
 import { DashboardComponent } from '../pages/dashboard/dashboard.component';
+import { ItemsListPageComponent } from '../pages/items-list-page/items-list-page.component';
 import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
@@ -23,6 +24,7 @@ export const CoinageRoutes = {
     TransferItemDetailsPage: new CoinageRoute('item/details/:id', TransferItemDetailsComponent, {}, { id: 'number' }),
     ReceiptDetailsPage: new CoinageRoute('receipt/details/:id', ReceiptDetailsComponent, {}, { id: 'number' }),
     TransfersListPage: new CoinageRoute('transfers', TransfersListComponent),
+    ItemsListPage: new CoinageRoute('items', ItemsListPageComponent),
     CreateTransferPage: new CoinageRoute('transfer/add', CreateEditTransferComponent),
     EditTransferPage: new CoinageRoute('transfer/edit/:id', CreateEditTransferComponent, {}, { id: 'number' }),
     CreateMultipleTransfersPage: new CoinageRoute('transfer/create', CreateMultipleTransfersComponent),

@@ -315,15 +315,15 @@ export class CreateEditTransferComponent implements OnInit {
     private mapToTransferItems(items: TransferItemDTO[]): ShoppingListItem[] {
         return items.map((item) => {
             return new ShoppingListItem(
-                undefined,
+                item.id,
                 item.itemName,
                 item.amount,
                 item.unitPrice,
                 item.unitPrice * item.amount,
-                undefined,
+                item.setDiscount,
                 0,
                 item.containerId,
-                item.id,
+                item.transferItemId,
             );
         });
     }
