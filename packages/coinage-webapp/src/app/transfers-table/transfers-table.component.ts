@@ -149,7 +149,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     );
                     this.optionsForCheckboxFilters.accounts = accounts.map((a) =>
                         TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds),
-                    );
+                    ).sort((a, b) => a.uiText.localeCompare(b.uiText));
                 },
             );
         }

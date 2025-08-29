@@ -2,32 +2,6 @@ div.transfers-table-container {
     margin: auto;
     margin-top: 24px;
 
-    .header-filters-container {
-        background: white;
-        border: 1px solid #d1d1d1;
-        border-radius: 8px;
-        padding: 8px 12px;
-        margin-bottom: 16px;
-        box-shadow: 0 1px 3px rgb(0 0 0 / 10%);
-
-        > div {
-            display: inline-flex;
-            align-items: center;
-            margin-right: 20px;
-
-            input[type='checkbox'] {
-                margin-right: 8px;
-                transform: scale(1.1);
-            }
-
-            label {
-                margin-bottom: 0;
-                font-weight: 500;
-                cursor: pointer;
-            }
-        }
-    }
-
     table.transfers-table {
         width: 100%;
         border-collapse: separate;
@@ -219,10 +193,6 @@ div.transfers-table-container {
 // Responsive design to match items table
 @media (width <= 768px) {
     div.transfers-table-container {
-        .header-filters-container {
-            padding: 6px 8px;
-        }
-
         table.transfers-table {
             font-size: 12px;
 
