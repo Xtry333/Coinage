@@ -22,7 +22,7 @@ import { TransfersListComponent } from './transfers-list/transfers-list.componen
 export class AppComponent implements OnInit, OnDestroy {
     public static readonly KEY_LAST_USER_VISIT_DATE = 'last-visit-date';
     public static readonly KEY_FORCE_MOCK_USER = 'debug-user-id';
-    public static readonly WELCOME_DELAY = 1000 * 60 * 60 * 12;
+    public static readonly WELCOME_DELAY = 1000 * 60 * 60 * 12; // 1000ms * 60s * 60m * 12h;
 
     public userIcon = faUser;
 
