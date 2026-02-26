@@ -7,4 +7,4 @@ EXPOSE 80
 EXPOSE 3333
 
 WORKDIR /usr/share/nginx/html
-COPY ./dist/apps/coinage .
+COPY ./dist/packages/coinage-webapp .

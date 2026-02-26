@@ -1,4 +1,3 @@
-version: '3'
 services:
     coinage-db:
         restart: unless-stopped
@@ -7,6 +6,12 @@ services:
             - ./.env
         ports:
             - 3306:3306
+        healthcheck:
+            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=$MYSQL_ROOT_PASSWORD"]
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
     coinage-api:
         build:
             context: .
@@ -19,13 +24,14 @@ services:
         ports:
             - 3333:3333
         depends_on:
-            - coinage-db
+            coinage-db:
+                condition: service_healthy
     coinage-webapp:
         build:
             context: .
             dockerfile: docker/webapp.Dockerfile
         image: coinage-webapp
         ports:
-            - 80:80
+            - 4200:4200
         depends_on:
             - coinage-api
