@@ -12,13 +12,24 @@
             @for (item of tableItems; track idTracker($index, item)) {
                 <tr class="transition-colors duration-200 hover:bg-gray-50">
                     <td class="px-4 py-3 text-sm">
-                        <a
-                            class="font-medium text-blue-600 hover:text-blue-700 hover:underline"
-                            [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })"
-                        >
-                            {{ item.itemName }}
-                        </a>
-                        <span class="text-xs italic text-gray-500">{{ getContainerDetails(item.containerId) }}</span>
+                        <div class="flex flex-wrap items-center gap-1">
+                            <a
+                                class="font-medium text-blue-600 hover:text-blue-700 hover:underline"
+                                [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })"
+                            >
+                                {{ item.itemName }}
+                            </a>
+                            <span class="text-xs italic text-gray-500">{{ getContainerDetails(item.containerId) }}</span>
+                            @for (tag of item.tags; track tag.id) {
+                                <span
+                                    class="inline-flex items-center rounded-full px-1.5 py-0.5 text-[10px] font-medium"
+                                    [style.background-color]="tag.color ? tag.color + '20' : '#e5e7eb'"
+                                    [style.color]="tag.color || '#6b7280'"
+                                >
+                                    {{ tag.name }}
+                                </span>
+                            }
+                        </div>
                     </td>
                     <td class="px-4 py-3 text-right font-mono text-sm text-gray-900">{{ item.unitPrice | plnCurrency }}</td>
                     <td class="px-4 py-3 text-right text-sm text-gray-900">{{ item.amount }}</td>

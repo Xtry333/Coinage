@@ -1,5 +1,5 @@
 import { ReceiptDTO, ReceiptDetailsDTO, TransferDTO, TransferType } from '@app/interfaces';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -7,8 +7,10 @@ import { ContractorDao } from '../daos/contractor.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Transfer } from '../entities/Transfer.entity';
+import { AuthGuard } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 
+@UseGuards(AuthGuard)
 @Controller('receipt(s)?')
 export class ReceiptsController {
     public constructor(

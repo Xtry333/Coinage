@@ -1,17 +1,10 @@
 import { AccountDTO, CategoryPathDTO, ReceiptDTO } from '../lib/interfaces';
+import { TagDTO } from '../lib/TagDTO.response';
 
 import { Type } from 'class-transformer';
 import { TransferDTO } from '../lib/FilteredTransferDTO.response';
 
 export class TransferItemDTO {
-    // public constructor(transferItem: TransferItemDTO) {
-    //     this.id = transferItem.id;
-    //     this.itemName = transferItem.itemName;
-    //     this.unitPrice = transferItem.unitPrice;
-    //     this.amount = transferItem.amount;
-    //     this.unit = transferItem.unit;
-    // }
-
     public id!: number;
     public itemName!: string;
     public unit!: string;
@@ -21,6 +14,7 @@ export class TransferItemDTO {
     public setDiscount!: number;
     public containerId?: number | null;
     public transferItemId!: number;
+    public tags!: TagDTO[];
 }
 
 export class TransferDetailsDTO {

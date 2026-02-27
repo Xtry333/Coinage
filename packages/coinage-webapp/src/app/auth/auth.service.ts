@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 
-import { AuthDataService } from './auth.dataservice';
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NavigatorService } from '../app-routing/navigator.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NotificationService } from '../services/notification.service';
+import { AuthDataService } from './auth.dataservice';
 
 @Injectable({
     providedIn: 'root',
@@ -39,8 +39,13 @@ export class AuthService {
         }
     }
 
-    public logout(redirectToLogin?: boolean): void {
+    public async logout(redirectToLogin?: boolean): Promise<void> {
         if (this.isAuthenticated()) {
+            try {
+                await this.authDataService.logout();
+            } catch {
+                // Server may be unreachable or token already expired - proceed with local cleanup
+            }
             this.coinageStorageService.setString(AuthService.USER_ACCESS_TOKEN, undefined);
             this.notificationService.push({ message: 'You have been logged out.', title: 'Logout' });
             if (redirectToLogin) {

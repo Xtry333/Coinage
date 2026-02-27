@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 
 import { parseUnit } from '@app/common-units';
 import {
@@ -16,7 +16,9 @@ import { ItemDao } from '../daos/item.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
 import { Item } from '../entities/Item.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
+import { AuthGuard } from '../services/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('item(s)?')
 export class ItemsController {
     public constructor(
@@ -144,6 +146,7 @@ export class ItemsController {
             itemName: item.name,
             categoryId: category?.id ?? null,
             categoryName: category?.name ?? null,
+            tags: (item.tags ?? []).map((tag) => ({ id: tag.id, name: tag.name, color: tag.color })),
             container: container,
             createdDate: item.createdDate,
             editedDate: item.editedDate,

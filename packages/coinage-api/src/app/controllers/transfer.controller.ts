@@ -134,6 +134,7 @@ export class TransferController {
                     setDiscount: item.totalSetDiscount,
                     containerId: item.containerId,
                     transferItemId: item.id,
+                    tags: (item.item.tags ?? []).map((tag) => ({ id: tag.id, name: tag.name, color: tag.color })),
                 };
             }),
             isPlanned: transfer.date > new Date(),

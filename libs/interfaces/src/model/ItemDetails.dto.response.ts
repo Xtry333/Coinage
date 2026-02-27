@@ -1,5 +1,6 @@
-import { Type } from 'class-transformer';
 import { Unit } from '@app/common-units';
+import { Type } from 'class-transformer';
+import { TagDTO } from '../lib/TagDTO.response';
 
 export class ItemDetailsDTO {
     public id!: number;
@@ -7,6 +8,7 @@ export class ItemDetailsDTO {
     public itemName!: string;
     public categoryId!: number | null;
     public categoryName!: string | null;
+    public tags!: TagDTO[];
     /**
      * @deprecated Prefer transfer-level container fields on TransferWithItemDetailsDTO.
      * Kept for backward compatibility.
