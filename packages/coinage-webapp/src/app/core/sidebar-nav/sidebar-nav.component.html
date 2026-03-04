@@ -16,6 +16,7 @@
                         <a
                             class="group flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-100 hover:text-gray-900"
                             [routerLink]="link.url"
+                            (click)="onLinkClicked()"
                             routerLinkActive="bg-primary-50 border-primary-200 text-primary-700 border"
                             ariaCurrentWhenActive="page"
                         >
