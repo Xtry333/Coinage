@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
+import { Router } from '@angular/router';
 
-import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NotificationService } from '../services/notification.service';
 import { AuthDataService } from './auth.dataservice';
@@ -15,26 +15,15 @@ export class AuthService {
     public constructor(
         private authDataService: AuthDataService,
         private coinageStorageService: CoinageStorageService,
-        private navigatorService: NavigatorService,
+        private router: Router,
         private notificationService: NotificationService,
-    ) {
-        console.log(this);
-    }
+    ) {}
 
     public async login(username: string, password: string): Promise<void> {
-        console.log('Login:', username, password);
         try {
-            // Call the data service to fetch the JWT token
             const response = await this.authDataService.login(username, password);
-            console.log('Login response:', response);
-
-            // Store the token using CoinageStorageService
             this.coinageStorageService.setString(AuthService.USER_ACCESS_TOKEN, response.token);
-
-            // Perform any additional login logic here
-            // ...
         } catch (error) {
-            // Handle any errors that occurred during login
             console.error('Login failed:', error);
         }
     }
@@ -46,16 +35,19 @@ export class AuthService {
             } catch {
                 // Server may be unreachable or token already expired - proceed with local cleanup
             }
+            const currentUrl = this.router.url;
             this.coinageStorageService.setString(AuthService.USER_ACCESS_TOKEN, undefined);
             this.notificationService.push({ message: 'You have been logged out.', title: 'Logout' });
             if (redirectToLogin) {
-                this.navigatorService.navigateTo('login');
+                const returnUrl = currentUrl && currentUrl !== '/login' ? currentUrl : undefined;
+                this.router.navigate(['/login'], {
+                    queryParams: returnUrl ? { returnUrl } : {},
+                });
             }
         }
     }
 
     public isAuthenticated(): boolean {
-        // Check if the token exists in CoinageStorageService
         return !!this.coinageStorageService.getString(AuthService.USER_ACCESS_TOKEN);
     }
 
