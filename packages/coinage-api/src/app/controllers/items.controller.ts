@@ -137,6 +137,7 @@ export class ItemsController {
             advancedContainer.weightUnit = parseUnit(container?.weightUnit ?? null) ?? undefined;
             advancedContainer.volume = container?.volume ?? undefined;
             advancedContainer.volumeUnit = parseUnit(container?.volumeUnit ?? null) ?? undefined;
+            advancedContainer.itemCount = container?.itemCount ?? null;
             itemContainers.push(advancedContainer);
         }
 
@@ -177,6 +178,7 @@ export class ItemsController {
         let containerWeightUnit: any | null = null;
         let containerVolume: number | null = null;
         let containerVolumeUnit: any | null = null;
+        let containerItemCount: number | null = null;
 
         if (transferItem.containerId !== null) {
             const container = await transferItem.container;
@@ -186,15 +188,12 @@ export class ItemsController {
                 containerWeightUnit = parseUnit(container.weightUnit ?? null) ?? null;
                 containerVolume = container.volume ?? null;
                 containerVolumeUnit = parseUnit(container.volumeUnit ?? null) ?? null;
+                containerItemCount = container.itemCount ?? null;
             }
         }
         return {
             transferId: transfer.id,
             transferName: transfer.description,
-            // amount: transfer.amount,
-            // type: transfer.type,
-            // categoryId: transfer.category?.id,
-            // categoryName: transfer.category?.name,
             transferContractorId: transfer.contractor?.id ?? null,
             transferContractorName: transfer.contractor?.name ?? null,
             accountId: transfer.originAccountId,
@@ -208,6 +207,7 @@ export class ItemsController {
             containerWeightUnit: containerWeightUnit,
             containerVolume: containerVolume,
             containerVolumeUnit: containerVolumeUnit,
+            containerItemCount: containerItemCount,
         };
     }
 }

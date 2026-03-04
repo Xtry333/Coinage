@@ -1,12 +1,12 @@
-import { Component, Input, OnChanges, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
-import { IconDefinition, faReceipt } from '@fortawesome/free-solid-svg-icons';
-import { ItemDetailsDTO, TransferDTO, TransferItemDTO, TransferWithItemDetailsDTO } from '@app/interfaces';
+import { ItemDetailsDTO, TransferWithItemDetailsDTO } from '@app/interfaces';
+import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
-import { CoinageDataService } from '../../services/coinage.data-service';
-import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
+import { toKg, toLiters, Unit } from '@app/common-units';
 import { CoinageRoutes } from '../../app-routing/app-routes';
-import { toLiters, toKg, Unit } from '@app/common-units';
+import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
+import { CoinageDataService } from '../../services/coinage.data-service';
 
 export enum TableColumn {
     Transfer = 'Transfer',
@@ -56,16 +56,17 @@ export class TransferItemsTableComponent {
 
     public transferWithItemIdTracker(_index: number, item: TransferWithItemDetailsDTO): string {
         const parts = [item.transferId?.toString() ?? '', item.unitPrice?.toString() ?? ''];
-    if (item.containerName) parts.push(item.containerName ?? '');
+        if (item.containerName) parts.push(item.containerName ?? '');
         return parts.join('|');
     }
 
     public formatContainer(details: TransferWithItemDetailsDTO): string {
-    const name = details.containerName ?? null;
-    const weight = details.containerWeight ?? null;
-    const weightUnit = details.containerWeightUnit ?? null;
-    const volume = details.containerVolume ?? null;
-    const volumeUnit = details.containerVolumeUnit ?? null;
+        const name = details.containerName ?? null;
+        const weight = details.containerWeight ?? null;
+        const weightUnit = details.containerWeightUnit ?? null;
+        const volume = details.containerVolume ?? null;
+        const volumeUnit = details.containerVolumeUnit ?? null;
+        const itemCount = details.containerItemCount ?? null;
 
         if (!name && !weight && !volume) return TransferItemsTableComponent.EMPTY_DESCRIPTION;
 
@@ -73,19 +74,38 @@ export class TransferItemsTableComponent {
         if (name) pieces.push(name);
         if (weight) pieces.push(`${weight}${weightUnit ? ' ' + weightUnit : ''}`);
         if (volume) pieces.push(`${volume}${volumeUnit ? ' ' + volumeUnit : ''}`);
+        if (itemCount) {
+            const perItemStr = this.formatPerItemWeight(weight, weightUnit, itemCount);
+            pieces.push(`${itemCount}× items${perItemStr ? ` (${perItemStr})` : ''}`);
+        }
 
         return pieces.join(' · ');
     }
 
+    public formatPerItemWeight(weight: number | null, weightUnit: string | null, itemCount: number): string | null {
+        if (!weight || !itemCount || itemCount <= 0) return null;
+        const perItem = weight / itemCount;
+        // Choose a sensible unit: if result >= 1 kg keep kg, otherwise show grams
+        if (weightUnit === Unit.KG) {
+            if (perItem >= 1) return `${perItem.toFixed(3)} kg`;
+            return `${(perItem * 1000).toFixed(0)} g`;
+        }
+        if (weightUnit === Unit.G) {
+            if (perItem >= 1000) return `${(perItem / 1000).toFixed(3)} kg`;
+            return `${perItem.toFixed(0)} g`;
+        }
+        return `${perItem.toFixed(3)} ${weightUnit ?? ''}`.trim();
+    }
+
     public getStandardPrice(details: TransferWithItemDetailsDTO): string {
-    // Compute standardized prices per L and per KG where possible using shared Unit enum.
-    let volumeSize = details.containerVolume ?? null;
-    let volumeUnit: Unit | null = details.containerVolumeUnit ?? null;
-    let weightSize = details.containerWeight ?? null;
-    let weightUnit: Unit | null = details.containerWeightUnit ?? null;
+        // Compute standardized prices per L and per KG where possible using shared Unit enum.
+        let volumeSize = details.containerVolume ?? null;
+        let volumeUnit: Unit | null = details.containerVolumeUnit ?? null;
+        let weightSize = details.containerWeight ?? null;
+        let weightUnit: Unit | null = details.containerWeightUnit ?? null;
 
         // fallback to deprecated item-level container
-        if ((!volumeSize && !weightSize) && this.item?.container) {
+        if (!volumeSize && !weightSize && this.item?.container) {
             const u = this.item.container.unit ?? null;
             const s = this.item.container.size ?? null;
             if (s && u) {
@@ -111,16 +131,15 @@ export class TransferItemsTableComponent {
             if (kgs && kgs > 0) parts.push(`${(details.unitPrice / kgs).toFixed(3)} zł/kg`);
         }
 
-    if (parts.length > 0) return parts.join(' · ');
+        if (parts.length > 0) return parts.join(' · ');
 
-    // fallback to raw container unit if nothing else
-    const fallbackUnit = (this.item?.container?.unit ?? details.containerVolumeUnit ?? details.containerWeightUnit) ?? null;
-    const fallbackSize = this.item?.container?.size ?? (details.containerVolume ?? details.containerWeight ?? 1);
-    const eff = fallbackSize && fallbackSize > 0 ? fallbackSize : 1;
-    const fallbackLabel = fallbackUnit ? fallbackUnit : '';
-    return `${(details.unitPrice / eff).toFixed(3)} zł/${fallbackLabel}`;
+        // fallback to raw container unit if nothing else
+        const fallbackUnit = this.item?.container?.unit ?? details.containerVolumeUnit ?? details.containerWeightUnit ?? null;
+        const fallbackSize = this.item?.container?.size ?? details.containerVolume ?? details.containerWeight ?? 1;
+        const eff = fallbackSize && fallbackSize > 0 ? fallbackSize : 1;
+        const fallbackLabel = fallbackUnit ? fallbackUnit : '';
+        return `${(details.unitPrice / eff).toFixed(3)} zł/${fallbackLabel}`;
     }
-
 
     public get isHeaderDisplayed(): boolean {
         return this.header !== undefined;

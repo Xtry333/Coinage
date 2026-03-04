@@ -35,6 +35,7 @@ export class TransferWithItemDetailsDTO {
     public containerWeightUnit!: Unit | null;
     public containerVolume!: number | null;
     public containerVolumeUnit!: Unit | null;
+    public containerItemCount!: number | null;
     @Type(() => Date) public date!: Date;
 }
 
@@ -52,4 +53,5 @@ export class AdvancedItemContainer {
     public weightUnit?: Unit;
     public volume?: number;
     public volumeUnit?: Unit;
+    public itemCount?: number | null;
 }
