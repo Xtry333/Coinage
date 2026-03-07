@@ -4,7 +4,7 @@
     "license": "MIT",
     "packageManager": "yarn@3.3.1",
     "private": true,
-    "author": "Michał Woźniak <xtry333@gmail.com>",
+    "author": "Micha\u0142 Wo\u017aniak <xtry333@gmail.com>",
     "repository": "git@github.com:Xtry333/Coinage.git",
     "workspaces": [
         "packages/*"
@@ -14,7 +14,6 @@
         "dev": "run-p dev:api dev:webapp",
         "dev:api": "nx serve coinage-api",
         "dev:webapp": "nx serve coinage-webapp",
-        "dev:worker": "nx serve receipt-worker",
         "build": "run-s build:api build:webapp build:docker",
         "build:api": "nx build coinage-api --prod",
         "build:webapp": "nx build coinage-webapp --prod",
@@ -70,6 +69,7 @@
         "@nestjs/common": "10.4.1",
         "@nestjs/config": "3.2.3",
         "@nestjs/core": "10.4.1",
+        "@nestjs/cqrs": "^10.2.8",
         "@nestjs/jwt": "10.2.0",
         "@nestjs/mapped-types": "2.0.5",
         "@nestjs/passport": "10.0.3",

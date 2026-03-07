@@ -1,20 +1,21 @@
 import { ReceiptDTO, ReceiptDetailsDTO, ReceiptPendingDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferDTO, TransferType } from '@app/interfaces';
-import { BadRequestException, Body, Controller, Get, Param, Patch, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { EventBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createHash } from 'crypto';
+import { createHash, Hash } from 'crypto';
+import { readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { ContractorDao } from '../daos/contractor.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
 import { TransferDao } from '../daos/transfer.dao';
-import { Receipt, ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
+import { ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
 import { Transfer } from '../entities/Transfer.entity';
+import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.event';
 import { DateParserService } from '../services/date-parser.service';
-import { EventsGateway } from '../events/events.gateway';
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads', 'receipts');
 
@@ -39,7 +40,7 @@ export class ReceiptsController {
         private readonly contractorDao: ContractorDao,
         private readonly accountDao: AccountDao,
         private readonly dateParserService: DateParserService,
-        private readonly eventsGateway: EventsGateway,
+        private readonly eventBus: EventBus,
     ) {}
 
     @Post(':id/upload-image')
@@ -53,11 +54,11 @@ export class ReceiptsController {
         }
 
         const receipt = await this.receiptDao.getById(id);
-        const hash = createHash('sha256').update(require('fs').readFileSync(file.path)).digest('hex');
+        const hash = createHash('sha256').update(readFileSync(file.path)).digest('hex');
 
         const duplicate = await this.receiptDao.findByHash(hash);
         if (duplicate && duplicate.id !== receipt.id) {
-            require('fs').unlinkSync(file.path);
+            unlinkSync(file.path);
             return { receiptId: id, isDuplicate: true, duplicateOfReceiptId: duplicate.id, status: ReceiptProcessingStatus.DUPLICATE };
         }
 
@@ -66,17 +67,20 @@ export class ReceiptsController {
         receipt.processingStatus = EntityReceiptProcessingStatus.PENDING;
         await this.receiptDao.save(receipt);
 
-        this.eventsGateway.emitReceiptQueued(id);
+        this.eventBus.publish(new ReceiptQueuedEvent(id, file.path));
 
         return { receiptId: id, isDuplicate: false, status: ReceiptProcessingStatus.PENDING };
     }
 
     @Post(':id/confirm-duplicate')
-    public async confirmDuplicateUpload(@Param('id') id: number, @Body() body: { filePath: string }): Promise<{ ok: boolean }> {
+    public async confirmDuplicateUpload(@Param('id') id: number): Promise<{ ok: boolean }> {
         const receipt = await this.receiptDao.getById(id);
+        if (!receipt.imagePath) {
+            throw new BadRequestException('Receipt has no image to process');
+        }
         receipt.processingStatus = EntityReceiptProcessingStatus.PENDING;
         await this.receiptDao.save(receipt);
-        this.eventsGateway.emitReceiptQueued(id);
+        this.eventBus.publish(new ReceiptQueuedEvent(id, receipt.imagePath));
         return { ok: true };
     }
 
@@ -97,29 +101,6 @@ export class ReceiptsController {
             status: receipt.processingStatus as unknown as ReceiptProcessingStatus,
             aiData: receipt.aiExtractedData,
         };
-    }
-
-    @Patch(':id/worker-status')
-    public async updateWorkerStatus(
-        @Param('id') id: number,
-        @Body() body: { status: string; aiData?: object },
-    ): Promise<{ ok: boolean }> {
-        const validStatuses = Object.values(EntityReceiptProcessingStatus) as string[];
-        if (!validStatuses.includes(body.status)) {
-            throw new BadRequestException(`Invalid status: ${body.status}`);
-        }
-        const status = body.status as EntityReceiptProcessingStatus;
-        await this.receiptDao.updateStatus(id, status, body.aiData);
-
-        if (status === EntityReceiptProcessingStatus.PROCESSED) {
-            this.eventsGateway.emitReceiptProcessed(id, body.aiData ?? {});
-        } else if (status === EntityReceiptProcessingStatus.ERROR) {
-            this.eventsGateway.emitReceiptError(id, 'Processing failed');
-        } else if (status === EntityReceiptProcessingStatus.PROCESSING) {
-            this.eventsGateway.emitReceiptProcessing(id);
-        }
-
-        return { ok: true };
     }
 
     @Get('all')
@@ -184,10 +165,6 @@ export class ReceiptsController {
     }
 
     private getNextTransferDate(transfers: Transfer[]): Date | undefined {
-        const todayStr = new Date().toISOString().substring(0, 10);
-        const todayTransfersIndex = transfers.find((t) => t.date.getTime() > new Date().getTime());
-        if (todayTransfersIndex) {
-            return todayTransfersIndex.date;
-        }
+        return transfers.find((t) => t.date.getTime() > new Date().getTime())?.date;
     }
 }
