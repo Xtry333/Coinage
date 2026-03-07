@@ -27,6 +27,8 @@ import {
     NewMonthlyUserStatsDTO,
     ReceiptDTO,
     ReceiptDetailsDTO,
+    ReceiptProcessingStatus,
+    ReceiptUploadResponseDTO,
     RefundTransferDTO,
     ScheduleDTO,
     SplitTransferDTO,
@@ -102,6 +104,16 @@ export class CoinageDataService {
                 .get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/${transferId}/details`)
                 .pipe(map((t) => plainToInstance(ReceiptDetailsDTO, t))),
         );
+    }
+
+    public uploadReceiptImage(receiptId: number, file: File): Promise<ReceiptUploadResponseDTO> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return lastValueFrom(this.http.post<ReceiptUploadResponseDTO>(`${CoinageDataService.API_URL}receipt/${receiptId}/upload-image`, formData));
+    }
+
+    public getReceiptStatus(receiptId: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null }> {
+        return lastValueFrom(this.http.get<{ status: ReceiptProcessingStatus; aiData?: object | null }>(`${CoinageDataService.API_URL}receipt/${receiptId}/status`));
     }
 
     public getAccountMonthlyStats(): Observable<NewMonthlyUserStatsDTO[]> {

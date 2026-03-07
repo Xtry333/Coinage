@@ -14,6 +14,7 @@
         "dev": "run-p dev:api dev:webapp",
         "dev:api": "nx serve coinage-api",
         "dev:webapp": "nx serve coinage-webapp",
+        "dev:worker": "nx serve receipt-worker",
         "build": "run-s build:api build:webapp build:docker",
         "build:api": "nx build coinage-api --prod",
         "build:webapp": "nx build coinage-webapp --prod",
