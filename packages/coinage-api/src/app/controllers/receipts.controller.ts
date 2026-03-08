@@ -1,5 +1,5 @@
 import { ReceiptDTO, ReceiptDetailsDTO, ReceiptPendingDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferDTO, TransferType } from '@app/interfaces';
-import { BadRequestException, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Param, ParseIntPipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createHash } from 'crypto';
@@ -15,6 +15,7 @@ import { TransferDao } from '../daos/transfer.dao';
 import { ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.event';
+import { AuthGuard } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads', 'receipts');
@@ -22,6 +23,9 @@ const UPLOAD_DIR = join(process.cwd(), 'uploads', 'receipts');
 if (!existsSync(UPLOAD_DIR)) {
     mkdirSync(UPLOAD_DIR, { recursive: true });
 }
+
+const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'];
+const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 const multerStorage = diskStorage({
     destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
@@ -32,6 +36,7 @@ const multerStorage = diskStorage({
 });
 
 @Controller('receipt(s)?')
+@UseGuards(AuthGuard)
 export class ReceiptsController {
     public constructor(
         private readonly transferDao: TransferDao,
@@ -44,9 +49,21 @@ export class ReceiptsController {
     ) {}
 
     @Post(':id/upload-image')
-    @UseInterceptors(FileInterceptor('file', { storage: multerStorage }))
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: multerStorage,
+            limits: { fileSize: MAX_FILE_SIZE_BYTES },
+            fileFilter: (_req, file, cb) => {
+                if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+                    cb(null, true);
+                } else {
+                    cb(new BadRequestException(`Unsupported file type: ${file.mimetype}. Allowed: ${ALLOWED_MIME_TYPES.join(', ')}`), false);
+                }
+            },
+        }),
+    )
     public async uploadReceiptImage(
-        @Param('id') id: number,
+        @Param('id', ParseIntPipe) id: number,
         @UploadedFile() file: Express.Multer.File,
     ): Promise<ReceiptUploadResponseDTO> {
         if (!file) {
@@ -73,7 +90,7 @@ export class ReceiptsController {
     }
 
     @Post(':id/confirm-duplicate')
-    public async confirmDuplicateUpload(@Param('id') id: number): Promise<{ ok: boolean }> {
+    public async confirmDuplicateUpload(@Param('id', ParseIntPipe) id: number): Promise<{ ok: boolean }> {
         const receipt = await this.receiptDao.getById(id);
         if (!receipt.imagePath) {
             throw new BadRequestException('Receipt has no image to process');
@@ -89,13 +106,13 @@ export class ReceiptsController {
         const pending = await this.receiptDao.getPending();
         return pending.map((r) => ({
             id: r.id,
-            imagePath: r.imagePath ?? '',
+            imagePath: '',
             processingStatus: r.processingStatus as unknown as ReceiptProcessingStatus,
         }));
     }
 
     @Get(':id/status')
-    public async getReceiptStatus(@Param('id') id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null }> {
+    public async getReceiptStatus(@Param('id', ParseIntPipe) id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null }> {
         const receipt = await this.receiptDao.getById(id);
         return {
             status: receipt.processingStatus as unknown as ReceiptProcessingStatus,
@@ -117,7 +134,7 @@ export class ReceiptsController {
     }
 
     @Get(':id/details')
-    public async getReceiptDetails(@Param('id') id: number): Promise<ReceiptDetailsDTO> {
+    public async getReceiptDetails(@Param('id', ParseIntPipe) id: number): Promise<ReceiptDetailsDTO> {
         if (!id) {
             throw new Error('Invalid ID provided.');
         }
