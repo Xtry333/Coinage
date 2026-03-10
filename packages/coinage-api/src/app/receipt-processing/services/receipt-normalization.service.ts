@@ -474,10 +474,11 @@ export class ReceiptNormalizationService {
 
 /**
  * Extract volume, weight, or item count from a product name string.
+ * Exported for unit testing.
  * Handles common Polish/European receipt formats.
  * Examples: "Mleko UHT 1L", "Ser żółty 250g", "Piwo 6x330ml", "Sok 0,5l"
  */
-function parseContainerDimensions(name: string): ParsedDimensions | null {
+export function parseContainerDimensions(name: string): ParsedDimensions | null {
     const n = name.toLowerCase();
     const result: ParsedDimensions = {};
     let found = false;
@@ -510,9 +511,9 @@ function parseContainerDimensions(name: string): ParsedDimensions | null {
 
 /**
  * Check whether a container's physical dimensions match parsed receipt dimensions.
- * Matches on volume OR weight; item count is checked as a tiebreaker.
+ * Matches on volume OR weight. Exported for unit testing.
  */
-function matchesDimensions(container: { volume?: number | null; volumeUnit?: string | null; weight?: number | null; weightUnit?: string | null; itemCount?: number | null }, parsed: ParsedDimensions): boolean {
+export function matchesDimensions(container: { volume?: number | null; volumeUnit?: string | null; weight?: number | null; weightUnit?: string | null; itemCount?: number | null }, parsed: ParsedDimensions): boolean {
     const volumeMatch =
         parsed.volume !== undefined &&
         container.volume !== null &&
