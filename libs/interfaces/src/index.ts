@@ -32,3 +32,5 @@ export * from './model/TransferDetails.dto.response';
 export * from './model/PartialDate';
 
 export * from './utils/Expand';
+
+export * from './lib/ReceiptImageDTO';

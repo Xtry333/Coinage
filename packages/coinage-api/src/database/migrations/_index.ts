@@ -12,6 +12,7 @@ import { AddItemsWithContainersView1745754622461 } from './1745754622461-AddItem
 import { AddItemCount1751894045445 } from './1751894045445-AddItemCount';
 import { AdjustItemView1754863716132 } from './1754863716132-migration';
 import { UpdateContainersView1755864881273 } from './1755864881273-UpdateContainersView';
+import { AddReceiptImageProcessing1741305600000 } from './1741305600000-AddReceiptImageProcessing';
 
 export default [
     CreateTables1000000000000,
@@ -28,4 +29,5 @@ export default [
     AddItemCount1751894045445,
     AdjustItemView1754863716132,
     UpdateContainersView1755864881273,
+    AddReceiptImageProcessing1741305600000,
 ];
