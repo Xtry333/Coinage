@@ -13,6 +13,7 @@ import { AddItemCount1751894045445 } from './1751894045445-AddItemCount';
 import { AdjustItemView1754863716132 } from './1754863716132-migration';
 import { UpdateContainersView1755864881273 } from './1755864881273-UpdateContainersView';
 import { AddTagTable1756400000000 } from './1756400000000-AddTagTable';
+import { SeedInitialData1756500000000 } from './1756500000000-SeedInitialData';
 
 export default [
     CreateTables1000000000000,
@@ -30,4 +31,5 @@ export default [
     AdjustItemView1754863716132,
     UpdateContainersView1755864881273,
     AddTagTable1756400000000,
+    SeedInitialData1756500000000,
 ];

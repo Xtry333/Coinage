@@ -38,7 +38,7 @@ services:
         restart: unless-stopped
         image: ghcr.io/${COINAGE_REGISTRY_USER:-Xtry333}/coinage-webapp:latest
         ports:
-            - ${COINAGE_WEBAPP_PORT:-4200}:80
+            - ${COINAGE_WEBAPP_PORT:-4200}:4200
         depends_on:
             - coinage-api
 
