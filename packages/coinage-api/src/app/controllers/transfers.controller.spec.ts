@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
 import { PartialProvider } from '../../test/partial-provider';
+import { AuthService } from '../auth/auth.service';
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
@@ -11,8 +12,8 @@ import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 import { TransfersService } from '../services/transfers.service';
+import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 import { TransfersController } from './transfers.controller';
 
 describe('TransfersController', () => {
@@ -60,10 +61,16 @@ describe('TransfersController', () => {
             useValue: { canActivate: jest.fn(() => Promise.resolve(true)) },
         };
 
+        const authServiceProvider: PartialProvider<AuthService> = {
+            provide: AuthService,
+            useValue: {},
+        };
+
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 TransfersController,
                 authGuardProvider,
+                authServiceProvider,
                 { provide: TransferDao, useValue: transferDao },
                 { provide: TransfersService, useValue: transfersService },
                 { provide: UserDao, useValue: userDao },

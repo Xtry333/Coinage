@@ -1,3 +1,5 @@
+import 'reflect-metadata';
+
 import { GlobalSearchRequest } from '@app/interfaces';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 

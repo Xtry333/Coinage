@@ -3,6 +3,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { GlobalSearchRequest, GlobalSearchResponse } from '@app/interfaces';
 
 import { PartialProvider } from '../../test/partial-provider';
+import { AuthService } from '../auth/auth.service';
+import { UserDao } from '../daos/user.dao';
 import { AuthGuard } from '../services/auth.guard';
 import { SearchService } from '../services/search.service';
 import { SearchController } from './search.controller';
@@ -21,12 +23,18 @@ describe('SearchController', () => {
             useValue: { canActivate: jest.fn(() => Promise.resolve(true)) },
         };
 
+        const authServiceProvider: PartialProvider<AuthService> = {
+            provide: AuthService,
+            useValue: {},
+        };
+
+        const userDaoProvider: PartialProvider<UserDao> = {
+            provide: UserDao,
+            useValue: {},
+        };
+
         const module: TestingModule = await Test.createTestingModule({
-            providers: [
-                SearchController,
-                authGuardProvider,
-                { provide: SearchService, useValue: searchService },
-            ],
+            providers: [SearchController, authGuardProvider, authServiceProvider, userDaoProvider, { provide: SearchService, useValue: searchService }],
         }).compile();
 
         controller = module.get(SearchController);

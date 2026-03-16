@@ -1,9 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { CategoryDao } from '../daos/category.dao';
-import { Category } from '../entities/Category.entity';
-import { CategoryCascadeService } from '../services/category-cascades.service';
 import { PartialProvider } from '../../test/partial-provider';
+import { AuthService } from '../auth/auth.service';
+import { CategoryDao } from '../daos/category.dao';
+import { UserDao } from '../daos/user.dao';
+import { Category } from '../entities/Category.entity';
+import { AuthGuard } from '../services/auth.guard';
+import { CategoryCascadeService } from '../services/category-cascades.service';
 import { CategoriesController } from './categories.controller';
 
 function makeCategory(id: number, name: string, parentId: number | null = null, tag?: string): Category {
@@ -18,8 +21,8 @@ function makeCategory(id: number, name: string, parentId: number | null = null, 
 
 describe('CategoriesController', () => {
     let controller: CategoriesController;
-    let categoryDao: jest.Mocked<Partial<CategoryDao>>;
-    let categoryCascadeService: jest.Mocked<Partial<CategoryCascadeService>>;
+    let categoryDao: any;
+    let categoryCascadeService: any;
 
     beforeEach(async () => {
         categoryDao = {
@@ -43,9 +46,24 @@ describe('CategoriesController', () => {
             useValue: categoryCascadeService,
         };
 
+        const authGuardProvider: PartialProvider<AuthGuard> = {
+            provide: AuthGuard,
+            useValue: { canActivate: jest.fn(() => Promise.resolve(true)) },
+        };
+
+        const userDaoProvider: PartialProvider<UserDao> = {
+            provide: UserDao,
+            useValue: {},
+        };
+
+        const authServiceProvider: PartialProvider<AuthService> = {
+            provide: AuthService,
+            useValue: {},
+        };
+
         const module: TestingModule = await Test.createTestingModule({
             controllers: [CategoriesController],
-            providers: [categoryDaoProvider, categoryCascadeServiceProvider],
+            providers: [categoryDaoProvider, categoryCascadeServiceProvider, authGuardProvider, userDaoProvider, authServiceProvider],
         }).compile();
 
         controller = module.get<CategoriesController>(CategoriesController);
@@ -54,7 +72,7 @@ describe('CategoriesController', () => {
     describe('getCategoryList', () => {
         it('returns all categories mapped to DTOs sorted alphabetically by name', async () => {
             const categories = [makeCategory(1, 'Zebra'), makeCategory(2, 'Apple'), makeCategory(3, 'Mango', 1)];
-            categoryDao.getAll!.mockResolvedValue(categories);
+            categoryDao.getAll.mockResolvedValue(categories);
 
             const result = await controller.getCategoryList();
 
@@ -65,7 +83,7 @@ describe('CategoriesController', () => {
         });
 
         it('maps parentId as null when category has no parent', async () => {
-            categoryDao.getAll!.mockResolvedValue([makeCategory(1, 'Root', null)]);
+            categoryDao.getAll.mockResolvedValue([makeCategory(1, 'Root', null)]);
 
             const result = await controller.getCategoryList();
 
@@ -73,7 +91,7 @@ describe('CategoriesController', () => {
         });
 
         it('maps parentId correctly when category has a parent', async () => {
-            categoryDao.getAll!.mockResolvedValue([makeCategory(5, 'Child', 2)]);
+            categoryDao.getAll.mockResolvedValue([makeCategory(5, 'Child', 2)]);
 
             const result = await controller.getCategoryList();
 
@@ -81,7 +99,7 @@ describe('CategoriesController', () => {
         });
 
         it('returns empty array when no categories exist', async () => {
-            categoryDao.getAll!.mockResolvedValue([]);
+            categoryDao.getAll.mockResolvedValue([]);
 
             const result = await controller.getCategoryList();
 
@@ -92,7 +110,7 @@ describe('CategoriesController', () => {
     describe('getCategoryTree', () => {
         it('returns only root categories (parentId == null) at the top level', async () => {
             const categories = [makeCategory(1, 'Root1', null), makeCategory(2, 'Root2', null), makeCategory(3, 'Child', 1)];
-            categoryDao.getAll!.mockResolvedValue(categories);
+            categoryDao.getAll.mockResolvedValue(categories);
 
             const result = await controller.getCategoryTree();
 
@@ -102,7 +120,7 @@ describe('CategoriesController', () => {
 
         it('nests children under their parent category', async () => {
             const categories = [makeCategory(1, 'Parent', null), makeCategory(2, 'Child', 1), makeCategory(3, 'Grandchild', 2)];
-            categoryDao.getAll!.mockResolvedValue(categories);
+            categoryDao.getAll.mockResolvedValue(categories);
 
             const result = await controller.getCategoryTree();
 
@@ -114,7 +132,7 @@ describe('CategoriesController', () => {
         });
 
         it('returns empty array when no categories exist', async () => {
-            categoryDao.getAll!.mockResolvedValue([]);
+            categoryDao.getAll.mockResolvedValue([]);
 
             const result = await controller.getCategoryTree();
 
@@ -125,7 +143,7 @@ describe('CategoriesController', () => {
     describe('saveCategory', () => {
         it('creates a new category when no id is provided', async () => {
             const saved = makeCategory(10, 'New Category');
-            categoryDao.save!.mockResolvedValue(saved);
+            categoryDao.save.mockResolvedValue(saved);
 
             const result = await controller.saveCategory({ name: 'New Category' } as any);
 
@@ -137,8 +155,8 @@ describe('CategoriesController', () => {
         it('updates an existing category when id is provided', async () => {
             const existing = makeCategory(5, 'Old Name');
             const saved = makeCategory(5, 'New Name');
-            categoryDao.getById!.mockResolvedValue(existing);
-            categoryDao.save!.mockResolvedValue(saved);
+            categoryDao.getById.mockResolvedValue(existing);
+            categoryDao.save.mockResolvedValue(saved);
 
             const result = await controller.saveCategory({ id: 5, name: 'New Name' } as any);
 
@@ -147,7 +165,7 @@ describe('CategoriesController', () => {
         });
 
         it('throws an error when id is provided but not found', async () => {
-            categoryDao.getById!.mockResolvedValue(null as any);
+            categoryDao.getById.mockResolvedValue(null as any);
 
             await expect(controller.saveCategory({ id: 99, name: 'Missing' } as any)).rejects.toThrow('Id not found.');
         });
@@ -155,8 +173,8 @@ describe('CategoriesController', () => {
         it('sets parentId when canSetCategoryParentById returns true', async () => {
             const saved = makeCategory(10, 'Category');
             const savedWithParent = makeCategory(10, 'Category', 2);
-            categoryDao.save!.mockResolvedValueOnce(saved).mockResolvedValueOnce(savedWithParent);
-            categoryCascadeService.canSetCategoryParentById!.mockResolvedValue(true);
+            categoryDao.save.mockResolvedValueOnce(saved).mockResolvedValueOnce(savedWithParent);
+            categoryCascadeService.canSetCategoryParentById.mockResolvedValue(true);
 
             const result = await controller.saveCategory({ name: 'Category', parentId: 2 } as any);
 
@@ -166,8 +184,8 @@ describe('CategoriesController', () => {
 
         it('does not set parentId when canSetCategoryParentById returns false', async () => {
             const saved = makeCategory(10, 'Category');
-            categoryDao.save!.mockResolvedValue(saved);
-            categoryCascadeService.canSetCategoryParentById!.mockResolvedValue(false);
+            categoryDao.save.mockResolvedValue(saved);
+            categoryCascadeService.canSetCategoryParentById.mockResolvedValue(false);
 
             const result = await controller.saveCategory({ name: 'Category', parentId: 2 } as any);
 
@@ -179,7 +197,7 @@ describe('CategoriesController', () => {
     describe('getTotalPerCategory', () => {
         it('delegates to categoryDao.getTotalByCategoryMonth with parsed year and month', async () => {
             const totals = [{ categoryId: 1, total: 500 }] as any;
-            categoryDao.getTotalByCategoryMonth!.mockResolvedValue(totals);
+            categoryDao.getTotalByCategoryMonth.mockResolvedValue(totals);
 
             const result = await controller.getTotalPerCategory('2024', '3', undefined as any);
 
@@ -196,7 +214,7 @@ describe('CategoriesController', () => {
 
         it('passes undefined for month when month param is not a number', async () => {
             const totals: any[] = [];
-            categoryDao.getTotalByCategoryMonth!.mockResolvedValue(totals);
+            categoryDao.getTotalByCategoryMonth.mockResolvedValue(totals);
 
             await controller.getTotalPerCategory('2024', 'abc', undefined as any);
 
@@ -204,7 +222,7 @@ describe('CategoriesController', () => {
         });
 
         it('passes day param when it is a valid number', async () => {
-            categoryDao.getTotalByCategoryMonth!.mockResolvedValue([]);
+            categoryDao.getTotalByCategoryMonth.mockResolvedValue([]);
 
             await controller.getTotalPerCategory('2024', '3', '15');
 

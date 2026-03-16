@@ -127,7 +127,7 @@ describe('TransfersService', () => {
 
         it('should throw when category is not found', async () => {
             const mockTransfer = createMockTransfer();
-            categoryDao.getById.mockResolvedValue(null);
+            categoryDao.getById.mockResolvedValue(null as any);
 
             await expect(service.saveTransfer(mockTransfer)).rejects.toThrow('Category not found');
             expect(transferDao.save).not.toHaveBeenCalled();

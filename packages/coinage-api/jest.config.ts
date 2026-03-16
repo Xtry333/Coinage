@@ -5,6 +5,7 @@ const jestConfig: JestConfigWithTsJest = {
     preset: '../../jest.preset.js',
     coverageDirectory: '../../coverage/packages/coinage-api',
     testEnvironment: 'node',
+    setupFiles: ['reflect-metadata'],
     transform: {
         '^.+\\.[tj]s$': [
             'ts-jest',

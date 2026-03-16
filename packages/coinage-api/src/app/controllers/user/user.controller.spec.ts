@@ -1,12 +1,24 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { UserDao } from '../../daos/user.dao';
 import { PartialProvider } from '../../../test/partial-provider';
+import { AuthService } from '../../auth/auth.service';
+import { UserDao } from '../../daos/user.dao';
+import { AuthGuard } from '../../services/auth.guard';
 import { UserController } from './user.controller';
 
 describe('UserController', () => {
     let controller: UserController;
     let userDao: jest.Mocked<Partial<UserDao>>;
+
+    const authGuardProvider: PartialProvider<AuthGuard> = {
+        provide: AuthGuard,
+        useValue: { canActivate: jest.fn(() => Promise.resolve(true)) },
+    };
+
+    const authServiceProvider: PartialProvider<AuthService> = {
+        provide: AuthService,
+        useValue: {},
+    };
 
     beforeEach(async () => {
         userDao = {
@@ -21,7 +33,7 @@ describe('UserController', () => {
 
         const module: TestingModule = await Test.createTestingModule({
             controllers: [UserController],
-            providers: [userDaoProvider],
+            providers: [userDaoProvider, authGuardProvider, authServiceProvider],
         }).compile();
 
         controller = module.get<UserController>(UserController);
@@ -34,7 +46,7 @@ describe('UserController', () => {
     describe('getUserData', () => {
         it('returns userId and username from the user entity', async () => {
             const mockUser = { id: 42, name: 'Alice' } as any;
-            userDao.getById!.mockResolvedValue(mockUser);
+            (userDao.getById as jest.Mock).mockResolvedValue(mockUser);
 
             const result = await controller.getUserData(42);
 
@@ -44,7 +56,7 @@ describe('UserController', () => {
 
         it('returns the userId as passed in the param', async () => {
             const mockUser = { id: 7, name: 'Bob' } as any;
-            userDao.getById!.mockResolvedValue(mockUser);
+            (userDao.getById as jest.Mock).mockResolvedValue(mockUser);
 
             const result = await controller.getUserData(7);
 
@@ -55,7 +67,7 @@ describe('UserController', () => {
     describe('getServerDate', () => {
         it('returns the date from userDao.getCurrentDbDate', async () => {
             const mockDate = new Date('2024-03-15T12:00:00Z');
-            userDao.getCurrentDbDate!.mockResolvedValue(mockDate);
+            (userDao.getCurrentDbDate as jest.Mock).mockResolvedValue(mockDate);
 
             const result = await controller.getServerDate();
 

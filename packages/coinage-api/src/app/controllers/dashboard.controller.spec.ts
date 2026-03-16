@@ -1,11 +1,13 @@
-import { Test, TestingModule } from '@nestjs/testing';
 import { HttpService } from '@nestjs/axios';
+import { Test, TestingModule } from '@nestjs/testing';
 
-import { PartialProvider } from '../../test/partial-provider';
 import { createMockAccounts } from '../../test/mock-generators/accounts.mock';
+import { PartialProvider } from '../../test/partial-provider';
+import { AuthService } from '../auth/auth.service';
 import { AccountDao } from '../daos/account.dao';
-import { AuthGuard } from '../services/auth.guard';
+import { UserDao } from '../daos/user.dao';
 import { AccountBalanceService } from '../services/account-balance.service';
+import { AuthGuard } from '../services/auth.guard';
 import { DashboardComponent } from './dashboard.controller';
 
 describe('DashboardController', () => {
@@ -16,6 +18,21 @@ describe('DashboardController', () => {
     const mockUser = { id: 42 } as any;
     const mockAccounts = createMockAccounts(2);
 
+    const authGuardProvider: PartialProvider<AuthGuard> = {
+        provide: AuthGuard,
+        useValue: { canActivate: jest.fn(() => Promise.resolve(true)) },
+    };
+
+    const userDaoProvider: PartialProvider<UserDao> = {
+        provide: UserDao,
+        useValue: {},
+    };
+
+    const authServiceProvider: PartialProvider<AuthService> = {
+        provide: AuthService,
+        useValue: {},
+    };
+
     beforeEach(async () => {
         accountDao = {
             getForUserId: jest.fn(),
@@ -24,15 +41,12 @@ describe('DashboardController', () => {
             getAccountsBalanceByIds: jest.fn(),
         };
 
-        const authGuardProvider: PartialProvider<AuthGuard> = {
-            provide: AuthGuard,
-            useValue: { canActivate: jest.fn(() => Promise.resolve(true)) },
-        };
-
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 DashboardComponent,
                 authGuardProvider,
+                userDaoProvider,
+                authServiceProvider,
                 { provide: AccountDao, useValue: accountDao },
                 { provide: AccountBalanceService, useValue: accountBalanceService },
                 { provide: HttpService, useValue: {} },

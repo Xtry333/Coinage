@@ -15,6 +15,12 @@ describe('NotificationComponent', () => {
     beforeEach(() => {
         fixture = TestBed.createComponent(NotificationComponent);
         component = fixture.componentInstance;
+        component.content = {
+            id: 1,
+            title: 'Test',
+            message: 'Test message',
+            autoCloseDelay: 5000,
+        };
         fixture.detectChanges();
     });
 

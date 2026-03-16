@@ -1,8 +1,11 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { ContractorDao } from '../daos/contractor.dao';
-import { Contractor } from '../entities/Contractor.entity';
 import { PartialProvider } from '../../test/partial-provider';
+import { AuthService } from '../auth/auth.service';
+import { ContractorDao } from '../daos/contractor.dao';
+import { UserDao } from '../daos/user.dao';
+import { Contractor } from '../entities/Contractor.entity';
+import { AuthGuard } from '../services/auth.guard';
 import { ContractorController } from './contractors.controller';
 
 function makeContractor(id: number, name: string): Contractor {
@@ -14,7 +17,7 @@ function makeContractor(id: number, name: string): Contractor {
 
 describe('ContractorController', () => {
     let controller: ContractorController;
-    let contractorDao: jest.Mocked<Partial<ContractorDao>>;
+    let contractorDao: any;
 
     beforeEach(async () => {
         contractorDao = {
@@ -28,9 +31,24 @@ describe('ContractorController', () => {
             useValue: contractorDao,
         };
 
+        const authGuardProvider: PartialProvider<AuthGuard> = {
+            provide: AuthGuard,
+            useValue: { canActivate: jest.fn(() => Promise.resolve(true)) },
+        };
+
+        const userDaoProvider: PartialProvider<UserDao> = {
+            provide: UserDao,
+            useValue: {},
+        };
+
+        const authServiceProvider: PartialProvider<AuthService> = {
+            provide: AuthService,
+            useValue: {},
+        };
+
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ContractorController],
-            providers: [contractorDaoProvider],
+            providers: [contractorDaoProvider, authGuardProvider, userDaoProvider, authServiceProvider],
         }).compile();
 
         controller = module.get<ContractorController>(ContractorController);
@@ -93,7 +111,7 @@ describe('ContractorController', () => {
         it('sets the name on the entity before saving', async () => {
             const existing = makeContractor(5, 'Old Name');
             contractorDao.getById!.mockResolvedValue(existing);
-            contractorDao.save!.mockImplementation(async (e) => e as Contractor);
+            contractorDao.save!.mockImplementation(async (e: Contractor) => e as Contractor);
 
             await controller.saveContractor({ id: 5, name: 'New Name' } as any);
 
