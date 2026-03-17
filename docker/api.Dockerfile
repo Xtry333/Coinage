@@ -10,6 +10,6 @@ RUN mkdir -p /app/api && cp -a /tmp/node_modules /app/api/
 WORKDIR /app/api
 COPY dist/packages/coinage-api/ /app/api
 
-EXPOSE 3333
+EXPOSE 8333
 
 CMD [ "node", "main.js" ]

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import * as bcrypt from 'bcryptjs';
 
 import { UserDao } from '../daos/user.dao';
 import { User } from '../entities/User.entity';
@@ -21,8 +22,7 @@ export class AuthService {
             const payload: JwtPayload = this.jwtService.verify(token);
             const user = await this.userDao.getByUsername(payload.username);
             return user;
-        } catch (error) {
-            console.error('Error:', error);
+        } catch {
             return undefined;
         }
     }
@@ -30,15 +30,22 @@ export class AuthService {
     public async loginUser(username: string, password: string): Promise<string> {
         const user = await this.userDao.getByUsername(username);
 
-        if (user === undefined) {
-            throw new Error('Invalid password.');
+        if (user === undefined || user.password === undefined) {
+            throw new Error('Invalid credentials.');
         }
 
-        if (user.password === undefined || user.password !== password) {
-            throw new Error('Invalid password.');
+        const isHashed = user.password.startsWith('$2a$') || user.password.startsWith('$2b$');
+        const isValid = isHashed ? await bcrypt.compare(password, user.password) : user.password === password;
+
+        if (!isValid) {
+            throw new Error('Invalid credentials.');
         }
 
         const payload: JwtPayload = { sub: user.id, username: user.name };
         return this.jwtService.signAsync(payload);
+    }
+
+    public static async hashPassword(password: string): Promise<string> {
+        return bcrypt.hash(password, 12);
     }
 }

@@ -7,12 +7,10 @@ services:
             MYSQL_USER: ${MYSQL_USER:-root}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
             MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
-        ports:
-            - ${COINAGE_MYSQL_PORT:-3306}:3306
         volumes:
             - coinage-db:/var/lib/mysql
         healthcheck:
-            test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-p${MYSQL_ROOT_PASSWORD}']
+            test: ['CMD-SHELL', 'MYSQL_PWD="$MYSQL_ROOT_PASSWORD" mysqladmin ping -h localhost -u root']
             interval: 5s
             timeout: 5s
             retries: 10
@@ -28,8 +26,9 @@ services:
             MYSQL_DATABASE: ${MYSQL_DATABASE:-coinage-db}
             MYSQL_USER: ${MYSQL_USER:-root}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
+            CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:8100}
         ports:
-            - ${COINAGE_API_PORT:-3333}:3333
+            - ${COINAGE_API_PORT:-8333}:8333
         depends_on:
             coinage-db:
                 condition: service_healthy
@@ -38,7 +37,7 @@ services:
         restart: unless-stopped
         image: ghcr.io/${COINAGE_REGISTRY_USER:-Xtry333}/coinage-webapp:latest
         ports:
-            - ${COINAGE_WEBAPP_PORT:-4200}:80
+            - ${COINAGE_WEBAPP_PORT:-8100}:8100
         depends_on:
             - coinage-api
 
