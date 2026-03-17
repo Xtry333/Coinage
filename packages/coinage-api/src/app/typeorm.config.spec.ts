@@ -28,7 +28,7 @@ describe('loadMigrations', () => {
             };
 
             const mockContext = jest.fn((key: string) => moduleMap[key]);
-            mockContext.keys = jest.fn(() => Object.keys(moduleMap));
+            Object.defineProperty(mockContext, 'keys', { value: jest.fn(() => Object.keys(moduleMap)) });
 
             const mockRequire = jest.fn() as unknown as NodeRequire;
             (mockRequire as any).context = jest.fn(() => mockContext);
@@ -48,7 +48,7 @@ describe('loadMigrations', () => {
                 if (key.includes('9999')) return { Late };
                 return { Early };
             });
-            mockContext.keys = jest.fn(() => ['./9999999999999-Late.ts', './1000000000000-Early.ts']);
+            Object.defineProperty(mockContext, 'keys', { value: () => ['./9999999999999-Late.ts', './1000000000000-Early.ts'] });
 
             const mockRequire = jest.fn() as unknown as NodeRequire;
             (mockRequire as any).context = jest.fn(() => mockContext);
