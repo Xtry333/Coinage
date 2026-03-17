@@ -187,7 +187,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
                         ],
                     },
                 ],
-                response_format: { type: 'json_object' },
+                response_format: { type: 'text' },
             }),
             signal: controller.signal,
         });
@@ -207,7 +207,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
             body: JSON.stringify({
                 model: this.model,
                 messages: [{ role: 'user', content: prompt }],
-                response_format: { type: 'json_object' },
+                response_format: { type: 'text' },
             }),
             signal: controller.signal,
         });
