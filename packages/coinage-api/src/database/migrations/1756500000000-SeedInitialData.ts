@@ -1,7 +1,6 @@
+import * as bcrypt from 'bcryptjs';
 import * as crypto from 'crypto';
 import { MigrationInterface, QueryRunner } from 'typeorm';
-
-import { AuthService } from '../../app/auth/auth.service';
 
 export class SeedInitialData1756500000000 implements MigrationInterface {
     public name = 'SeedInitialData1756500000000';
@@ -10,7 +9,7 @@ export class SeedInitialData1756500000000 implements MigrationInterface {
         const users = await queryRunner.query(`SELECT id FROM \`user\` LIMIT 1`);
         if (users.length === 0) {
             const plainPassword = crypto.randomBytes(12).toString('base64url');
-            const hashedPassword = await AuthService.hashPassword(plainPassword);
+            const hashedPassword = await bcrypt.hash(plainPassword, 12);
             await queryRunner.query(`
                 INSERT INTO \`user\` (\`name\`, \`password\`, \`is_system_user\`, \`created_date\`)
                 VALUES ('admin', ?, b'0', NOW())
