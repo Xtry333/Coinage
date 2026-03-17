@@ -242,8 +242,6 @@ export class ReceiptNormalizationService {
         extractedPrice: number,
         resolvedItem: Item | null,
     ): Promise<Pick<NormalizedItem, 'suggestedContainer' | 'historicalContainers' | 'containerConfidence' | 'needsContainerConfirmation'>> {
-        const noContainer = { suggestedContainer: null, historicalContainers: [], containerConfidence: 'none' as const, needsContainerConfirmation: false };
-
         if (resolvedItem !== null) {
             // Known item — look up historically used containers
             const historicalPairs = await this.itemsWithContainersDao.getContainersUsedWithItem(resolvedItem.id);
@@ -424,7 +422,7 @@ export class ReceiptNormalizationService {
 
     private formatItemLabel(item: Item): string {
         const parts = [item.brand, item.name, item.containerSize ? `${item.containerSize}${item.containerSizeUnit ?? ''}` : null];
-        return parts.filter(Boolean).join(' ');
+        return parts.filter((p): p is string => p !== null && p !== undefined && p !== '').join(' ');
     }
 
     // ─── AI resolution with retry ─────────────────────────────────────────────
@@ -438,7 +436,7 @@ export class ReceiptNormalizationService {
             const pool = attempt === 0 ? candidates : candidates.slice(0, RETRY_PASS_CANDIDATES);
             const result = await this.ollamaService.resolveEntityMatch(query, pool, categories);
 
-            if (result?.confidence >= AI_CONFIDENCE_THRESHOLD && result.matchedId !== null) {
+            if (result !== null && result.confidence >= AI_CONFIDENCE_THRESHOLD && result.matchedId !== null) {
                 const matched = pool.find((c) => c.id === result.matchedId);
                 if (matched) {
                     this.logger.debug(`AI resolved "${query}" → "${matched.name}" (confidence=${result.confidence.toFixed(2)}, attempt=${attempt + 1})`);
