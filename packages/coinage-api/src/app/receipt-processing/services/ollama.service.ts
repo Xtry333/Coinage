@@ -34,6 +34,7 @@ export class OllamaService {
     private readonly baseUrl: string;
     private readonly model: string;
     private readonly timeoutMs: number;
+    private readonly resolveTimeoutMs: number;
     private readonly availabilityCheckTimeoutMs = 5000;
 
     public constructor() {
@@ -47,7 +48,8 @@ export class OllamaService {
             this.model = process.env['OLLAMA_MODEL'] ?? 'llava';
         }
 
-        this.timeoutMs = parseInt(process.env['OLLAMA_TIMEOUT_MS'] ?? '120000');
+        this.timeoutMs = parseInt(process.env['OLLAMA_TIMEOUT_MS'] ?? '300000');
+        this.resolveTimeoutMs = parseInt(process.env['OLLAMA_RESOLVE_TIMEOUT_MS'] ?? '60000');
     }
 
     public async isAvailable(): Promise<boolean> {
@@ -120,7 +122,7 @@ Return ONLY valid JSON with no explanation:
 Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
 
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), 20_000);
+        const timer = setTimeout(() => controller.abort(), this.resolveTimeoutMs);
 
         try {
             const raw =
