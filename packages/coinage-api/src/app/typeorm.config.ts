@@ -6,17 +6,23 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import entities from './entities/_index';
 
 export function loadMigrations(): (Function | string)[] {
-    // webpack bundles everything; require.context MUST be called literally (not via a variable)
-    // so webpack's static analyzer can detect it and bundle the migration files.
-    if (typeof (require as any).context === 'function') {
-        const ctx = (require as any).context('../database/migrations', false, /^\.\/(\d+\S*)\.(ts|js)$/);
+    // webpack bundles everything; require.context MUST be the literal identifier `require`
+    // (not a cast expression like `(require as any)`) so webpack's static analyzer detects
+    // the call and bundles the migration files at build time.
+    // @ts-expect-error: require.context is a webpack-specific API not in Node typings
+    if (typeof require.context === 'function') {
+        // @ts-expect-error: require.context is a webpack-specific API not in Node typings
+        const ctx = require.context('../database/migrations', false, /^\.\/(\d+\S*)\.(ts|js)$/);
         return ctx
             .keys()
             .sort()
             .flatMap((key: string) => (Object.values(ctx(key)) as Function[]).filter((v) => typeof v === 'function'));
     }
-    // ts-node context (TypeORM CLI): return a glob pattern for TypeORM to resolve
-    return [path.join(__dirname, '../database/migrations/[0-9]*.{ts,js}')];
+    // ts-node context (TypeORM CLI): return glob patterns for TypeORM to resolve
+    return [
+        path.join(__dirname, '../database/migrations/[0-9]*.ts'),
+        path.join(__dirname, '../database/migrations/[0-9]*.js'),
+    ];
 }
 
 export class CustomNamingStrategy extends SnakeNamingStrategy {

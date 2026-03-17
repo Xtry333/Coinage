@@ -2,18 +2,18 @@ import { loadMigrations } from './typeorm.config';
 
 describe('loadMigrations', () => {
     describe('ts-node context (require.context unavailable)', () => {
-        it('returns a single glob pattern string', () => {
+        it('returns two glob pattern strings (one for .ts, one for .js)', () => {
             const result = loadMigrations();
 
-            expect(result).toHaveLength(1);
-            expect(typeof result[0]).toBe('string');
+            expect(result).toHaveLength(2);
+            expect(result.every((r) => typeof r === 'string')).toBe(true);
         });
 
-        it('glob pattern matches timestamp-prefixed migration files', () => {
-            const [pattern] = loadMigrations() as string[];
+        it('glob patterns target timestamp-prefixed migration files', () => {
+            const [tsPattern, jsPattern] = loadMigrations() as string[];
 
-            expect(pattern).toMatch(/\[0-9\]\*/);
-            expect(pattern).toMatch(/\{ts,js\}/);
+            expect(tsPattern).toMatch(/\[0-9\]\*.*\.ts$/);
+            expect(jsPattern).toMatch(/\[0-9\]\*.*\.js$/);
         });
     });
 
