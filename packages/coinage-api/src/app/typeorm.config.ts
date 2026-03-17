@@ -5,10 +5,10 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import entities from './entities/_index';
 
-function loadMigrations(): (Function | string)[] {
+export function loadMigrations(req: NodeRequire = require): (Function | string)[] {
     // webpack bundles everything; require.context resolves matching modules at build time
-    if (typeof (require as any).context === 'function') {
-        const ctx = (require as any).context('../database/migrations', false, /^\.\/(\d+\S*)\.(ts|js)$/);
+    if (typeof (req as any).context === 'function') {
+        const ctx = (req as any).context('../database/migrations', false, /^\.\/(\d+\S*)\.(ts|js)$/);
         return ctx
             .keys()
             .sort()
