@@ -106,6 +106,10 @@ export class CoinageDataService {
         );
     }
 
+    public createReceipt(): Promise<{ id: number }> {
+        return lastValueFrom(this.http.post<{ id: number }>(`${CoinageDataService.API_URL}receipts`, {}));
+    }
+
     public uploadReceiptImage(receiptId: number, file: File): Promise<ReceiptUploadResponseDTO> {
         const formData = new FormData();
         formData.append('file', file);

@@ -11,6 +11,7 @@ import { AccountSettingsPageComponent } from '../pages/account-settings-page/acc
 import { DashboardComponent } from '../pages/dashboard/dashboard.component';
 import { ItemsListPageComponent } from '../pages/items-list-page/items-list-page.component';
 import { ReceiptDetailsComponent } from '../receipt-details/receipt-details.component';
+import { ReceiptUploadPageComponent } from '../receipt-upload/receipt-upload.component';
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
 import { TransfersListComponent } from '../transfers-list/transfers-list.component';
@@ -26,6 +27,7 @@ export const CoinageRoutes = {
     TransferDetailsPage: new CoinageRoute('transfer/details/:id', TransferDetailsComponent, guarded, { id: 'number' }),
     TransferItemDetailsPage: new CoinageRoute('item/details/:id', TransferItemDetailsComponent, guarded, { id: 'number' }),
     ReceiptDetailsPage: new CoinageRoute('receipt/details/:id', ReceiptDetailsComponent, guarded, { id: 'number' }),
+    ReceiptUploadPage: new CoinageRoute('receipt/upload', ReceiptUploadPageComponent, guarded),
     TransfersListPage: new CoinageRoute('transfers', TransfersListComponent, guarded),
     ItemsListPage: new CoinageRoute('items', ItemsListPageComponent, guarded),
     CreateTransferPage: new CoinageRoute('transfer/add', CreateEditTransferComponent, guarded),

@@ -8,7 +8,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 
 import { ReceiptDao } from '../daos/receipt.dao';
-import { ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
+import { Receipt, ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.event';
 import { AuthGuard } from '../services/auth.guard';
@@ -46,6 +46,15 @@ export class ReceiptsController {
         private readonly receiptDao: ReceiptDao,
         private readonly eventBus: EventBus,
     ) {}
+
+    @Post()
+    public async createReceipt(): Promise<{ id: number }> {
+        const receipt = new Receipt();
+        receipt.amount = 0;
+        receipt.processingStatus = EntityReceiptProcessingStatus.NONE;
+        const result = await this.receiptDao.insert(receipt);
+        return { id: result.identifiers[0].id as number };
+    }
 
     @Post(':id/upload-image')
     @UseInterceptors(

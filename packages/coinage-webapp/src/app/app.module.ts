@@ -36,6 +36,7 @@ import { DashboardCountersComponent } from './pages/dashboard/dashboard-counters
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { ItemsListPageComponent } from './pages/items-list-page/items-list-page.component';
 import { ReceiptDetailsComponent } from './receipt-details/receipt-details.component';
+import { ReceiptUploadPageComponent } from './receipt-upload/receipt-upload.component';
 import { StatisticsComponent } from './statistics/statistics.component';
 import { ItemsTableComponent } from './transfer-details/items-table/items-table.component';
 import { TransferDetailsComponent } from './transfer-details/transfer-details.component';
@@ -81,6 +82,7 @@ Chart.register(zoomPlugin);
         MonthSummaryComponent,
         TransferDetailsComponent,
         ReceiptDetailsComponent,
+        ReceiptUploadPageComponent,
         SpinnerComponent,
         CategoryManagerComponent,
         CreateEditTransferComponent,

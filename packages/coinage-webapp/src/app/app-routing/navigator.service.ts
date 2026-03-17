@@ -29,6 +29,10 @@ export class NavigatorService {
         return this.router.navigateByUrl(CoinageRoutes.ReceiptDetailsPage.getUrl({ id: receiptId }));
     }
 
+    public goToReceiptUploadPage(): Promise<boolean> {
+        return this.router.navigateByUrl(CoinageRoutes.ReceiptUploadPage.getUrl({}));
+    }
+
     public goToDashboardPage(): Promise<boolean> {
         return this.router.navigateByUrl(CoinageRoutes.DashboardPage.getUrl({}));
     }
