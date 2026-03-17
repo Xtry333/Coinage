@@ -112,7 +112,7 @@ ${candidateList}
 Task: Decide which entry best matches the extracted text, considering:
 - Abbreviations and store-specific naming ("Mleko UHT" ≈ "Mleko UHT 3.2% 1L")
 - Spelling variants or OCR errors
-- Different languages (Polish receipts are common)
+- Different languages (Mostly Polish receipts)
 
 Return ONLY valid JSON with no explanation:
 {"matchedId": <number or null>, "confidence": <0.0–1.0>}
