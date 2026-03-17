@@ -53,3 +53,4 @@ nx-cloud.env
 
 .nx/cache
 .nx/workspace-data
+uploads/*

@@ -37,11 +37,11 @@ export class OllamaService {
     private readonly availabilityCheckTimeoutMs = 5000;
 
     public constructor() {
-        this.provider = (process.env['RECEIPT_AI_PROVIDER'] ?? 'ollama') as ReceiptAIProvider;
+        this.provider = (process.env['RECEIPT_AI_PROVIDER'] ?? 'lmstudio') as ReceiptAIProvider;
 
         if (this.provider === 'lmstudio') {
-            this.baseUrl = process.env['LM_STUDIO_BASE_URL'] ?? 'http://localhost:1234';
-            this.model = process.env['LM_STUDIO_MODEL'] ?? '';
+            this.baseUrl = process.env['LM_STUDIO_BASE_URL'] ?? 'http://192.168.50.176:1234';
+            this.model = process.env['LM_STUDIO_MODEL'] ?? 'qwen/qwen3.5-9b';
         } else {
             this.baseUrl = process.env['OLLAMA_BASE_URL'] ?? 'http://localhost:11434';
             this.model = process.env['OLLAMA_MODEL'] ?? 'llava';
@@ -187,7 +187,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
                         ],
                     },
                 ],
-                response_format: { type: 'json_object' },
+                response_format: { type: 'text' },
             }),
             signal: controller.signal,
         });
@@ -207,7 +207,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
             body: JSON.stringify({
                 model: this.model,
                 messages: [{ role: 'user', content: prompt }],
-                response_format: { type: 'json_object' },
+                response_format: { type: 'text' },
             }),
             signal: controller.signal,
         });
