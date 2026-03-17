@@ -7,16 +7,11 @@ import { readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 
-import { AccountDao } from '../daos/account.dao';
-import { CategoryDao } from '../daos/category.dao';
-import { ContractorDao } from '../daos/contractor.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
-import { TransferDao } from '../daos/transfer.dao';
 import { ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.event';
 import { AuthGuard } from '../services/auth.guard';
-import { DateParserService } from '../services/date-parser.service';
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads', 'receipts');
 
@@ -25,6 +20,15 @@ if (!existsSync(UPLOAD_DIR)) {
 }
 
 const ALLOWED_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif'];
+
+const ENTITY_STATUS_TO_DTO: Record<EntityReceiptProcessingStatus, ReceiptProcessingStatus> = {
+    [EntityReceiptProcessingStatus.NONE]: ReceiptProcessingStatus.NONE,
+    [EntityReceiptProcessingStatus.PENDING]: ReceiptProcessingStatus.PENDING,
+    [EntityReceiptProcessingStatus.PROCESSING]: ReceiptProcessingStatus.PROCESSING,
+    [EntityReceiptProcessingStatus.PROCESSED]: ReceiptProcessingStatus.PROCESSED,
+    [EntityReceiptProcessingStatus.DUPLICATE]: ReceiptProcessingStatus.DUPLICATE,
+    [EntityReceiptProcessingStatus.ERROR]: ReceiptProcessingStatus.ERROR,
+};
 const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
 
 const multerStorage = diskStorage({
@@ -39,12 +43,7 @@ const multerStorage = diskStorage({
 @Controller('receipt(s)?')
 export class ReceiptsController {
     public constructor(
-        private readonly transferDao: TransferDao,
         private readonly receiptDao: ReceiptDao,
-        private readonly categoryDao: CategoryDao,
-        private readonly contractorDao: ContractorDao,
-        private readonly accountDao: AccountDao,
-        private readonly dateParserService: DateParserService,
         private readonly eventBus: EventBus,
     ) {}
 
@@ -107,7 +106,7 @@ export class ReceiptsController {
         return pending.map((r) => ({
             id: r.id,
             imagePath: '',
-            processingStatus: r.processingStatus as unknown as ReceiptProcessingStatus,
+            processingStatus: ENTITY_STATUS_TO_DTO[r.processingStatus],
         }));
     }
 
@@ -115,7 +114,7 @@ export class ReceiptsController {
     public async getReceiptStatus(@Param('id', ParseIntPipe) id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null }> {
         const receipt = await this.receiptDao.getById(id);
         return {
-            status: receipt.processingStatus as unknown as ReceiptProcessingStatus,
+            status: ENTITY_STATUS_TO_DTO[receipt.processingStatus],
             aiData: receipt.aiExtractedData,
         };
     }
@@ -135,9 +134,6 @@ export class ReceiptsController {
 
     @Get(':id/details')
     public async getReceiptDetails(@Param('id', ParseIntPipe) id: number): Promise<ReceiptDetailsDTO> {
-        if (!id) {
-            throw new Error('Invalid ID provided.');
-        }
         const receipt = await this.receiptDao.getById(id);
 
         return {
@@ -150,7 +146,7 @@ export class ReceiptsController {
             totalTransferred: this.calculateTotalAmount(receipt.transfers, false),
             contractorId: receipt.contractor?.id ?? null,
             contractorName: receipt.contractor?.name ?? null,
-            allTransfers: receipt.transfers.map(this.toTransferDTO),
+            allTransfers: receipt.transfers.map((t) => this.toTransferDTO(t)),
         };
     }
 

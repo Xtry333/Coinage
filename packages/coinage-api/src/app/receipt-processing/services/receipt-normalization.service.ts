@@ -389,16 +389,17 @@ export class ReceiptNormalizationService {
     ): { suggested: SuggestedContainer } | null {
         if (receiptPrice <= 0) return null;
 
-        const withPrice = enriched.filter((e) => e.lastUnitPrice !== null && e.lastUnitPrice > 0);
+        const withPrice = enriched
+            .filter((e): e is { suggested: SuggestedContainer; lastUnitPrice: number } => e.lastUnitPrice !== null && e.lastUnitPrice > 0);
         if (withPrice.length === 0) return null;
 
         const closest = withPrice.reduce((best, current) => {
-            const currentDiff = Math.abs((current.lastUnitPrice! - receiptPrice) / receiptPrice);
-            const bestDiff = Math.abs((best.lastUnitPrice! - receiptPrice) / receiptPrice);
+            const currentDiff = Math.abs((current.lastUnitPrice - receiptPrice) / receiptPrice);
+            const bestDiff = Math.abs((best.lastUnitPrice - receiptPrice) / receiptPrice);
             return currentDiff < bestDiff ? current : best;
         });
 
-        const relativeDiff = Math.abs((closest.lastUnitPrice! - receiptPrice) / receiptPrice);
+        const relativeDiff = Math.abs((closest.lastUnitPrice - receiptPrice) / receiptPrice);
         if (relativeDiff <= PRICE_MATCH_TOLERANCE) {
             return { suggested: closest.suggested };
         }
@@ -419,10 +420,6 @@ export class ReceiptNormalizationService {
             itemCount: pair.containerItemCount,
             lastUnitPrice,
         };
-    }
-
-    private itemToNormalized(item: Item, base: NormalizedItem): NormalizedItem {
-        return { ...base, itemId: item.id, isNew: false, name: item.name, brand: item.brand ?? null, categoryId: item.categoryId ?? null };
     }
 
     private formatItemLabel(item: Item): string {

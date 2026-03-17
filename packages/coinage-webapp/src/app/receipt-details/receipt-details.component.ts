@@ -1,13 +1,11 @@
-import * as Rx from 'rxjs';
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ReceiptDetailsDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferType } from '@app/interfaces';
+import { Subscription } from 'rxjs';
 
 import { ActivatedRoute } from '@angular/router';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NavigatorService } from '../app-routing/navigator.service';
 import { SocketService } from '../services/socket.service';
-import { Subscription } from 'rxjs';
 
 @Component({
     selector: 'app-receipt-details',
@@ -22,7 +20,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
     public uploadStatus: 'idle' | 'uploading' | 'duplicate' | 'queued' | 'processing' | 'processed' | 'error' = 'idle';
     public uploadMessage = '';
     public duplicateReceiptId?: number;
-    public aiExtractedData?: object | null;
+    public aiExtractedData?: unknown;
     public processingStatus?: ReceiptProcessingStatus;
 
     private socketSubs: Subscription[] = [];
@@ -41,7 +39,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
             const id = parseInt(params.get('id') ?? '') ?? undefined;
             if (id) {
                 this.receiptId = id;
-                Rx.zip(this.coinageData.getReceiptDetails(id)).subscribe(([receipt]) => {
+                this.coinageData.getReceiptDetails(id).then((receipt) => {
                     this.receiptDetails = receipt;
                 });
                 this.loadStatus(id);
