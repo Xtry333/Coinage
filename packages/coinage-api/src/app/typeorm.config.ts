@@ -1,22 +1,8 @@
-import * as path from 'path';
-
 import { DataSource, DataSourceOptions, Table } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import entities from './entities/_index';
-
-export function loadMigrations(req: NodeRequire = require): (Function | string)[] {
-    // webpack bundles everything; require.context resolves matching modules at build time
-    if (typeof (req as any).context === 'function') {
-        const ctx = (req as any).context('../database/migrations', false, /^\.\/(\d+\S*)\.(ts|js)$/);
-        return ctx
-            .keys()
-            .sort()
-            .flatMap((key: string) => (Object.values(ctx(key)) as Function[]).filter((v) => typeof v === 'function'));
-    }
-    // ts-node context (TypeORM CLI): return a glob pattern for TypeORM to resolve
-    return [path.join(__dirname, '../database/migrations/[0-9]*.{ts,js}')];
-}
+import migrations from '../database/migrations/_index';
 
 export class CustomNamingStrategy extends SnakeNamingStrategy {
     public foreignKeyName(tableOrName: Table | string, columnNames: string[], referencedTablePath: string, referencedColumnNames: string[]): string {
@@ -49,7 +35,7 @@ export const opts: DataSourceOptions = {
     synchronize: false,
     logging: false,
     migrationsRun: true,
-    migrations: loadMigrations(),
+    migrations: [...migrations],
     migrationsTransactionMode: 'each',
     entities: [...entities],
     timezone: 'Z',
