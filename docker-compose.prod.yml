@@ -29,7 +29,7 @@ services:
             MYSQL_USER: ${MYSQL_USER:-root}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}
         ports:
-            - ${COINAGE_API_PORT:-3333}:3333
+            - ${COINAGE_API_PORT:-8333}:8333
         depends_on:
             coinage-db:
                 condition: service_healthy
@@ -38,7 +38,7 @@ services:
         restart: unless-stopped
         image: ghcr.io/${COINAGE_REGISTRY_USER:-Xtry333}/coinage-webapp:latest
         ports:
-            - ${COINAGE_WEBAPP_PORT:-4200}:4200
+            - ${COINAGE_WEBAPP_PORT:-8100}:8100
         depends_on:
             - coinage-api
 

@@ -11,7 +11,7 @@ import { AppModule } from './app/app.module';
 
 async function bootstrap() {
     const globalPrefix = 'api';
-    const port = process.env.PORT || 3333;
+    const port = process.env.PORT || 8333;
     const app = await NestFactory.create(AppModule);
 
     app.use(helmet());
