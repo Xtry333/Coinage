@@ -7,11 +7,13 @@ import { ContractorDao } from '../daos/contractor.dao';
 import { ItemDao } from '../daos/item.dao';
 import { ItemsWithContainersDao } from '../daos/itemsWithContainers.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
+import { UserDao } from '../daos/user.dao';
 import { Category } from '../entities/Category.entity';
 import { Container } from '../entities/Container.entity';
 import { Contractor } from '../entities/Contractor.entity';
 import { Item } from '../entities/Item.entity';
 import { Receipt } from '../entities/Receipt.entity';
+import { User } from '../entities/User.entity';
 import { ItemsWithContainers } from '../entities/views/ItemsWithContainers.view';
 import { EventsGateway } from '../events/events.gateway';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
@@ -29,7 +31,7 @@ const EventHandlers = [ReceiptQueuedHandler, ReceiptProcessedHandler, ReceiptErr
 @Module({
     imports: [
         CqrsModule,
-        TypeOrmModule.forFeature([Receipt, Category, Contractor, Item, Container, ItemsWithContainers]),
+        TypeOrmModule.forFeature([Receipt, Category, Contractor, Item, Container, User, ItemsWithContainers]),
     ],
     providers: [
         OllamaService,
@@ -40,6 +42,7 @@ const EventHandlers = [ReceiptQueuedHandler, ReceiptProcessedHandler, ReceiptErr
         ContractorDao,
         ItemDao,
         ItemsWithContainersDao,
+        UserDao,
         TemplateNameMapperService,
         EventsGateway,
         ...CommandHandlers,
