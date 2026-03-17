@@ -8,6 +8,7 @@ import { ItemsController } from './items.controller';
 import { ReceiptsController } from './receipts.controller';
 import { SchedulesController } from './schedules.controller';
 import { SearchController } from './search.controller';
+import { TagsController } from './tags.controller';
 import { TransferController } from './transfer.controller';
 import { TransfersController } from './transfers.controller';
 import { UserController } from './user/user.controller';
@@ -21,6 +22,7 @@ export default [
     ReceiptsController,
     SchedulesController,
     SearchController,
+    TagsController,
     TransfersController,
     TransferController,
     ItemsController,

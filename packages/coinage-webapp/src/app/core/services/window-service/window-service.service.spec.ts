@@ -6,7 +6,9 @@ describe('WindowService', () => {
     let service: WindowService;
 
     beforeEach(() => {
-        TestBed.configureTestingModule({});
+        TestBed.configureTestingModule({
+            providers: [WindowService],
+        });
         service = TestBed.inject(WindowService);
     });
 

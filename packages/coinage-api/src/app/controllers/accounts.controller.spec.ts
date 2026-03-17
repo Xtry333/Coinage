@@ -1,6 +1,7 @@
 import { createMockAccounts } from '@coinage-app/test/mock-generators/accounts.mock';
 import { Test, TestingModule } from '@nestjs/testing';
 import { PartialProvider } from '../../test/partial-provider';
+import { AuthService } from '../auth/auth.service';
 import { AccountDao } from '../daos/account.dao';
 import { UserDao } from '../daos/user.dao';
 import { AccountBalanceService } from '../services/account-balance.service';
@@ -27,6 +28,11 @@ describe('AccountsController', () => {
         useValue: {},
     };
 
+    const authServiceProvider: PartialProvider<AuthService> = {
+        provide: AuthService,
+        useValue: {},
+    };
+
     const accountsServiceProvider: PartialProvider<AccountsService> = {
         provide: AccountsService,
         useValue: {
@@ -50,6 +56,7 @@ describe('AccountsController', () => {
                 AccountsController,
                 authGuardProvider,
                 userDaoProvider,
+                authServiceProvider,
                 {
                     provide: AccountDao,
                     useValue: {

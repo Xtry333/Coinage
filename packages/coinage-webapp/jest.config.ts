@@ -5,6 +5,9 @@ export default {
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
     globals: {},
     coverageDirectory: '../../coverage/packages/coinage-webapp',
+    moduleNameMapper: {
+        'ngx-socket-io': '<rootDir>/src/__mocks__/ngx-socket.ts',
+    },
     transform: {
         '^.+\\.(ts|mjs|js|html)$': [
             'jest-preset-angular',

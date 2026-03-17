@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 
 import { parseUnit } from '@app/common-units';
 import {
@@ -16,7 +16,9 @@ import { ItemDao } from '../daos/item.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
 import { Item } from '../entities/Item.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
+import { AuthGuard } from '../services/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('item(s)?')
 export class ItemsController {
     public constructor(
@@ -135,6 +137,7 @@ export class ItemsController {
             advancedContainer.weightUnit = parseUnit(container?.weightUnit ?? null) ?? undefined;
             advancedContainer.volume = container?.volume ?? undefined;
             advancedContainer.volumeUnit = parseUnit(container?.volumeUnit ?? null) ?? undefined;
+            advancedContainer.itemCount = container?.itemCount ?? null;
             itemContainers.push(advancedContainer);
         }
 
@@ -144,6 +147,7 @@ export class ItemsController {
             itemName: item.name,
             categoryId: category?.id ?? null,
             categoryName: category?.name ?? null,
+            tags: (item.tags ?? []).map((tag) => ({ id: tag.id, name: tag.name, color: tag.color })),
             container: container,
             createdDate: item.createdDate,
             editedDate: item.editedDate,
@@ -174,6 +178,7 @@ export class ItemsController {
         let containerWeightUnit: any | null = null;
         let containerVolume: number | null = null;
         let containerVolumeUnit: any | null = null;
+        let containerItemCount: number | null = null;
 
         if (transferItem.containerId !== null) {
             const container = await transferItem.container;
@@ -183,15 +188,12 @@ export class ItemsController {
                 containerWeightUnit = parseUnit(container.weightUnit ?? null) ?? null;
                 containerVolume = container.volume ?? null;
                 containerVolumeUnit = parseUnit(container.volumeUnit ?? null) ?? null;
+                containerItemCount = container.itemCount ?? null;
             }
         }
         return {
             transferId: transfer.id,
             transferName: transfer.description,
-            // amount: transfer.amount,
-            // type: transfer.type,
-            // categoryId: transfer.category?.id,
-            // categoryName: transfer.category?.name,
             transferContractorId: transfer.contractor?.id ?? null,
             transferContractorName: transfer.contractor?.name ?? null,
             accountId: transfer.originAccountId,
@@ -205,6 +207,7 @@ export class ItemsController {
             containerWeightUnit: containerWeightUnit,
             containerVolume: containerVolume,
             containerVolumeUnit: containerVolumeUnit,
+            containerItemCount: containerItemCount,
         };
     }
 }

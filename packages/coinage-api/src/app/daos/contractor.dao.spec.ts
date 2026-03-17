@@ -6,7 +6,13 @@ describe('ContractorDao', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [ContractorDao],
+            providers: [
+                ContractorDao,
+                {
+                    provide: 'ContractorRepository',
+                    useValue: { findOne: jest.fn(), find: jest.fn(), findBy: jest.fn() },
+                },
+            ],
         }).compile();
 
         dao = module.get(ContractorDao);

@@ -2,12 +2,13 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as Rx from 'rxjs';
 
-import { ItemDetailsDTO } from '@app/interfaces';
+import { Unit } from '@app/common-units';
+import { AdvancedItemContainer, ItemDetailsDTO } from '@app/interfaces';
 
-import { CoinageDataService } from '../services/coinage.data-service';
-import { NavigatorService } from '../app-routing/navigator.service';
-import { NotificationService } from '../services/notification.service';
 import { CoinageRoutes } from '../app-routing/app-routes';
+import { NavigatorService } from '../app-routing/navigator.service';
+import { CoinageDataService } from '../services/coinage.data-service';
+import { NotificationService } from '../services/notification.service';
 
 @Component({
     selector: 'app-transfer-item-details',
@@ -44,6 +45,21 @@ export class TransferItemDetailsComponent implements OnInit, OnDestroy {
 
     public ngOnDestroy(): void {
         this.routeSubscription.unsubscribe();
+    }
+
+    public perItemWeight(container: AdvancedItemContainer): string | null {
+        const weight = container.weight ?? null;
+        const weightUnit = (container.weightUnit as Unit) ?? null;
+        const itemCount = container.itemCount ?? null;
+        if (!weight || !itemCount || itemCount <= 0) return null;
+        const perItem = weight / itemCount;
+        if (weightUnit === Unit.KG) {
+            return perItem >= 1 ? `${perItem.toFixed(3)} kg` : `${(perItem * 1000).toFixed(0)} g`;
+        }
+        if (weightUnit === Unit.G) {
+            return perItem >= 1000 ? `${(perItem / 1000).toFixed(3)} kg` : `${perItem.toFixed(0)} g`;
+        }
+        return `${perItem.toFixed(3)} ${weightUnit ?? ''}`.trim();
     }
 
     private loadItemDetails(id: number): void {

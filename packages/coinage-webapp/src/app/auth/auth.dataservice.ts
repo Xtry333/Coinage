@@ -12,4 +12,8 @@ export class AuthDataService {
         const body = { username, password };
         return lastValueFrom(this.http.post<{ token: string }>('/api/auth/login', body));
     }
+
+    public logout() {
+        return lastValueFrom(this.http.post<{ message: string }>('/api/auth/logout', {}));
+    }
 }

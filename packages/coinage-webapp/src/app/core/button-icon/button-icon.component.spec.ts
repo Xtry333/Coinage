@@ -39,6 +39,6 @@ describe('ButtonIconComponent', () => {
     it('should apply correct size classes', () => {
         component.size = 'lg';
         expect(component.buttonClasses).toContain('h-10 w-10');
-        expect(component.iconSize).toContain('h-5 w-5');
+        expect(component.iconSize).toBe('lg');
     });
 });

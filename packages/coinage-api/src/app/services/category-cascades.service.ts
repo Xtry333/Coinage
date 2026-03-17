@@ -1,6 +1,6 @@
-import { Category } from '../entities/Category.entity';
-import { CategoryDao } from '../daos/category.dao';
 import { Injectable } from '@nestjs/common';
+import { CategoryDao } from '../daos/category.dao';
+import { Category } from '../entities/Category.entity';
 
 @Injectable()
 export class CategoryCascadeService {
@@ -13,22 +13,25 @@ export class CategoryCascadeService {
         const newParent = categories.find((c) => c.id === newParentId);
 
         if (category !== undefined && newParentId === null) {
-            category.parentId = newParentId;
             return true;
         } else if (category === undefined || newParent === undefined) {
             throw new Error('Category not found');
         }
 
-        let parentCategory: Category | undefined = newParent;
-        while (parentCategory !== undefined && parentCategory?.id !== category.id) {
-            if (parentCategory?.parentId === null) {
-                category.parentId = newParentId;
-                return true;
-            }
-            parentCategory = categories.find((c) => c.id === parentCategory?.parentId);
+        if (newParentId === categoryId) {
+            return false;
         }
 
-        return false;
+        let parentId: number | null = newParent.parentId ?? null;
+        while (parentId !== null) {
+            if (parentId === categoryId) {
+                return false;
+            }
+            const parent = categories.find((c) => c.id === parentId);
+            parentId = parent?.parentId ?? null;
+        }
+
+        return true;
     }
 
     public async setCategoryParentById(category: Category, newParentId: number | null): Promise<boolean> {
@@ -44,16 +47,17 @@ export class CategoryCascadeService {
             throw new Error('Parent category not found');
         }
 
-        let parentCategory: Category | undefined = newParent;
-        while (parentCategory !== undefined && parentCategory?.id !== category.id) {
-            if (parentCategory?.parentId === null) {
-                category.parentId = newParentId;
-                await this.categoryDao.save(category);
-                return true;
+        let parentId: number | null = newParent.parentId ?? null;
+        while (parentId !== null) {
+            if (parentId === category.id) {
+                return false;
             }
-            parentCategory = categories.find((c) => c.id === parentCategory?.parentId);
+            const parent = categories.find((c) => c.id === parentId);
+            parentId = parent?.parentId ?? null;
         }
 
-        return false;
+        category.parentId = newParentId;
+        await this.categoryDao.save(category);
+        return true;
     }
 }

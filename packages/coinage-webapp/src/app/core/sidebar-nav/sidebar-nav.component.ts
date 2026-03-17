@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 import { CoinageRoutes } from '../../app-routing/app-routes';
@@ -30,47 +30,17 @@ export class SidebarNavComponent implements OnInit {
     public isSidebarOpen = true;
     public isUserMenuOpen = false;
 
+    @Output() public linkClicked = new EventEmitter<void>();
+
     public links: UiNavLink[] = [
-        {
-            text: 'Dashboard',
-            icon: 'bi-house-door',
-            url: CoinageRoutes.DashboardPage.getUrl({}),
-        },
-        {
-            text: 'Transfers',
-            icon: 'bi-card-list',
-            url: CoinageRoutes.TransfersListPage.getUrl({}),
-        },
-        {
-            text: 'Items',
-            icon: 'bi-box',
-            url: CoinageRoutes.ItemsListPage.getUrl({}),
-        },
-        {
-            text: 'Categories',
-            icon: 'bi-tag',
-            url: CoinageRoutes.CategoryManagerPage.getUrl({}),
-        },
-        {
-            text: 'Account 1',
-            icon: 'bi-wallet',
-            url: CoinageRoutes.AccountDetailsPage.getUrl({ id: 1 }),
-        },
-        {
-            text: 'Add Transfer',
-            icon: 'bi-plus',
-            url: CoinageRoutes.CreateTransferPage.getUrl({}),
-        },
-        {
-            text: 'Add Receipt',
-            icon: 'bi-plus',
-            url: CoinageRoutes.CreateMultipleTransfersPage.getUrl({}),
-        },
-        {
-            text: 'Account Settings',
-            icon: 'bi-person',
-            url: CoinageRoutes.ManageAccountsPage.getUrl({}),
-        },
+        { text: 'Dashboard', icon: 'bi-house-door', url: CoinageRoutes.DashboardPage.getUrl({}) },
+        { text: 'Transfers', icon: 'bi-card-list', url: CoinageRoutes.TransfersListPage.getUrl({}) },
+        { text: 'Items', icon: 'bi-box', url: CoinageRoutes.ItemsListPage.getUrl({}) },
+        { text: 'Categories', icon: 'bi-tag', url: CoinageRoutes.CategoryManagerPage.getUrl({}) },
+        { text: 'Account 1', icon: 'bi-wallet', url: CoinageRoutes.AccountDetailsPage.getUrl({ id: 1 }) },
+        { text: 'Add Transfer', icon: 'bi-plus', url: CoinageRoutes.CreateTransferPage.getUrl({}) },
+        { text: 'Add Receipt', icon: 'bi-plus', url: CoinageRoutes.CreateMultipleTransfersPage.getUrl({}) },
+        { text: 'Account Settings', icon: 'bi-person', url: CoinageRoutes.ManageAccountsPage.getUrl({}) },
     ];
 
     @ViewChild('dropdownUserMenuComponent')
@@ -85,8 +55,11 @@ export class SidebarNavComponent implements OnInit {
         this.userDataService.userData$.subscribe((user) => {
             this.username = user['username'];
             this.dateTime = new Date(user['date'] ?? 0).toLocaleString();
-            //console.log(user['date']);
         });
+    }
+
+    public onLinkClicked(): void {
+        this.linkClicked.emit();
     }
 
     public openUserMenuDropdown(): void {

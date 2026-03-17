@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { TemplateNameMapperService } from './template-name-mapper.service';
-import { Transfer } from '../entities/Transfer.entity';
 import { Account } from '../entities/Account.entity';
+import { Contractor } from '../entities/Contractor.entity';
+import { Transfer } from '../entities/Transfer.entity';
+import { TemplateNameMapperService } from './template-name-mapper.service';
 
 describe('TemplateNameMapperService', () => {
     let service: TemplateNameMapperService;
@@ -19,13 +20,17 @@ describe('TemplateNameMapperService', () => {
         expect(service).toBeDefined();
     });
 
-    it('should replace %account% template with account name from transfer', () => {
-        const transfers = [createTransferMock('%account%', 'xxx'), createTransferMock('Contractor %account%', 'xxx'), createTransferMock('Contractor', 'yyy')];
+    it('should replace %account-origin% template with account name from transfer', () => {
+        const transfers = [
+            createTransferMock('%account-origin%', 'xxx'),
+            createTransferMock('Contractor %account-origin%', 'xxx'),
+            createTransferMock('Contractor', 'yyy'),
+        ];
 
         service.mapTransfersTemplateNames(transfers);
 
         for (const transfer of transfers) {
-            expect(transfer.contractor?.name).not.toContain(TemplateNameMapperService.ACCOUNT_NAME);
+            expect(transfer.contractor?.name).not.toContain(TemplateNameMapperService.ACCOUNT_ORIGIN_NAME);
         }
 
         expect(transfers[0].contractor?.name).toContain('xxx');
@@ -35,9 +40,15 @@ describe('TemplateNameMapperService', () => {
 
     function createTransferMock(contractorName: string, accountName: string): Transfer {
         const transfer = new Transfer();
-        transfer.contractor = { id: 1, name: contractorName };
-        transfer.account = new Account();
-        transfer.account.name = accountName;
+        const contractor = new Contractor();
+        contractor.id = 1;
+        contractor.name = contractorName;
+        contractor.isActive = true;
+        transfer.contractor = contractor;
+        const account = new Account();
+        account.name = accountName;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (transfer as any).originAccount = account;
 
         return transfer;
     }

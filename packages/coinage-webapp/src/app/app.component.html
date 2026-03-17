@@ -19,6 +19,7 @@
     [class.transition-transform]="isMobileView"
     [class.duration-300]="isMobileView"
     [class.ease-in-out]="isMobileView"
+    (linkClicked)="closeSidebar()"
 ></app-sidebar-nav>
 
 <!-- Main content -->

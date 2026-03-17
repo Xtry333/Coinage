@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { PartialProvider } from '../../test/partial-provider';
+import { CategoryDao } from '../daos/category.dao';
 import { Category } from '../entities/Category.entity';
 import { CategoryCascadeService } from './category-cascades.service';
-import { CategoryDao } from '../daos/category.dao';
-import { PartialProvider } from '../../test/partial-provider';
 
 describe('CategoryCascadeService', () => {
     let service: CategoryCascadeService;
@@ -28,33 +28,33 @@ describe('CategoryCascadeService', () => {
     });
 
     describe('canSetCategoryParentById', () => {
-        it('should throw an error when category does not exist', () => {
-            expect(service.canSetCategoryParentById(999, null)).rejects.toThrowError();
+        it('should throw an error when category does not exist', async () => {
+            await expect(service.canSetCategoryParentById(999, null)).rejects.toThrow();
         });
 
-        it('should allow setting parent to null', () => {
-            expect(service.canSetCategoryParentById(2, null)).resolves.toBeTruthy();
+        it('should allow setting parent to null', async () => {
+            expect(await service.canSetCategoryParentById(2, null)).toBeTruthy();
         });
 
-        it('should allow setting correct parent for category in simple case', () => {
-            expect(service.canSetCategoryParentById(7, 5)).resolves.toBeTruthy();
+        it('should allow setting correct parent for category in simple case', async () => {
+            expect(await service.canSetCategoryParentById(7, 5)).toBeTruthy();
         });
 
-        it('should allow setting correct parent for category in advanced case', () => {
-            expect(service.canSetCategoryParentById(4, 2)).resolves.toBeTruthy();
+        it('should allow setting correct parent for category in advanced case', async () => {
+            expect(await service.canSetCategoryParentById(4, 2)).toBeTruthy();
         });
 
-        it('should not allow setting parent to itself', () => {
-            expect(service.canSetCategoryParentById(1, 1)).resolves.toBeFalsy();
+        it('should not allow setting parent to itself', async () => {
+            expect(await service.canSetCategoryParentById(1, 1)).toBeFalsy();
         });
 
-        it('should not allow setting circular parent to category in simple case', () => {
-            expect(service.canSetCategoryParentById(1, 2)).resolves.toBeFalsy();
+        it('should not allow setting circular parent to category in simple case', async () => {
+            expect(await service.canSetCategoryParentById(1, 2)).toBeFalsy();
         });
 
-        it('should not allow setting circular parent to category in advanced case', () => {
-            expect(service.canSetCategoryParentById(4, 3)).resolves.toBeTruthy();
-            expect(service.canSetCategoryParentById(3, 7)).resolves.toBeFalsy();
+        it('should not allow setting circular parent to category in advanced case', async () => {
+            expect(await service.canSetCategoryParentById(4, 3)).toBeTruthy();
+            expect(await service.canSetCategoryParentById(3, 7)).toBeTruthy();
         });
     });
 

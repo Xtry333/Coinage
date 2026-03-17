@@ -21,6 +21,7 @@ export * from './lib/SaveTransferDTO.request';
 export * from './lib/SaveTransferDTO.response';
 export * from './lib/ScheduleDTO.response';
 export * from './lib/SplitTransferDTO.request';
+export * from './lib/TagDTO.response';
 export * from './lib/TotalInMonthByCategory.response';
 export * from './model/BulkEditTransfer.dto.request';
 export * from './model/CreateEditItem.dto.request';

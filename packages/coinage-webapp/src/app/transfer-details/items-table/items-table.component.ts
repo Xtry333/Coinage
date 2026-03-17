@@ -14,6 +14,7 @@ export class UiTransferItemDTO extends TransferItemDTO {
         this.totalPrice = transferItem.totalPrice;
         this.setDiscount = transferItem.setDiscount;
         this.containerId = transferItem.containerId;
+        this.tags = transferItem.tags ?? [];
     }
 }
 

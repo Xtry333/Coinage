@@ -1,6 +1,8 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, UseGuards } from '@nestjs/common';
 import { UserDao } from '../../daos/user.dao';
+import { AuthGuard } from '../../services/auth.guard';
 
+@UseGuards(AuthGuard)
 @Controller('user')
 export class UserController {
     public constructor(private readonly userDao: UserDao) {}

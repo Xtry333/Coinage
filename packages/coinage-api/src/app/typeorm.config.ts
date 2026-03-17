@@ -34,7 +34,7 @@ export const opts: DataSourceOptions = {
     database: process.env.MYSQL_DATABASE,
     synchronize: false,
     logging: false,
-    migrationsRun: false,
+    migrationsRun: true,
     migrations: migrations,
     migrationsTransactionMode: 'each',
     entities: [...entities],

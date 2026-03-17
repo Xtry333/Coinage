@@ -35,8 +35,8 @@ const multerStorage = diskStorage({
     },
 });
 
-@Controller('receipt(s)?')
 @UseGuards(AuthGuard)
+@Controller('receipt(s)?')
 export class ReceiptsController {
     public constructor(
         private readonly transferDao: TransferDao,

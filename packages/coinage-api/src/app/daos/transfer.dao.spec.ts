@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { TemplateNameMapperService } from '../services/template-name-mapper.service';
 import { TransferDao } from './transfer.dao';
 
 describe('TransferDao', () => {
@@ -6,7 +7,17 @@ describe('TransferDao', () => {
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [TransferDao],
+            providers: [
+                TransferDao,
+                {
+                    provide: 'TransferRepository',
+                    useValue: { findOne: jest.fn(), find: jest.fn() },
+                },
+                {
+                    provide: TemplateNameMapperService,
+                    useValue: { mapTransfersTemplateNames: jest.fn() },
+                },
+            ],
         }).compile();
 
         dao = module.get(TransferDao);
