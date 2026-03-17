@@ -15,7 +15,7 @@ export class CreateTables1000000000000 implements MigrationInterface {
         await queryRunner.query(`
             CREATE TABLE \`account\` (
                 \`id\` INT NOT NULL AUTO_INCREMENT,
-                \`name\` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8mb4_0900_ai_ci',
+                \`name\` VARCHAR(50) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',
                 \`user_id\` INT NOT NULL,
                 \`currency_symbol\` VARCHAR(16) NULL DEFAULT NULL,
                 \`is_contractor_account\` BIT(1) NOT NULL DEFAULT b'0',

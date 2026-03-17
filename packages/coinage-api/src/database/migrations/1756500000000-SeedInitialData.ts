@@ -1,24 +1,34 @@
+import * as crypto from 'crypto';
 import { MigrationInterface, QueryRunner } from 'typeorm';
+
+import { AuthService } from '../../app/auth/auth.service';
 
 export class SeedInitialData1756500000000 implements MigrationInterface {
     public name = 'SeedInitialData1756500000000';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
-        // Create default admin user only if no users exist
         const users = await queryRunner.query(`SELECT id FROM \`user\` LIMIT 1`);
         if (users.length === 0) {
+            const plainPassword = crypto.randomBytes(12).toString('base64url');
+            const hashedPassword = await AuthService.hashPassword(plainPassword);
             await queryRunner.query(`
                 INSERT INTO \`user\` (\`name\`, \`password\`, \`is_system_user\`, \`created_date\`)
-                VALUES ('admin', 'admin', b'0', NOW())
-            `);
+                VALUES ('admin', ?, b'0', NOW())
+            `, [hashedPassword]);
+            console.log('');
+            console.log('========================================================');
+            console.log('  Default admin account created.');
+            console.log(`  Username : admin`);
+            console.log(`  Password : ${plainPassword}`);
+            console.log('  Change this password after first login.');
+            console.log('========================================================');
+            console.log('');
         }
 
-        // Seed initial global categories (user_id = NULL) only if no categories exist
         const categories = await queryRunner.query(`SELECT id FROM \`category\` LIMIT 1`);
         if (categories.length === 0) {
             await queryRunner.query(`
                 INSERT INTO \`category\` (\`name\`, \`type\`, \`description\`, \`tag\`) VALUES
-                -- OUTCOME categories
                 ('Housing & Utilities', 'OUTCOME', 'Rent, mortgage, electricity, water, internet, phone bills', 'housing'),
                 ('Food & Groceries', 'OUTCOME', 'Supermarket shopping, grocery stores', 'groceries'),
                 ('Dining Out', 'OUTCOME', 'Restaurants, cafes, takeaway, food delivery', 'dining'),
@@ -33,7 +43,6 @@ export class SeedInitialData1756500000000 implements MigrationInterface {
                 ('Gifts & Donations', 'OUTCOME', 'Presents, charity, donations', 'gifts'),
                 ('Savings & Investments', 'OUTCOME', 'Transfers to savings, investment contributions', 'savings'),
                 ('Other Expenses', 'OUTCOME', 'Miscellaneous expenses that do not fit other categories', 'other_expense'),
-                -- INCOME categories
                 ('Salary', 'INCOME', 'Regular employment income, wages', 'salary'),
                 ('Freelance', 'INCOME', 'Freelance work, consulting, contract income', 'freelance'),
                 ('Business Income', 'INCOME', 'Revenue from business activities', 'business'),
