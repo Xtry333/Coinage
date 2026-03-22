@@ -14,6 +14,7 @@ import { AdjustItemView1754863716132 } from './1754863716132-migration';
 import { UpdateContainersView1755864881273 } from './1755864881273-UpdateContainersView';
 import { AddReceiptImageProcessing1741305600000 } from './1741305600000-AddReceiptImageProcessing';
 import { AddTagTable1756400000000 } from './1756400000000-AddTagTable';
+import { AddReceiptExtractedStatus1756500000000 } from './1756500000000-AddReceiptExtractedStatus';
 
 export default [
     CreateTables1000000000000,
@@ -32,4 +33,5 @@ export default [
     UpdateContainersView1755864881273,
     AddReceiptImageProcessing1741305600000,
     AddTagTable1756400000000,
+    AddReceiptExtractedStatus1756500000000,
 ];
