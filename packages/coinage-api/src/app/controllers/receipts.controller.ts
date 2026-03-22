@@ -25,6 +25,7 @@ const ENTITY_STATUS_TO_DTO: Record<EntityReceiptProcessingStatus, ReceiptProcess
     [EntityReceiptProcessingStatus.NONE]: ReceiptProcessingStatus.NONE,
     [EntityReceiptProcessingStatus.PENDING]: ReceiptProcessingStatus.PENDING,
     [EntityReceiptProcessingStatus.PROCESSING]: ReceiptProcessingStatus.PROCESSING,
+    [EntityReceiptProcessingStatus.EXTRACTED]: ReceiptProcessingStatus.EXTRACTED,
     [EntityReceiptProcessingStatus.PROCESSED]: ReceiptProcessingStatus.PROCESSED,
     [EntityReceiptProcessingStatus.DUPLICATE]: ReceiptProcessingStatus.DUPLICATE,
     [EntityReceiptProcessingStatus.ERROR]: ReceiptProcessingStatus.ERROR,

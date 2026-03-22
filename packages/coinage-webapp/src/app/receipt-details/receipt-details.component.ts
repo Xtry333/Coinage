@@ -83,6 +83,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
             this.aiExtractedData = result.aiData;
             if (result.status === ReceiptProcessingStatus.PENDING) this.uploadStatus = 'queued';
             else if (result.status === ReceiptProcessingStatus.PROCESSING) this.uploadStatus = 'processing';
+            else if (result.status === ReceiptProcessingStatus.EXTRACTED) this.uploadStatus = 'processing';
             else if (result.status === ReceiptProcessingStatus.PROCESSED) this.uploadStatus = 'processed';
             else if (result.status === ReceiptProcessingStatus.ERROR) this.uploadStatus = 'error';
         } catch {
