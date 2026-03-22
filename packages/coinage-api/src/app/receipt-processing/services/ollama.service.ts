@@ -14,7 +14,7 @@ export interface OllamaExtractedData {
 
 export type ReceiptAIProvider = 'ollama' | 'lmstudio';
 
-const RECEIPT_EXTRACTION_PROMPT = `You are a receipt parsing assistant. Analyze the provided receipt image and extract information as JSON:
+const RECEIPT_EXTRACTION_PROMPT = `You are a receipt parsing assistant. The receipts will be mostly in Polish. Analyze the provided receipt image and extract information as JSON:
 {
   "date": "YYYY-MM-DD or null",
   "amount": <total amount as number or null>,
@@ -24,6 +24,8 @@ const RECEIPT_EXTRACTION_PROMPT = `You are a receipt parsing assistant. Analyze 
   "rawText": "<all text from receipt>",
   "confidence": <0.0-1.0>
 }
+You may fix minor OCR errors (keep in mind the base receipt language) in the text, but do not hallucinate details that are not present.
+The confidence score should reflect how certain you are about the extracted data, based on the image quality and clarity of text.
 Return ONLY valid JSON. Use null for unknown fields.`;
 
 @Injectable()
