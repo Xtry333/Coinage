@@ -14,11 +14,11 @@ import { ItemsWithContainers } from '../../entities/views/ItemsWithContainers.vi
 import { OllamaExtractedData, OllamaService } from './ollama.service';
 
 /** Top N fuzzy candidates to send to AI on first attempt. */
-const FIRST_PASS_CANDIDATES = 8;
+const FIRST_PASS_CANDIDATES = 10;
 /** Top N fuzzy candidates to send to AI on retry. */
-const RETRY_PASS_CANDIDATES = 30;
+const RETRY_PASS_CANDIDATES = 50;
 /** Score above which the fuzzy match is accepted without an AI call. */
-const AUTO_MATCH_THRESHOLD = 0.92;
+const AUTO_MATCH_THRESHOLD = 0.96;
 /** Minimum AI confidence to accept a match. */
 const AI_CONFIDENCE_THRESHOLD = 0.65;
 /** Minimum fuzzy score to include a candidate at all. */
