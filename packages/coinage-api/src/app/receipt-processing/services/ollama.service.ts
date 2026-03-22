@@ -73,7 +73,10 @@ export class OllamaService {
         const base64Image = imageBytes.toString('base64');
 
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), this.timeoutMs);
+
+        // For LM Studio (streaming): inactivity timer is managed inside readSSEStream.
+        // For Ollama (non-streaming): use a hard wall-clock abort here.
+        const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.timeoutMs) : undefined;
 
         try {
             const raw =
@@ -122,7 +125,10 @@ Return ONLY valid JSON with no explanation:
 Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
 
         const controller = new AbortController();
-        const timer = setTimeout(() => controller.abort(), this.resolveTimeoutMs);
+
+        // For LM Studio (streaming): inactivity timer is managed inside readSSEStream.
+        // For Ollama (non-streaming): use a hard wall-clock abort here.
+        const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.resolveTimeoutMs) : undefined;
 
         try {
             const raw =
@@ -198,7 +204,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
             throw new Error(`LM Studio responded with ${response.status}: ${await response.text()}`);
         }
 
-        return this.readSSEStream(response);
+        return this.readSSEStream(response, controller, this.timeoutMs);
     }
 
     private async callLMStudioText(prompt: string, controller: AbortController): Promise<string | null> {
@@ -215,15 +221,15 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
 
         if (!response.ok) return null;
 
-        return this.readSSEStream(response);
+        return this.readSSEStream(response, controller, this.resolveTimeoutMs);
     }
 
     /**
      * Reads an OpenAI-compatible SSE stream and assembles the full content string.
-     * Streaming keeps the TCP connection alive during long LLM generation,
-     * preventing idle-connection timeouts on slow models.
+     * Uses an inactivity timer that resets on every received chunk, so the abort
+     * only fires if the model goes completely silent — not after a fixed wall-clock limit.
      */
-    private async readSSEStream(response: Response): Promise<string> {
+    private async readSSEStream(response: Response, controller: AbortController, idleTimeoutMs: number): Promise<string> {
         if (!response.body) throw new Error('LM Studio returned no response body');
 
         const reader = response.body.getReader();
@@ -231,11 +237,18 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
         let content = '';
         let buffer = '';
 
+        let idleTimer = setTimeout(() => controller.abort(), idleTimeoutMs);
+        const resetIdle = (): void => {
+            clearTimeout(idleTimer);
+            idleTimer = setTimeout(() => controller.abort(), idleTimeoutMs);
+        };
+
         try {
             while (true) {
                 const { done, value } = await reader.read();
                 if (done) break;
 
+                resetIdle();
                 buffer += decoder.decode(value, { stream: true });
                 const lines = buffer.split('\n');
                 buffer = lines.pop() ?? '';
@@ -254,6 +267,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
                 }
             }
         } finally {
+            clearTimeout(idleTimer);
             reader.releaseLock();
         }
 
