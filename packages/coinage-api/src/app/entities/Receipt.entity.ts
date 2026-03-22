@@ -9,6 +9,7 @@ export enum ReceiptProcessingStatus {
     NONE = 'NONE',
     PENDING = 'PENDING',
     PROCESSING = 'PROCESSING',
+    EXTRACTED = 'EXTRACTED',
     PROCESSED = 'PROCESSED',
     DUPLICATE = 'DUPLICATE',
     ERROR = 'ERROR',

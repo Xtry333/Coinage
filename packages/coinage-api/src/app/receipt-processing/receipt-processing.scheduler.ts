@@ -4,6 +4,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { ReceiptDao } from '../daos/receipt.dao';
 import { ReceiptProcessingStatus } from '../entities/Receipt.entity';
+import { MatchExtractedReceiptCommand } from './commands/match-extracted-receipt.command';
 import { ProcessPendingReceiptCommand } from './commands/process-pending-receipt.command';
 import { OllamaService } from './services/ollama.service';
 
@@ -34,23 +35,26 @@ export class ReceiptProcessingScheduler implements OnModuleInit {
 
         this.isRunning = true;
 
-        const pending = await this.receiptDao.getPending();
-        if (pending.length === 0) {
+        const [pending, extracted] = await Promise.all([this.receiptDao.getPending(), this.receiptDao.getExtracted()]);
+        if (pending.length === 0 && extracted.length === 0) {
             this.isRunning = false;
             return;
         }
 
-        this.logger.log(`Found ${pending.length} pending receipt(s), checking AI availability...`);
+        this.logger.log(`Found ${pending.length} pending, ${extracted.length} extracted — checking AI availability...`);
 
         const available = await this.ollamaService.isAvailable();
         if (!available) {
-            this.logger.warn(`AI not available — ${pending.length} receipt(s) will remain PENDING`);
+            this.logger.warn(`AI not available — ${pending.length} pending, ${extracted.length} extracted receipt(s) will wait`);
             this.isRunning = false;
             return;
         }
-        this.logger.log(`Ollama available — processing ${pending.length} pending receipt(s)`);
+        this.logger.log(`AI available — processing ${pending.length} pending + ${extracted.length} extracted receipt(s)`);
 
         try {
+            for (const receipt of extracted) {
+                await this.commandBus.execute(new MatchExtractedReceiptCommand(receipt.id));
+            }
             for (const receipt of pending) {
                 if (!receipt.imagePath) {
                     this.logger.warn(`Receipt ${receipt.id} has no image path, skipping`);

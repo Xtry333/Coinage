@@ -58,6 +58,13 @@ export class ReceiptDao extends BaseDao {
         });
     }
 
+    public async getExtracted(): Promise<Receipt[]> {
+        return this.receiptRepository.find({
+            where: { processingStatus: ReceiptProcessingStatus.EXTRACTED },
+            order: { id: 'ASC' },
+        });
+    }
+
     public async resetStuckProcessing(): Promise<number> {
         const result = await this.receiptRepository.update(
             { processingStatus: ReceiptProcessingStatus.PROCESSING },

@@ -17,6 +17,7 @@ import { User } from '../entities/User.entity';
 import { ItemsWithContainers } from '../entities/views/ItemsWithContainers.view';
 import { EventsGateway } from '../events/events.gateway';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+import { MatchExtractedReceiptHandler } from './commands/handlers/match-extracted-receipt.handler';
 import { ProcessPendingReceiptHandler } from './commands/handlers/process-pending-receipt.handler';
 import { ReceiptErrorHandler } from './events/handlers/receipt-error.handler';
 import { ReceiptProcessedHandler } from './events/handlers/receipt-processed.handler';
@@ -25,7 +26,7 @@ import { ReceiptProcessingScheduler } from './receipt-processing.scheduler';
 import { OllamaService } from './services/ollama.service';
 import { ReceiptNormalizationService } from './services/receipt-normalization.service';
 
-const CommandHandlers = [ProcessPendingReceiptHandler];
+const CommandHandlers = [ProcessPendingReceiptHandler, MatchExtractedReceiptHandler];
 const EventHandlers = [ReceiptQueuedHandler, ReceiptProcessedHandler, ReceiptErrorHandler];
 
 @Module({
