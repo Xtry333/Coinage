@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ReceiptDetailsDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferType } from '@app/interfaces';
+import { ReceiptAiResultDTO, ReceiptDetailsDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferType } from '@app/interfaces';
 import { Subscription } from 'rxjs';
 
 import { ActivatedRoute } from '@angular/router';
@@ -20,7 +20,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
     public uploadStatus: 'idle' | 'uploading' | 'duplicate' | 'queued' | 'processing' | 'processed' | 'error' = 'idle';
     public uploadMessage = '';
     public duplicateReceiptId?: number;
-    public aiExtractedData?: unknown;
+    public aiExtractedData?: ReceiptAiResultDTO;
     public processingStatus?: ReceiptProcessingStatus;
 
     private socketSubs: Subscription[] = [];
@@ -61,7 +61,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
         const processing = this.socketService.fromEvent<{ receiptId: number }>('receiptProcessing').subscribe((data) => {
             if (data.receiptId === id) this.uploadStatus = 'processing';
         });
-        const processed = this.socketService.fromEvent<{ receiptId: number; aiData: object }>('receiptProcessed').subscribe((data) => {
+        const processed = this.socketService.fromEvent<{ receiptId: number; aiData: ReceiptAiResultDTO }>('receiptProcessed').subscribe((data) => {
             if (data.receiptId === id) {
                 this.uploadStatus = 'processed';
                 this.aiExtractedData = data.aiData;
@@ -80,7 +80,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
         try {
             const result = await this.coinageData.getReceiptStatus(id);
             this.processingStatus = result.status;
-            this.aiExtractedData = result.aiData;
+            this.aiExtractedData = result.aiData as ReceiptAiResultDTO | undefined;
             if (result.status === ReceiptProcessingStatus.PENDING) this.uploadStatus = 'queued';
             else if (result.status === ReceiptProcessingStatus.PROCESSING) this.uploadStatus = 'processing';
             else if (result.status === ReceiptProcessingStatus.EXTRACTED) this.uploadStatus = 'processing';
@@ -115,6 +115,14 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
         }
 
         input.value = '';
+    }
+
+    public onTransfersCreated(): void {
+        if (this.receiptId) {
+            this.coinageData.getReceiptDetails(this.receiptId).then((receipt) => {
+                this.receiptDetails = receipt;
+            });
+        }
     }
 
     public get receiptDirectionDisplaySymbol(): string {

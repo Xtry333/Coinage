@@ -1,0 +1,199 @@
+<div class="mt-4 space-y-4">
+    <!-- Header: Summary -->
+    <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">AI Extraction Results</h3>
+            <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="confidenceClass">
+                {{ confidencePercent }}% confidence
+            </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
+            <div>
+                <span class="text-gray-500">Date</span>
+                <p class="font-medium">{{ aiData.normalized.date ?? 'Unknown' }}</p>
+            </div>
+            <div>
+                <span class="text-gray-500">Contractor</span>
+                <p class="font-medium">
+                    {{ aiData.normalized.contractorName ?? 'Unknown' }}
+                    @if (aiData.normalized.isNewContractor) {
+                        <span class="ml-1 rounded bg-yellow-100 px-1.5 py-0.5 text-xs text-yellow-700">New</span>
+                    } @else {
+                        <span class="ml-1 rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700">Matched</span>
+                    }
+                </p>
+            </div>
+            <div>
+                <span class="text-gray-500">Total Amount</span>
+                <p class="font-medium">{{ aiData.normalized.amount | plnCurrency }}</p>
+            </div>
+            <div>
+                <span class="text-gray-500">Items</span>
+                <p class="font-medium">
+                    {{ items.length }} total
+                    <span class="text-green-600">({{ matchedCount }} matched)</span>
+                    @if (newCount > 0) {
+                        <span class="text-yellow-600">({{ newCount }} new)</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Account & Date Selection -->
+    <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <h4 class="mb-3 text-sm font-semibold text-gray-700">Transfer Details</h4>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div>
+                <label class="mb-1 block text-sm text-gray-600" for="reviewAccountSelect">Account</label>
+                <ng-select
+                    [(ngModel)]="selectedAccountId"
+                    [items]="accounts"
+                    [clearable]="false"
+                    bindValue="id"
+                    bindLabel="name"
+                    placeholder="Select account..."
+                    labelForId="reviewAccountSelect"
+                ></ng-select>
+            </div>
+            <div>
+                <label class="mb-1 block text-sm text-gray-600" for="reviewDateInput">Date</label>
+                <input
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="reviewDateInput"
+                    [(ngModel)]="overrideDate"
+                    type="date"
+                />
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="rounded-lg border border-gray-200 bg-white">
+        <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+            <h4 class="text-sm font-semibold text-gray-700">Extracted Items</h4>
+            <div class="flex gap-2">
+                <button
+                    class="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
+                    (click)="toggleAll(true)"
+                    type="button"
+                >
+                    Select All
+                </button>
+                <button
+                    class="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
+                    (click)="toggleAll(false)"
+                    type="button"
+                >
+                    Deselect All
+                </button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                    <tr>
+                        <th class="px-4 py-2 w-10"></th>
+                        <th class="px-4 py-2">Status</th>
+                        <th class="px-4 py-2">Item Name</th>
+                        <th class="px-4 py-2 text-right">Qty</th>
+                        <th class="px-4 py-2 text-right">Unit Price</th>
+                        <th class="px-4 py-2 text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of items; track item.name; let i = $index) {
+                        <tr
+                            class="border-t border-gray-100 transition-colors"
+                            [class.opacity-40]="!item.included"
+                            [class.bg-white]="item.included"
+                            [class.bg-gray-50]="!item.included"
+                        >
+                            <td class="px-4 py-2.5">
+                                <input
+                                    type="checkbox"
+                                    [checked]="item.included"
+                                    (change)="toggleItem(item)"
+                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                />
+                            </td>
+                            <td class="px-4 py-2.5">
+                                @if (item.isNew) {
+                                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
+                                        New
+                                    </span>
+                                } @else {
+                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+                                        Matched
+                                    </span>
+                                }
+                            </td>
+                            <td class="px-4 py-2.5">
+                                <span class="font-medium text-gray-900">{{ item.name }}</span>
+                                @if (item.brand) {
+                                    <span class="ml-1 text-xs text-gray-400">{{ item.brand }}</span>
+                                }
+                                @if (item.suggestedContainer) {
+                                    <span class="ml-1 text-xs text-gray-400">
+                                        ({{ item.suggestedContainer.containerName }})
+                                    </span>
+                                }
+                            </td>
+                            <td class="px-4 py-2.5 text-right font-mono text-gray-700">{{ item.quantity }}</td>
+                            <td class="px-4 py-2.5 text-right font-mono text-gray-700">
+                                {{ item.price | plnCurrency }}
+                            </td>
+                            <td class="px-4 py-2.5 text-right font-mono font-medium text-gray-900">
+                                {{ item.price * item.quantity | plnCurrency }}
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="border-t-2 border-gray-200 bg-gray-50 font-semibold">
+                        <td class="px-4 py-2.5" colspan="5" class="px-4 py-2.5 text-right text-gray-700">
+                            Selected Total ({{ includedItems.length }} items)
+                        </td>
+                        <td class="px-4 py-2.5 text-right font-mono text-gray-900">
+                            {{ totalAmount | plnCurrency }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between">
+        <button
+            class="text-sm text-gray-500 underline hover:text-gray-700"
+            (click)="showRawJson = !showRawJson"
+            type="button"
+        >
+            {{ showRawJson ? 'Hide' : 'Show' }} raw AI data
+        </button>
+
+        <button
+            class="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="isSubmitting || !selectedAccountId || includedItems.length === 0"
+            (click)="onConfirm()"
+            type="button"
+        >
+            @if (isSubmitting) {
+                Creating...
+            } @else {
+                Create {{ includedItems.length }} Transfer(s)
+            }
+        </button>
+    </div>
+
+    <!-- Raw JSON (collapsible) -->
+    @if (showRawJson) {
+        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <h4 class="mb-2 text-sm font-semibold text-gray-700">Raw AI Extraction</h4>
+            <pre class="overflow-auto whitespace-pre-wrap text-xs text-gray-600">{{ aiData.raw | json }}</pre>
+        </div>
+    }
+</div>

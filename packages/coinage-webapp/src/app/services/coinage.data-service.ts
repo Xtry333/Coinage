@@ -10,6 +10,7 @@ import {
     BulkDeleteTransferDTO,
     BulkEditTransferDTO,
     CategoryDTO,
+    ConfirmReceiptDTO,
     ContainerDTO,
     ContractorDTO,
     CreateEditCategoryDTO,
@@ -253,5 +254,9 @@ export class CoinageDataService {
     // Receipt methods
     public getAllReceipts(): Observable<ReceiptDTO[]> {
         return this.http.get<ReceiptDTO[]>(`${CoinageDataService.API_URL}receipts/all`);
+    }
+
+    public confirmReceipt(receiptId: number, body: ConfirmReceiptDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}receipt/${receiptId}/confirm`, body));
     }
 }

@@ -79,13 +79,15 @@
                 </div>
             }
 
-            @if (uploadStatus === 'processed' && aiExtractedData) {
-                <div class="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
-                    <h4 class="text-sm font-semibold text-green-800 mb-2">AI Extracted Data</h4>
-                    <pre class="text-xs text-green-700 overflow-auto whitespace-pre-wrap">{{ aiExtractedData | json }}</pre>
-                </div>
-            }
         </div>
+
+        @if (aiExtractedData?.normalized && receiptId) {
+            <app-receipt-ai-review
+                [receiptId]="receiptId"
+                [aiData]="aiExtractedData"
+                (transfersCreated)="onTransfersCreated()"
+            ></app-receipt-ai-review>
+        }
 
         <app-transfers-table
             [header]="'Transfers in receipt'"

@@ -1,5 +1,5 @@
-import { ReceiptDTO, ReceiptDetailsDTO, ReceiptPendingDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferDTO, TransferType } from '@app/interfaces';
-import { BadRequestException, Controller, Get, Param, ParseIntPipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BaseResponseDTO, ConfirmReceiptDTO, ReceiptDTO, ReceiptDetailsDTO, ReceiptPendingDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferDTO, TransferType } from '@app/interfaces';
+import { BadRequestException, Body, Controller, Get, Logger, Param, ParseIntPipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createHash } from 'crypto';
@@ -7,11 +7,19 @@ import { readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 
+import { AccountDao } from '../daos/account.dao';
+import { CategoryDao } from '../daos/category.dao';
+import { ContractorDao } from '../daos/contractor.dao';
+import { ItemDao } from '../daos/item.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
+import { Item } from '../entities/Item.entity';
 import { Receipt, ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
 import { Transfer } from '../entities/Transfer.entity';
+import { TransferItem } from '../entities/TransferItem.entity';
+import { User } from '../entities/User.entity';
 import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.event';
-import { AuthGuard } from '../services/auth.guard';
+import { AuthGuard, RequestingUser } from '../services/auth.guard';
+import { TransfersService } from '../services/transfers.service';
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads', 'receipts');
 
@@ -43,9 +51,16 @@ const multerStorage = diskStorage({
 @UseGuards(AuthGuard)
 @Controller('receipt(s)?')
 export class ReceiptsController {
+    private readonly logger = new Logger(ReceiptsController.name);
+
     public constructor(
         private readonly receiptDao: ReceiptDao,
         private readonly eventBus: EventBus,
+        private readonly accountDao: AccountDao,
+        private readonly categoryDao: CategoryDao,
+        private readonly contractorDao: ContractorDao,
+        private readonly itemDao: ItemDao,
+        private readonly transfersService: TransfersService,
     ) {}
 
     @Post()
@@ -140,6 +155,97 @@ export class ReceiptsController {
             contractor: receipt.contractor?.name,
             transferIds: receipt.transfers?.map((t) => t.id) || [],
         }));
+    }
+
+    @Post(':id/confirm')
+    public async confirmReceipt(
+        @RequestingUser() user: User,
+        @Param('id', ParseIntPipe) id: number,
+        @Body() body: ConfirmReceiptDTO,
+    ): Promise<BaseResponseDTO> {
+        const receipt = await this.receiptDao.getById(id);
+        const account = await this.accountDao.getById(body.accountId);
+        const contractor = body.contractorId ? await this.contractorDao.getById(body.contractorId) : null;
+        const date = new Date(body.date);
+
+        const includedItems = body.items.filter((i) => i.included);
+        if (includedItems.length === 0) {
+            throw new BadRequestException('No items selected');
+        }
+
+        // Resolve item IDs: create new items if needed
+        const resolvedItems: Array<{ itemId: number; price: number; quantity: number; categoryId: number }> = [];
+        for (const item of includedItems) {
+            let itemId = item.itemId;
+            let categoryId: number | null = null;
+
+            if (item.isNew || !itemId) {
+                const newItem = new Item();
+                newItem.name = item.name;
+                newItem.brand = null;
+                newItem.categoryId = null;
+                const saved = await this.itemDao.save(newItem);
+                itemId = saved.id;
+                this.logger.log(`Created new item "${item.name}" with id ${itemId}`);
+            }
+
+            // Get category from item
+            const dbItem = await this.itemDao.getById(itemId);
+            categoryId = dbItem.categoryId ?? (await this.categoryDao.getAll())[0]?.id ?? 1;
+
+            resolvedItems.push({ itemId, price: item.price, quantity: item.quantity, categoryId });
+        }
+
+        // Group by category and create transfers
+        const categoryMap = new Map<number, typeof resolvedItems>();
+        for (const item of resolvedItems) {
+            const group = categoryMap.get(item.categoryId) ?? [];
+            group.push(item);
+            categoryMap.set(item.categoryId, group);
+        }
+
+        const transferIds: number[] = [];
+        for (const [categoryId, items] of categoryMap) {
+            const category = await this.categoryDao.getById(categoryId);
+
+            const transfer = new Transfer();
+            transfer.amount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+            transfer.currency = account.currency;
+            transfer.date = date;
+            transfer.categoryId = category.id;
+            transfer.type = category.type;
+            transfer.contractorId = contractor?.id ?? null;
+            transfer.ownerUserId = user.id;
+            transfer.originAccountId = account.id;
+            transfer.targetAccountId = 17; // TODO: Fix this
+            transfer.receiptId = receipt.id;
+            transfer.isEthereal = true;
+
+            await this.transfersService.saveTransfer(transfer);
+
+            transfer.transferItems = items.map((item) => {
+                const ti = new TransferItem();
+                ti.transferId = transfer.id;
+                ti.itemId = item.itemId;
+                ti.quantity = item.quantity;
+                ti.unitPrice = item.price;
+                ti.totalSetPrice = item.price * item.quantity;
+                ti.totalSetDiscount = 0;
+                return ti;
+            });
+
+            const saved = await this.transfersService.saveTransfer(transfer);
+            transferIds.push(saved.id);
+        }
+
+        // Update receipt with confirmed data
+        receipt.amount = resolvedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+        receipt.date = date;
+        receipt.contractorId = contractor?.id ?? null;
+        await this.receiptDao.save(receipt);
+
+        this.logger.log(`Receipt ${id} confirmed: ${transferIds.length} transfer(s) created`);
+        return { insertedIds: transferIds };
     }
 
     @Get(':id/details')
