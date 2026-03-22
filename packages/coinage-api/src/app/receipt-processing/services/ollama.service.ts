@@ -48,8 +48,8 @@ export class OllamaService {
             this.model = process.env['OLLAMA_MODEL'] ?? 'llava';
         }
 
-        this.timeoutMs = parseInt(process.env['OLLAMA_TIMEOUT_MS'] ?? '300000');
-        this.resolveTimeoutMs = parseInt(process.env['OLLAMA_RESOLVE_TIMEOUT_MS'] ?? '60000');
+        this.timeoutMs = parseInt(process.env['OLLAMA_TIMEOUT_MS'] ?? '600000');
+        this.resolveTimeoutMs = parseInt(process.env['OLLAMA_RESOLVE_TIMEOUT_MS'] ?? '120000');
     }
 
     public async isAvailable(): Promise<boolean> {
@@ -180,6 +180,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: this.model,
+                stream: true,
                 messages: [
                     {
                         role: 'user',
@@ -189,7 +190,6 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
                         ],
                     },
                 ],
-                response_format: { type: 'text' },
             }),
             signal: controller.signal,
         });
@@ -198,8 +198,7 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
             throw new Error(`LM Studio responded with ${response.status}: ${await response.text()}`);
         }
 
-        const result = (await response.json()) as { choices: Array<{ message: { content: string } }> };
-        return result.choices[0].message.content;
+        return this.readSSEStream(response);
     }
 
     private async callLMStudioText(prompt: string, controller: AbortController): Promise<string | null> {
@@ -208,16 +207,57 @@ Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 model: this.model,
+                stream: true,
                 messages: [{ role: 'user', content: prompt }],
-                response_format: { type: 'text' },
             }),
             signal: controller.signal,
         });
 
         if (!response.ok) return null;
 
-        const result = (await response.json()) as { choices: Array<{ message: { content: string } }> };
-        return result.choices[0].message.content;
+        return this.readSSEStream(response);
+    }
+
+    /**
+     * Reads an OpenAI-compatible SSE stream and assembles the full content string.
+     * Streaming keeps the TCP connection alive during long LLM generation,
+     * preventing idle-connection timeouts on slow models.
+     */
+    private async readSSEStream(response: Response): Promise<string> {
+        if (!response.body) throw new Error('LM Studio returned no response body');
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let content = '';
+        let buffer = '';
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                buffer += decoder.decode(value, { stream: true });
+                const lines = buffer.split('\n');
+                buffer = lines.pop() ?? '';
+
+                for (const line of lines) {
+                    if (!line.startsWith('data: ')) continue;
+                    const data = line.slice(6).trim();
+                    if (data === '[DONE]') return content;
+
+                    try {
+                        const chunk = JSON.parse(data) as { choices: Array<{ delta: { content?: string } }> };
+                        content += chunk.choices[0]?.delta?.content ?? '';
+                    } catch {
+                        // malformed chunk — skip
+                    }
+                }
+            }
+        } finally {
+            reader.releaseLock();
+        }
+
+        return content;
     }
 
     // ── Shared ───────────────────────────────────────────────────────────────
