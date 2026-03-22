@@ -16,7 +16,7 @@ import { OllamaExtractedData, OllamaService } from './ollama.service';
 /** Top N fuzzy candidates to send to AI on first attempt. */
 const FIRST_PASS_CANDIDATES = 8;
 /** Top N fuzzy candidates to send to AI on retry. */
-const RETRY_PASS_CANDIDATES = 3;
+const RETRY_PASS_CANDIDATES = 30;
 /** Score above which the fuzzy match is accepted without an AI call. */
 const AUTO_MATCH_THRESHOLD = 0.92;
 /** Minimum AI confidence to accept a match. */
