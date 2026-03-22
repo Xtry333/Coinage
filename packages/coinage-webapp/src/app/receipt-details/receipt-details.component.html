@@ -84,7 +84,7 @@
         @if (aiExtractedData?.normalized && receiptId) {
             <app-receipt-ai-review
                 [receiptId]="receiptId"
-                [aiData]="aiExtractedData"
+                [aiData]="aiExtractedData!"
                 (transfersCreated)="onTransfersCreated()"
             ></app-receipt-ai-review>
         }
