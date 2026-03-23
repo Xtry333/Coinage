@@ -46,7 +46,7 @@
         <div class="rounded-lg border border-gray-200 bg-white">
             <button
                 class="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold text-gray-700 hover:bg-gray-50"
-                (click)="showReceiptImage = !showReceiptImage"
+                (click)="toggleReceiptImage()"
                 type="button"
             >
                 <span>Receipt Image</span>
@@ -62,11 +62,15 @@
             </button>
             @if (showReceiptImage) {
                 <div class="border-t border-gray-100 p-4">
-                    <img
-                        class="mx-auto max-h-[70vh] w-auto rounded border border-gray-200 object-contain shadow-sm"
-                        [src]="imageUrl"
-                        alt="Receipt image"
-                    />
+                    @if (imageLoading) {
+                        <p class="text-center text-sm text-gray-400">Loading image...</p>
+                    } @else if (receiptImageSafeUrl) {
+                        <img
+                            class="mx-auto max-h-[70vh] w-auto rounded border border-gray-200 object-contain shadow-sm"
+                            [src]="receiptImageSafeUrl"
+                            alt="Receipt image"
+                        />
+                    }
                 </div>
             }
         </div>

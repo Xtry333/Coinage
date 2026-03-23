@@ -1,4 +1,6 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 import { AccountDTO, ConfirmReceiptDTO, ConfirmReceiptItemDTO, NormalizedReceiptItemDTO, ReceiptAiResultDTO } from '@app/interfaces';
 
@@ -19,7 +21,7 @@ export interface ReviewItem extends NormalizedReceiptItemDTO {
     styleUrls: ['./receipt-ai-review.component.scss'],
     standalone: false,
 })
-export class ReceiptAiReviewComponent implements OnInit {
+export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
     @Input() public receiptId!: number;
     @Input() public aiData!: ReceiptAiResultDTO;
     @Input() public rawLlmResponse?: string | null;
@@ -34,10 +36,15 @@ export class ReceiptAiReviewComponent implements OnInit {
     public isSubmitting = false;
     public showRawData = false;
     public showReceiptImage = false;
+    public receiptImageSafeUrl?: SafeUrl;
+    public imageLoading = false;
+    private _receiptImageObjectUrl?: string;
 
     public constructor(
         private readonly dataService: CoinageDataService,
         private readonly notificationService: NotificationService,
+        private readonly http: HttpClient,
+        private readonly sanitizer: DomSanitizer,
     ) {}
 
     public ngOnInit(): void {
@@ -83,6 +90,29 @@ export class ReceiptAiReviewComponent implements OnInit {
         if (this.confidence >= 0.8) return 'text-green-700 bg-green-100';
         if (this.confidence >= 0.5) return 'text-yellow-700 bg-yellow-100';
         return 'text-red-700 bg-red-100';
+    }
+
+    public ngOnDestroy(): void {
+        if (this._receiptImageObjectUrl) {
+            URL.revokeObjectURL(this._receiptImageObjectUrl);
+        }
+    }
+
+    public toggleReceiptImage(): void {
+        this.showReceiptImage = !this.showReceiptImage;
+        if (this.showReceiptImage && !this._receiptImageObjectUrl && this.imageUrl) {
+            this.imageLoading = true;
+            this.http.get(this.imageUrl, { responseType: 'blob' }).subscribe({
+                next: (blob) => {
+                    this._receiptImageObjectUrl = URL.createObjectURL(blob);
+                    this.receiptImageSafeUrl = this.sanitizer.bypassSecurityTrustUrl(this._receiptImageObjectUrl);
+                    this.imageLoading = false;
+                },
+                error: () => {
+                    this.imageLoading = false;
+                },
+            });
+        }
     }
 
     public toggleItem(item: ReviewItem): void {
