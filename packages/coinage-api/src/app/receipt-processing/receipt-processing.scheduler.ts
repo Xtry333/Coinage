@@ -3,7 +3,6 @@ import { CommandBus } from '@nestjs/cqrs';
 import { Cron, CronExpression } from '@nestjs/schedule';
 
 import { ReceiptDao } from '../daos/receipt.dao';
-import { ReceiptProcessingStatus } from '../entities/Receipt.entity';
 import { MatchExtractedReceiptCommand } from './commands/match-extracted-receipt.command';
 import { ProcessPendingReceiptCommand } from './commands/process-pending-receipt.command';
 import { OllamaService } from './services/ollama.service';

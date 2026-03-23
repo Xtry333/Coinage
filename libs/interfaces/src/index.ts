@@ -34,5 +34,5 @@ export * from './model/PartialDate';
 
 export * from './utils/Expand';
 
-export * from './lib/ReceiptImageDTO';
 export * from './lib/ReceiptAiReviewDTO';
+export * from './lib/ReceiptImageDTO';

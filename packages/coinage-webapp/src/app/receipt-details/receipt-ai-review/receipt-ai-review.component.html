@@ -3,9 +3,7 @@
     <div class="rounded-lg border border-gray-200 bg-white p-4">
         <div class="mb-3 flex items-center justify-between">
             <h3 class="text-lg font-semibold text-gray-900">AI Extraction Results</h3>
-            <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="confidenceClass">
-                {{ confidencePercent }}% confidence
-            </span>
+            <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="confidenceClass"> {{ confidencePercent }}% confidence </span>
         </div>
 
         <div class="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
@@ -109,20 +107,8 @@
         <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
             <h4 class="text-sm font-semibold text-gray-700">Extracted Items <span class="ml-1 font-normal text-gray-400">(editable)</span></h4>
             <div class="flex gap-2">
-                <button
-                    class="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
-                    (click)="toggleAll(true)"
-                    type="button"
-                >
-                    Select All
-                </button>
-                <button
-                    class="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-50"
-                    (click)="toggleAll(false)"
-                    type="button"
-                >
-                    Deselect All
-                </button>
+                <button class="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50" (click)="toggleAll(true)" type="button">Select All</button>
+                <button class="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-50" (click)="toggleAll(false)" type="button">Deselect All</button>
             </div>
         </div>
 
@@ -140,18 +126,14 @@
                 </thead>
                 <tbody>
                     @for (item of items; track item.name; let i = $index) {
-                        <tr
-                            class="border-t border-gray-100 transition-colors"
-                            [class.opacity-50]="!item.included"
-                            [class.bg-gray-50]="!item.included"
-                        >
+                        <tr class="border-t border-gray-100 transition-colors" [class.opacity-50]="!item.included" [class.bg-gray-50]="!item.included">
                             <!-- Checkbox -->
                             <td class="px-3 py-2">
                                 <input
-                                    type="checkbox"
+                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                     [checked]="item.included"
                                     (change)="toggleItem(item)"
-                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    type="checkbox"
                                 />
                             </td>
 
@@ -160,7 +142,9 @@
                                 @if (item.isNew) {
                                     <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">New</span>
                                 } @else {
-                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Matched</span>
+                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                                        >Matched</span
+                                    >
                                 }
                             </td>
 
@@ -169,9 +153,9 @@
                                 <input
                                     class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-sm text-gray-900 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
                                     [(ngModel)]="item.name"
+                                    [title]="item.brand ? 'Brand: ' + item.brand : ''"
                                     (ngModelChange)="onNameChange(item)"
                                     type="text"
-                                    [title]="item.brand ? 'Brand: ' + item.brand : ''"
                                 />
                                 @if (item.suggestedContainer) {
                                     <div class="mt-0.5 text-xs text-gray-400">{{ item.suggestedContainer.containerName }}</div>
@@ -218,9 +202,7 @@
                 </tbody>
                 <tfoot>
                     <tr class="border-t-2 border-gray-200 bg-gray-50 font-semibold">
-                        <td colspan="5" class="px-3 py-2 text-right text-gray-700 text-sm">
-                            Selected Total ({{ includedItems.length }} items)
-                        </td>
+                        <td class="px-3 py-2 text-right text-sm text-gray-700" colspan="5">Selected Total ({{ includedItems.length }} items)</td>
                         <td class="px-3 py-2 text-right font-mono text-gray-900">
                             {{ totalAmount | plnCurrency }}
                         </td>
@@ -233,11 +215,7 @@
     <!-- Actions -->
     <div class="flex items-center justify-between">
         <div class="flex items-center gap-3">
-            <button
-                class="text-sm text-gray-500 underline hover:text-gray-700"
-                (click)="showRawData = !showRawData"
-                type="button"
-            >
+            <button class="text-sm text-gray-500 underline hover:text-gray-700" (click)="showRawData = !showRawData" type="button">
                 {{ showRawData ? 'Hide' : 'Show' }} Raw AI Data
             </button>
             <button
@@ -248,7 +226,12 @@
                 type="button"
             >
                 <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
                 </svg>
                 Retry AI
             </button>
@@ -275,14 +258,18 @@
             @if (rawLlmResponse) {
                 <div>
                     <h4 class="mb-1 text-sm font-semibold text-gray-700">Raw LLM Response</h4>
-                    <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{ rawLlmResponse }}</pre>
+                    <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{
+                        rawLlmResponse
+                    }}</pre>
                 </div>
             }
 
             <!-- Parsed JSON extraction -->
             <div>
                 <h4 class="mb-1 text-sm font-semibold text-gray-700">Parsed Extraction (JSON)</h4>
-                <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{ aiData.raw | json }}</pre>
+                <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{
+                    aiData.raw | json
+                }}</pre>
             </div>
         </div>
     }

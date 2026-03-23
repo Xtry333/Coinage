@@ -3,8 +3,8 @@ import { ReceiptAiResultDTO, ReceiptDetailsDTO, ReceiptProcessingStatus, Receipt
 import { Subscription } from 'rxjs';
 
 import { ActivatedRoute } from '@angular/router';
-import { CoinageDataService } from '../services/coinage.data-service';
 import { NavigatorService } from '../app-routing/navigator.service';
+import { CoinageDataService } from '../services/coinage.data-service';
 import { SocketService } from '../services/socket.service';
 
 @Component({
@@ -149,25 +149,39 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
 
     public get statusLabel(): string {
         switch (this.uploadStatus) {
-            case 'uploading': return 'Uploading...';
-            case 'duplicate': return 'Duplicate image';
-            case 'queued': return 'Queued for AI';
-            case 'processing': return 'AI processing...';
-            case 'processed': return 'AI processed';
-            case 'error': return 'Error';
-            default: return '';
+            case 'uploading':
+                return 'Uploading...';
+            case 'duplicate':
+                return 'Duplicate image';
+            case 'queued':
+                return 'Queued for AI';
+            case 'processing':
+                return 'AI processing...';
+            case 'processed':
+                return 'AI processed';
+            case 'error':
+                return 'Error';
+            default:
+                return '';
         }
     }
 
     public get statusClass(): string {
         switch (this.uploadStatus) {
-            case 'uploading': return 'bg-blue-100 text-blue-700';
-            case 'duplicate': return 'bg-yellow-100 text-yellow-700';
-            case 'queued': return 'bg-indigo-100 text-indigo-700';
-            case 'processing': return 'bg-purple-100 text-purple-700';
-            case 'processed': return 'bg-green-100 text-green-700';
-            case 'error': return 'bg-red-100 text-red-700';
-            default: return '';
+            case 'uploading':
+                return 'bg-blue-100 text-blue-700';
+            case 'duplicate':
+                return 'bg-yellow-100 text-yellow-700';
+            case 'queued':
+                return 'bg-indigo-100 text-indigo-700';
+            case 'processing':
+                return 'bg-purple-100 text-purple-700';
+            case 'processed':
+                return 'bg-green-100 text-green-700';
+            case 'error':
+                return 'bg-red-100 text-red-700';
+            default:
+                return '';
         }
     }
 }

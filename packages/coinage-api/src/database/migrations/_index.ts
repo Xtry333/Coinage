@@ -7,12 +7,12 @@ import { NonNullTargetTransfer1678491536904 } from './1678491536904-NonNullTarge
 import { AddSchedule1708475125634 } from './1708475125634-AddSchedule';
 import { AddScheduleCounts1708476166410 } from './1708476166410-AddScheduleCounts';
 import { AddPasswords1708644980026 } from './1708644980026-AddPasswords';
+import { AddReceiptImageProcessing1741305600000 } from './1741305600000-AddReceiptImageProcessing';
 import { AddContainerTable1745336625326 } from './1745336625326-AddContainerTable';
 import { AddItemsWithContainersView1745754622461 } from './1745754622461-AddItemsWithContainersView';
 import { AddItemCount1751894045445 } from './1751894045445-AddItemCount';
 import { AdjustItemView1754863716132 } from './1754863716132-migration';
 import { UpdateContainersView1755864881273 } from './1755864881273-UpdateContainersView';
-import { AddReceiptImageProcessing1741305600000 } from './1741305600000-AddReceiptImageProcessing';
 import { AddTagTable1756400000000 } from './1756400000000-AddTagTable';
 import { AddReceiptExtractedStatus1756500000000 } from './1756500000000-AddReceiptExtractedStatus';
 import { AddRawAiResponseColumn1756600000000 } from './1756600000000-AddRawAiResponseColumn';

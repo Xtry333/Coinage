@@ -30,10 +30,7 @@ const CommandHandlers = [ProcessPendingReceiptHandler, MatchExtractedReceiptHand
 const EventHandlers = [ReceiptQueuedHandler, ReceiptProcessedHandler, ReceiptErrorHandler];
 
 @Module({
-    imports: [
-        CqrsModule,
-        TypeOrmModule.forFeature([Receipt, Category, Contractor, Item, Container, User, ItemsWithContainers]),
-    ],
+    imports: [CqrsModule, TypeOrmModule.forFeature([Receipt, Category, Contractor, Item, Container, User, ItemsWithContainers])],
     providers: [
         OllamaService,
         ReceiptNormalizationService,

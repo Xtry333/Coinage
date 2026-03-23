@@ -31,7 +31,11 @@ export function makeItem(id: number, name: string, opts?: { brand?: string; cate
     return i;
 }
 
-export function makeContainer(id: number, name: string, opts?: { volume?: number; volumeUnit?: string; weight?: number; weightUnit?: string; itemCount?: number }): Container {
+export function makeContainer(
+    id: number,
+    name: string,
+    opts?: { volume?: number; volumeUnit?: string; weight?: number; weightUnit?: string; itemCount?: number },
+): Container {
     const c = new Container();
     c.id = id;
     c.name = name;

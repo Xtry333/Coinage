@@ -37,7 +37,9 @@ export class MatchExtractedReceiptHandler implements ICommandHandler<MatchExtrac
         try {
             const normalized = await this.normalizationService.normalize(rawData);
             const matchedCount = normalized.items.filter((i) => !i.isNew).length;
-            this.logger.log(`Receipt ${receiptId} matched — ${matchedCount}/${normalized.items.length} items matched, contractor ${normalized.isNewContractor ? 'NEW' : 'matched'}`);
+            this.logger.log(
+                `Receipt ${receiptId} matched — ${matchedCount}/${normalized.items.length} items matched, contractor ${normalized.isNewContractor ? 'NEW' : 'matched'}`,
+            );
 
             const aiData = { raw: rawData, normalized };
             await this.receiptDao.updateStatus(receiptId, ReceiptProcessingStatus.PROCESSED, aiData as object);

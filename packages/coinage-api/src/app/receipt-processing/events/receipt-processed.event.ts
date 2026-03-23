@@ -1,5 +1,5 @@
-import { NormalizedReceiptData } from '../services/receipt-normalization.service';
 import { OllamaExtractedData } from '../services/ollama.service';
+import { NormalizedReceiptData } from '../services/receipt-normalization.service';
 
 export interface ProcessedReceiptData {
     raw: OllamaExtractedData;

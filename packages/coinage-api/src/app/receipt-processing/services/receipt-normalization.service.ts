@@ -45,10 +45,10 @@ export interface SuggestedContainer {
 }
 
 export type ContainerConfidence =
-    | 'auto-single'      // Only one container ever used with this item
-    | 'price-match'      // Selected because its last price is closest to current receipt price
-    | 'dimension-match'  // Parsed volume/weight from OCR name matched an existing container
-    | 'none';            // Could not determine — user must pick
+    | 'auto-single' // Only one container ever used with this item
+    | 'price-match' // Selected because its last price is closest to current receipt price
+    | 'dimension-match' // Parsed volume/weight from OCR name matched an existing container
+    | 'none'; // Could not determine — user must pick
 
 export interface NormalizedItem {
     /** null means no existing item matched — a new Item should be created on confirmation. */
@@ -121,20 +121,14 @@ export class ReceiptNormalizationService {
     ) {}
 
     public async normalize(rawData: OllamaExtractedData): Promise<NormalizedReceiptData> {
-        const [categories, contractors, items] = await Promise.all([
-            this.categoryDao.getAll(),
-            this.contractorDao.getActive(),
-            this.itemDao.getAll(),
-        ]);
+        const [categories, contractors, items] = await Promise.all([this.categoryDao.getAll(), this.contractorDao.getActive(), this.itemDao.getAll()]);
 
         // Only use OUTCOME categories for receipt items (purchases)
         const outcomeCategories = categories.filter((c) => c.type === TransferTypeEnum.OUTCOME);
 
         const [contractorId, contractorName, isNewContractor] = await this.resolveContractor(rawData.contractor ?? null, contractors);
 
-        const normalizedItems = await Promise.all(
-            (rawData.items ?? []).map((item) => this.resolveItem(item, items, outcomeCategories)),
-        );
+        const normalizedItems = await Promise.all((rawData.items ?? []).map((item) => this.resolveItem(item, items, outcomeCategories)));
 
         return {
             date: rawData.date,
@@ -265,7 +259,9 @@ export class ReceiptNormalizationService {
             // 1. Try price proximity
             const priceMatch = this.findByPriceProximity(extractedPrice, historical);
             if (priceMatch) {
-                this.logger.debug(`Item "${resolvedItem.name}" container resolved by price proximity → "${priceMatch.suggested.name}" (lastPrice=${priceMatch.suggested.lastUnitPrice})`);
+                this.logger.debug(
+                    `Item "${resolvedItem.name}" container resolved by price proximity → "${priceMatch.suggested.name}" (lastPrice=${priceMatch.suggested.lastUnitPrice})`,
+                );
                 return {
                     suggestedContainer: priceMatch.suggested,
                     historicalContainers: historical.map((h) => h.suggested),
@@ -383,8 +379,9 @@ export class ReceiptNormalizationService {
     ): { suggested: SuggestedContainer } | null {
         if (receiptPrice <= 0) return null;
 
-        const withPrice = enriched
-            .filter((e): e is { suggested: SuggestedContainer; lastUnitPrice: number } => e.lastUnitPrice !== null && e.lastUnitPrice > 0);
+        const withPrice = enriched.filter(
+            (e): e is { suggested: SuggestedContainer; lastUnitPrice: number } => e.lastUnitPrice !== null && e.lastUnitPrice > 0,
+        );
         if (withPrice.length === 0) return null;
 
         const closest = withPrice.reduce((best, current) => {
@@ -505,7 +502,10 @@ export function parseContainerDimensions(name: string): ParsedDimensions | null 
  * Check whether a container's physical dimensions match parsed receipt dimensions.
  * Matches on volume OR weight. Exported for unit testing.
  */
-export function matchesDimensions(container: { volume?: number | null; volumeUnit?: string | null; weight?: number | null; weightUnit?: string | null; itemCount?: number | null }, parsed: ParsedDimensions): boolean {
+export function matchesDimensions(
+    container: { volume?: number | null; volumeUnit?: string | null; weight?: number | null; weightUnit?: string | null; itemCount?: number | null },
+    parsed: ParsedDimensions,
+): boolean {
     const volumeMatch =
         parsed.volume !== undefined &&
         container.volume !== null &&

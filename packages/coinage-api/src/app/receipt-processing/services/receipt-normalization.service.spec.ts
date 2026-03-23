@@ -1,10 +1,4 @@
-import {
-    makeCategory,
-    makeContractor,
-    makeItem,
-    makeContainer,
-    makeItemContainerPair,
-} from '@coinage-app/test/mock-generators/receipt-normalization.mock';
+import { makeCategory, makeContainer, makeContractor, makeItem, makeItemContainerPair } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 import { DataSource } from 'typeorm';
 
@@ -14,11 +8,7 @@ import { ItemDao } from '../../daos/item.dao';
 import { ItemsWithContainersDao } from '../../daos/itemsWithContainers.dao';
 import { TransferTypeEnum } from '../../entities/Category.entity';
 import { OllamaService } from './ollama.service';
-import {
-    matchesDimensions,
-    parseContainerDimensions,
-    ReceiptNormalizationService,
-} from './receipt-normalization.service';
+import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -282,7 +272,7 @@ describe('ReceiptNormalizationService', () => {
 
             ollamaService.resolveEntityMatch
                 .mockResolvedValueOnce({ matchedId: null, confidence: 0.4 }) // first pass: unconfident
-                .mockResolvedValueOnce({ matchedId: 1, confidence: 0.85 });  // retry: confident
+                .mockResolvedValueOnce({ matchedId: 1, confidence: 0.85 }); // retry: confident
 
             const result = await service.normalize({ items: [{ name: 'Item similar 0', price: 1.0 }] });
 
@@ -405,7 +395,7 @@ describe('ReceiptNormalizationService', () => {
             it('returns no container suggestion when OCR name has no dimension info', async () => {
                 itemDao.getAll.mockResolvedValue([]);
 
-                const result = await service.normalize({ items: [{ name: 'Chleb tostowy', price: 3.50 }] });
+                const result = await service.normalize({ items: [{ name: 'Chleb tostowy', price: 3.5 }] });
                 const item = result.items[0];
 
                 expect(item.suggestedContainer).toBeNull();

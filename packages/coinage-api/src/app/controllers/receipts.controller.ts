@@ -1,10 +1,34 @@
-import { BaseResponseDTO, ConfirmReceiptDTO, ReceiptDTO, ReceiptDetailsDTO, ReceiptPendingDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferDTO, TransferType } from '@app/interfaces';
-import { BadRequestException, Body, Controller, Get, Logger, NotFoundException, Param, ParseIntPipe, Post, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import type { Response } from 'express';
+import {
+    BaseResponseDTO,
+    ConfirmReceiptDTO,
+    ReceiptDTO,
+    ReceiptDetailsDTO,
+    ReceiptPendingDTO,
+    ReceiptProcessingStatus,
+    ReceiptUploadResponseDTO,
+    TransferDTO,
+    TransferType,
+} from '@app/interfaces';
+import {
+    BadRequestException,
+    Body,
+    Controller,
+    Get,
+    Logger,
+    NotFoundException,
+    Param,
+    ParseIntPipe,
+    Post,
+    Res,
+    UploadedFile,
+    UseGuards,
+    UseInterceptors,
+} from '@nestjs/common';
 import { EventBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createHash } from 'crypto';
-import { readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
+import type { Response } from 'express';
+import { existsSync, mkdirSync, readFileSync, unlinkSync } from 'fs';
 import { diskStorage } from 'multer';
 import { extname, join, relative } from 'path';
 
@@ -14,7 +38,7 @@ import { ContractorDao } from '../daos/contractor.dao';
 import { ItemDao } from '../daos/item.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
 import { Item } from '../entities/Item.entity';
-import { Receipt, ReceiptProcessingStatus as EntityReceiptProcessingStatus } from '../entities/Receipt.entity';
+import { ReceiptProcessingStatus as EntityReceiptProcessingStatus, Receipt } from '../entities/Receipt.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { User } from '../entities/User.entity';
@@ -87,10 +111,7 @@ export class ReceiptsController {
             },
         }),
     )
-    public async uploadReceiptImage(
-        @Param('id', ParseIntPipe) id: number,
-        @UploadedFile() file: Express.Multer.File,
-    ): Promise<ReceiptUploadResponseDTO> {
+    public async uploadReceiptImage(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File): Promise<ReceiptUploadResponseDTO> {
         if (!file) {
             throw new BadRequestException('No file provided');
         }
@@ -152,7 +173,9 @@ export class ReceiptsController {
     }
 
     @Get(':id/status')
-    public async getReceiptStatus(@Param('id', ParseIntPipe) id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }> {
+    public async getReceiptStatus(
+        @Param('id', ParseIntPipe) id: number,
+    ): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }> {
         const receipt = await this.receiptDao.getById(id);
         return {
             status: ENTITY_STATUS_TO_DTO[receipt.processingStatus],

@@ -9,7 +9,6 @@ export interface OllamaExtractedData {
     contractor?: string | null;
     description?: string | null;
     items?: Array<{ name: string; price: number; quantity?: number }>;
-    rawText?: string | null;
     confidence?: number;
 }
 
@@ -94,9 +93,7 @@ export class OllamaService {
         categories?: Category[],
     ): Promise<{ matchedId: number | null; confidence: number } | null> {
         const categoryHint =
-            categories && categories.length > 0
-                ? `\nAvailable product categories for context: ${categories.map((c) => c.name).join(', ')}.`
-                : '';
+            categories && categories.length > 0 ? `\nAvailable product categories for context: ${categories.map((c) => c.name).join(', ')}.` : '';
 
         const candidateList = candidates.map((c) => `${c.id} | ${c.name}`).join('\n');
 
@@ -127,13 +124,13 @@ Return matchedId: null if no candidate is a sufficiently good match.`;
         const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.resolveTimeoutMs) : undefined;
 
         try {
-            const raw =
-                this.provider === 'lmstudio'
-                    ? await this.callLMStudioText(prompt, controller)
-                    : await this.callOllamaText(prompt, controller);
+            const raw = this.provider === 'lmstudio' ? await this.callLMStudioText(prompt, controller) : await this.callOllamaText(prompt, controller);
 
             if (raw === null) return null;
-            const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            const cleaned = raw
+                .replace(/```json\n?/g, '')
+                .replace(/```\n?/g, '')
+                .trim();
             return JSON.parse(cleaned) as { matchedId: number | null; confidence: number };
         } catch {
             return null;
@@ -274,11 +271,14 @@ Return matchedId: null if no candidate is a sufficiently good match.`;
 
     private parseResponse(raw: string): OllamaExtractedData {
         try {
-            const cleaned = raw.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
+            const cleaned = raw
+                .replace(/```json\n?/g, '')
+                .replace(/```\n?/g, '')
+                .trim();
             return JSON.parse(cleaned) as OllamaExtractedData;
         } catch {
             this.logger.warn('Failed to parse AI JSON response, returning raw text');
-            return { rawText: raw, confidence: 0 };
+            return { confidence: 0 };
         }
     }
 }

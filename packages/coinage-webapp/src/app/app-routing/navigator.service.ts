@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PartialDate } from '@app/interfaces';
 import { Router } from '@angular/router';
+import { PartialDate } from '@app/interfaces';
 import { CoinageRoutes } from './app-routes';
 
 @Injectable({
