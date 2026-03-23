@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { Category } from '../../entities/Category.entity';
-import { RECEIPT_EXTRACTION_PROMPT_POLISH } from './prompts.model';
+import { getReceiptExtractionPromptPolish } from './prompts.model';
 
 export interface OllamaExtractedData {
     date?: string | null;
@@ -68,10 +68,13 @@ export class OllamaService {
         const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.timeoutMs) : undefined;
 
         try {
+            const today = new Date().toISOString().split('T')[0];
+            const extractionPrompt = getReceiptExtractionPromptPolish(today);
+
             const rawResponse =
                 this.provider === 'lmstudio'
-                    ? await this.callLMStudioVision(base64Image, RECEIPT_EXTRACTION_PROMPT_POLISH, controller)
-                    : await this.callOllamaGenerate(base64Image, RECEIPT_EXTRACTION_PROMPT_POLISH, controller);
+                    ? await this.callLMStudioVision(base64Image, extractionPrompt, controller)
+                    : await this.callOllamaGenerate(base64Image, extractionPrompt, controller);
 
             return { data: this.parseResponse(rawResponse), rawResponse };
         } finally {

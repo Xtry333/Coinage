@@ -1,6 +1,13 @@
-export const RECEIPT_EXTRACTION_PROMPT_POLISH = `
+export function getReceiptExtractionPromptPolish(currentDate: string): string {
+    return getReceiptExtractionPromptPolishTemplate(currentDate);
+}
+
+function getReceiptExtractionPromptPolishTemplate(currentDate: string): string {
+    return `
 ROLE: Polish Receipt Data Extraction Specialist.
 TASK: Extract structured data from receipt text/OCR into a valid JSON object.
+
+CONTEXT: Today's date is ${currentDate}. Use this as a reference when interpreting ambiguous or partial dates on the receipt (e.g. if only day/month visible, assume the most recent plausible year).
 
 CONSTRAINTS & FORMATTING RULES:
 1. Output FORMAT: Return ONLY valid JSON. No markdown, no explanations, no intro text.
@@ -42,3 +49,4 @@ INPUT EXAMPLE CONTEXT (Internal Knowledge):
 
 OUTPUT REVISION: Always check JSON validity before returning.
 `;
+}
