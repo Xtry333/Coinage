@@ -23,6 +23,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
     public aiExtractedData?: ReceiptAiResultDTO;
     public rawAiResponse?: string | null;
     public processingStatus?: ReceiptProcessingStatus;
+    public imageUrl?: string;
 
     private socketSubs: Subscription[] = [];
 
@@ -84,6 +85,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
             this.processingStatus = result.status;
             this.aiExtractedData = result.aiData as ReceiptAiResultDTO | undefined;
             this.rawAiResponse = result.rawAiResponse;
+            this.imageUrl = result.hasImage ? `/api/receipt/${id}/image` : undefined;
             if (result.status === ReceiptProcessingStatus.PENDING) this.uploadStatus = 'queued';
             else if (result.status === ReceiptProcessingStatus.PROCESSING) this.uploadStatus = 'processing';
             else if (result.status === ReceiptProcessingStatus.EXTRACTED) this.uploadStatus = 'processing';

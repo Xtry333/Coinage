@@ -117,8 +117,8 @@ export class CoinageDataService {
         return lastValueFrom(this.http.post<ReceiptUploadResponseDTO>(`${CoinageDataService.API_URL}receipt/${receiptId}/upload-image`, formData));
     }
 
-    public getReceiptStatus(receiptId: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null }> {
-        return lastValueFrom(this.http.get<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null }>(`${CoinageDataService.API_URL}receipt/${receiptId}/status`));
+    public getReceiptStatus(receiptId: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }> {
+        return lastValueFrom(this.http.get<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }>(`${CoinageDataService.API_URL}receipt/${receiptId}/status`));
     }
 
     public getAccountMonthlyStats(): Observable<NewMonthlyUserStatsDTO[]> {

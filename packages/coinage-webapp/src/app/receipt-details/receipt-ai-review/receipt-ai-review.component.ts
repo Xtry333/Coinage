@@ -23,6 +23,7 @@ export class ReceiptAiReviewComponent implements OnInit {
     @Input() public receiptId!: number;
     @Input() public aiData!: ReceiptAiResultDTO;
     @Input() public rawLlmResponse?: string | null;
+    @Input() public imageUrl?: string;
 
     @Output() public transfersCreated = new EventEmitter<void>();
 
@@ -32,6 +33,7 @@ export class ReceiptAiReviewComponent implements OnInit {
     public items: ReviewItem[] = [];
     public isSubmitting = false;
     public showRawData = false;
+    public showReceiptImage = false;
 
     public constructor(
         private readonly dataService: CoinageDataService,

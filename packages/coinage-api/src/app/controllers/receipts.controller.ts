@@ -1,5 +1,6 @@
 import { BaseResponseDTO, ConfirmReceiptDTO, ReceiptDTO, ReceiptDetailsDTO, ReceiptPendingDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferDTO, TransferType } from '@app/interfaces';
-import { BadRequestException, Body, Controller, Get, Logger, Param, ParseIntPipe, Post, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Logger, NotFoundException, Param, ParseIntPipe, Post, Res, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import type { Response } from 'express';
 import { EventBus } from '@nestjs/cqrs';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { createHash } from 'crypto';
@@ -137,13 +138,23 @@ export class ReceiptsController {
     }
 
     @Get(':id/status')
-    public async getReceiptStatus(@Param('id', ParseIntPipe) id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null }> {
+    public async getReceiptStatus(@Param('id', ParseIntPipe) id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }> {
         const receipt = await this.receiptDao.getById(id);
         return {
             status: ENTITY_STATUS_TO_DTO[receipt.processingStatus],
             aiData: receipt.aiExtractedData,
             rawAiResponse: receipt.rawAiResponse,
+            hasImage: !!receipt.imagePath,
         };
+    }
+
+    @Get(':id/image')
+    public async getReceiptImage(@Param('id', ParseIntPipe) id: number, @Res() res: Response): Promise<void> {
+        const receipt = await this.receiptDao.getById(id);
+        if (!receipt.imagePath) {
+            throw new NotFoundException('Receipt has no image');
+        }
+        res.sendFile(join(process.cwd(), receipt.imagePath));
     }
 
     @Get('all')
