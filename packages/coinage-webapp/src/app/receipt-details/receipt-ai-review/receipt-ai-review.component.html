@@ -64,6 +64,8 @@
                 <div class="border-t border-gray-100 p-4">
                     @if (imageLoading) {
                         <p class="text-center text-sm text-gray-400">Loading image...</p>
+                    } @else if (imageLoadError) {
+                        <p class="text-center text-sm text-red-500">Failed to load receipt image.</p>
                     } @else if (receiptImageSafeUrl) {
                         <img
                             class="mx-auto max-h-[70vh] w-auto rounded border border-gray-200 object-contain shadow-sm"
