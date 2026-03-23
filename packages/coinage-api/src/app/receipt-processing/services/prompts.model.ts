@@ -1,13 +1,8 @@
-export function getReceiptExtractionPromptPolish(currentDate: string): string {
-    return getReceiptExtractionPromptPolishTemplate(currentDate);
-}
-
-function getReceiptExtractionPromptPolishTemplate(currentDate: string): string {
-    return `
+const RECEIPT_EXTRACTION_PROMPT_POLISH = `
 ROLE: Polish Receipt Data Extraction Specialist.
 TASK: Extract structured data from receipt text/OCR into a valid JSON object.
 
-CONTEXT: Today's date is ${currentDate}. Use this as a reference when interpreting ambiguous or partial dates on the receipt (e.g. if only day/month visible, assume the most recent plausible year).
+CONTEXT: Today's date is %today%. Use this as a reference when interpreting ambiguous or partial dates on the receipt (e.g. if only day/month visible, assume the most recent plausible year).
 
 CONSTRAINTS & FORMATTING RULES:
 1. Output FORMAT: Return ONLY valid JSON. No markdown, no explanations, no intro text.
@@ -16,7 +11,7 @@ CONSTRAINTS & FORMATTING RULES:
 4. AMOUNT: Extract the total sum from 'SUMA PLN' or 'Suma:' section as a number (remove currency symbol and space).
 5. CONTRACTOR: Extract visible vendor/store name (e.g., "Lidl sp.z o.o.", "PARAGON FISKALNY").
 6. DESCRIPTION: Generate a short Polish summary of the contents (max 50 characters) based on item names.
-7. ITEMS ARRAY: Each item object must have 'name' (Polish string), 'price' (number, total price for that line), and 'quantity' (number). 
+7. ITEMS ARRAY: Each item object must have 'name' (Polish string), 'price' (number, total price for that line), and 'quantity' (number).
    - Handle unit vs total prices carefully (extract the TOTAL price column usually).
 8. CONFIDENCE: Float between 0.0 and 1.0. Lower if OCR is smudged or text is partially cut off.
 
@@ -49,4 +44,7 @@ INPUT EXAMPLE CONTEXT (Internal Knowledge):
 
 OUTPUT REVISION: Always check JSON validity before returning.
 `;
+
+export function getReceiptExtractionPromptPolish(currentDate: string): string {
+    return RECEIPT_EXTRACTION_PROMPT_POLISH.replace('%today%', currentDate);
 }
