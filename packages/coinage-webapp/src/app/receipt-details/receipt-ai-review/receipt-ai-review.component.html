@@ -232,13 +232,27 @@
 
     <!-- Actions -->
     <div class="flex items-center justify-between">
-        <button
-            class="text-sm text-gray-500 underline hover:text-gray-700"
-            (click)="showRawData = !showRawData"
-            type="button"
-        >
-            {{ showRawData ? 'Hide' : 'Show' }} Raw AI Data
-        </button>
+        <div class="flex items-center gap-3">
+            <button
+                class="text-sm text-gray-500 underline hover:text-gray-700"
+                (click)="showRawData = !showRawData"
+                type="button"
+            >
+                {{ showRawData ? 'Hide' : 'Show' }} Raw AI Data
+            </button>
+            <button
+                class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="isSubmitting"
+                (click)="onRetry()"
+                title="Discard the current AI result and re-run receipt parsing"
+                type="button"
+            >
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Retry AI
+            </button>
+        </div>
 
         <button
             class="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"

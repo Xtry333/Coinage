@@ -28,6 +28,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
     @Input() public imageUrl?: string;
 
     @Output() public transfersCreated = new EventEmitter<void>();
+    @Output() public retryRequested = new EventEmitter<void>();
 
     public accounts: AccountDTO[] = [];
     public selectedAccountId?: number;
@@ -148,6 +149,15 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
     }
 
     // ── Confirm ──────────────────────────────────────────────────────────────
+
+    public async onRetry(): Promise<void> {
+        try {
+            await this.dataService.retryReceiptProcessing(this.receiptId);
+            this.retryRequested.emit();
+        } catch {
+            this.notificationService.push({ title: 'Error', message: 'Failed to retry receipt processing' });
+        }
+    }
 
     public async onConfirm(): Promise<void> {
         if (!this.selectedAccountId) {

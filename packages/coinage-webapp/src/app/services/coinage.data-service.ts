@@ -121,6 +121,10 @@ export class CoinageDataService {
         return lastValueFrom(this.http.get<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }>(`${CoinageDataService.API_URL}receipt/${receiptId}/status`));
     }
 
+    public retryReceiptProcessing(receiptId: number): Promise<{ ok: boolean }> {
+        return lastValueFrom(this.http.post<{ ok: boolean }>(`${CoinageDataService.API_URL}receipt/${receiptId}/retry`, {}));
+    }
+
     public getAccountMonthlyStats(): Observable<NewMonthlyUserStatsDTO[]> {
         return this.http.get<NewMonthlyUserStatsDTO[]>(`${CoinageDataService.API_URL}account/lastYearMonthlyStats`, {
             // params: { accountIds: [1] },

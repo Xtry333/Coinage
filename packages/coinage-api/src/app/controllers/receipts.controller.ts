@@ -127,6 +127,20 @@ export class ReceiptsController {
         return { ok: true };
     }
 
+    @Post(':id/retry')
+    public async retryReceiptProcessing(@Param('id', ParseIntPipe) id: number): Promise<{ ok: boolean }> {
+        const receipt = await this.receiptDao.getById(id);
+        if (!receipt.imagePath) {
+            throw new BadRequestException('Receipt has no image to process');
+        }
+        receipt.processingStatus = EntityReceiptProcessingStatus.PENDING;
+        receipt.aiExtractedData = null;
+        receipt.rawAiResponse = null;
+        await this.receiptDao.save(receipt);
+        this.eventBus.publish(new ReceiptQueuedEvent(id, receipt.imagePath));
+        return { ok: true };
+    }
+
     @Get('pending')
     public async getPendingReceipts(): Promise<ReceiptPendingDTO[]> {
         const pending = await this.receiptDao.getPending();

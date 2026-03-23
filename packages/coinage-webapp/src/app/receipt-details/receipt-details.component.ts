@@ -130,6 +130,12 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
         }
     }
 
+    public onRetryRequested(): void {
+        this.aiExtractedData = undefined;
+        this.rawAiResponse = undefined;
+        this.uploadStatus = 'queued';
+    }
+
     public get receiptDirectionDisplaySymbol(): string {
         return TransferType.OUTCOME.symbol;
     }
