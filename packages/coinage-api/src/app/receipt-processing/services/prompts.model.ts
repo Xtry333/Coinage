@@ -60,11 +60,7 @@ export function getReceiptExtractionPromptPolish(currentDate: string): string {
     return RECEIPT_EXTRACTION_PROMPT_POLISH.replace('%today%', currentDate);
 }
 
-export function getEntityMatchPrompt(
-    query: string,
-    candidates: Array<{ id: number; name: string; score: number }>,
-    categoryNames: string[],
-): string {
+export function getEntityMatchPrompt(query: string, candidates: Array<{ id: number; name: string; score: number }>, categoryNames: string[]): string {
     const categoryHint = categoryNames.length > 0 ? `\nAvailable product categories for context: ${categoryNames.join(', ')}.` : '';
     const candidateList = candidates.map((c) => `${c.id} | ${c.name}`).join('\n');
 
