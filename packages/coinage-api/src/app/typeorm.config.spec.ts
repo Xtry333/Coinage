@@ -2,22 +2,34 @@ import { loadMigrations } from './typeorm.config';
 
 describe('loadMigrations', () => {
     describe('ts-node context (require.context unavailable)', () => {
-        it('returns a single glob pattern string', () => {
+        it('returns two glob pattern strings (one for .ts, one for .js)', () => {
             const result = loadMigrations();
 
-            expect(result).toHaveLength(1);
-            expect(typeof result[0]).toBe('string');
+            expect(result).toHaveLength(2);
+            expect(result.every((r) => typeof r === 'string')).toBe(true);
         });
 
-        it('glob pattern matches timestamp-prefixed migration files', () => {
-            const [pattern] = loadMigrations() as string[];
+        it('glob patterns target timestamp-prefixed migration files', () => {
+            const [tsPattern, jsPattern] = loadMigrations() as string[];
 
-            expect(pattern).toMatch(/\[0-9\]\*/);
-            expect(pattern).toMatch(/\{ts,js\}/);
+            expect(tsPattern).toMatch(/\[0-9\]\*.*\.ts$/);
+            expect(jsPattern).toMatch(/\[0-9\]\*.*\.js$/);
         });
     });
 
-    describe('webpack context (require.context available)', () => {
+    describe('webpack context (__webpack_require__ present)', () => {
+        function withWebpackContext(mockContext: jest.Mock, fn: () => void): void {
+            // Simulate webpack bundle: inject __webpack_require__ and require.context
+            (global as any).__webpack_require__ = true;
+            (require as any).context = jest.fn(() => mockContext);
+            try {
+                fn();
+            } finally {
+                delete (global as any).__webpack_require__;
+                delete (require as any).context;
+            }
+        }
+
         it('returns constructor functions extracted from each matched module', () => {
             class Migration1 {}
             class Migration2 {}
@@ -30,14 +42,12 @@ describe('loadMigrations', () => {
             const mockContext = jest.fn((key: string) => moduleMap[key]);
             Object.defineProperty(mockContext, 'keys', { value: jest.fn(() => Object.keys(moduleMap)) });
 
-            const mockRequire = jest.fn() as unknown as NodeRequire;
-            (mockRequire as any).context = jest.fn(() => mockContext);
-
-            const result = loadMigrations(mockRequire);
-
-            expect(result).toContain(Migration1);
-            expect(result).toContain(Migration2);
-            expect(result.every((m) => typeof m === 'function')).toBe(true);
+            withWebpackContext(mockContext, () => {
+                const result = loadMigrations();
+                expect(result).toContain(Migration1);
+                expect(result).toContain(Migration2);
+                expect(result.every((m) => typeof m === 'function')).toBe(true);
+            });
         });
 
         it('sorts migrations by filename so they run in timestamp order', () => {
@@ -50,12 +60,10 @@ describe('loadMigrations', () => {
             });
             Object.defineProperty(mockContext, 'keys', { value: () => ['./9999999999999-Late.ts', './1000000000000-Early.ts'] });
 
-            const mockRequire = jest.fn() as unknown as NodeRequire;
-            (mockRequire as any).context = jest.fn(() => mockContext);
-
-            const result = loadMigrations(mockRequire);
-
-            expect(result.indexOf(Early)).toBeLessThan(result.indexOf(Late));
+            withWebpackContext(mockContext, () => {
+                const result = loadMigrations();
+                expect(result.indexOf(Early)).toBeLessThan(result.indexOf(Late));
+            });
         });
     });
 });
