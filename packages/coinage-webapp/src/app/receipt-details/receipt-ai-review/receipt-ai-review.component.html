@@ -1,0 +1,278 @@
+<div class="mt-4 space-y-4">
+    <!-- Header: Summary -->
+    <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <div class="mb-3 flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-gray-900">AI Extraction Results</h3>
+            <span class="rounded-full px-2.5 py-1 text-xs font-medium" [class]="confidenceClass"> {{ confidencePercent }}% confidence </span>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
+            <div>
+                <span class="text-gray-500">Date</span>
+                <p class="font-medium">{{ aiData.normalized.date ?? 'Unknown' }}</p>
+            </div>
+            <div>
+                <span class="text-gray-500">Contractor</span>
+                <p class="font-medium">
+                    {{ aiData.normalized.contractorName ?? 'Unknown' }}
+                    @if (aiData.normalized.isNewContractor) {
+                        <span class="ml-1 rounded bg-yellow-100 px-1.5 py-0.5 text-xs text-yellow-700">New</span>
+                    } @else {
+                        <span class="ml-1 rounded bg-green-100 px-1.5 py-0.5 text-xs text-green-700">Matched</span>
+                    }
+                </p>
+            </div>
+            <div>
+                <span class="text-gray-500">Total Amount</span>
+                <p class="font-medium">{{ aiData.normalized.amount | plnCurrency }}</p>
+            </div>
+            <div>
+                <span class="text-gray-500">Items</span>
+                <p class="font-medium">
+                    {{ items.length }} total
+                    <span class="text-green-600">({{ matchedCount }} matched)</span>
+                    @if (newCount > 0) {
+                        <span class="text-yellow-600">({{ newCount }} new)</span>
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Image -->
+    @if (imageUrl) {
+        <div class="rounded-lg border border-gray-200 bg-white">
+            <button
+                class="flex w-full items-center justify-between px-4 py-3 text-left text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                (click)="toggleReceiptImage()"
+                type="button"
+            >
+                <span>Receipt Image</span>
+                <svg
+                    class="h-4 w-4 text-gray-400 transition-transform"
+                    [class.rotate-180]="showReceiptImage"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+            @if (showReceiptImage) {
+                <div class="border-t border-gray-100 p-4">
+                    @if (imageLoading) {
+                        <p class="text-center text-sm text-gray-400">Loading image...</p>
+                    } @else if (imageLoadError) {
+                        <p class="text-center text-sm text-red-500">Failed to load receipt image.</p>
+                    } @else if (receiptImageSafeUrl) {
+                        <img
+                            class="mx-auto max-h-[70vh] w-auto rounded border border-gray-200 object-contain shadow-sm"
+                            [src]="receiptImageSafeUrl"
+                            alt="Receipt image"
+                        />
+                    }
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Account & Date Selection -->
+    <div class="rounded-lg border border-gray-200 bg-white p-4">
+        <h4 class="mb-3 text-sm font-semibold text-gray-700">Transfer Details</h4>
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+            <div>
+                <label class="mb-1 block text-sm text-gray-600" for="reviewAccountSelect">Account</label>
+                <ng-select
+                    [(ngModel)]="selectedAccountId"
+                    [items]="accounts"
+                    [clearable]="false"
+                    bindValue="id"
+                    bindLabel="name"
+                    placeholder="Select account..."
+                    labelForId="reviewAccountSelect"
+                ></ng-select>
+            </div>
+            <div>
+                <label class="mb-1 block text-sm text-gray-600" for="reviewDateInput">Date</label>
+                <input
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    id="reviewDateInput"
+                    [(ngModel)]="overrideDate"
+                    type="date"
+                />
+            </div>
+        </div>
+    </div>
+
+    <!-- Items Table (editable) -->
+    <div class="rounded-lg border border-gray-200 bg-white">
+        <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+            <h4 class="text-sm font-semibold text-gray-700">Extracted Items <span class="ml-1 font-normal text-gray-400">(editable)</span></h4>
+            <div class="flex gap-2">
+                <button class="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50" (click)="toggleAll(true)" type="button">Select All</button>
+                <button class="rounded px-2 py-1 text-xs text-gray-500 hover:bg-gray-50" (click)="toggleAll(false)" type="button">Deselect All</button>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                    <tr>
+                        <th class="w-10 px-3 py-2"></th>
+                        <th class="w-20 px-3 py-2">Status</th>
+                        <th class="px-3 py-2">Item Name</th>
+                        <th class="w-28 px-3 py-2 text-right">Qty</th>
+                        <th class="w-28 px-3 py-2 text-right">Unit Price</th>
+                        <th class="w-28 px-3 py-2 text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (item of items; track item.name; let i = $index) {
+                        <tr class="border-t border-gray-100 transition-colors" [class.opacity-50]="!item.included" [class.bg-gray-50]="!item.included">
+                            <!-- Checkbox -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                                    [checked]="item.included"
+                                    (change)="toggleItem(item)"
+                                    type="checkbox"
+                                />
+                            </td>
+
+                            <!-- Status badge -->
+                            <td class="px-3 py-2">
+                                @if (item.isNew) {
+                                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">New</span>
+                                } @else {
+                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700"
+                                        >Matched</span
+                                    >
+                                }
+                            </td>
+
+                            <!-- Editable name -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-sm text-gray-900 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item.name"
+                                    [title]="item.brand ? 'Brand: ' + item.brand : ''"
+                                    (ngModelChange)="onNameChange(item)"
+                                    type="text"
+                                />
+                                @if (item.suggestedContainer) {
+                                    <div class="mt-0.5 text-xs text-gray-400">{{ item.suggestedContainer.containerName }}</div>
+                                }
+                            </td>
+
+                            <!-- Editable qty -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item.quantity"
+                                    (ngModelChange)="onQtyChange(item)"
+                                    type="number"
+                                    min="0.001"
+                                    step="0.001"
+                                />
+                            </td>
+
+                            <!-- Editable unit price -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item.price"
+                                    (ngModelChange)="onPriceChange(item)"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                />
+                            </td>
+
+                            <!-- Editable total (magic calculator) -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm font-medium text-gray-900 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item._total"
+                                    (ngModelChange)="onTotalChange(item)"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="border-t-2 border-gray-200 bg-gray-50 font-semibold">
+                        <td class="px-3 py-2 text-right text-sm text-gray-700" colspan="5">Selected Total ({{ includedItems.length }} items)</td>
+                        <td class="px-3 py-2 text-right font-mono text-gray-900">
+                            {{ totalAmount | plnCurrency }}
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <button class="text-sm text-gray-500 underline hover:text-gray-700" (click)="showRawData = !showRawData" type="button">
+                {{ showRawData ? 'Hide' : 'Show' }} Raw AI Data
+            </button>
+            <button
+                class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                [disabled]="isSubmitting"
+                (click)="onRetry()"
+                title="Discard the current AI result and re-run receipt parsing"
+                type="button"
+            >
+                <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                </svg>
+                Retry AI
+            </button>
+        </div>
+
+        <button
+            class="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            [disabled]="isSubmitting || !selectedAccountId || includedItems.length === 0"
+            (click)="onConfirm()"
+            type="button"
+        >
+            @if (isSubmitting) {
+                Creating...
+            } @else {
+                Create {{ includedItems.length }} Transfer(s)
+            }
+        </button>
+    </div>
+
+    <!-- Raw AI Data (collapsible) -->
+    @if (showRawData) {
+        <div class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <!-- Raw LLM response (the actual text from the model) -->
+            @if (rawLlmResponse) {
+                <div>
+                    <h4 class="mb-1 text-sm font-semibold text-gray-700">Raw LLM Response</h4>
+                    <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{
+                        rawLlmResponse
+                    }}</pre>
+                </div>
+            }
+
+            <!-- Parsed JSON extraction -->
+            <div>
+                <h4 class="mb-1 text-sm font-semibold text-gray-700">Parsed Extraction (JSON)</h4>
+                <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{
+                    aiData.raw | json
+                }}</pre>
+            </div>
+        </div>
+    }
+</div>

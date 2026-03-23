@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { PartialDate } from '@app/interfaces';
 import { Router } from '@angular/router';
+import { PartialDate } from '@app/interfaces';
 import { CoinageRoutes } from './app-routes';
 
 @Injectable({
@@ -27,6 +27,10 @@ export class NavigatorService {
 
     public goToReceiptDetailsPage(receiptId: number): Promise<boolean> {
         return this.router.navigateByUrl(CoinageRoutes.ReceiptDetailsPage.getUrl({ id: receiptId }));
+    }
+
+    public goToReceiptUploadPage(): Promise<boolean> {
+        return this.router.navigateByUrl(CoinageRoutes.ReceiptUploadPage.getUrl({}));
     }
 
     public goToDashboardPage(): Promise<boolean> {

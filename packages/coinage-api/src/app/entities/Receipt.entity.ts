@@ -5,6 +5,16 @@ import { Transfer } from './Transfer.entity';
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 
+export enum ReceiptProcessingStatus {
+    NONE = 'NONE',
+    PENDING = 'PENDING',
+    PROCESSING = 'PROCESSING',
+    EXTRACTED = 'EXTRACTED',
+    PROCESSED = 'PROCESSED',
+    DUPLICATE = 'DUPLICATE',
+    ERROR = 'ERROR',
+}
+
 @Entity()
 export class Receipt {
     @PrimaryGeneratedColumn()
@@ -28,4 +38,25 @@ export class Receipt {
 
     @OneToMany(() => Transfer, (transfer) => transfer.receipt, { eager: true })
     public transfers!: Transfer[];
+
+    @Column({ name: 'image_path', type: 'varchar', length: 500, nullable: true, default: null })
+    public imagePath!: string | null;
+
+    @Column({ name: 'image_hash', type: 'varchar', length: 64, nullable: true, default: null })
+    public imageHash!: string | null;
+
+    @Column({
+        name: 'processing_status',
+        type: 'enum',
+        enum: ReceiptProcessingStatus,
+        default: ReceiptProcessingStatus.NONE,
+        nullable: false,
+    })
+    public processingStatus!: ReceiptProcessingStatus;
+
+    @Column({ name: 'ai_extracted_data', type: 'json', nullable: true, default: null })
+    public aiExtractedData!: object | null;
+
+    @Column({ name: 'raw_ai_response', type: 'longtext', nullable: true, default: null })
+    public rawAiResponse!: string | null;
 }

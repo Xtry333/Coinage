@@ -9,6 +9,7 @@ import controllers from './controllers/_index';
 import daos from './daos/_index';
 import entities from './entities/_index';
 import { EventsGateway } from './events/events.gateway';
+import { ReceiptProcessingModule } from './receipt-processing/receipt-processing.module';
 import services from './services/_index';
 import { opts } from './typeorm.config';
 
@@ -23,6 +24,7 @@ import { opts } from './typeorm.config';
             secret: process.env.COINAGE_API_JWT_SECRET,
             signOptions: { expiresIn: '7d' },
         }),
+        ReceiptProcessingModule,
     ],
     controllers: [...controllers],
     providers: [...services, ...daos, EventsGateway],

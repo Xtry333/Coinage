@@ -10,6 +10,7 @@ import {
     BulkDeleteTransferDTO,
     BulkEditTransferDTO,
     CategoryDTO,
+    ConfirmReceiptDTO,
     ContainerDTO,
     ContractorDTO,
     CreateEditCategoryDTO,
@@ -27,6 +28,8 @@ import {
     NewMonthlyUserStatsDTO,
     ReceiptDTO,
     ReceiptDetailsDTO,
+    ReceiptProcessingStatus,
+    ReceiptUploadResponseDTO,
     RefundTransferDTO,
     ScheduleDTO,
     SplitTransferDTO,
@@ -102,6 +105,30 @@ export class CoinageDataService {
                 .get<ReceiptDetailsDTO>(`${CoinageDataService.API_URL}receipt/${transferId}/details`)
                 .pipe(map((t) => plainToInstance(ReceiptDetailsDTO, t))),
         );
+    }
+
+    public createReceipt(): Promise<{ id: number }> {
+        return lastValueFrom(this.http.post<{ id: number }>(`${CoinageDataService.API_URL}receipts`, {}));
+    }
+
+    public uploadReceiptImage(receiptId: number, file: File): Promise<ReceiptUploadResponseDTO> {
+        const formData = new FormData();
+        formData.append('file', file);
+        return lastValueFrom(this.http.post<ReceiptUploadResponseDTO>(`${CoinageDataService.API_URL}receipt/${receiptId}/upload-image`, formData));
+    }
+
+    public getReceiptStatus(
+        receiptId: number,
+    ): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }> {
+        return lastValueFrom(
+            this.http.get<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null; hasImage: boolean }>(
+                `${CoinageDataService.API_URL}receipt/${receiptId}/status`,
+            ),
+        );
+    }
+
+    public retryReceiptProcessing(receiptId: number): Promise<{ ok: boolean }> {
+        return lastValueFrom(this.http.post<{ ok: boolean }>(`${CoinageDataService.API_URL}receipt/${receiptId}/retry`, {}));
     }
 
     public getAccountMonthlyStats(): Observable<NewMonthlyUserStatsDTO[]> {
@@ -237,5 +264,9 @@ export class CoinageDataService {
     // Receipt methods
     public getAllReceipts(): Observable<ReceiptDTO[]> {
         return this.http.get<ReceiptDTO[]>(`${CoinageDataService.API_URL}receipts/all`);
+    }
+
+    public confirmReceipt(receiptId: number, body: ConfirmReceiptDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}receipt/${receiptId}/confirm`, body));
     }
 }
