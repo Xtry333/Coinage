@@ -9,6 +9,7 @@
 /node_modules
 /.yarn
 .yarnrc.yml
+package-lock.json
 
 # IDEs and editors
 /.idea
@@ -52,3 +53,4 @@ nx-cloud.env
 
 .nx/cache
 .nx/workspace-data
+uploads/*

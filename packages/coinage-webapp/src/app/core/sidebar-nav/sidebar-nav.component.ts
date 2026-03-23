@@ -40,6 +40,7 @@ export class SidebarNavComponent implements OnInit {
         { text: 'Account 1', icon: 'bi-wallet', url: CoinageRoutes.AccountDetailsPage.getUrl({ id: 1 }) },
         { text: 'Add Transfer', icon: 'bi-plus', url: CoinageRoutes.CreateTransferPage.getUrl({}) },
         { text: 'Add Receipt', icon: 'bi-plus', url: CoinageRoutes.CreateMultipleTransfersPage.getUrl({}) },
+        { text: 'Upload Receipt', icon: 'bi-upload', url: CoinageRoutes.ReceiptUploadPage.getUrl({}) },
         { text: 'Account Settings', icon: 'bi-person', url: CoinageRoutes.ManageAccountsPage.getUrl({}) },
     ];
 

@@ -13,7 +13,6 @@ import {
 import { from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Server, Socket } from 'socket.io';
-import { AccountDao } from '../daos/account.dao';
 import { UserDao } from '../daos/user.dao';
 import { User } from '../entities/User.entity';
 
@@ -108,5 +107,21 @@ export class EventsGateway implements OnGatewayConnection, OnGatewayDisconnect {
         this.chatLog.push(chatLogMessage);
         this.server.emit('chatMessageServer', chatLogMessage);
         return;
+    }
+
+    public emitReceiptQueued(receiptId: number): void {
+        this.server.emit('receiptQueued', { receiptId });
+    }
+
+    public emitReceiptProcessing(receiptId: number): void {
+        this.server.emit('receiptProcessing', { receiptId });
+    }
+
+    public emitReceiptProcessed(receiptId: number, aiData: object): void {
+        this.server.emit('receiptProcessed', { receiptId, aiData });
+    }
+
+    public emitReceiptError(receiptId: number, error: string): void {
+        this.server.emit('receiptError', { receiptId, error });
     }
 }
