@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { Category } from '../../entities/Category.entity';
-import { getReceiptExtractionPromptPolish } from './prompts.model';
+import { getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
 
 export interface OllamaExtractedData {
     date?: string | null;
@@ -92,30 +92,8 @@ export class OllamaService {
         candidates: Array<{ id: number; name: string; score: number }>,
         categories?: Category[],
     ): Promise<{ matchedId: number | null; confidence: number } | null> {
-        const categoryHint =
-            categories && categories.length > 0 ? `\nAvailable product categories for context: ${categories.map((c) => c.name).join(', ')}.` : '';
-
-        const candidateList = candidates.map((c) => `${c.id} | ${c.name}`).join('\n');
-
-        const prompt = `You are a product/entity matching assistant for a Polish personal finance app.
-
-Receipt OCR text (may be abbreviated or have OCR errors): "${query}"${categoryHint}
-
-Database candidates (id | name):
-${candidateList}
-
-Task: Find which candidate best matches the receipt text. Consider:
-- OCR truncations and abbreviations ("MLEKO UHT 3%" ≈ "Mleko UHT 3.2% 1L")
-- Polish characters: accented vs plain (ó/o, ą/a, ę/e, ż/z, ś/s, ć/c, ł/l, ź/z, ń/n)
-- Brand + product name reordering ("Ser Edam" ≈ "Edam ser żółty")
-- Size/variant suffixes that may or may not be present
-- Common OCR mistakes (0→O, 1→l, rn→m, ii→n)
-- Only match if you are confident the receipt item IS that product (≥0.65)
-
-Return ONLY valid JSON, no explanation, no markdown:
-{"matchedId": <id number or null>, "confidence": <0.0–1.0>}
-
-Return matchedId: null if no candidate is a sufficiently good match.`;
+        const categoryNames = categories?.map((c) => c.name) ?? [];
+        const prompt = getEntityMatchPrompt(query, candidates, categoryNames);
 
         const controller = new AbortController();
 

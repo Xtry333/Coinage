@@ -30,7 +30,7 @@ import { createHash } from 'crypto';
 import type { Response } from 'express';
 import { existsSync, mkdirSync, readFileSync, unlinkSync } from 'fs';
 import { diskStorage } from 'multer';
-import { extname, join, relative } from 'path';
+import { extname, join, relative, resolve } from 'path';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -186,12 +186,19 @@ export class ReceiptsController {
     }
 
     @Get(':id/image')
-    public async getReceiptImage(@Param('id', ParseIntPipe) id: number, @Res() res: Response): Promise<void> {
+    public async getReceiptImage(@Param('id', ParseIntPipe) id: number, @Res({ passthrough: true }) res: Response): Promise<void> {
         const receipt = await this.receiptDao.getById(id);
         if (!receipt.imagePath) {
             throw new NotFoundException('Receipt has no image');
         }
-        res.sendFile(join(process.cwd(), receipt.imagePath));
+        const absolutePath = resolve(process.cwd(), receipt.imagePath);
+        if (!absolutePath.startsWith(UPLOAD_DIR)) {
+            throw new NotFoundException('Receipt image not found');
+        }
+        if (!existsSync(absolutePath)) {
+            throw new NotFoundException('Receipt image file not found on disk');
+        }
+        res.sendFile(absolutePath);
     }
 
     @Get('all')

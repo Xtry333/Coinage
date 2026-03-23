@@ -39,6 +39,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
     public showReceiptImage = false;
     public receiptImageSafeUrl?: SafeUrl;
     public imageLoading = false;
+    public imageLoadError = false;
     private _receiptImageObjectUrl?: string;
 
     public constructor(
@@ -111,6 +112,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
                 },
                 error: () => {
                     this.imageLoading = false;
+                    this.imageLoadError = true;
                 },
             });
         }
