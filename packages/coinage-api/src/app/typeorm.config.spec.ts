@@ -17,7 +17,19 @@ describe('loadMigrations', () => {
         });
     });
 
-    describe('webpack context (require.context available)', () => {
+    describe('webpack context (__webpack_require__ present)', () => {
+        function withWebpackContext(mockContext: jest.Mock, fn: () => void): void {
+            // Simulate webpack bundle: inject __webpack_require__ and require.context
+            (global as any).__webpack_require__ = true;
+            (require as any).context = jest.fn(() => mockContext);
+            try {
+                fn();
+            } finally {
+                delete (global as any).__webpack_require__;
+                delete (require as any).context;
+            }
+        }
+
         it('returns constructor functions extracted from each matched module', () => {
             class Migration1 {}
             class Migration2 {}
@@ -30,17 +42,12 @@ describe('loadMigrations', () => {
             const mockContext = jest.fn((key: string) => moduleMap[key]);
             Object.defineProperty(mockContext, 'keys', { value: jest.fn(() => Object.keys(moduleMap)) });
 
-            const originalContext = (require as any).context;
-            (require as any).context = jest.fn(() => mockContext);
-
-            try {
+            withWebpackContext(mockContext, () => {
                 const result = loadMigrations();
                 expect(result).toContain(Migration1);
                 expect(result).toContain(Migration2);
                 expect(result.every((m) => typeof m === 'function')).toBe(true);
-            } finally {
-                (require as any).context = originalContext;
-            }
+            });
         });
 
         it('sorts migrations by filename so they run in timestamp order', () => {
@@ -53,15 +60,10 @@ describe('loadMigrations', () => {
             });
             Object.defineProperty(mockContext, 'keys', { value: () => ['./9999999999999-Late.ts', './1000000000000-Early.ts'] });
 
-            const originalContext = (require as any).context;
-            (require as any).context = jest.fn(() => mockContext);
-
-            try {
+            withWebpackContext(mockContext, () => {
                 const result = loadMigrations();
                 expect(result.indexOf(Early)).toBeLessThan(result.indexOf(Late));
-            } finally {
-                (require as any).context = originalContext;
-            }
+            });
         });
     });
 });

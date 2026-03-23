@@ -6,11 +6,14 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import entities from './entities/_index';
 
 export function loadMigrations(): (Function | string)[] {
-    // webpack bundles everything; require.context MUST be the literal identifier `require`
-    // (not a cast expression like `(require as any)`) so webpack's static analyzer detects
-    // the call and bundles the migration files at build time.
-    // @ts-expect-error: require.context is a webpack-specific API not in Node typings
-    if (typeof require.context === 'function') {
+    // Detect webpack context via __webpack_require__ (injected by webpack at build time).
+    // Checking `typeof require.context` instead triggers a webpack warning:
+    // "Critical dependency: require function is used in a way in which dependencies cannot
+    // be statically extracted" — which prevents webpack from bundling the context modules.
+    // Using __webpack_require__ for the guard avoids that; webpack still statically analyzes
+    // the require.context(...) call below and bundles all matching migration files.
+    // @ts-expect-error: __webpack_require__ is injected by webpack, not in Node typings
+    if (typeof __webpack_require__ !== 'undefined') {
         // @ts-expect-error: require.context is a webpack-specific API not in Node typings
         const ctx = require.context('../database/migrations', false, /^\.\/(\d+\S*)\.(ts|js)$/);
         return ctx
