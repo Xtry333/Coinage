@@ -85,6 +85,7 @@
             <app-receipt-ai-review
                 [receiptId]="receiptId"
                 [aiData]="aiExtractedData!"
+                [rawLlmResponse]="rawAiResponse"
                 (transfersCreated)="onTransfersCreated()"
             ></app-receipt-ai-review>
         }

@@ -15,19 +15,46 @@ export interface OllamaExtractedData {
 
 export type ReceiptAIProvider = 'ollama' | 'lmstudio';
 
-const RECEIPT_EXTRACTION_PROMPT = `You are a receipt parsing assistant. The receipts will be mostly in Polish. Analyze the provided receipt image and extract information as JSON:
+const RECEIPT_EXTRACTION_PROMPT = `You are an OCR receipt parsing assistant specialized in Polish grocery and retail receipts.
+
+Analyze the provided receipt image and extract all information as JSON.
+
+Common patterns in Polish receipts:
+- Date: DD.MM.YYYY or DD-MM-YYYY format (usually near the top or bottom)
+- Store name at the top (Biedronka, Lidl, Żabka, Carrefour, Auchan, Rossmann, Netto, Pepco, etc.)
+- Items are listed with name, quantity (szt/opak/kg/l), unit price, and total line price
+  - Example: "MLEKO UHT 3.2%  2 × 2,89  5,78"
+  - Example: "SER EDAM 250G  1szt  4,99  4,99"
+  - Example: "CHLEB PSZENNY  0,450kg  5,99/kg  2,70"
+  - Discount lines starting with RABAT, OSZCZĘDZASZ, UPUST reduce the preceding item — apply the discount to get the final unit price
+  - VAT columns (A/B/C/D/PTU rows) relate to tax — ignore them for item prices
+  - Lines that are just VAT summary rows (PTU A 23%, etc.) are NOT items — skip them
+- Total: look for SUMA, RAZEM, DO ZAPŁATY, ŁĄCZNIE, SUMA PLN fields for the final paid amount
+- Currency: PLN (Polish Złoty). Decimal separator on Polish receipts is a comma — convert to a dot (3,99 → 3.99)
+- NIP (store tax ID, e.g. "NIP 123-456-78-90") — not needed in output
+
+Return ONLY valid JSON matching this exact schema:
 {
   "date": "YYYY-MM-DD or null",
-  "amount": <total amount as number or null>,
-  "contractor": "<store/vendor name or null>",
-  "description": "<brief description or null>",
-  "items": [{"name": "<item>", "price": <price>, "quantity": <qty>}],
-  "rawText": "<all text from receipt>",
-  "confidence": <0.0-1.0>
+  "amount": <total amount as decimal number, or null>,
+  "contractor": "<store/vendor name, cleaned up, or null>",
+  "description": "<brief one-line purchase description or null>",
+  "items": [
+    {"name": "<item name as printed, cleaned>", "price": <unit price as decimal number>, "quantity": <quantity as number, default 1>}
+  ],
+  "rawText": "<full verbatim text extracted from the receipt>",
+  "confidence": <0.0–1.0>
 }
-You may fix minor OCR errors (keep in mind the base receipt language) in the text, but do not hallucinate details that are not present.
-The confidence score should reflect how certain you are about the extracted data, based on the image quality and clarity of text.
-Return ONLY valid JSON. Use null for unknown fields.`;
+
+Rules:
+- Convert ALL Polish decimal commas to dots in numbers (3,99 → 3.99; 1 234,56 → 1234.56)
+- "price" is the unit price (divide total line price by quantity if needed)
+- If a discount is applied to an item, show the final post-discount unit price
+- quantity defaults to 1 if not stated
+- Skip VAT summary lines, header/footer text, and store address lines from items
+- Do NOT hallucinate items or prices that are not clearly visible
+- Use null for any field that cannot be determined with reasonable confidence
+- Return ONLY valid JSON, no markdown fences, no explanation`;
 
 @Injectable()
 export class OllamaService {
@@ -68,7 +95,7 @@ export class OllamaService {
         }
     }
 
-    public async extractReceiptData(imagePath: string): Promise<OllamaExtractedData> {
+    public async extractReceiptData(imagePath: string): Promise<{ data: OllamaExtractedData; rawResponse: string }> {
         this.logger.debug(`Extracting data from: ${imagePath} using ${this.provider} model: ${this.model}`);
 
         const { readFileSync } = await import('fs');
@@ -82,12 +109,12 @@ export class OllamaService {
         const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.timeoutMs) : undefined;
 
         try {
-            const raw =
+            const rawResponse =
                 this.provider === 'lmstudio'
                     ? await this.callLMStudioVision(base64Image, RECEIPT_EXTRACTION_PROMPT_POLISH, controller)
                     : await this.callOllamaGenerate(base64Image, RECEIPT_EXTRACTION_PROMPT_POLISH, controller);
 
-            return this.parseResponse(raw);
+            return { data: this.parseResponse(rawResponse), rawResponse };
         } finally {
             clearTimeout(timer);
         }
@@ -105,27 +132,30 @@ export class OllamaService {
     ): Promise<{ matchedId: number | null; confidence: number } | null> {
         const categoryHint =
             categories && categories.length > 0
-                ? `\nAvailable categories for context: ${categories.map((c) => c.name).join(', ')}.`
+                ? `\nAvailable product categories for context: ${categories.map((c) => c.name).join(', ')}.`
                 : '';
 
-        const candidateList = candidates.map((c) => `  id ${c.id}: "${c.name}" (fuzzy score: ${c.score.toFixed(2)})`).join('\n');
+        const candidateList = candidates.map((c) => `${c.id} | ${c.name}`).join('\n');
 
-        const prompt = `You are a data-matching assistant for a personal finance app.
+        const prompt = `You are a product/entity matching assistant for a Polish personal finance app.
 
-Extracted text from a receipt: "${query}"${categoryHint}
+Receipt OCR text (may be abbreviated or have OCR errors): "${query}"${categoryHint}
 
-Existing database entries that may match (by fuzzy similarity):
+Database candidates (id | name):
 ${candidateList}
 
-Task: Decide which entry best matches the extracted text, considering:
-- Abbreviations and store-specific naming ("Mleko UHT" ≈ "Mleko UHT 3.2% 1L")
-- Spelling variants or OCR errors
-- Different languages (Mostly Polish receipts)
+Task: Find which candidate best matches the receipt text. Consider:
+- OCR truncations and abbreviations ("MLEKO UHT 3%" ≈ "Mleko UHT 3.2% 1L")
+- Polish characters: accented vs plain (ó/o, ą/a, ę/e, ż/z, ś/s, ć/c, ł/l, ź/z, ń/n)
+- Brand + product name reordering ("Ser Edam" ≈ "Edam ser żółty")
+- Size/variant suffixes that may or may not be present
+- Common OCR mistakes (0→O, 1→l, rn→m, ii→n)
+- Only match if you are confident the receipt item IS that product (≥0.65)
 
-Return ONLY valid JSON with no explanation:
-{"matchedId": <number or null>, "confidence": <0.0–1.0>}
+Return ONLY valid JSON, no explanation, no markdown:
+{"matchedId": <id number or null>, "confidence": <0.0–1.0>}
 
-Use matchedId: null if no entry is a good match (confidence would be < 0.65).`;
+Return matchedId: null if no candidate is a sufficiently good match.`;
 
         const controller = new AbortController();
 

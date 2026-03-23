@@ -73,7 +73,11 @@ export class ReceiptDao extends BaseDao {
         return result.affected ?? 0;
     }
 
-    public async updateStatus(id: number, status: ReceiptProcessingStatus, aiData?: object): Promise<void> {
-        await this.receiptRepository.update({ id: Equal(id) }, { processingStatus: status, ...(aiData !== undefined ? { aiExtractedData: aiData } : {}) });
+    public async updateStatus(id: number, status: ReceiptProcessingStatus, aiData?: object, rawAiResponse?: string): Promise<void> {
+        await this.receiptRepository.update({ id: Equal(id) }, {
+            processingStatus: status,
+            ...(aiData !== undefined ? { aiExtractedData: aiData } : {}),
+            ...(rawAiResponse !== undefined ? { rawAiResponse } : {}),
+        });
     }
 }

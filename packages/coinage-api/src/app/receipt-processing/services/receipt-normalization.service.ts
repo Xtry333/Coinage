@@ -156,23 +156,21 @@ export class ReceiptNormalizationService {
     ): Promise<[contractorId: number | null, contractorName: string | null, isNew: boolean]> {
         if (!extractedName) return [null, null, false];
 
-        const candidates = this.topFuzzyCandidates(
-            extractedName,
-            contractors.map((c) => ({ id: c.id, name: c.name })),
-            FIRST_PASS_CANDIDATES,
-        );
+        const contractorPool = contractors.map((c) => ({ id: c.id, name: c.name }));
+        const extendedCandidates = this.topFuzzyCandidates(extractedName, contractorPool, RETRY_PASS_CANDIDATES);
+        const firstPassCandidates = extendedCandidates.slice(0, FIRST_PASS_CANDIDATES);
 
-        if (candidates.length === 0) {
+        if (extendedCandidates.length === 0) {
             this.logger.log(`Contractor "${extractedName}" has no fuzzy candidates — will be created`);
             return [null, extractedName, true];
         }
 
-        if (candidates[0].score >= AUTO_MATCH_THRESHOLD) {
-            this.logger.debug(`Contractor "${extractedName}" auto-matched to "${candidates[0].name}" (${candidates[0].score.toFixed(2)})`);
-            return [candidates[0].id, candidates[0].name, false];
+        if (firstPassCandidates[0].score >= AUTO_MATCH_THRESHOLD) {
+            this.logger.debug(`Contractor "${extractedName}" auto-matched to "${firstPassCandidates[0].name}" (${firstPassCandidates[0].score.toFixed(2)})`);
+            return [firstPassCandidates[0].id, firstPassCandidates[0].name, false];
         }
 
-        const match = await this.resolveWithAI(extractedName, candidates);
+        const match = await this.resolveWithAI(extractedName, firstPassCandidates, extendedCandidates);
         if (match) return [match.id, match.name, false];
 
         this.logger.log(`Contractor "${extractedName}" unresolved — will be created`);
@@ -197,20 +195,18 @@ export class ReceiptNormalizationService {
         };
 
         // Resolve item identity
-        const candidates = this.topFuzzyCandidates(
-            extracted.name,
-            allItems.map((i) => ({ id: i.id, name: this.formatItemLabel(i) })),
-            FIRST_PASS_CANDIDATES,
-        );
+        const itemPool = allItems.map((i) => ({ id: i.id, name: this.formatItemLabel(i) }));
+        const extendedCandidates = this.topFuzzyCandidates(extracted.name, itemPool, RETRY_PASS_CANDIDATES);
+        const firstPassCandidates = extendedCandidates.slice(0, FIRST_PASS_CANDIDATES);
 
         let resolvedItem: Item | null = null;
 
-        if (candidates.length > 0) {
-            if (candidates[0].score >= AUTO_MATCH_THRESHOLD) {
-                this.logger.debug(`Item "${extracted.name}" auto-matched to "${candidates[0].name}" (${candidates[0].score.toFixed(2)})`);
-                resolvedItem = allItems.find((i) => i.id === candidates[0].id) ?? null;
+        if (extendedCandidates.length > 0) {
+            if (firstPassCandidates[0].score >= AUTO_MATCH_THRESHOLD) {
+                this.logger.debug(`Item "${extracted.name}" auto-matched to "${firstPassCandidates[0].name}" (${firstPassCandidates[0].score.toFixed(2)})`);
+                resolvedItem = allItems.find((i) => i.id === firstPassCandidates[0].id) ?? null;
             } else {
-                const match = await this.resolveWithAI(extracted.name, candidates, categories);
+                const match = await this.resolveWithAI(extracted.name, firstPassCandidates, extendedCandidates, categories);
                 if (match) {
                     resolvedItem = allItems.find((i) => i.id === match.id) ?? null;
                 }
@@ -430,10 +426,11 @@ export class ReceiptNormalizationService {
     private async resolveWithAI(
         query: string,
         candidates: FuzzyCandidate[],
+        extendedCandidates?: FuzzyCandidate[],
         categories?: Category[],
     ): Promise<FuzzyCandidate | null> {
         for (let attempt = 0; attempt < 2; attempt++) {
-            const pool = attempt === 0 ? candidates : candidates.slice(0, RETRY_PASS_CANDIDATES);
+            const pool = attempt === 0 ? candidates : (extendedCandidates ?? candidates);
             const result = await this.ollamaService.resolveEntityMatch(query, pool, categories);
 
             if (result !== null && result.confidence >= AI_CONFIDENCE_THRESHOLD && result.matchedId !== null) {
@@ -446,7 +443,7 @@ export class ReceiptNormalizationService {
 
             if (attempt === 0) {
                 this.logger.debug(
-                    `AI pass 1 for "${query}" unconfident (confidence=${result?.confidence ?? 0}, matchedId=${result?.matchedId ?? null}) — retrying with top ${RETRY_PASS_CANDIDATES}`,
+                    `AI pass 1 for "${query}" unconfident (confidence=${result?.confidence ?? 0}, matchedId=${result?.matchedId ?? null}) — retrying with ${(extendedCandidates ?? candidates).length} candidates`,
                 );
             }
         }

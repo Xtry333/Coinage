@@ -26,10 +26,10 @@ export class ProcessPendingReceiptHandler implements ICommandHandler<ProcessPend
         await this.receiptDao.updateStatus(receiptId, ReceiptProcessingStatus.PROCESSING);
 
         try {
-            const rawData = await this.ollamaService.extractReceiptData(imagePath);
+            const { data: rawData, rawResponse } = await this.ollamaService.extractReceiptData(imagePath);
             this.logger.log(`Receipt ${receiptId} OCR complete (confidence: ${rawData.confidence ?? 'N/A'}, items: ${rawData.items?.length ?? 0})`);
 
-            await this.receiptDao.updateStatus(receiptId, ReceiptProcessingStatus.EXTRACTED, { raw: rawData });
+            await this.receiptDao.updateStatus(receiptId, ReceiptProcessingStatus.EXTRACTED, { raw: rawData }, rawResponse);
 
             // Immediately proceed to matching; scheduler will retry matching if this fails
             await this.commandBus.execute(new MatchExtractedReceiptCommand(receiptId));

@@ -69,10 +69,10 @@
         </div>
     </div>
 
-    <!-- Items Table -->
+    <!-- Items Table (editable) -->
     <div class="rounded-lg border border-gray-200 bg-white">
         <div class="flex items-center justify-between border-b border-gray-200 px-4 py-3">
-            <h4 class="text-sm font-semibold text-gray-700">Extracted Items</h4>
+            <h4 class="text-sm font-semibold text-gray-700">Extracted Items <span class="ml-1 font-normal text-gray-400">(editable)</span></h4>
             <div class="flex gap-2">
                 <button
                     class="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
@@ -95,23 +95,23 @@
             <table class="w-full text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                     <tr>
-                        <th class="px-4 py-2 w-10"></th>
-                        <th class="px-4 py-2">Status</th>
-                        <th class="px-4 py-2">Item Name</th>
-                        <th class="px-4 py-2 text-right">Qty</th>
-                        <th class="px-4 py-2 text-right">Unit Price</th>
-                        <th class="px-4 py-2 text-right">Total</th>
+                        <th class="w-10 px-3 py-2"></th>
+                        <th class="w-20 px-3 py-2">Status</th>
+                        <th class="px-3 py-2">Item Name</th>
+                        <th class="w-28 px-3 py-2 text-right">Qty</th>
+                        <th class="w-28 px-3 py-2 text-right">Unit Price</th>
+                        <th class="w-28 px-3 py-2 text-right">Total</th>
                     </tr>
                 </thead>
                 <tbody>
                     @for (item of items; track item.name; let i = $index) {
                         <tr
                             class="border-t border-gray-100 transition-colors"
-                            [class.opacity-40]="!item.included"
-                            [class.bg-white]="item.included"
+                            [class.opacity-50]="!item.included"
                             [class.bg-gray-50]="!item.included"
                         >
-                            <td class="px-4 py-2.5">
+                            <!-- Checkbox -->
+                            <td class="px-3 py-2">
                                 <input
                                     type="checkbox"
                                     [checked]="item.included"
@@ -119,44 +119,74 @@
                                     class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                                 />
                             </td>
-                            <td class="px-4 py-2.5">
+
+                            <!-- Status badge -->
+                            <td class="px-3 py-2">
                                 @if (item.isNew) {
-                                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">
-                                        New
-                                    </span>
+                                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-medium text-yellow-700">New</span>
                                 } @else {
-                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
-                                        Matched
-                                    </span>
+                                    <span class="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Matched</span>
                                 }
                             </td>
-                            <td class="px-4 py-2.5">
-                                <span class="font-medium text-gray-900">{{ item.name }}</span>
-                                @if (item.brand) {
-                                    <span class="ml-1 text-xs text-gray-400">{{ item.brand }}</span>
-                                }
+
+                            <!-- Editable name -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-sm text-gray-900 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item.name"
+                                    (ngModelChange)="onNameChange(item)"
+                                    type="text"
+                                    [title]="item.brand ? 'Brand: ' + item.brand : ''"
+                                />
                                 @if (item.suggestedContainer) {
-                                    <span class="ml-1 text-xs text-gray-400">
-                                        ({{ item.suggestedContainer.containerName }})
-                                    </span>
+                                    <div class="mt-0.5 text-xs text-gray-400">{{ item.suggestedContainer.containerName }}</div>
                                 }
                             </td>
-                            <td class="px-4 py-2.5 text-right font-mono text-gray-700">{{ item.quantity }}</td>
-                            <td class="px-4 py-2.5 text-right font-mono text-gray-700">
-                                {{ item.price | plnCurrency }}
+
+                            <!-- Editable qty -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item.quantity"
+                                    (ngModelChange)="onQtyChange(item)"
+                                    type="number"
+                                    min="0.001"
+                                    step="0.001"
+                                />
                             </td>
-                            <td class="px-4 py-2.5 text-right font-mono font-medium text-gray-900">
-                                {{ item.price * item.quantity | plnCurrency }}
+
+                            <!-- Editable unit price -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item.price"
+                                    (ngModelChange)="onPriceChange(item)"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                />
+                            </td>
+
+                            <!-- Editable total (magic calculator) -->
+                            <td class="px-3 py-2">
+                                <input
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm font-medium text-gray-900 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    [(ngModel)]="item._total"
+                                    (ngModelChange)="onTotalChange(item)"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                />
                             </td>
                         </tr>
                     }
                 </tbody>
                 <tfoot>
                     <tr class="border-t-2 border-gray-200 bg-gray-50 font-semibold">
-                        <td class="px-4 py-2.5" colspan="5" class="px-4 py-2.5 text-right text-gray-700">
+                        <td colspan="5" class="px-3 py-2 text-right text-gray-700 text-sm">
                             Selected Total ({{ includedItems.length }} items)
                         </td>
-                        <td class="px-4 py-2.5 text-right font-mono text-gray-900">
+                        <td class="px-3 py-2 text-right font-mono text-gray-900">
                             {{ totalAmount | plnCurrency }}
                         </td>
                     </tr>
@@ -169,10 +199,10 @@
     <div class="flex items-center justify-between">
         <button
             class="text-sm text-gray-500 underline hover:text-gray-700"
-            (click)="showRawJson = !showRawJson"
+            (click)="showRawData = !showRawData"
             type="button"
         >
-            {{ showRawJson ? 'Hide' : 'Show' }} raw AI data
+            {{ showRawData ? 'Hide' : 'Show' }} Raw AI Data
         </button>
 
         <button
@@ -189,11 +219,22 @@
         </button>
     </div>
 
-    <!-- Raw JSON (collapsible) -->
-    @if (showRawJson) {
-        <div class="rounded-lg border border-gray-200 bg-gray-50 p-4">
-            <h4 class="mb-2 text-sm font-semibold text-gray-700">Raw AI Extraction</h4>
-            <pre class="overflow-auto whitespace-pre-wrap text-xs text-gray-600">{{ aiData.raw | json }}</pre>
+    <!-- Raw AI Data (collapsible) -->
+    @if (showRawData) {
+        <div class="space-y-3 rounded-lg border border-gray-200 bg-gray-50 p-4">
+            <!-- Raw LLM response (the actual text from the model) -->
+            @if (rawLlmResponse) {
+                <div>
+                    <h4 class="mb-1 text-sm font-semibold text-gray-700">Raw LLM Response</h4>
+                    <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{ rawLlmResponse }}</pre>
+                </div>
+            }
+
+            <!-- Parsed JSON extraction -->
+            <div>
+                <h4 class="mb-1 text-sm font-semibold text-gray-700">Parsed Extraction (JSON)</h4>
+                <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{ aiData.raw | json }}</pre>
+            </div>
         </div>
     }
 </div>

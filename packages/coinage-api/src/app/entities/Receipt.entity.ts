@@ -56,4 +56,7 @@ export class Receipt {
 
     @Column({ name: 'ai_extracted_data', type: 'json', nullable: true, default: null })
     public aiExtractedData!: object | null;
+
+    @Column({ name: 'raw_ai_response', type: 'longtext', nullable: true, default: null })
+    public rawAiResponse!: string | null;
 }

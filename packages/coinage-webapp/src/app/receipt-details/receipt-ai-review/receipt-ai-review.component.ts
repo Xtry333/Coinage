@@ -7,6 +7,10 @@ import { NotificationService } from '../../services/notification.service';
 
 export interface ReviewItem extends NormalizedReceiptItemDTO {
     included: boolean;
+    /** Tracks which of qty/price was last edited — the other adjusts when total is changed. */
+    _lastEdited: 'qty' | 'price';
+    /** Computed total displayed in the editable total cell. */
+    _total: number;
 }
 
 @Component({
@@ -18,6 +22,7 @@ export interface ReviewItem extends NormalizedReceiptItemDTO {
 export class ReceiptAiReviewComponent implements OnInit {
     @Input() public receiptId!: number;
     @Input() public aiData!: ReceiptAiResultDTO;
+    @Input() public rawLlmResponse?: string | null;
 
     @Output() public transfersCreated = new EventEmitter<void>();
 
@@ -26,7 +31,7 @@ export class ReceiptAiReviewComponent implements OnInit {
     public overrideDate = '';
     public items: ReviewItem[] = [];
     public isSubmitting = false;
-    public showRawJson = false;
+    public showRawData = false;
 
     public constructor(
         private readonly dataService: CoinageDataService,
@@ -43,6 +48,8 @@ export class ReceiptAiReviewComponent implements OnInit {
         this.items = normalized.items.map((item) => ({
             ...item,
             included: true,
+            _lastEdited: 'price' as const,
+            _total: +(item.price * item.quantity).toFixed(2),
         }));
     }
 
@@ -51,7 +58,7 @@ export class ReceiptAiReviewComponent implements OnInit {
     }
 
     public get totalAmount(): number {
-        return this.includedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+        return +this.includedItems.reduce((sum, i) => sum + i._total, 0).toFixed(2);
     }
 
     public get matchedCount(): number {
@@ -83,6 +90,32 @@ export class ReceiptAiReviewComponent implements OnInit {
     public toggleAll(included: boolean): void {
         this.items.forEach((i) => (i.included = included));
     }
+
+    // ── Magic Calculator ─────────────────────────────────────────────────────
+
+    public onQtyChange(item: ReviewItem): void {
+        item._lastEdited = 'qty';
+        item._total = +(item.price * item.quantity).toFixed(2);
+    }
+
+    public onPriceChange(item: ReviewItem): void {
+        item._lastEdited = 'price';
+        item._total = +(item.price * item.quantity).toFixed(2);
+    }
+
+    public onTotalChange(item: ReviewItem): void {
+        if (item._lastEdited === 'qty' && item.price > 0) {
+            item.quantity = +(item._total / item.price).toFixed(3);
+        } else if (item.quantity > 0) {
+            item.price = +(item._total / item.quantity).toFixed(2);
+        }
+    }
+
+    public onNameChange(_item: ReviewItem): void {
+        // name is bound directly; nothing extra to compute
+    }
+
+    // ── Confirm ──────────────────────────────────────────────────────────────
 
     public async onConfirm(): Promise<void> {
         if (!this.selectedAccountId) {

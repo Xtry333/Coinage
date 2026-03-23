@@ -21,6 +21,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
     public uploadMessage = '';
     public duplicateReceiptId?: number;
     public aiExtractedData?: ReceiptAiResultDTO;
+    public rawAiResponse?: string | null;
     public processingStatus?: ReceiptProcessingStatus;
 
     private socketSubs: Subscription[] = [];
@@ -64,7 +65,8 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
         const processed = this.socketService.fromEvent<{ receiptId: number; aiData: ReceiptAiResultDTO }>('receiptProcessed').subscribe((data) => {
             if (data.receiptId === id) {
                 this.uploadStatus = 'processed';
-                this.aiExtractedData = data.aiData;
+                // Re-fetch to get rawAiResponse from the full status endpoint
+                this.loadStatus(id);
             }
         });
         const error = this.socketService.fromEvent<{ receiptId: number; error: string }>('receiptError').subscribe((data) => {
@@ -81,6 +83,7 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
             const result = await this.coinageData.getReceiptStatus(id);
             this.processingStatus = result.status;
             this.aiExtractedData = result.aiData as ReceiptAiResultDTO | undefined;
+            this.rawAiResponse = result.rawAiResponse;
             if (result.status === ReceiptProcessingStatus.PENDING) this.uploadStatus = 'queued';
             else if (result.status === ReceiptProcessingStatus.PROCESSING) this.uploadStatus = 'processing';
             else if (result.status === ReceiptProcessingStatus.EXTRACTED) this.uploadStatus = 'processing';

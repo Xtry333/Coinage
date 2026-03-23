@@ -136,11 +136,12 @@ export class ReceiptsController {
     }
 
     @Get(':id/status')
-    public async getReceiptStatus(@Param('id', ParseIntPipe) id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null }> {
+    public async getReceiptStatus(@Param('id', ParseIntPipe) id: number): Promise<{ status: ReceiptProcessingStatus; aiData?: object | null; rawAiResponse?: string | null }> {
         const receipt = await this.receiptDao.getById(id);
         return {
             status: ENTITY_STATUS_TO_DTO[receipt.processingStatus],
             aiData: receipt.aiExtractedData,
+            rawAiResponse: receipt.rawAiResponse,
         };
     }
 

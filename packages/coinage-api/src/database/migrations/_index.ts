@@ -15,6 +15,7 @@ import { UpdateContainersView1755864881273 } from './1755864881273-UpdateContain
 import { AddReceiptImageProcessing1741305600000 } from './1741305600000-AddReceiptImageProcessing';
 import { AddTagTable1756400000000 } from './1756400000000-AddTagTable';
 import { AddReceiptExtractedStatus1756500000000 } from './1756500000000-AddReceiptExtractedStatus';
+import { AddRawAiResponseColumn1756600000000 } from './1756600000000-AddRawAiResponseColumn';
 
 export default [
     CreateTables1000000000000,
@@ -34,4 +35,5 @@ export default [
     AddReceiptImageProcessing1741305600000,
     AddTagTable1756400000000,
     AddReceiptExtractedStatus1756500000000,
+    AddRawAiResponseColumn1756600000000,
 ];
