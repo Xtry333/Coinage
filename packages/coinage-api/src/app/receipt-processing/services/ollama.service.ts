@@ -58,7 +58,8 @@ export class OllamaService {
         this.logger.debug(`Extracting data from: ${imagePath} using ${this.provider} model: ${this.model}`);
 
         const { readFileSync } = await import('fs');
-        const imageBytes = readFileSync(imagePath);
+        const { join } = await import('path');
+        const imageBytes = readFileSync(join(process.cwd(), imagePath));
         const base64Image = imageBytes.toString('base64');
 
         const controller = new AbortController();

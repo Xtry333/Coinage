@@ -5,7 +5,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { createHash } from 'crypto';
 import { readFileSync, unlinkSync, existsSync, mkdirSync } from 'fs';
 import { diskStorage } from 'multer';
-import { extname, join } from 'path';
+import { extname, join, relative } from 'path';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
@@ -103,12 +103,13 @@ export class ReceiptsController {
             return { receiptId: id, isDuplicate: true, duplicateOfReceiptId: duplicate.id, status: ReceiptProcessingStatus.DUPLICATE };
         }
 
-        receipt.imagePath = file.path;
+        const relativePath = relative(process.cwd(), file.path);
+        receipt.imagePath = relativePath;
         receipt.imageHash = hash;
         receipt.processingStatus = EntityReceiptProcessingStatus.PENDING;
         await this.receiptDao.save(receipt);
 
-        this.eventBus.publish(new ReceiptQueuedEvent(id, file.path));
+        this.eventBus.publish(new ReceiptQueuedEvent(id, relativePath));
 
         return { receiptId: id, isDuplicate: false, status: ReceiptProcessingStatus.PENDING };
     }
