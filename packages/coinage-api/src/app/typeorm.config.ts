@@ -1,8 +1,32 @@
+import * as path from 'path';
+
 import { DataSource, DataSourceOptions, Table } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import entities from './entities/_index';
-import migrations from '../database/migrations/_index';
+
+export function loadMigrations(): (Function | string)[] {
+    // Detect webpack context via __webpack_require__ (injected by webpack at build time).
+    // Checking `typeof require.context` instead triggers a webpack warning:
+    // "Critical dependency: require function is used in a way in which dependencies cannot
+    // be statically extracted" — which prevents webpack from bundling the context modules.
+    // Using __webpack_require__ for the guard avoids that; webpack still statically analyzes
+    // the require.context(...) call below and bundles all matching migration files.
+    // @ts-expect-error: __webpack_require__ is injected by webpack, not in Node typings
+    if (typeof __webpack_require__ !== 'undefined') {
+        // @ts-expect-error: require.context is a webpack-specific API not in Node typings
+        const ctx = require.context('../database/migrations', false, /^\.\/(\d+\S*)\.(ts|js)$/);
+        return ctx
+            .keys()
+            .sort()
+            .flatMap((key: string) => (Object.values(ctx(key)) as Function[]).filter((v) => typeof v === 'function'));
+    }
+    // ts-node context (TypeORM CLI): return glob patterns for TypeORM to resolve
+    return [
+        path.join(__dirname, '../database/migrations/[0-9]*.ts'),
+        path.join(__dirname, '../database/migrations/[0-9]*.js'),
+    ];
+}
 
 export class CustomNamingStrategy extends SnakeNamingStrategy {
     public foreignKeyName(tableOrName: Table | string, columnNames: string[], referencedTablePath: string, referencedColumnNames: string[]): string {
@@ -35,7 +59,7 @@ export const opts: DataSourceOptions = {
     synchronize: false,
     logging: false,
     migrationsRun: true,
-    migrations: migrations,
+    migrations: loadMigrations(),
     migrationsTransactionMode: 'each',
     entities: [...entities],
     timezone: 'Z',
