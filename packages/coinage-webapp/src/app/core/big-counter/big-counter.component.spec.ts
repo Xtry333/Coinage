@@ -38,14 +38,23 @@ describe('BigCounterComponent', () => {
         expect(component.displayValue).toBe('0.00');
     });
 
-    it('should set displayValue immediately on first change', () => {
+    it('should start animation on first change with non-zero value', () => {
+        const rafSpy = jest.fn().mockReturnValue(1);
+        window.requestAnimationFrame = rafSpy;
+
         component.ngOnChanges({
             value: new SimpleChange(undefined, 1234.56, true),
         });
 
-        expect(component.displayValue).toContain('1');
-        expect(component.displayValue).toContain('234');
-        expect(component.displayValue).toContain('56');
+        expect(rafSpy).toHaveBeenCalled();
+    });
+
+    it('should set displayValue immediately on first change with zero value', () => {
+        component.ngOnChanges({
+            value: new SimpleChange(undefined, 0, true),
+        });
+
+        expect(component.displayValue).toBe('0.00');
     });
 
     it('should set displayValue immediately when animate is false', () => {
@@ -69,17 +78,10 @@ describe('BigCounterComponent', () => {
         expect(component.displayValue).toBe(initialDisplay);
     });
 
-    it('should start animation on subsequent value changes', () => {
+    it('should start animation on value changes', () => {
         const rafSpy = jest.fn().mockReturnValue(1);
         window.requestAnimationFrame = rafSpy;
 
-        // First change (no animation)
-        component.ngOnChanges({
-            value: new SimpleChange(undefined, 100, true),
-        });
-        expect(rafSpy).not.toHaveBeenCalled();
-
-        // Second change (should animate)
         component.ngOnChanges({
             value: new SimpleChange(100, 200, false),
         });
@@ -136,6 +138,7 @@ describe('BigCounterComponent', () => {
     });
 
     it('should format negative values correctly', () => {
+        component.animate = false;
         component.ngOnChanges({
             value: new SimpleChange(undefined, -500.5, true),
         });
@@ -145,6 +148,7 @@ describe('BigCounterComponent', () => {
     });
 
     it('should format zero value with two decimal places', () => {
+        component.animate = false;
         component.ngOnChanges({
             value: new SimpleChange(undefined, 0, true),
         });

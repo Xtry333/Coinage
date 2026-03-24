@@ -31,7 +31,7 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
         if (!changes['value']) return;
 
         const newTarget = parseFloat(changes['value'].currentValue);
-        if (!this.animate || changes['value'].isFirstChange()) {
+        if (!this.animate) {
             this.targetValue = newTarget;
             this.startValue = newTarget;
             this.displayValue = this.formatValue(newTarget);
