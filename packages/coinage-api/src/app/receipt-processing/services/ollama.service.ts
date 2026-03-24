@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { Category } from '../../entities/Category.entity';
-import { getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
+import { BatchItemEntry, BatchMatchResult, getBatchEntityMatchPrompt, getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
 
 export interface OllamaExtractedData {
     date?: string | null;
@@ -111,6 +111,55 @@ export class OllamaService {
                 .trim();
             return JSON.parse(cleaned) as { matchedId: number | null; confidence: number };
         } catch {
+            return null;
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    /**
+     * Batch-resolve multiple receipt items against their fuzzy candidates in a single AI call.
+     * Includes contractor context and purchase history for better matching.
+     *
+     * Returns per-item results with individual confidence scores, or null on failure.
+     * The caller should validate that each matchedId is actually in the candidates for that item.
+     */
+    public async resolveItemMatchBatch(
+        items: BatchItemEntry[],
+        contractorName: string | null,
+        categoryNames: string[],
+        contractorHistoryItemNames: string[],
+    ): Promise<BatchMatchResult[] | null> {
+        if (items.length === 0) return [];
+
+        const prompt = getBatchEntityMatchPrompt(items, contractorName, categoryNames, contractorHistoryItemNames);
+        this.logger.debug(`Batch matching ${items.length} items (prompt length: ${prompt.length} chars)`);
+
+        const controller = new AbortController();
+        const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.resolveTimeoutMs) : undefined;
+
+        try {
+            const raw = this.provider === 'lmstudio' ? await this.callLMStudioText(prompt, controller) : await this.callOllamaText(prompt, controller);
+
+            if (raw === null) {
+                this.logger.warn('Batch match call returned null response');
+                return null;
+            }
+
+            const cleaned = raw
+                .replace(/```json\n?/g, '')
+                .replace(/```\n?/g, '')
+                .trim();
+            const parsed = JSON.parse(cleaned) as { items: BatchMatchResult[] };
+
+            if (!Array.isArray(parsed.items)) {
+                this.logger.warn('Batch match response missing items array');
+                return null;
+            }
+
+            return parsed.items;
+        } catch (err) {
+            this.logger.warn(`Batch match failed: ${err instanceof Error ? err.message : String(err)}`);
             return null;
         } finally {
             clearTimeout(timer);
