@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChangeDetectorRef, SimpleChange } from '@angular/core';
+import { SimpleChange } from '@angular/core';
 
 import { BigCounterComponent } from './big-counter.component';
 
@@ -70,7 +70,7 @@ describe('BigCounterComponent', () => {
     });
 
     it('should start animation on subsequent value changes', () => {
-        const rafSpy = jasmine.createSpy('requestAnimationFrame').and.returnValue(1);
+        const rafSpy = jest.fn().mockReturnValue(1);
         window.requestAnimationFrame = rafSpy;
 
         // First change (no animation)
@@ -87,11 +87,11 @@ describe('BigCounterComponent', () => {
     });
 
     it('should cancel previous animation when value changes mid-animation', () => {
-        const cancelSpy = jasmine.createSpy('cancelAnimationFrame');
+        const cancelSpy = jest.fn();
         window.cancelAnimationFrame = cancelSpy;
-        window.requestAnimationFrame = jasmine.createSpy('requestAnimationFrame').and.returnValue(42);
+        window.requestAnimationFrame = jest.fn().mockReturnValue(42);
 
-        // First change
+        // First change (no animation)
         component.ngOnChanges({
             value: new SimpleChange(undefined, 100, true),
         });
@@ -110,9 +110,9 @@ describe('BigCounterComponent', () => {
     });
 
     it('should cancel animation on destroy', () => {
-        const cancelSpy = jasmine.createSpy('cancelAnimationFrame');
+        const cancelSpy = jest.fn();
         window.cancelAnimationFrame = cancelSpy;
-        window.requestAnimationFrame = jasmine.createSpy('requestAnimationFrame').and.returnValue(99);
+        window.requestAnimationFrame = jest.fn().mockReturnValue(99);
 
         component.ngOnChanges({
             value: new SimpleChange(undefined, 100, true),
@@ -127,7 +127,7 @@ describe('BigCounterComponent', () => {
     });
 
     it('should not call cancelAnimationFrame on destroy when no animation is running', () => {
-        const cancelSpy = jasmine.createSpy('cancelAnimationFrame');
+        const cancelSpy = jest.fn();
         window.cancelAnimationFrame = cancelSpy;
 
         component.ngOnDestroy();
@@ -154,17 +154,17 @@ describe('BigCounterComponent', () => {
 
     describe('tick animation', () => {
         let rafCallback: FrameRequestCallback;
-        let rafSpy: jasmine.Spy;
+        let rafSpy: jest.Mock;
 
         beforeEach(() => {
-            rafSpy = jasmine.createSpy('requestAnimationFrame').and.callFake((cb: FrameRequestCallback) => {
+            rafSpy = jest.fn().mockImplementation((cb: FrameRequestCallback) => {
                 rafCallback = cb;
                 return 1;
             });
             window.requestAnimationFrame = rafSpy;
-            window.cancelAnimationFrame = jasmine.createSpy('cancelAnimationFrame');
+            window.cancelAnimationFrame = jest.fn();
 
-            // Set initial value
+            // Set initial value without animation
             component.ngOnChanges({
                 value: new SimpleChange(undefined, 0, true),
             });
@@ -175,10 +175,10 @@ describe('BigCounterComponent', () => {
                 value: new SimpleChange(0, 1000, false),
             });
 
-            // Simulate a frame at the midpoint (250ms into 500ms animation)
+            // Simulate frames: first sets animationStart, second is at midpoint
             const startTime = 1000;
-            rafCallback(startTime); // first frame sets animationStart
-            rafCallback(startTime + 250); // midpoint frame
+            rafCallback(startTime);
+            rafCallback(startTime + 250); // 50% progress
 
             // At 50% progress with cubic ease-out: 1 - (1-0.5)^3 = 0.875
             // Expected value: 0 + 1000 * 0.875 = 875
@@ -191,8 +191,8 @@ describe('BigCounterComponent', () => {
             });
 
             const startTime = 1000;
-            rafCallback(startTime); // sets animationStart
-            rafCallback(startTime + 500); // exactly at duration end
+            rafCallback(startTime);
+            rafCallback(startTime + 500); // 100% progress
 
             expect(component.displayValue).toContain('1');
             expect(component.displayValue).toContain('000');
@@ -204,15 +204,13 @@ describe('BigCounterComponent', () => {
                 value: new SimpleChange(0, 1000, false),
             });
 
-            const callCountBefore = rafSpy.calls.count();
+            const callCountBefore = rafSpy.mock.calls.length;
 
             const startTime = 1000;
             rafCallback(startTime);
+            rafCallback(startTime + 100); // 20% through, not done
 
-            // Midway frame should request another frame
-            rafCallback(startTime + 100);
-
-            expect(rafSpy.calls.count()).toBeGreaterThan(callCountBefore);
+            expect(rafSpy.mock.calls.length).toBeGreaterThan(callCountBefore);
         });
 
         it('should not request next frame when animation is complete', () => {
@@ -223,48 +221,39 @@ describe('BigCounterComponent', () => {
             const startTime = 1000;
             rafCallback(startTime);
 
-            const callCountBefore = rafSpy.calls.count();
+            const callCountBefore = rafSpy.mock.calls.length;
+            rafCallback(startTime + 600); // past duration
 
-            // Final frame at or past duration
-            rafCallback(startTime + 600);
-
-            // No new rAF should be scheduled after completion
-            expect(rafSpy.calls.count()).toBe(callCountBefore);
+            expect(rafSpy.mock.calls.length).toBe(callCountBefore);
         });
 
-        it('should animate from current position when interrupted', () => {
+        it('should animate from current position when interrupted mid-animation', () => {
             component.ngOnChanges({
                 value: new SimpleChange(0, 1000, false),
             });
 
-            // Simulate partial animation
             const startTime = 1000;
             rafCallback(startTime);
-            rafCallback(startTime + 250); // midpoint, value ~875
+            rafCallback(startTime + 250); // partial progress, value ~875
 
-            // Now change target while animating
+            // Change target while animating
             component.ngOnChanges({
                 value: new SimpleChange(1000, 0, false),
             });
 
-            // First frame of new animation
             const newStart = 2000;
             rafCallback(newStart);
             rafCallback(newStart + 500); // complete new animation
 
-            // Should end at the new target (0)
             expect(component.displayValue).toBe('0.00');
         });
     });
 
     describe('template rendering', () => {
         it('should render labels and value in the template', () => {
-            component.upperLabel = 'PLN';
-            component.lowerLabel = 'Main Account';
-            component.ngOnChanges({
-                value: new SimpleChange(undefined, 1500.75, true),
-            });
-            fixture.changeDetectorRef.markForCheck();
+            fixture.componentRef.setInput('upperLabel', 'PLN');
+            fixture.componentRef.setInput('lowerLabel', 'Main Account');
+            fixture.componentRef.setInput('value', 1500.75);
             fixture.detectChanges();
 
             const el: HTMLElement = fixture.nativeElement;
