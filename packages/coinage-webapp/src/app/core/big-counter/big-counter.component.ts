@@ -1,9 +1,10 @@
-import { Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, NgZone, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
 
 @Component({
     selector: 'app-big-counter',
     templateUrl: './big-counter.component.html',
     styleUrls: ['./big-counter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
     standalone: false,
 })
 export class BigCounterComponent implements OnChanges, OnDestroy {
@@ -12,47 +13,84 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
     @Input() public lowerLabel = '';
     @Input() public animate = true;
 
-    public internalValue = 0;
+    public displayValue = '0.00';
 
-    public animateInterval?: ReturnType<typeof setInterval>;
+    private animationFrameId: number | null = null;
+    private startValue = 0;
+    private targetValue = 0;
+    private animationStart = 0;
+
+    private static readonly ANIMATION_DURATION_MS = 1000;
+    private static readonly EASE_OUT_POWER = 4;
+
+    constructor(
+        private readonly ngZone: NgZone,
+        private readonly cdr: ChangeDetectorRef,
+    ) {}
 
     public ngOnChanges(changes: SimpleChanges): void {
-        const targetValue = parseFloat(changes['value'].currentValue);
-        if (!this.animate) {
-            this.internalValue = targetValue;
-        } else {
-            this.tryClearAnimateInterval();
+        if (!changes['value']) return;
 
-            this.animateInterval = setInterval(() => {
-                this.animateCounterValue(targetValue);
-            }, 10);
+        const newTarget = parseFloat(changes['value'].currentValue);
+        if (!this.animate) {
+            this.targetValue = newTarget;
+            this.startValue = newTarget;
+            this.displayValue = this.formatValue(newTarget);
+            return;
         }
+
+        this.cancelAnimation();
+        this.startValue = this.getCurrentAnimatedValue();
+        this.targetValue = newTarget;
+        this.animationStart = 0;
+
+        this.ngZone.runOutsideAngular(() => {
+            this.animationFrameId = requestAnimationFrame((ts) => this.tick(ts));
+        });
     }
 
     public ngOnDestroy(): void {
-        this.tryClearAnimateInterval();
+        this.cancelAnimation();
     }
 
-    public animateCounterValue(targetValue: number) {
-        const delta = Math.abs(targetValue - this.internalValue) / 15;
-        if (this.internalValue + delta < targetValue && this.internalValue <= targetValue && delta > 0.001) {
-            this.internalValue += delta;
-        } else if (this.internalValue + delta > targetValue && this.internalValue >= targetValue && delta > 0.001) {
-            this.internalValue -= delta;
+    private tick(timestamp: number): void {
+        if (!this.animationStart) {
+            this.animationStart = timestamp;
+        }
+
+        const elapsed = timestamp - this.animationStart;
+        const progress = Math.min(elapsed / BigCounterComponent.ANIMATION_DURATION_MS, 1);
+        const eased = 1 - Math.pow(1 - progress, BigCounterComponent.EASE_OUT_POWER);
+
+        const current = this.startValue + (this.targetValue - this.startValue) * eased;
+        this.displayValue = this.formatValue(current);
+        this.cdr.detectChanges();
+
+        if (progress < 1) {
+            this.animationFrameId = requestAnimationFrame((ts) => this.tick(ts));
         } else {
-            this.internalValue = targetValue;
-            this.tryClearAnimateInterval();
+            this.animationFrameId = null;
         }
     }
 
-    public tryClearAnimateInterval() {
-        if (this.animateInterval) {
-            clearInterval(this.animateInterval);
-            this.animateInterval = undefined;
+    private getCurrentAnimatedValue(): number {
+        if (!this.animationFrameId || !this.animationStart) {
+            return this.targetValue;
+        }
+        const elapsed = performance.now() - this.animationStart;
+        const progress = Math.min(elapsed / BigCounterComponent.ANIMATION_DURATION_MS, 1);
+        const eased = 1 - Math.pow(1 - progress, BigCounterComponent.EASE_OUT_POWER);
+        return this.startValue + (this.targetValue - this.startValue) * eased;
+    }
+
+    private cancelAnimation(): void {
+        if (this.animationFrameId !== null) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
         }
     }
 
-    public get displayValue() {
-        return this.internalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    private formatValue(val: number): string {
+        return val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 }
