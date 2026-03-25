@@ -20,7 +20,8 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
     private targetValue = 0;
     private animationStart = 0;
 
-    private static readonly ANIMATION_DURATION_MS = 500;
+    private static readonly ANIMATION_DURATION_MS = 1000;
+    private static readonly EASE_OUT_POWER = 4;
 
     constructor(
         private readonly ngZone: NgZone,
@@ -59,7 +60,7 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
 
         const elapsed = timestamp - this.animationStart;
         const progress = Math.min(elapsed / BigCounterComponent.ANIMATION_DURATION_MS, 1);
-        const eased = 1 - Math.pow(1 - progress, 3); // cubic ease-out
+        const eased = 1 - Math.pow(1 - progress, BigCounterComponent.EASE_OUT_POWER);
 
         const current = this.startValue + (this.targetValue - this.startValue) * eased;
         this.displayValue = this.formatValue(current);
@@ -78,7 +79,7 @@ export class BigCounterComponent implements OnChanges, OnDestroy {
         }
         const elapsed = performance.now() - this.animationStart;
         const progress = Math.min(elapsed / BigCounterComponent.ANIMATION_DURATION_MS, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
+        const eased = 1 - Math.pow(1 - progress, BigCounterComponent.EASE_OUT_POWER);
         return this.startValue + (this.targetValue - this.startValue) * eased;
     }
 
