@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
 import { Category } from '../../entities/Category.entity';
-import { getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
+import { BatchItemEntry, BatchMatchResult, getBatchEntityMatchPrompt, getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
 
 export interface OllamaExtractedData {
     date?: string | null;
@@ -12,40 +12,60 @@ export interface OllamaExtractedData {
     confidence?: number;
 }
 
-export type ReceiptAIProvider = 'ollama' | 'lmstudio';
-
+/**
+ * Unified receipt AI service using the OpenAI-compatible `/v1/chat/completions`
+ * endpoint. Works with any backend that implements the OpenAI API spec:
+ * LM Studio, Ollama (≥0.1.14), vLLM, LocalAI, etc.
+ *
+ * Configuration (env vars):
+ *   RECEIPT_AI_BASE_URL    – Server URL (default: http://192.168.50.176:1234)
+ *   RECEIPT_AI_MODEL       – Model identifier (default: qwen/qwen3.5-9b)
+ *   RECEIPT_AI_TIMEOUT_MS  – Idle timeout for vision extraction (default: 600000)
+ *   RECEIPT_AI_RESOLVE_TIMEOUT_MS – Idle timeout for text matching (default: 120000)
+ *   RECEIPT_AI_STREAMING   – "true" for SSE streaming, "false" for blocking (default: true)
+ *
+ * Legacy env vars (LM_STUDIO_*, OLLAMA_*) are still read as fallbacks.
+ */
 @Injectable()
 export class OllamaService {
     private readonly logger = new Logger(OllamaService.name);
 
-    private readonly provider: ReceiptAIProvider;
     private readonly baseUrl: string;
     private readonly model: string;
     private readonly timeoutMs: number;
     private readonly resolveTimeoutMs: number;
     private readonly availabilityCheckTimeoutMs = 5000;
+    private readonly streaming: boolean;
 
     public constructor() {
-        this.provider = (process.env['RECEIPT_AI_PROVIDER'] ?? 'lmstudio') as ReceiptAIProvider;
+        this.baseUrl =
+            process.env['RECEIPT_AI_BASE_URL'] ??
+            process.env['LM_STUDIO_BASE_URL'] ??
+            process.env['OLLAMA_BASE_URL'] ??
+            'http://192.168.50.176:1234';
 
-        if (this.provider === 'lmstudio') {
-            this.baseUrl = process.env['LM_STUDIO_BASE_URL'] ?? 'http://192.168.50.176:1234';
-            this.model = process.env['LM_STUDIO_MODEL'] ?? 'qwen/qwen3.5-9b';
-        } else {
-            this.baseUrl = process.env['OLLAMA_BASE_URL'] ?? 'http://localhost:11434';
-            this.model = process.env['OLLAMA_MODEL'] ?? 'llava';
-        }
+        this.model =
+            process.env['RECEIPT_AI_MODEL'] ??
+            process.env['LM_STUDIO_MODEL'] ??
+            process.env['OLLAMA_MODEL'] ??
+            'qwen/qwen3.5-9b';
 
-        this.timeoutMs = parseInt(process.env['OLLAMA_TIMEOUT_MS'] ?? '600000');
-        this.resolveTimeoutMs = parseInt(process.env['OLLAMA_RESOLVE_TIMEOUT_MS'] ?? '120000');
+        this.timeoutMs = parseInt(
+            process.env['RECEIPT_AI_TIMEOUT_MS'] ?? process.env['OLLAMA_TIMEOUT_MS'] ?? '600000',
+        );
+        this.resolveTimeoutMs = parseInt(
+            process.env['RECEIPT_AI_RESOLVE_TIMEOUT_MS'] ?? process.env['OLLAMA_RESOLVE_TIMEOUT_MS'] ?? '120000',
+        );
+        this.streaming = (process.env['RECEIPT_AI_STREAMING'] ?? 'true') === 'true';
     }
+
+    // ── Public API ────────────────────────────────────────────────────────────
 
     public async isAvailable(): Promise<boolean> {
         try {
             const controller = new AbortController();
             const timer = setTimeout(() => controller.abort(), this.availabilityCheckTimeoutMs);
-            const checkUrl = this.provider === 'lmstudio' ? `${this.baseUrl}/v1/models` : `${this.baseUrl}/api/tags`;
-            const res = await fetch(checkUrl, { signal: controller.signal });
+            const res = await fetch(`${this.baseUrl}/v1/models`, { signal: controller.signal });
             clearTimeout(timer);
             return res.ok;
         } catch {
@@ -54,38 +74,23 @@ export class OllamaService {
     }
 
     public async extractReceiptData(imagePath: string): Promise<{ data: OllamaExtractedData; rawResponse: string }> {
-        this.logger.debug(`Extracting data from: ${imagePath} using ${this.provider} model: ${this.model}`);
+        this.logger.debug(`Extracting data from: ${imagePath} using model: ${this.model}`);
 
         const { readFileSync } = await import('fs');
         const { join } = await import('path');
         const imageBytes = readFileSync(join(process.cwd(), imagePath));
         const base64Image = imageBytes.toString('base64');
 
-        const controller = new AbortController();
+        const today = new Date().toISOString().split('T')[0];
+        const prompt = getReceiptExtractionPromptPolish(today);
 
-        // For LM Studio (streaming): inactivity timer is managed inside readSSEStream.
-        // For Ollama (non-streaming): use a hard wall-clock abort here.
-        const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.timeoutMs) : undefined;
-
-        try {
-            const today = new Date().toISOString().split('T')[0];
-            const extractionPrompt = getReceiptExtractionPromptPolish(today);
-
-            const rawResponse =
-                this.provider === 'lmstudio'
-                    ? await this.callLMStudioVision(base64Image, extractionPrompt, controller)
-                    : await this.callOllamaGenerate(base64Image, extractionPrompt, controller);
-
-            return { data: this.parseResponse(rawResponse), rawResponse };
-        } finally {
-            clearTimeout(timer);
-        }
+        const rawResponse = await this.callVision(base64Image, prompt, this.timeoutMs);
+        return { data: this.parseResponse(rawResponse), rawResponse };
     }
 
     /**
      * Text-only call to resolve an extracted string (item name, contractor) against a list of
-     * fuzzy-match candidates. No image is sent — uses the same model in text mode.
-     * Returns null on network/parse failure so the caller can treat it as "no match".
+     * fuzzy-match candidates. Returns null on network/parse failure so the caller can treat it as "no match".
      */
     public async resolveEntityMatch(
         query: string,
@@ -95,104 +100,138 @@ export class OllamaService {
         const categoryNames = categories?.map((c) => c.name) ?? [];
         const prompt = getEntityMatchPrompt(query, candidates, categoryNames);
 
-        const controller = new AbortController();
-
-        // For LM Studio (streaming): inactivity timer is managed inside readSSEStream.
-        // For Ollama (non-streaming): use a hard wall-clock abort here.
-        const timer = this.provider !== 'lmstudio' ? setTimeout(() => controller.abort(), this.resolveTimeoutMs) : undefined;
-
         try {
-            const raw = this.provider === 'lmstudio' ? await this.callLMStudioText(prompt, controller) : await this.callOllamaText(prompt, controller);
-
+            const raw = await this.callText(prompt, this.resolveTimeoutMs);
             if (raw === null) return null;
-            const cleaned = raw
-                .replace(/```json\n?/g, '')
-                .replace(/```\n?/g, '')
-                .trim();
-            return JSON.parse(cleaned) as { matchedId: number | null; confidence: number };
+            return JSON.parse(this.cleanJsonResponse(raw)) as { matchedId: number | null; confidence: number };
         } catch {
             return null;
+        }
+    }
+
+    /**
+     * Batch-resolve multiple receipt items against their fuzzy candidates in a single AI call.
+     * Includes contractor context and purchase history for better matching.
+     *
+     * Returns per-item results with individual confidence scores, or null on failure.
+     * The caller should validate that each matchedId is actually in the candidates for that item.
+     */
+    public async resolveItemMatchBatch(
+        items: BatchItemEntry[],
+        contractorName: string | null,
+        categoryNames: string[],
+        contractorHistoryItemNames: string[],
+    ): Promise<BatchMatchResult[] | null> {
+        if (items.length === 0) return [];
+
+        const prompt = getBatchEntityMatchPrompt(items, contractorName, categoryNames, contractorHistoryItemNames);
+        this.logger.debug(`Batch matching ${items.length} items (prompt length: ${prompt.length} chars)`);
+
+        try {
+            const raw = await this.callText(prompt, this.resolveTimeoutMs);
+            if (raw === null) {
+                this.logger.warn('Batch match call returned null response');
+                return null;
+            }
+
+            const parsed = JSON.parse(this.cleanJsonResponse(raw)) as { items: BatchMatchResult[] };
+
+            if (!Array.isArray(parsed.items)) {
+                this.logger.warn('Batch match response missing items array');
+                return null;
+            }
+
+            return parsed.items;
+        } catch (err) {
+            this.logger.warn(`Batch match failed: ${err instanceof Error ? err.message : String(err)}`);
+            return null;
+        }
+    }
+
+    // ── OpenAI-compatible /v1/chat/completions ───────────────────────────────
+
+    /**
+     * Vision call: sends an image + text prompt via the OpenAI chat completions API.
+     * Throws on non-OK status.
+     */
+    private async callVision(base64Image: string, prompt: string, timeoutMs: number): Promise<string> {
+        const messages = [
+            {
+                role: 'user',
+                content: [
+                    { type: 'text', text: prompt },
+                    { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } },
+                ],
+            },
+        ];
+
+        return this.chatCompletion(messages, timeoutMs, true);
+    }
+
+    /**
+     * Text-only call via the OpenAI chat completions API.
+     * Returns null on non-OK status (instead of throwing).
+     */
+    private async callText(prompt: string, timeoutMs: number): Promise<string | null> {
+        const messages = [{ role: 'user', content: prompt }];
+
+        try {
+            return await this.chatCompletion(messages, timeoutMs, false);
+        } catch {
+            return null;
+        }
+    }
+
+    /**
+     * Core method: POST /v1/chat/completions.
+     * Supports both streaming (SSE with idle timeout) and non-streaming modes.
+     */
+    private async chatCompletion(
+        messages: Array<{ role: string; content: unknown }>,
+        timeoutMs: number,
+        throwOnError: boolean,
+    ): Promise<string> {
+        const controller = new AbortController();
+
+        const body: Record<string, unknown> = {
+            model: this.model,
+            messages,
+            stream: this.streaming,
+        };
+
+        if (!this.streaming) {
+            body['response_format'] = { type: 'json_object' };
+        }
+
+        // For non-streaming: wall-clock timeout. For streaming: idle timer is inside readSSEStream.
+        const timer = !this.streaming ? setTimeout(() => controller.abort(), timeoutMs) : undefined;
+
+        try {
+            const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: controller.signal,
+            });
+
+            if (!response.ok) {
+                if (throwOnError) {
+                    throw new Error(`AI server responded with ${response.status}: ${await response.text()}`);
+                }
+                return '';
+            }
+
+            if (this.streaming) {
+                return await this.readSSEStream(response, controller, timeoutMs);
+            }
+
+            const result = (await response.json()) as {
+                choices: Array<{ message: { content: string } }>;
+            };
+            return result.choices[0]?.message?.content ?? '';
         } finally {
             clearTimeout(timer);
         }
-    }
-
-    // ── Ollama native API ────────────────────────────────────────────────────
-
-    private async callOllamaGenerate(base64Image: string, prompt: string, controller: AbortController): Promise<string> {
-        const response = await fetch(`${this.baseUrl}/api/generate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: this.model, prompt, images: [base64Image], stream: false, format: 'json' }),
-            signal: controller.signal,
-        });
-
-        if (!response.ok) {
-            throw new Error(`Ollama responded with ${response.status}: ${await response.text()}`);
-        }
-
-        const result = (await response.json()) as { response: string };
-        return result.response;
-    }
-
-    private async callOllamaText(prompt: string, controller: AbortController): Promise<string | null> {
-        const response = await fetch(`${this.baseUrl}/api/generate`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ model: this.model, prompt, stream: false, format: 'json' }),
-            signal: controller.signal,
-        });
-
-        if (!response.ok) return null;
-
-        const result = (await response.json()) as { response: string };
-        return result.response;
-    }
-
-    // ── LM Studio OpenAI-compatible API ─────────────────────────────────────
-
-    private async callLMStudioVision(base64Image: string, prompt: string, controller: AbortController): Promise<string> {
-        const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: this.model,
-                stream: true,
-                messages: [
-                    {
-                        role: 'user',
-                        content: [
-                            { type: 'text', text: prompt },
-                            { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${base64Image}` } },
-                        ],
-                    },
-                ],
-            }),
-            signal: controller.signal,
-        });
-
-        if (!response.ok) {
-            throw new Error(`LM Studio responded with ${response.status}: ${await response.text()}`);
-        }
-
-        return this.readSSEStream(response, controller, this.timeoutMs);
-    }
-
-    private async callLMStudioText(prompt: string, controller: AbortController): Promise<string | null> {
-        const response = await fetch(`${this.baseUrl}/v1/chat/completions`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                model: this.model,
-                stream: true,
-                messages: [{ role: 'user', content: prompt }],
-            }),
-            signal: controller.signal,
-        });
-
-        if (!response.ok) return null;
-
-        return this.readSSEStream(response, controller, this.resolveTimeoutMs);
     }
 
     /**
@@ -201,7 +240,7 @@ export class OllamaService {
      * only fires if the model goes completely silent — not after a fixed wall-clock limit.
      */
     private async readSSEStream(response: Response, controller: AbortController, idleTimeoutMs: number): Promise<string> {
-        if (!response.body) throw new Error('LM Studio returned no response body');
+        if (!response.body) throw new Error('AI server returned no response body');
 
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -245,15 +284,18 @@ export class OllamaService {
         return content;
     }
 
-    // ── Shared ───────────────────────────────────────────────────────────────
+    // ── Shared helpers ───────────────────────────────────────────────────────
+
+    private cleanJsonResponse(raw: string): string {
+        return raw
+            .replace(/```json\n?/g, '')
+            .replace(/```\n?/g, '')
+            .trim();
+    }
 
     private parseResponse(raw: string): OllamaExtractedData {
         try {
-            const cleaned = raw
-                .replace(/```json\n?/g, '')
-                .replace(/```\n?/g, '')
-                .trim();
-            return JSON.parse(cleaned) as OllamaExtractedData;
+            return JSON.parse(this.cleanJsonResponse(raw)) as OllamaExtractedData;
         } catch {
             this.logger.warn('Failed to parse AI JSON response, returning raw text');
             return { confidence: 0 };
