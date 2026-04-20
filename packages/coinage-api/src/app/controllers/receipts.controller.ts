@@ -63,7 +63,7 @@ const ENTITY_STATUS_TO_DTO: Record<EntityReceiptProcessingStatus, ReceiptProcess
     [EntityReceiptProcessingStatus.DUPLICATE]: ReceiptProcessingStatus.DUPLICATE,
     [EntityReceiptProcessingStatus.ERROR]: ReceiptProcessingStatus.ERROR,
 };
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10 MB
+const MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024; // MB
 
 const multerStorage = diskStorage({
     destination: (_req, _file, cb) => cb(null, UPLOAD_DIR),
