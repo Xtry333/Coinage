@@ -1,4 +1,2 @@
-export const Bit = {
-    False: "b'0'",
-    True: "b'1'",
-};
+// Deprecated: Boolean columns now use native PostgreSQL `boolean` type.
+// Kept for reference; no longer used by any entity.

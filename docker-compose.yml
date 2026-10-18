@@ -1,13 +1,15 @@
 services:
     coinage-db:
         restart: unless-stopped
-        image: mysql
+        image: postgres:15-alpine
         env_file:
             - ./.env
         ports:
-            - 3306:3306
+            - 5432:5432
+        volumes:
+            - ./docker/postgres-data:/var/lib/postgresql/data
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=$MYSQL_ROOT_PASSWORD"]
+            test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE:-postgres}"]
             interval: 5s
             timeout: 5s
             retries: 10
@@ -18,7 +20,7 @@ services:
             dockerfile: docker/api.Dockerfile
         image: coinage-api
         environment:
-            MYSQL_HOST: coinage-db
+            PG_HOST: coinage-db
         env_file:
             - ./.env
         ports:

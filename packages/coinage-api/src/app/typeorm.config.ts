@@ -50,12 +50,12 @@ export class CustomNamingStrategy extends SnakeNamingStrategy {
 }
 
 export const opts: DataSourceOptions = {
-    type: 'mysql',
-    host: process.env.MYSQL_HOST || 'localhost',
-    port: Number(process.env.COINAGE_MYSQL_PORT) || 3306,
-    username: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
+    type: 'postgres',
+    host: process.env.PG_HOST || process.env.MYSQL_HOST || 'localhost',
+    port: Number(process.env.COINAGE_PG_PORT) || Number(process.env.COINAGE_MYSQL_PORT) || 5432,
+    username: process.env.PG_USER || process.env.MYSQL_USER,
+    password: process.env.PG_PASSWORD || process.env.MYSQL_PASSWORD,
+    database: process.env.PG_DATABASE || process.env.MYSQL_DATABASE,
     synchronize: false,
     logging: false,
     migrationsRun: true,

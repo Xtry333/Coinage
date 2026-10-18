@@ -46,6 +46,7 @@ Thumbs.db
 
 # DB Files
 coinage-data.sql
+docker/postgres-data/
 
 # Environment
 .env

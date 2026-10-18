@@ -1,6 +1,5 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Bit } from '../constants/booleanBuffer.const';
 import { Account } from './Account.entity';
 import { Category } from './Category.entity';
 import { Contractor } from './Contractor.entity';
@@ -8,7 +7,6 @@ import { Currency } from './Currency.entity';
 import { Receipt } from './Receipt.entity';
 import { Schedule } from './Schedule.entity';
 import { TransferItem } from './TransferItem.entity';
-import { BooleanTransformer } from './transformers/boolean.transformer';
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
 import { User } from './User.entity';
@@ -108,13 +106,13 @@ export class Transfer extends WithDateEntity {
     @JoinColumn({ name: 'target_account_id' })
     public targetAccount!: Account | null;
 
-    @Column({ type: 'bit', nullable: false, default: Bit.False, transformer: new BooleanTransformer() })
+    @Column({ type: 'boolean', nullable: false, default: false })
     public isEthereal!: boolean;
 
-    @Column({ type: 'bit', nullable: false, default: Bit.False, transformer: new BooleanTransformer() })
+    @Column({ type: 'boolean', nullable: false, default: false })
     public isFlagged!: boolean;
 
-    @Column({ type: 'json', nullable: false, default: 'json_object()' })
+    @Column({ type: 'jsonb', nullable: false, default: '{}' })
     public metadata!: TransferMetadata & { [key: string]: string | number | undefined };
 
     @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: ['insert'] })
