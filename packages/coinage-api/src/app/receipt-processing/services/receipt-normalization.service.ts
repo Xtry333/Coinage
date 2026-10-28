@@ -12,23 +12,39 @@ import { Contractor } from '../../entities/Contractor.entity';
 import { Item } from '../../entities/Item.entity';
 import { ItemsWithContainers } from '../../entities/views/ItemsWithContainers.view';
 import { OllamaExtractedData, OllamaService } from './ollama.service';
+import { BatchItemEntry } from './prompts.model';
 
-/** Top N fuzzy candidates to send to AI on first attempt. */
-const FIRST_PASS_CANDIDATES = 10;
-/** Top N fuzzy candidates to send to AI on retry. */
-const RETRY_PASS_CANDIDATES = 50;
+/** Top N fuzzy candidates to send to AI on first attempt (per item). */
+const FIRST_PASS_CANDIDATES = parseInt(process.env['RECEIPT_FIRST_PASS_CANDIDATES'] ?? '10');
+/** Top N fuzzy candidates to send to AI on retry (per item). */
+const RETRY_PASS_CANDIDATES = parseInt(process.env['RECEIPT_RETRY_PASS_CANDIDATES'] ?? '50');
 /** Score above which the fuzzy match is accepted without an AI call. */
-const AUTO_MATCH_THRESHOLD = 0.96;
+const AUTO_MATCH_THRESHOLD = parseFloat(process.env['RECEIPT_AUTO_MATCH_THRESHOLD'] ?? '0.96');
 /** Minimum AI confidence to accept a match. */
-const AI_CONFIDENCE_THRESHOLD = 0.65;
+const AI_CONFIDENCE_THRESHOLD = parseFloat(process.env['RECEIPT_AI_CONFIDENCE_THRESHOLD'] ?? '0.65');
 /** Minimum fuzzy score to include a candidate at all. */
-const MINIMUM_FUZZY_SCORE = 0.5;
+const MINIMUM_FUZZY_SCORE = parseFloat(process.env['RECEIPT_MINIMUM_FUZZY_SCORE'] ?? '0.5');
 /**
  * If the last recorded unit price for a container is within this fraction of
  * the current receipt price, it is considered a price match.
  * e.g. 0.20 means ±20% tolerance.
  */
-const PRICE_MATCH_TOLERANCE = 0.2;
+const PRICE_MATCH_TOLERANCE = parseFloat(process.env['RECEIPT_PRICE_MATCH_TOLERANCE'] ?? '0.2');
+
+/**
+ * Approximate token budget per batch AI call (in characters).
+ * 1 token ≈ 4 characters on average. Default 15 000 tokens ≈ 60 000 chars.
+ * Configurable via RECEIPT_BATCH_TOKEN_BUDGET env var (in tokens).
+ */
+const BATCH_TOKEN_BUDGET = parseInt(process.env['RECEIPT_BATCH_TOKEN_BUDGET'] ?? '15000');
+const CHARS_PER_TOKEN = 4;
+const BATCH_CHAR_BUDGET = BATCH_TOKEN_BUDGET * CHARS_PER_TOKEN;
+
+/**
+ * Fuzzy score bonus for items previously purchased from the same contractor.
+ * Makes contractor-history items more likely to appear in candidate lists.
+ */
+const CONTRACTOR_HISTORY_BOOST = parseFloat(process.env['RECEIPT_CONTRACTOR_HISTORY_BOOST'] ?? '0.10');
 
 // ─── Public interfaces ────────────────────────────────────────────────────────
 
@@ -128,7 +144,17 @@ export class ReceiptNormalizationService {
 
         const [contractorId, contractorName, isNewContractor] = await this.resolveContractor(rawData.contractor ?? null, contractors);
 
-        const normalizedItems = await Promise.all((rawData.items ?? []).map((item) => this.resolveItem(item, items, outcomeCategories)));
+        // Fetch contractor purchase history for boosting & context
+        const contractorHistoryItemIds = contractorId ? await this.itemDao.getItemIdsByContractor(contractorId) : [];
+        const contractorHistorySet = new Set(contractorHistoryItemIds);
+
+        const normalizedItems = await this.resolveAllItems(
+            rawData.items ?? [],
+            items,
+            outcomeCategories,
+            contractorName,
+            contractorHistorySet,
+        );
 
         return {
             date: rawData.date,
@@ -171,12 +197,294 @@ export class ReceiptNormalizationService {
         return [null, extractedName, true];
     }
 
-    // ─── Item resolution ──────────────────────────────────────────────────────
+    // ─── Batch item resolution ───────────────────────────────────────────────
 
-    private async resolveItem(
-        extracted: { name: string; price: number; quantity?: number },
+    /**
+     * Resolve all extracted items using a two-phase approach:
+     *
+     * Phase 1: Fuzzy matching — auto-accept items above AUTO_MATCH_THRESHOLD.
+     * Phase 2: Batch AI matching — send remaining items in token-budget-sized
+     *          batches to the AI, with contractor context and purchase history.
+     *          Falls back to per-item AI on batch failure.
+     *
+     * Token budget per batch is configurable via RECEIPT_BATCH_TOKEN_BUDGET env
+     * var (default 15 000 tokens). Items are packed into batches greedily until
+     * the budget is exhausted.
+     */
+    private async resolveAllItems(
+        extractedItems: Array<{ name: string; price: number; quantity?: number }>,
         allItems: Item[],
         categories: Category[],
+        contractorName: string | null,
+        contractorHistoryItemIds: Set<number>,
+    ): Promise<NormalizedItem[]> {
+        const itemPool = allItems.map((i) => ({ id: i.id, name: this.formatItemLabel(i) }));
+
+        // Build contractor history item names for the prompt (capped to avoid bloating)
+        const contractorHistoryItemNames = allItems
+            .filter((i) => contractorHistoryItemIds.has(i.id))
+            .map((i) => this.formatItemLabel(i))
+            .slice(0, 100);
+
+        // Collect category names relevant to outcome categories only
+        const categoryNames = categories.map((c) => c.name);
+
+        // ── Phase 1: Fuzzy matching ─────────────────────────────────────────
+
+        interface PreparedItem {
+            originalIndex: number;
+            extracted: { name: string; price: number; quantity?: number };
+            firstPassCandidates: FuzzyCandidate[];
+            extendedCandidates: FuzzyCandidate[];
+            resolvedItem: Item | null;
+            needsAI: boolean;
+        }
+
+        const prepared: PreparedItem[] = extractedItems.map((extracted, idx) => {
+            const extendedCandidates = this.topFuzzyCandidatesWithBoost(
+                extracted.name,
+                itemPool,
+                RETRY_PASS_CANDIDATES,
+                contractorHistoryItemIds,
+            );
+            const firstPassCandidates = extendedCandidates.slice(0, FIRST_PASS_CANDIDATES);
+
+            let resolvedItem: Item | null = null;
+            let needsAI = true;
+
+            if (firstPassCandidates.length > 0 && firstPassCandidates[0].score >= AUTO_MATCH_THRESHOLD) {
+                resolvedItem = allItems.find((i) => i.id === firstPassCandidates[0].id) ?? null;
+                if (resolvedItem) {
+                    needsAI = false;
+                    this.logger.debug(
+                        `Item "${extracted.name}" auto-matched to "${firstPassCandidates[0].name}" (${firstPassCandidates[0].score.toFixed(2)})`,
+                    );
+                }
+            }
+
+            return { originalIndex: idx, extracted, firstPassCandidates, extendedCandidates, resolvedItem, needsAI };
+        });
+
+        const needAI = prepared.filter((p) => p.needsAI);
+        const autoMatchedCount = prepared.length - needAI.length;
+
+        if (needAI.length > 0) {
+            this.logger.log(
+                `Phase 1 complete: ${autoMatchedCount} auto-matched, ${needAI.length} need AI (budget: ${BATCH_TOKEN_BUDGET} tokens/batch)`,
+            );
+        }
+
+        // ── Phase 2: Batch AI matching ──────────────────────────────────────
+
+        if (needAI.length > 0) {
+            await this.batchResolveItems(needAI, allItems, categoryNames, contractorName, contractorHistoryItemNames);
+        }
+
+        // ── Phase 3: Resolve containers and build final results ─────────────
+
+        const results: NormalizedItem[] = await Promise.all(
+            prepared.map((p) => this.buildNormalizedItem(p.extracted, p.resolvedItem)),
+        );
+
+        return results;
+    }
+
+    /**
+     * Split items needing AI into token-budget-sized batches, call the batch AI
+     * endpoint, and apply results. Falls back to per-item AI on batch failure.
+     * Retries unmatched items with extended candidates in a second pass.
+     */
+    private async batchResolveItems(
+        items: Array<{
+            originalIndex: number;
+            extracted: { name: string; price: number; quantity?: number };
+            firstPassCandidates: FuzzyCandidate[];
+            extendedCandidates: FuzzyCandidate[];
+            resolvedItem: Item | null;
+        }>,
+        allItems: Item[],
+        categoryNames: string[],
+        contractorName: string | null,
+        contractorHistoryItemNames: string[],
+    ): Promise<void> {
+        // First pass: use firstPassCandidates
+        const firstPassBatches = this.buildBatches(items, 'first');
+        this.logger.log(`Batch AI pass 1: ${items.length} items in ${firstPassBatches.length} batch(es)`);
+
+        const unresolvedAfterFirstPass: typeof items = [];
+
+        for (let batchIdx = 0; batchIdx < firstPassBatches.length; batchIdx++) {
+            const batch = firstPassBatches[batchIdx];
+            const batchEntries: BatchItemEntry[] = batch.map((item) => ({
+                index: item.originalIndex,
+                ocrName: item.extracted.name,
+                price: item.extracted.price,
+                quantity: item.extracted.quantity ?? 1,
+                candidates: item.firstPassCandidates,
+            }));
+
+            const results = await this.ollamaService.resolveItemMatchBatch(
+                batchEntries,
+                contractorName,
+                categoryNames,
+                contractorHistoryItemNames,
+            );
+
+            if (results === null) {
+                // Batch call failed — fall back to per-item for this batch
+                this.logger.warn(`Batch ${batchIdx + 1} failed — falling back to per-item AI`);
+                await this.perItemFallback(batch, allItems);
+                continue;
+            }
+
+            // Apply batch results
+            const resultMap = new Map(results.map((r) => [r.index, r]));
+            for (const item of batch) {
+                const result = resultMap.get(item.originalIndex);
+                if (result && result.matchedId !== null && result.confidence >= AI_CONFIDENCE_THRESHOLD) {
+                    // Validate the matchedId is actually in this item's candidates
+                    const validCandidate = item.firstPassCandidates.find((c) => c.id === result.matchedId);
+                    if (validCandidate) {
+                        item.resolvedItem = allItems.find((i) => i.id === result.matchedId) ?? null;
+                        if (item.resolvedItem) {
+                            this.logger.debug(
+                                `Batch AI resolved "${item.extracted.name}" → "${validCandidate.name}" (confidence=${result.confidence.toFixed(2)})`,
+                            );
+                            continue;
+                        }
+                    } else {
+                        this.logger.warn(
+                            `Batch AI returned matchedId=${result.matchedId} for "${item.extracted.name}" but it's not in candidates — ignoring`,
+                        );
+                    }
+                }
+                unresolvedAfterFirstPass.push(item);
+            }
+        }
+
+        // Retry pass: use extended candidates for unresolved items
+        if (unresolvedAfterFirstPass.length > 0) {
+            this.logger.log(`Batch AI pass 2 (retry): ${unresolvedAfterFirstPass.length} unresolved items with extended candidates`);
+            const retryBatches = this.buildBatches(unresolvedAfterFirstPass, 'retry');
+
+            for (let batchIdx = 0; batchIdx < retryBatches.length; batchIdx++) {
+                const batch = retryBatches[batchIdx];
+                const batchEntries: BatchItemEntry[] = batch.map((item) => ({
+                    index: item.originalIndex,
+                    ocrName: item.extracted.name,
+                    price: item.extracted.price,
+                    quantity: item.extracted.quantity ?? 1,
+                    candidates: item.extendedCandidates,
+                }));
+
+                const results = await this.ollamaService.resolveItemMatchBatch(
+                    batchEntries,
+                    contractorName,
+                    categoryNames,
+                    contractorHistoryItemNames,
+                );
+
+                if (results === null) {
+                    this.logger.warn(`Retry batch ${batchIdx + 1} failed — falling back to per-item AI`);
+                    await this.perItemFallback(batch, allItems);
+                    continue;
+                }
+
+                const resultMap = new Map(results.map((r) => [r.index, r]));
+                for (const item of batch) {
+                    const result = resultMap.get(item.originalIndex);
+                    if (result && result.matchedId !== null && result.confidence >= AI_CONFIDENCE_THRESHOLD) {
+                        const validCandidate = item.extendedCandidates.find((c) => c.id === result.matchedId);
+                        if (validCandidate) {
+                            item.resolvedItem = allItems.find((i) => i.id === result.matchedId) ?? null;
+                            if (item.resolvedItem) {
+                                this.logger.debug(
+                                    `Retry batch resolved "${item.extracted.name}" → "${validCandidate.name}" (confidence=${result.confidence.toFixed(2)})`,
+                                );
+                            }
+                        }
+                    }
+                    if (!item.resolvedItem) {
+                        this.logger.debug(`Item "${item.extracted.name}" unresolved after retry — will be created`);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Pack items into batches based on the token budget.
+     * Estimates character cost per item based on OCR name + candidate list,
+     * then greedily fills batches up to BATCH_CHAR_BUDGET.
+     */
+    private buildBatches(
+        items: Array<{
+            originalIndex: number;
+            extracted: { name: string; price: number; quantity?: number };
+            firstPassCandidates: FuzzyCandidate[];
+            extendedCandidates: FuzzyCandidate[];
+        }>,
+        pass: 'first' | 'retry',
+    ): Array<typeof items> {
+        const batches: Array<typeof items> = [];
+        let currentBatch: typeof items = [];
+        let currentBudget = 0;
+
+        // Reserve ~800 chars for the prompt template, contractor hint, category hint, and history hint
+        const promptOverhead = 800;
+        const effectiveBudget = BATCH_CHAR_BUDGET - promptOverhead;
+
+        for (const item of items) {
+            const candidates = pass === 'first' ? item.firstPassCandidates : item.extendedCandidates;
+            // Estimate: item header (~60 chars) + each candidate line (~30 chars)
+            const itemCost = 60 + candidates.length * 30;
+
+            if (currentBatch.length > 0 && currentBudget + itemCost > effectiveBudget) {
+                batches.push(currentBatch);
+                currentBatch = [];
+                currentBudget = 0;
+            }
+
+            currentBatch.push(item);
+            currentBudget += itemCost;
+        }
+
+        if (currentBatch.length > 0) {
+            batches.push(currentBatch);
+        }
+
+        return batches;
+    }
+
+    /**
+     * Fallback: resolve items one-by-one using the legacy per-item AI method.
+     * Used when a batch AI call fails entirely.
+     */
+    private async perItemFallback(
+        items: Array<{
+            extracted: { name: string; price: number; quantity?: number };
+            firstPassCandidates: FuzzyCandidate[];
+            extendedCandidates: FuzzyCandidate[];
+            resolvedItem: Item | null;
+        }>,
+        allItems: Item[],
+    ): Promise<void> {
+        for (const item of items) {
+            if (item.resolvedItem) continue;
+            const match = await this.resolveWithAI(item.extracted.name, item.firstPassCandidates, item.extendedCandidates);
+            if (match) {
+                item.resolvedItem = allItems.find((i) => i.id === match.id) ?? null;
+            }
+        }
+    }
+
+    /**
+     * Build a NormalizedItem from an extracted item and its resolved DB item (if any).
+     * Handles container resolution.
+     */
+    private async buildNormalizedItem(
+        extracted: { name: string; price: number; quantity?: number },
+        resolvedItem: Item | null,
     ): Promise<NormalizedItem> {
         const base: Omit<NormalizedItem, 'suggestedContainer' | 'historicalContainers' | 'containerConfidence' | 'needsContainerConfirmation'> = {
             itemId: null,
@@ -188,34 +496,10 @@ export class ReceiptNormalizationService {
             quantity: extracted.quantity ?? 1,
         };
 
-        // Resolve item identity
-        const itemPool = allItems.map((i) => ({ id: i.id, name: this.formatItemLabel(i) }));
-        const extendedCandidates = this.topFuzzyCandidates(extracted.name, itemPool, RETRY_PASS_CANDIDATES);
-        const firstPassCandidates = extendedCandidates.slice(0, FIRST_PASS_CANDIDATES);
-
-        let resolvedItem: Item | null = null;
-
-        if (extendedCandidates.length > 0) {
-            if (firstPassCandidates[0].score >= AUTO_MATCH_THRESHOLD) {
-                this.logger.debug(`Item "${extracted.name}" auto-matched to "${firstPassCandidates[0].name}" (${firstPassCandidates[0].score.toFixed(2)})`);
-                resolvedItem = allItems.find((i) => i.id === firstPassCandidates[0].id) ?? null;
-            } else {
-                const match = await this.resolveWithAI(extracted.name, firstPassCandidates, extendedCandidates, categories);
-                if (match) {
-                    resolvedItem = allItems.find((i) => i.id === match.id) ?? null;
-                }
-            }
-        }
-
-        if (!resolvedItem) {
-            this.logger.debug(`Item "${extracted.name}" unresolved — will be created`);
-        }
-
         const itemFields = resolvedItem
             ? { itemId: resolvedItem.id, isNew: false, name: resolvedItem.name, brand: resolvedItem.brand ?? null, categoryId: resolvedItem.categoryId ?? null }
             : {};
 
-        // Resolve container against the matched item (or from OCR name for new items)
         const containerResult = await this.resolveContainer(extracted.name, extracted.price, resolvedItem);
 
         return {
@@ -453,6 +737,30 @@ export class ReceiptNormalizationService {
     private topFuzzyCandidates(query: string, candidates: Array<{ id: number; name: string }>, topN: number): FuzzyCandidate[] {
         return candidates
             .map((c) => ({ ...c, score: jaroWinklerNormalized(query, c.name) }))
+            .filter((c) => c.score >= MINIMUM_FUZZY_SCORE)
+            .sort((a, b) => b.score - a.score)
+            .slice(0, topN);
+    }
+
+    /**
+     * Like topFuzzyCandidates but gives a score boost to items that have been
+     * previously purchased from the same contractor. This makes store-specific
+     * products more likely to appear in the candidate list.
+     */
+    private topFuzzyCandidatesWithBoost(
+        query: string,
+        candidates: Array<{ id: number; name: string }>,
+        topN: number,
+        contractorHistoryItemIds: Set<number>,
+    ): FuzzyCandidate[] {
+        return candidates
+            .map((c) => {
+                let score = jaroWinklerNormalized(query, c.name);
+                if (contractorHistoryItemIds.has(c.id)) {
+                    score = Math.min(score + CONTRACTOR_HISTORY_BOOST, 1.0);
+                }
+                return { ...c, score };
+            })
             .filter((c) => c.score >= MINIMUM_FUZZY_SCORE)
             .sort((a, b) => b.score - a.score)
             .slice(0, topN);

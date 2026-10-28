@@ -84,3 +84,87 @@ Return ONLY valid JSON, no explanation, no markdown:
 
 Return matchedId: null if no candidate is a sufficiently good match.`;
 }
+
+// ─── Batch entity matching prompt ────────────────────────────────────────────
+
+export interface BatchItemEntry {
+    /** Index in the original extracted items array. */
+    index: number;
+    /** OCR text from the receipt. */
+    ocrName: string;
+    /** Unit price from the receipt. */
+    price: number;
+    /** Quantity from the receipt. */
+    quantity: number;
+    /** Pre-computed fuzzy candidates for this item. */
+    candidates: Array<{ id: number; name: string; score: number }>;
+}
+
+export interface BatchMatchResult {
+    index: number;
+    matchedId: number | null;
+    confidence: number;
+}
+
+/**
+ * Build a prompt that asks the AI to match multiple receipt items at once.
+ *
+ * Compared to the per-item `getEntityMatchPrompt`, this:
+ * - Sends all items in a single request → fewer API calls
+ * - Includes the contractor name → store-specific context
+ * - Groups all candidates per item → AI can reason across items
+ * - Optionally includes items previously purchased at this store
+ *
+ * The prompt is designed to use 10 000–20 000 tokens of context,
+ * which is configurable via the candidate counts passed in.
+ */
+export function getBatchEntityMatchPrompt(
+    items: BatchItemEntry[],
+    contractorName: string | null,
+    categoryNames: string[],
+    contractorHistoryItemNames: string[],
+): string {
+    const contractorHint = contractorName ? `\nThis receipt is from: "${contractorName}".` : '';
+
+    const categoryHint =
+        categoryNames.length > 0 ? `\nAvailable product categories for context: ${categoryNames.join(', ')}.` : '';
+
+    const historyHint =
+        contractorHistoryItemNames.length > 0
+            ? `\nItems previously purchased at this store (for context — these are likely matches if a receipt item looks similar):\n${contractorHistoryItemNames.map((n) => `  - ${n}`).join('\n')}`
+            : '';
+
+    const itemSections = items
+        .map((item) => {
+            const candidateList =
+                item.candidates.length > 0
+                    ? item.candidates.map((c) => `    ${c.id} | ${c.name}`).join('\n')
+                    : '    (no candidates)';
+            return `[Item ${item.index}] OCR: "${item.ocrName}" | price: ${item.price} | qty: ${item.quantity}
+  Candidates:
+${candidateList}`;
+        })
+        .join('\n\n');
+
+    return `You are a product/entity matching assistant for a Polish personal finance app.
+You are given a batch of items from a single receipt. Match each item to its best database candidate.${contractorHint}${categoryHint}${historyHint}
+
+ITEMS TO MATCH:
+
+${itemSections}
+
+MATCHING RULES:
+- OCR truncations and abbreviations ("MLEKO UHT 3%" ≈ "Mleko UHT 3.2% 1L")
+- Polish characters: accented vs plain (ó/o, ą/a, ę/e, ż/z, ś/s, ć/c, ł/l, ź/z, ń/n)
+- Brand + product name reordering ("Ser Edam" ≈ "Edam ser żółty")
+- Size/variant suffixes that may or may not be present
+- Common OCR mistakes (0→O, 1→l, rn→m, ii→n)
+- Use the store name, other items on the receipt, and purchase history as context clues
+- Only match if you are confident the receipt item IS that product (confidence ≥ 0.65)
+- Each item's matchedId MUST be one of the candidate IDs listed for that item, or null
+
+Return ONLY valid JSON, no explanation, no markdown:
+{"items": [{"index": <number>, "matchedId": <id or null>, "confidence": <0.0-1.0>}]}
+
+Return one entry per item. Preserve the index values exactly as given.`;
+}

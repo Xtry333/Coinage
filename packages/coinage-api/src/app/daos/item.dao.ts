@@ -74,6 +74,22 @@ export class ItemDao extends BaseDao {
         return this.itemRepository.save(entity);
     }
 
+    /**
+     * Get the IDs of items that have been purchased in transactions
+     * linked to a specific contractor. Used for contractor-aware matching
+     * to boost items known to be sold at a given store.
+     */
+    public async getItemIdsByContractor(contractorId: number): Promise<number[]> {
+        const rows: Array<{ item_id: number }> = await this.itemRepository.query(
+            `SELECT DISTINCT ti.item_id
+             FROM transfer_item ti
+             JOIN transfer t ON t.id = ti.transfer_id
+             WHERE t.contractor_id = ?`,
+            [contractorId],
+        );
+        return rows.map((r) => r.item_id);
+    }
+
     public async searchByNameOrBrand(query: string, limit: number): Promise<Item[]> {
         return this.itemRepository.find({
             where: [{ name: ILike(`%${query}%`) }, { brand: ILike(`%${query}%`) }],
