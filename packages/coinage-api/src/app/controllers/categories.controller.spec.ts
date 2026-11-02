@@ -199,14 +199,14 @@ describe('CategoriesController', () => {
             const totals = [{ categoryId: 1, total: 500 }] as any;
             categoryDao.getTotalByCategoryMonth.mockResolvedValue(totals);
 
-            const result = await controller.getTotalPerCategory('2024', '3', undefined as any);
+            const result = await controller.getTotalPerCategory('2024', '3', undefined as any, 10);
 
-            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, undefined);
+            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, undefined, 10);
             expect(result).toBe(totals);
         });
 
         it('returns empty array when year is not a valid number', async () => {
-            const result = await controller.getTotalPerCategory('invalid', '3', undefined as any);
+            const result = await controller.getTotalPerCategory('invalid', '3', undefined as any, 10);
 
             expect(categoryDao.getTotalByCategoryMonth).not.toHaveBeenCalled();
             expect(result).toEqual([]);
@@ -216,17 +216,17 @@ describe('CategoriesController', () => {
             const totals: any[] = [];
             categoryDao.getTotalByCategoryMonth.mockResolvedValue(totals);
 
-            await controller.getTotalPerCategory('2024', 'abc', undefined as any);
+            await controller.getTotalPerCategory('2024', 'abc', undefined as any, 10);
 
-            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, undefined, undefined);
+            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, undefined, undefined, 10);
         });
 
         it('passes day param when it is a valid number', async () => {
             categoryDao.getTotalByCategoryMonth.mockResolvedValue([]);
 
-            await controller.getTotalPerCategory('2024', '3', '15');
+            await controller.getTotalPerCategory('2024', '3', '15', 10);
 
-            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, 15);
+            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, 15, 10);
         });
     });
 });

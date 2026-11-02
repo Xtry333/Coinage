@@ -42,27 +42,35 @@ export class AccountsController {
     }
 
     @Get('spendings/:date')
-    public async getTotalSpendingsAsOfToday(@Param('date') date: Date): Promise<BalanceDTO[]> {
-        const accountIds = await this.accountDao.getForUserId(1);
-        date = new Date(date);
-        return this.getAccountSpendingsAsOfDate({ accountIds: accountIds.map((a) => a.id).join(','), asOfDate: date.toISOString() });
+    public async getTotalSpendingsAsOfToday(@Param('date') dateParam: string, @RequestingUser('id') userId: number): Promise<BalanceDTO[]> {
+        const asOfDate = new Date(dateParam);
+        if (Number.isNaN(asOfDate.getTime())) throw new Error('Invalid parameters');
+        const accounts = await this.accountDao.getForUserId(userId);
+        return this.getAccountSpendingsForUser(accounts.map((account) => account.id), asOfDate, userId);
     }
 
     @Get(':accountIds/spendings')
-    public async getAccountSpendingsAsOfToday(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
+    public async getAccountSpendingsAsOfToday(@Param() params: { [key: string]: string }, @RequestingUser('id') userId: number): Promise<BalanceDTO[]> {
         const asOfDate = new Date().toISOString().split('T')[0];
-        return this.getAccountSpendingsAsOfDate({ accountIds: params.accountIds, asOfDate: asOfDate });
+        return this.getAccountSpendingsForUser(
+            params.accountIds.split(',').map((id) => parseInt(id, 10)),
+            new Date(asOfDate),
+            userId,
+        );
     }
 
     @Get(':accountIds/spendings/:asOfDate')
-    public async getAccountSpendingsAsOfDate(@Param() params: { [key: string]: string }): Promise<BalanceDTO[]> {
+    public async getAccountSpendingsAsOfDate(@Param() params: { [key: string]: string }, @RequestingUser('id') userId: number): Promise<BalanceDTO[]> {
         const accountIds = params.accountIds.split(',').map((id) => parseInt(id, 10));
         const asOfDate = new Date(params.asOfDate);
-        const userId = 1;
 
         if (!accountIds || !asOfDate || asOfDate.toString() === 'Invalid Date') {
             throw new Error('Invalid parameters');
         }
+        return this.getAccountSpendingsForUser(accountIds, asOfDate, userId);
+    }
+
+    private async getAccountSpendingsForUser(accountIds: number[], asOfDate: Date, userId: number): Promise<BalanceDTO[]> {
         const balanceDTOs = await this.accountDao.getSpendingsAsOfDate(accountIds, asOfDate, userId);
         if (balanceDTOs.length === 0) {
             return [

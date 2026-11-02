@@ -354,7 +354,7 @@ export class ReceiptNormalizationService {
             `SELECT ti.container_id AS containerId, ti.unit_price AS lastUnitPrice
              FROM transfer_item ti
              JOIN transfer t ON t.id = ti.transfer_id
-             WHERE ti.item_id = ? AND ti.container_id IS NOT NULL
+             WHERE ti.item_id = $1 AND ti.container_id IS NOT NULL
              ORDER BY t.date DESC`,
             [itemId],
         );

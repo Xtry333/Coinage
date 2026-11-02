@@ -22,7 +22,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
             CREATE TABLE "user" (
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(50) NOT NULL,
-                password VARCHAR(64) NULL,
+                password VARCHAR(255) NULL,
                 is_system_user BOOLEAN NOT NULL DEFAULT false,
                 created_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
             );
@@ -51,7 +51,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
                 id SERIAL PRIMARY KEY,
                 name VARCHAR(50) NOT NULL,
                 currency_symbol VARCHAR(16) NOT NULL,
-                user_id INT NOT NULL,
+                user_id INT NULL,
                 is_contractor_account BOOLEAN NOT NULL DEFAULT false,
                 is_active BOOLEAN NOT NULL DEFAULT true,
                 edited_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -116,7 +116,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
                 id SERIAL PRIMARY KEY,
                 description TEXT NULL,
                 amount DECIMAL(20,2) NOT NULL DEFAULT 0.00,
-                date DATE NOT NULL DEFAULT CURRENT_DATE,
+                date DATE NULL DEFAULT NULL,
                 contractor_id INT NULL,
                 image_path VARCHAR(500) NULL DEFAULT NULL,
                 image_hash VARCHAR(64) NULL DEFAULT NULL,
@@ -142,7 +142,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
                 receipt_id INT NULL,
                 type VARCHAR(10) NOT NULL DEFAULT 'OUTCOME' CHECK (type IN ('INCOME', 'OUTCOME')),
                 schedule_id INT NULL,
-                origin_account_id INT NOT NULL,
+                account_id INT NOT NULL,
                 target_account_id INT NULL,
                 is_ethereal BOOLEAN NOT NULL DEFAULT false,
                 is_flagged BOOLEAN NOT NULL DEFAULT false,
@@ -155,7 +155,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
                 CONSTRAINT FK_transfer_owner_user_id_REF_user_id FOREIGN KEY (owner_user_id) REFERENCES "user"(id) ON UPDATE CASCADE ON DELETE RESTRICT,
                 CONSTRAINT FK_transfer_receipt_id_REF_receipt_id FOREIGN KEY (receipt_id) REFERENCES receipt(id) ON UPDATE CASCADE ON DELETE SET NULL,
                 CONSTRAINT FK_transfer_schedule_id_REF_schedule_id FOREIGN KEY (schedule_id) REFERENCES schedule(id) ON UPDATE CASCADE ON DELETE SET NULL,
-                CONSTRAINT FK_transfer_origin_account_id_REF_account_id FOREIGN KEY (origin_account_id) REFERENCES account(id) ON UPDATE CASCADE ON DELETE RESTRICT,
+                CONSTRAINT FK_transfer_account_id_REF_account_id FOREIGN KEY (account_id) REFERENCES account(id) ON UPDATE CASCADE ON DELETE RESTRICT,
                 CONSTRAINT FK_transfer_target_account_id_REF_account_id FOREIGN KEY (target_account_id) REFERENCES account(id) ON UPDATE CASCADE ON DELETE RESTRICT
             );
         `);
@@ -225,6 +225,30 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
             );
         `);
 
+        // -- item/container view -------------------------------------------
+        await queryRunner.query(`
+            CREATE VIEW items_with_containers AS
+            SELECT DISTINCT
+                item.id AS item_id,
+                item.brand AS item_brand,
+                item.name AS item_name,
+                item.category_id AS item_category_id,
+                item.container_size AS item_container_size,
+                item.container_size_unit AS item_container_size_unit,
+                item.created_date AS item_created_date,
+                item.edited_date AS item_updated_date,
+                container.id AS container_id,
+                container.name AS container_name,
+                container.weight AS container_weight,
+                container.weight_unit AS container_weight_unit,
+                container.volume AS container_volume,
+                container.volume_unit AS container_volume_unit,
+                container.item_count AS container_item_count
+            FROM item
+            JOIN transfer_item ON item.id = transfer_item.item_id
+            JOIN container ON container.id = transfer_item.container_id;
+        `);
+
         // -- indexes --------------------------------------------------------
         await queryRunner.query(`CREATE INDEX IDX_account_user_id ON account(user_id);`);
         await queryRunner.query(`CREATE INDEX IDX_account_currency_symbol ON account(currency_symbol);`);
@@ -234,7 +258,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
         await queryRunner.query(`CREATE INDEX IDX_transfer_receipt_id ON transfer(receipt_id);`);
         await queryRunner.query(`CREATE INDEX IDX_transfer_contractor_id ON transfer(contractor_id);`);
         await queryRunner.query(`CREATE INDEX IDX_transfer_category_id ON transfer(category_id);`);
-        await queryRunner.query(`CREATE INDEX IDX_transfer_origin_account_id ON transfer(origin_account_id);`);
+        await queryRunner.query(`CREATE INDEX IDX_transfer_account_id ON transfer(account_id);`);
         await queryRunner.query(`CREATE INDEX IDX_transfer_target_account_id ON transfer(target_account_id);`);
         await queryRunner.query(`CREATE INDEX IDX_transfer_schedule_id ON transfer(schedule_id);`);
         await queryRunner.query(`CREATE INDEX IDX_transfer_owner_user_id ON transfer(owner_user_id);`);
@@ -249,6 +273,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
     public async down(queryRunner: QueryRunner): Promise<void>
     {
         // Destructive: drops all tables created by up(). One-way door.
+        await queryRunner.query(`DROP VIEW IF EXISTS items_with_containers;`);
         await queryRunner.query(`DROP TABLE IF EXISTS item_tag CASCADE;`);
         await queryRunner.query(`DROP TABLE IF EXISTS tag CASCADE;`);
         await queryRunner.query(`DROP TABLE IF EXISTS transfer_item CASCADE;`);

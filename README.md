@@ -45,7 +45,7 @@ Set `COINAGE_ADMIN_USERNAME` and a unique `COINAGE_ADMIN_PASSWORD` in `.env` bef
 ```powershell
 if (!(Test-Path .env)) { Copy-Item .env.template .env }
 corepack yarn install --immutable
-docker compose -p coinage-dev -f docker-compose.dev.yml up -d
+docker compose -p coinage-postgres-dev -f docker-compose.dev.yml up -d
 corepack yarn dev
 ```
 
@@ -57,15 +57,15 @@ If you change `package.json` or `yarn.lock`, install the updated dependencies on
 corepack yarn install --immutable
 ```
 
-PostgreSQL data is stored under the project-local `.docker-data/postgres` directory (ignored by Git); receipt files are written under the project-local `uploads/` directory. The image-based stack requires `.env` before starting.
+PostgreSQL 18 data is stored under the project-local `.docker-data/postgres18` directory (ignored by Git); receipt files are written under the project-local `uploads/` directory. The image-based stack requires `.env` before starting.
 
 Stop `corepack yarn dev` with Ctrl+C, then stop PostgreSQL without deleting its data:
 
 ```powershell
-docker compose -p coinage-dev -f docker-compose.dev.yml down
+  docker compose -p coinage-postgres-dev -f docker-compose.dev.yml down
 ```
 
-PostgreSQL data remains in `.docker-data/postgres` after stopping. Back it up before manually removing it to reset the database. The image-based stack remains available with `corepack yarn build` followed by `corepack yarn docker:up`.
+PostgreSQL data remains in `.docker-data/postgres18` after stopping. Back it up before manually removing it to reset the database. The image-based stack remains available with `corepack yarn build` followed by `corepack yarn docker:up`.
 
 ## Development server
 
