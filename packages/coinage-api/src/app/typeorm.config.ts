@@ -1,6 +1,7 @@
 import * as path from 'path';
 
-import { DataSource, DataSourceOptions, Table } from 'typeorm';
+import { DataSource, Table } from 'typeorm';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import entities from './entities/_index';
@@ -49,7 +50,7 @@ export class CustomNamingStrategy extends SnakeNamingStrategy {
     }
 }
 
-export const opts: DataSourceOptions = {
+export const opts: PostgresConnectionOptions = {
     type: 'postgres',
     host: process.env.PG_HOST || process.env.MYSQL_HOST || 'localhost',
     port: Number(process.env.COINAGE_PG_PORT) || Number(process.env.COINAGE_MYSQL_PORT) || 5432,
@@ -62,7 +63,6 @@ export const opts: DataSourceOptions = {
     migrations: loadMigrations(),
     migrationsTransactionMode: 'each',
     entities: [...entities],
-    timezone: 'Z',
     namingStrategy: new CustomNamingStrategy(),
 };
 

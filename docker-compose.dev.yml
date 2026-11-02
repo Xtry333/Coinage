@@ -1,0 +1,20 @@
+name: coinage-dev
+
+services:
+    coinage-db:
+        image: postgres:15-alpine
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${PG_DATABASE:-coinage-db}
+            POSTGRES_USER: ${PG_USER:-postgres}
+            POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
+        ports:
+            - "127.0.0.1:${COINAGE_PG_PORT:-5432}:5432"
+        volumes:
+            - ./.docker-data/postgres:/var/lib/postgresql/data
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE:-coinage-db}"]
+            interval: 5s
+            timeout: 5s
+            retries: 20
+            start_period: 10s

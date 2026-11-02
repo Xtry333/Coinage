@@ -3,6 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { UserDao } from '../daos/user.dao';
 import { User } from '../entities/User.entity';
+import { verifyPassword } from './password-hash.util';
 
 interface JwtPayload {
     username: string;
@@ -34,7 +35,7 @@ export class AuthService {
             throw new Error('Invalid password.');
         }
 
-        if (user.password === undefined || user.password !== password) {
+        if (!password || !user.password || !verifyPassword(password, user.password)) {
             throw new Error('Invalid password.');
         }
 

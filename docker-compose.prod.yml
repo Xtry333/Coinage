@@ -24,6 +24,8 @@ services:
             PG_HOST: coinage-db
             COINAGE_PG_PORT: 5432
             COINAGE_API_JWT_SECRET: ${COINAGE_API_JWT_SECRET:-change-me}
+            COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:-}
+            COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:-}
             PG_DATABASE: ${PG_DATABASE:-coinage-db}
             PG_USER: ${PG_USER:-postgres}
             PG_PASSWORD: ${PG_PASSWORD:-password}

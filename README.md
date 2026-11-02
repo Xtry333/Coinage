@@ -38,18 +38,40 @@ Features planned for the future (far or near):
 
 ## Quick Start
 
-```bash
-yarn
-yarn build
-yarn docker:up
+For the hybrid development setup (Option A), Docker runs PostgreSQL and Node/Nx/Angular run natively for fast file watching. Install Node.js 22.18+ and run from the project root:
+
+Set `COINAGE_ADMIN_USERNAME` and a unique `COINAGE_ADMIN_PASSWORD` in `.env` before the first database migration. The migration creates/promotes that system user once; changing the password in `.env` later does not reset it. Passwords are stored as salted scrypt hashes.
+
+```powershell
+if (!(Test-Path .env)) { Copy-Item .env.template .env }
+corepack yarn install --immutable
+docker compose -p coinage-dev -f docker-compose.dev.yml up -d
+corepack yarn dev
 ```
+
+Open <http://localhost:4200>. The API is available at <http://localhost:3333/api>. Frontend and API edits are watched natively; no container rebuild/recreation is needed.
+
+If you change `package.json` or `yarn.lock`, install the updated dependencies on the host, then restart `corepack yarn dev`:
+
+```powershell
+corepack yarn install --immutable
+```
+
+PostgreSQL data is stored under the project-local `.docker-data/postgres` directory (ignored by Git); receipt files are written under the project-local `uploads/` directory. The image-based stack requires `.env` before starting.
+
+Stop `corepack yarn dev` with Ctrl+C, then stop PostgreSQL without deleting its data:
+
+```powershell
+docker compose -p coinage-dev -f docker-compose.dev.yml down
+```
+
+PostgreSQL data remains in `.docker-data/postgres` after stopping. Back it up before manually removing it to reset the database. The image-based stack remains available with `corepack yarn build` followed by `corepack yarn docker:up`.
 
 ## Development server
 
 ```bash
-yarn
-yarn dev:api # Starts the API server
-yarn dev:webapp # Starts the web application
+corepack yarn dev:api # Starts the API server
+corepack yarn dev:webapp # Starts the web application
 ```
 
 ## Creating a migration for SQL

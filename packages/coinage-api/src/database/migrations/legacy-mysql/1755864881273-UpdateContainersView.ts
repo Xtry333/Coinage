@@ -4,6 +4,20 @@ export class UpdateContainersView1755864881273 implements MigrationInterface {
     name = 'UpdateContainersView1755864881273';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
+        if (!(await queryRunner.hasColumn('item', 'brand'))) {
+            await queryRunner.query(`ALTER TABLE \`item\` ADD \`brand\` varchar(50) NULL`);
+        }
+        if (!(await queryRunner.hasColumn('item', 'container_size'))) {
+            await queryRunner.query(`ALTER TABLE \`item\` ADD \`container_size\` float NULL`);
+        }
+        if (!(await queryRunner.hasColumn('item', 'container_size_unit'))) {
+            await queryRunner.query(`ALTER TABLE \`item\` ADD \`container_size_unit\` varchar(16) NULL`);
+        }
+        await queryRunner.query(
+            `DELETE FROM \`coinage-db\`.\`typeorm_metadata\` WHERE \`type\` = ? AND \`name\` = ? AND \`schema\` = ?`,
+            ['VIEW', 'items_with_containers', 'coinage-db'],
+        );
+        await queryRunner.query(`DROP VIEW IF EXISTS \`items_with_containers\``);
         await queryRunner.query(`CREATE VIEW \`items_with_containers\` AS 
 SELECT 
     item.id AS item_id,

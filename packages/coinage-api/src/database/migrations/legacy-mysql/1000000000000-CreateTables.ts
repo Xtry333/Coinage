@@ -4,13 +4,13 @@ export class CreateTables1000000000000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         const sql =
             "\
-            CREATE TABLE `user` (\
+            CREATE TABLE IF NOT EXISTS `user` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `name` VARCHAR(64) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',\
                 PRIMARY KEY (`id`) USING BTREE\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `account` (\
+            CREATE TABLE IF NOT EXISTS `account` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `name` VARCHAR(50) NOT NULL DEFAULT '0' COLLATE 'utf8mb4_0900_ai_ci',\
                 `user_id` INT NOT NULL,\
@@ -22,13 +22,13 @@ export class CreateTables1000000000000 implements MigrationInterface {
                 CONSTRAINT `FK_account_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `group` (\
+            CREATE TABLE IF NOT EXISTS `group` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `name` VARCHAR(64) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',\
                 PRIMARY KEY (`id`) USING BTREE\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `user_group` (\
+            CREATE TABLE IF NOT EXISTS `user_group` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `user_id` INT NOT NULL,\
                 `group_id` INT NOT NULL,\
@@ -39,7 +39,7 @@ export class CreateTables1000000000000 implements MigrationInterface {
                 CONSTRAINT `FK_user_group_group` FOREIGN KEY (`group_id`) REFERENCES `group` (`id`) ON UPDATE CASCADE ON DELETE CASCADE\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `category` (\
+            CREATE TABLE IF NOT EXISTS `category` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `name` VARCHAR(64) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',\
                 `description` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',\
@@ -51,18 +51,18 @@ export class CreateTables1000000000000 implements MigrationInterface {
                 UNIQUE INDEX `name` (`name`, `user_id`) USING BTREE,\
                 UNIQUE INDEX `tag` (`tag`) USING BTREE,\
                 INDEX `FK_category_category` (`parent_id`) USING BTREE,\
-                INDEX `FK_account_user` (`user_id`) USING BTREE,\
-                CONSTRAINT `FK_category_category` FOREIGN KEY (`parent_id`) REFERENCES `category` (`id`) ON UPDATE CASCADE ON DELETE SET NULL\
-                CONSTRAINT `FK_account_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT\
+                INDEX `FK_category_user` (`user_id`) USING BTREE,\
+                CONSTRAINT `FK_category_category` FOREIGN KEY (`parent_id`) REFERENCES `category` (`id`) ON UPDATE CASCADE ON DELETE SET NULL,\
+                CONSTRAINT `FK_category_user` FOREIGN KEY (`user_id`) REFERENCES `user` (`id`) ON UPDATE RESTRICT ON DELETE RESTRICT\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `contractor` (\
+            CREATE TABLE IF NOT EXISTS `contractor` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `name` VARCHAR(64) NOT NULL COLLATE 'utf8mb4_0900_ai_ci',\
                 PRIMARY KEY (`id`) USING BTREE\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `receipt` (\
+            CREATE TABLE IF NOT EXISTS `receipt` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `description` TEXT NULL DEFAULT NULL COLLATE 'utf8mb4_0900_ai_ci',\
                 `date` DATE NOT NULL DEFAULT (now()),\
@@ -73,7 +73,7 @@ export class CreateTables1000000000000 implements MigrationInterface {
                 CONSTRAINT `FK_receipt_contractor` FOREIGN KEY (`contractor_id`) REFERENCES `contractor` (`id`) ON UPDATE CASCADE ON DELETE SET NULL\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `transfer` (\
+            CREATE TABLE IF NOT EXISTS `transfer` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `description` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',\
                 `amount` DECIMAL(20,2) NOT NULL DEFAULT '0.00',\
@@ -99,7 +99,7 @@ export class CreateTables1000000000000 implements MigrationInterface {
                 CONSTRAINT `FK_transfer_receipt` FOREIGN KEY (`receipt_id`) REFERENCES `receipt` (`id`) ON UPDATE CASCADE ON DELETE SET NULL\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `item` (\
+            CREATE TABLE IF NOT EXISTS `item` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `name` TEXT NOT NULL COLLATE 'utf8mb4_0900_ai_ci',\
                 `edited_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\
@@ -107,7 +107,7 @@ export class CreateTables1000000000000 implements MigrationInterface {
                 PRIMARY KEY (`id`) USING BTREE\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             \
-            CREATE TABLE `transfer_item` (\
+            CREATE TABLE IF NOT EXISTS `transfer_item` (\
                 `id` INT NOT NULL AUTO_INCREMENT,\
                 `item_id` INT NOT NULL,\
                 `unit_price` DECIMAL(20,2) NOT NULL DEFAULT '0.00',\
@@ -120,12 +120,12 @@ export class CreateTables1000000000000 implements MigrationInterface {
                 CONSTRAINT `FK_transfer_item_item` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON UPDATE CASCADE ON DELETE RESTRICT\
             ) COLLATE='utf8mb4_0900_ai_ci' ENGINE=InnoDB;\
             ";
-        sql.split(/;/).forEach(async (query) => {
-            query = query.trim();
-            if (query.length > 0) {
-                await queryRunner.query(query);
+        for (const query of sql.split(/;/)) {
+            const statement = query.trim();
+            if (statement.length > 0) {
+                await queryRunner.query(statement);
             }
-        });
+        }
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
