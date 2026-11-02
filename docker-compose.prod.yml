@@ -25,6 +25,8 @@ services:
             MYSQL_HOST: coinage-db
             COINAGE_MYSQL_PORT: 3306
             COINAGE_API_JWT_SECRET: ${COINAGE_API_JWT_SECRET:-change-me}
+            COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:-}
+            COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:-}
             MYSQL_DATABASE: ${MYSQL_DATABASE:-coinage-db}
             MYSQL_USER: ${MYSQL_USER:-root}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD:-password}

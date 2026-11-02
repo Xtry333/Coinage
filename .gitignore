@@ -8,7 +8,6 @@
 # dependencies
 /node_modules
 /.yarn
-.yarnrc.yml
 package-lock.json
 
 # IDEs and editors
@@ -46,6 +45,7 @@ Thumbs.db
 
 # DB Files
 coinage-data.sql
+.docker-data/
 
 # Environment
 .env

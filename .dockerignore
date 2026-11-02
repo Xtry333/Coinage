@@ -1,0 +1,10 @@
+.git
+.env
+.env.*
+.docker-data
+node_modules
+**/node_modules
+.nx
+.angular
+coverage
+uploads

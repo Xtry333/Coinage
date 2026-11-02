@@ -2,6 +2,17 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class ReforgeForeignKeys1654876993290 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE \`account\` DROP FOREIGN KEY \`FK_account_user\``);
+        await queryRunner.query(`ALTER TABLE \`category\` DROP FOREIGN KEY \`FK_category_category\``);
+        await queryRunner.query(`ALTER TABLE \`category\` DROP FOREIGN KEY \`FK_category_user\``);
+        await queryRunner.query(`ALTER TABLE \`transfer_item\` DROP FOREIGN KEY \`FK_transfer_item_item\``);
+        await queryRunner.query(`ALTER TABLE \`transfer_item\` DROP FOREIGN KEY \`FK_transfer_item_transfer\``);
+        await queryRunner.query(`ALTER TABLE \`transfer\` DROP FOREIGN KEY \`FK_transfer_account\``);
+        await queryRunner.query(`ALTER TABLE \`transfer\` DROP FOREIGN KEY \`FK_transfer_category\``);
+        await queryRunner.query(`ALTER TABLE \`transfer\` DROP FOREIGN KEY \`FK_transfer_contractor\``);
+        await queryRunner.query(`ALTER TABLE \`transfer\` DROP FOREIGN KEY \`FK_transfer_receipt\``);
+        await queryRunner.query(`ALTER TABLE \`receipt\` DROP FOREIGN KEY \`FK_receipt_contractor\``);
+        await queryRunner.query(`DROP INDEX \`FK_account_user\` ON \`account\``);
         await queryRunner.query(`DROP INDEX \`FK_category_category\` ON \`category\``);
         await queryRunner.query(`DROP INDEX \`FK_category_user\` ON \`category\``);
         await queryRunner.query(`DROP INDEX \`FK_transfer_item_item\` ON \`transfer_item\``);

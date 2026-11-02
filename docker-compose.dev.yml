@@ -1,0 +1,21 @@
+name: coinage-dev
+
+services:
+    coinage-db:
+        image: mysql:8.0
+        restart: unless-stopped
+        environment:
+            MYSQL_DATABASE: ${MYSQL_DATABASE:-coinage-db}
+            MYSQL_USER: ${MYSQL_USER:-coinage}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD:-coinage-dev-password}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-coinage-dev-root-password}
+        ports:
+            - "127.0.0.1:${COINAGE_MYSQL_PORT:-3306}:3306"
+        volumes:
+            - ./.docker-data/mysql:/var/lib/mysql
+        healthcheck:
+            test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+            interval: 5s
+            timeout: 5s
+            retries: 20
+            start_period: 10s

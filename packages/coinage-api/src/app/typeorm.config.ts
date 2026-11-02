@@ -1,6 +1,7 @@
 import * as path from 'path';
 
-import { DataSource, DataSourceOptions, Table } from 'typeorm';
+import { DataSource, Table } from 'typeorm';
+import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import entities from './entities/_index';
@@ -49,7 +50,7 @@ export class CustomNamingStrategy extends SnakeNamingStrategy {
     }
 }
 
-export const opts: DataSourceOptions = {
+export const opts: MysqlConnectionOptions = {
     type: 'mysql',
     host: process.env.MYSQL_HOST || 'localhost',
     port: Number(process.env.COINAGE_MYSQL_PORT) || 3306,

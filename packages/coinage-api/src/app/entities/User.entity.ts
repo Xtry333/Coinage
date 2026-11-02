@@ -17,7 +17,7 @@ export class User {
     @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
 
-    @Column({ type: 'varchar', length: 64, nullable: true })
+    @Column({ type: 'varchar', length: 255, nullable: true })
     public password?: string;
 
     @OneToMany(() => Account, (account) => account.user)

@@ -1,13 +1,15 @@
 services:
     coinage-db:
         restart: unless-stopped
-        image: mysql
+        image: mysql:8.0
         env_file:
             - ./.env
         ports:
-            - 3306:3306
+            - 127.0.0.1:${COINAGE_MYSQL_PORT:-3306}:3306
+        volumes:
+            - ./.docker-data/mysql:/var/lib/mysql
         healthcheck:
-            test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "--password=$MYSQL_ROOT_PASSWORD"]
+            test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
             interval: 5s
             timeout: 5s
             retries: 10
@@ -19,10 +21,13 @@ services:
         image: coinage-api
         environment:
             MYSQL_HOST: coinage-db
+            COINAGE_MYSQL_PORT: "3306"
         env_file:
             - ./.env
         ports:
             - 3333:3333
+        volumes:
+            - ./.docker-data/uploads:/app/api/uploads
         depends_on:
             coinage-db:
                 condition: service_healthy
@@ -32,6 +37,6 @@ services:
             dockerfile: docker/webapp.Dockerfile
         image: coinage-webapp
         ports:
-            - 4200:4200
+            - 4200:80
         depends_on:
             - coinage-api
