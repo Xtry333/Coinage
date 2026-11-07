@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import { finalize, zip } from 'rxjs';
 
@@ -8,8 +8,6 @@ import { CoinageStorageService } from '../../core/services/storage-service/coina
 import { StorageScope } from '../../core/services/storage-service/storage-scope.enum';
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
-import { CoinageRoutes } from '../../app-routing/app-routes';
-import { FormsModule, NgForm } from '@angular/forms';
 
 export interface SelectedDetails {
     accountId: number | undefined;

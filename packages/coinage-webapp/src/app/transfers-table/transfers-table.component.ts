@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs';
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 import { IconDefinition, faEdit, faFlagCheckered, faReceipt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -148,9 +148,9 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     this.optionsForCheckboxFilters.contractors = contractors.map((c) =>
                         TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.contractorIds),
                     );
-                    this.optionsForCheckboxFilters.accounts = accounts.map((a) =>
-                        TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds),
-                    ).sort((a, b) => a.uiText.localeCompare(b.uiText));
+                    this.optionsForCheckboxFilters.accounts = accounts
+                        .map((a) => TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds))
+                        .sort((a, b) => a.uiText.localeCompare(b.uiText));
                 },
             );
         }

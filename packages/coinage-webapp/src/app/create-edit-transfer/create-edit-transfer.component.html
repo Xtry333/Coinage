@@ -47,7 +47,7 @@
                         <ng-select
                             #categorySelect
                             [(ngModel)]="selectedTransferInputs.categoryId"
-                            [clearable]="false"
+                            [clearable]="true"
                             [required]="true"
                             [editableSearchTerm]="true"
                             [items]="categories"
@@ -96,7 +96,7 @@
                         <label class="block text-sm font-medium text-gray-700" for="targetAccount">Target Account</label>
                         <ng-select
                             [(ngModel)]="selectedTransferInputs.targetAccountId"
-                            [clearable]="false"
+                            [clearable]="true"
                             [editableSearchTerm]="true"
                             [items]="accounts"
                             name="targetAccount"

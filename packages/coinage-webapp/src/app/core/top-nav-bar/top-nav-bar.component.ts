@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { faBars, faBell, faUser, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { CurrentUserDataService } from '../../services/current-user.service';

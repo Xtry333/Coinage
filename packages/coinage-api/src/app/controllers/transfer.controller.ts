@@ -265,6 +265,7 @@ export class TransferController {
         let entity: Transfer;
         const category = await this.categoryDao.getById(transfer.categoryId);
         const account = await this.accountDao.getById(transfer.accountId);
+        const targetAccount = await this.accountDao.getById(transfer.targetAccountId ?? 17);
         const contractor = transfer.contractorId !== null ? await this.contractorDao.getById(transfer.contractorId) : null;
         const receipt = transfer.receiptId !== null ? await this.receiptDao.getById(transfer.receiptId) : null;
 
@@ -289,6 +290,9 @@ export class TransferController {
 
         entity.originAccount = account;
         entity.originAccountId = account.id;
+
+        entity.targetAccount = targetAccount;
+        entity.targetAccountId = targetAccount.id;
 
         entity.contractor = contractor;
         entity.contractorId = contractor?.id ?? null;
@@ -365,6 +369,7 @@ export class TransferController {
         let entity: Transfer;
         const category = await this.categoryDao.getById(transfer.categoryId);
         const account = await this.accountDao.getById(transfer.accountId);
+        const targetAccount = await this.accountDao.getById(transfer.targetAccountId ?? 17);
         const contractor = transfer.contractorId !== null ? await this.contractorDao.getById(transfer.contractorId) : null;
         const receipt = transfer.receiptId !== null ? await this.receiptDao.getById(transfer.receiptId) : null;
 
@@ -381,6 +386,9 @@ export class TransferController {
 
         entity.originAccount = account;
         entity.originAccountId = account.id;
+
+        entity.targetAccount = targetAccount;
+        entity.targetAccountId = targetAccount.id;
 
         entity.contractor = contractor;
         entity.contractorId = contractor?.id ?? null;

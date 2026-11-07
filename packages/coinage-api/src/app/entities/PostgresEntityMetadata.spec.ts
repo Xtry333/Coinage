@@ -16,17 +16,13 @@ describe('PostgreSQL entity metadata', () => {
     });
 
     it('does not use MySQL-specific BIT column type (Postgres uses boolean)', () => {
-        const bitColumns = entityMetadatas.flatMap((table) =>
-            table.columns.filter((col) => col.type === 'bit'),
-        );
+        const bitColumns = entityMetadatas.flatMap((table) => table.columns.filter((col) => col.type === 'bit'));
 
         expect(bitColumns).toHaveLength(0);
     });
 
     it('does not use MySQL-specific longtext column type (Postgres uses text)', () => {
-        const longtextColumns = entityMetadatas.flatMap((table) =>
-            table.columns.filter((col) => col.type === 'longtext'),
-        );
+        const longtextColumns = entityMetadatas.flatMap((table) => table.columns.filter((col) => col.type === 'longtext'));
 
         expect(longtextColumns).toHaveLength(0);
     });
@@ -34,9 +30,7 @@ describe('PostgreSQL entity metadata', () => {
     it('Account entity uses boolean for is_active and is_contractor_account', () => {
         const accountMeta = entityMetadatas.find((t) => t.target === Account);
         const isActiveCol = accountMeta?.columns.find((c) => c.propertyName === 'isActive');
-        const isContractorCol = accountMeta?.columns.find(
-            (c) => c.propertyName === 'isContractorAccount',
-        );
+        const isContractorCol = accountMeta?.columns.find((c) => c.propertyName === 'isContractorAccount');
 
         expect(isActiveCol?.type).toBe('boolean');
         expect(isContractorCol?.type).toBe('boolean');
@@ -82,9 +76,7 @@ describe('PostgreSQL entity metadata', () => {
     });
 
     it('all enum columns use a CHECK-compatible string type (varchar/text), not MySQL ENUM', () => {
-        const enumColumns = entityMetadatas.flatMap((table) =>
-            table.columns.filter((col) => col.type === 'enum' && col.length === undefined),
-        );
+        const enumColumns = entityMetadatas.flatMap((table) => table.columns.filter((col) => col.type === 'enum' && col.length === undefined));
 
         // TypeORM maps 'enum' column type to either a DB enum or a check constraint.
         // For Postgres we use VARCHAR + CHECK in the baseline migration, so TypeORM

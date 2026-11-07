@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Output, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Output } from '@angular/core';
 
 @Component({
     selector: 'app-auto-pagination',

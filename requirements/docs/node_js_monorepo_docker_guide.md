@@ -11,19 +11,21 @@ Furthermore, native OS dependencies (like `esbuild` or `bcrypt`) installed on a 
 When developing locally, you must choose how strictly you want to use Docker for your Node applications.
 
 ### Option A: The Hybrid Approach (Industry Standard)
+
 Developing natively on your host OS while using Docker exclusively for backing services is generally preferred for daily developer experience.
 
-* **How it works:** Run the Node monorepo directly on your host OS, but spin up your databases, Redis, and message brokers via Docker Compose.
-* **Pros:** File watchers run natively (bypassing heavy file-syncing latency), IDEs attach instantly, and you avoid the headache of masking `node_modules` with anonymous volumes.
-* **Cons:** You risk OS-level divergence where native binaries compiled on your host machine behave differently than they will on your production Linux image.
+- **How it works:** Run the Node monorepo directly on your host OS, but spin up your databases, Redis, and message brokers via Docker Compose.
+- **Pros:** File watchers run natively (bypassing heavy file-syncing latency), IDEs attach instantly, and you avoid the headache of masking `node_modules` with anonymous volumes.
+- **Cons:** You risk OS-level divergence where native binaries compiled on your host machine behave differently than they will on your production Linux image.
 
 ### Option B: Full Isolation (Dockerized Development)
+
 Running the actual Node.js runtime inside Docker Compose during development.
 
-* **How it works:** You mount your source code into the container, allowing hot-reloading.
-* **Pros:** Complete environmental consistency across the team and production. No need to install Node locally.
-* **Cons:** Fragile volume mounts, sluggish hot-reloading on macOS/Windows, and higher resource usage.
-* ***Note on Dev Containers:*** If strict isolation is mandatory, using IDE-integrated **Dev Containers** (VS Code/IntelliJ) is recommended over manual volume hacks, as they inject a headless server into the container to handle syncing natively.
+- **How it works:** You mount your source code into the container, allowing hot-reloading.
+- **Pros:** Complete environmental consistency across the team and production. No need to install Node locally.
+- **Cons:** Fragile volume mounts, sluggish hot-reloading on macOS/Windows, and higher resource usage.
+- _**Note on Dev Containers:**_ If strict isolation is mandatory, using IDE-integrated **Dev Containers** (VS Code/IntelliJ) is recommended over manual volume hacks, as they inject a headless server into the container to handle syncing natively.
 
 ---
 
@@ -57,31 +59,31 @@ When Docker processes volumes, it prioritizes the most specific path. By masking
 ```yaml
 # docker-compose.yml
 services:
-  api:
-    build:
-      context: .
-      dockerfile: apps/api/Dockerfile.dev
-    working_dir: /usr/src/app/apps/api
-    command: npm run dev
-    volumes:
-      # 1. Mount the entire monorepo root to preserve inter-workspace symlinks
-      - .:/usr/src/app
-      # 2. Mask the root node_modules with an anonymous volume
-      - /usr/src/app/node_modules
-      # 3. Mask the app-specific node_modules (repeat for used packages)
-      - /usr/src/app/apps/api/node_modules
-      - /usr/src/app/packages/shared/node_modules
-    ports:
-      - "3000:3000"
+    api:
+        build:
+            context: .
+            dockerfile: apps/api/Dockerfile.dev
+        working_dir: /usr/src/app/apps/api
+        command: npm run dev
+        volumes:
+            # 1. Mount the entire monorepo root to preserve inter-workspace symlinks
+            - .:/usr/src/app
+            # 2. Mask the root node_modules with an anonymous volume
+            - /usr/src/app/node_modules
+            # 3. Mask the app-specific node_modules (repeat for used packages)
+            - /usr/src/app/apps/api/node_modules
+            - /usr/src/app/packages/shared/node_modules
+        ports:
+            - '3000:3000'
 ```
 
-*Note: Because `node_modules` is isolated in the container, you must run `docker compose exec api npm install` to install new dependencies, rather than running it on your host.*
+_Note: Because `node_modules` is isolated in the container, you must run `docker compose exec api npm install` to install new dependencies, rather than running it on your host._
 
 ---
 
 ## 4. Production Build Strategy (Dockerfile)
 
-In production, you want a lightweight image that only contains the target application and its specific dependencies. Monorepos make Docker caching difficult because a change in *any* workspace invalidates the root `package.json` cache layer.
+In production, you want a lightweight image that only contains the target application and its specific dependencies. Monorepos make Docker caching difficult because a change in _any_ workspace invalidates the root `package.json` cache layer.
 
 Utilize a multi-stage build that copies only what is required before installing dependencies.
 
@@ -124,16 +126,19 @@ CMD ["node", "dist/index.js"]
 ## 5. Dependency Managers and Symlink Caveats
 
 ### NPM and Yarn Workspaces
+
 Both natively handle dependency hoisting well with Docker. When you require `@my-org/shared` inside `apps/api`, Node looks up the directory tree to the root `node_modules`, finds a symlink pointing back to `packages/shared`, and resolves the code.
 
 ### PNPM Strictness
+
 If using `pnpm`, dependencies are not hoisted flat. Instead, `pnpm` uses a global content-addressable store (virtual store) linked via hard links and symlinks. By default, Docker cannot resolve hard links or symlinks that point outside the container's isolated filesystem (e.g., to a global `~/.local/share/pnpm/store` on your host).
 
 **The fix:** Configure pnpm to keep its store inside the project directory so Docker can see it.
+
 1. Create a `.npmrc` at your monorepo root:
-   ```ini
-   store-dir=.pnpm-store
-   ```
+    ```ini
+    store-dir=.pnpm-store
+    ```
 2. Add `- /usr/src/app/.pnpm-store` as an anonymous volume in your `docker-compose.yml`.
 
 ---
@@ -142,4 +147,4 @@ If using `pnpm`, dependencies are not hoisted flat. Instead, `pnpm` uses a globa
 
 For large monorepos, standard Docker layer caching becomes a bottleneck. Tools like Turborepo provide a `prune` command designed specifically for Docker.
 
-You can add a pre-build stage in your Dockerfile (e.g., `RUN npx turbo prune --scope=@my-org/api --docker`). This generates a stripped-down, isolated version of your monorepo containing *only* the internal packages and `package.json` files that the target app relies on, maximizing Docker's layer cache hits when source code changes in unrelated packages.
+You can add a pre-build stage in your Dockerfile (e.g., `RUN npx turbo prune --scope=@my-org/api --docker`). This generates a stripped-down, isolated version of your monorepo containing _only_ the internal packages and `package.json` files that the target app relies on, maximizing Docker's layer cache hits when source code changes in unrelated packages.

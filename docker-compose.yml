@@ -7,11 +7,11 @@ services:
             POSTGRES_USER: ${PG_USER:-postgres}
             POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
         ports:
-            - "127.0.0.1:${COINAGE_PG_PORT:-5432}:5432"
+            - '127.0.0.1:${COINAGE_PG_PORT:-5432}:5432'
         volumes:
             - ./.docker-data/postgres18:/var/lib/postgresql
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE:-coinage-db}"]
+            test: ['CMD-SHELL', 'pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE:-coinage-db}']
             interval: 5s
             timeout: 5s
             retries: 10
@@ -23,7 +23,7 @@ services:
         image: coinage-api
         environment:
             PG_HOST: coinage-db
-            COINAGE_PG_PORT: "5432"
+            COINAGE_PG_PORT: '5432'
         env_file:
             - ./.env
         ports:

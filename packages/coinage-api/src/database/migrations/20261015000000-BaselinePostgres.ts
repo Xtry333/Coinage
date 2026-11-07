@@ -15,8 +15,7 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
  * Table creation order respects foreign-key dependencies.
  */
 export class BaselinePostgres20261015000000 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<void>
-    {
+    public async up(queryRunner: QueryRunner): Promise<void> {
         // -- user -----------------------------------------------------------
         await queryRunner.query(`
             CREATE TABLE "user" (
@@ -270,8 +269,7 @@ export class BaselinePostgres20261015000000 implements MigrationInterface {
         await queryRunner.query(`CREATE INDEX IDX_item_category_id ON item(category_id);`);
     }
 
-    public async down(queryRunner: QueryRunner): Promise<void>
-    {
+    public async down(queryRunner: QueryRunner): Promise<void> {
         // Destructive: drops all tables created by up(). One-way door.
         await queryRunner.query(`DROP VIEW IF EXISTS items_with_containers;`);
         await queryRunner.query(`DROP TABLE IF EXISTS item_tag CASCADE;`);

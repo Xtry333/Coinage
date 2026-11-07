@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CategoryDTO } from '@app/interfaces';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 

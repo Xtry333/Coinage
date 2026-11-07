@@ -1,8 +1,8 @@
 import * as path from 'path';
 
 import { DataSource, Table } from 'typeorm';
-import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
 import entities from './entities/_index';
 
@@ -23,10 +23,7 @@ export function loadMigrations(): (Function | string)[] {
             .flatMap((key: string) => (Object.values(ctx(key)) as Function[]).filter((v) => typeof v === 'function'));
     }
     // ts-node context (TypeORM CLI): return glob patterns for TypeORM to resolve
-    return [
-        path.join(__dirname, '../database/migrations/[0-9]*.ts'),
-        path.join(__dirname, '../database/migrations/[0-9]*.js'),
-    ];
+    return [path.join(__dirname, '../database/migrations/[0-9]*.ts'), path.join(__dirname, '../database/migrations/[0-9]*.js')];
 }
 
 export class CustomNamingStrategy extends SnakeNamingStrategy {

@@ -21,6 +21,8 @@ Dependencies are selected for compatibility, not by blindly installing every pac
 
 Validate both applications with `yarn nx run-many --target=typecheck`, and build them with `yarn nx run-many --target=build --configuration=production`. Nx's Jest, ESLint, Cypress, and API webpack targets use the Nx 24 inference plugins rather than the removed executors. Angular's existing zone-based change detection is explicitly retained.
 
+The webapp uses `@angular/build:application` and the Vite-based `@angular/build:dev-server`. Browser output remains directly in `dist/packages/coinage-webapp` (without a `browser/` subdirectory) for the nginx image. Development requests under `/api`, `/ws`, and `/socket.io` are proxied to port 3333, including nested paths and query strings.
+
 ## Features
 
 Currently Coinage supports limited features:

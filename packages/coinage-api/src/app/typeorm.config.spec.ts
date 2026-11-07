@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 
-import { loadMigrations, opts, dataSource } from './typeorm.config';
+import { dataSource, loadMigrations, opts } from './typeorm.config';
 
 describe('loadMigrations', () => {
     describe('ts-node context (require.context unavailable)', () => {

@@ -19,15 +19,15 @@
 
 ## Docker (Local)
 
-| Script                     | Description                             |
-| -------------------------- | --------------------------------------- |
-| `yarn docker:build-api`    | Build API Docker image locally (x86)    |
-| `yarn docker:build-webapp` | Build webapp Docker image locally (x86) |
-| `yarn docker:up`           | Start the image-based stack via Compose |
-| `yarn docker:down`         | Stop all containers                     |
+| Script                     | Description                                               |
+| -------------------------- | --------------------------------------------------------- |
+| `yarn docker:build-api`    | Build API Docker image locally (x86)                      |
+| `yarn docker:build-webapp` | Build webapp Docker image locally (x86)                   |
+| `yarn docker:up`           | Start the image-based stack via Compose                   |
+| `yarn docker:down`         | Stop all containers                                       |
 | `yarn docker:dev`          | Start the Docker PostgreSQL service for local development |
-| `yarn docker:dev:logs`     | Follow Docker PostgreSQL logs                |
-| `yarn docker:dev:down`     | Stop the Docker PostgreSQL service           |
+| `yarn docker:dev:logs`     | Follow Docker PostgreSQL logs                             |
+| `yarn docker:dev:down`     | Stop the Docker PostgreSQL service                        |
 
 ## Docker (Push to Registry)
 

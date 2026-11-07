@@ -1,9 +1,9 @@
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { BalanceDTO, TransferDTO, TransferTypeEnum } from '@app/interfaces';
 import { ChartDataset, ChartOptions } from 'chart.js';
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { DateParserService, PartedDate } from '../services/date-parser.service';
 import { Subscription, lastValueFrom } from 'rxjs';
+import { DateParserService, PartedDate } from '../services/date-parser.service';
 
 import { CoinageDataService } from '../services/coinage.data-service';
 import { TableFilterFields } from '../transfers-table/transfers-table.component';

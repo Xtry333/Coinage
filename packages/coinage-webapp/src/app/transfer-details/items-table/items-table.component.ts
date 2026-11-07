@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { ContainerDTO, TransferItemDTO } from '@app/interfaces';
 import { CoinageRoutes } from '../../app-routing/app-routes';
 

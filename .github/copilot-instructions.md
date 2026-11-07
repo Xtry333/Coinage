@@ -1,4 +1,3 @@
-
 ## Purpose
 
 This file gives focused, discoverable guidance for an AI coding agent working on the Coinage monorepo so it can be productive immediately.

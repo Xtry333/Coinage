@@ -1,8 +1,8 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
 import { CategoryDTO } from '@app/interfaces';
-import { CoinageDataService } from '../services/coinage.data-service';
 import { finalize } from 'rxjs/operators';
+import { CoinageDataService } from '../services/coinage.data-service';
 
 @Component({
     selector: 'app-category-manager',

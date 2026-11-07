@@ -1,5 +1,5 @@
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ChartDataset, ChartOptions, ChartType } from 'chart.js';
-import { Component, Input, ChangeDetectionStrategy } from '@angular/core';
 
 export const enum CoinageChartType {
     Bar = 'bar',

@@ -1,7 +1,7 @@
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddContainerTable1745336625326 implements MigrationInterface {
-    name = 'AddContainerTable1745336625326'
+    name = 'AddContainerTable1745336625326';
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         if (!(await queryRunner.hasTable('container'))) {
@@ -47,5 +47,4 @@ export class AddContainerTable1745336625326 implements MigrationInterface {
         await queryRunner.query(`ALTER TABLE \`transfer_item\` DROP COLUMN \`container_id\``);
         await queryRunner.query(`DROP TABLE \`container\``);
     }
-
 }

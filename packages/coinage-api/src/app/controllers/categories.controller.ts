@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 
 import { BaseResponseDTO, CategoryDTO, CreateEditCategoryDTO, TotalInMonthByCategory } from '@app/interfaces';
 
-import { CategoryDao as CategoryDao } from '../daos/category.dao';
+import { CategoryDao } from '../daos/category.dao';
 import { Category } from '../entities/Category.entity';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { CategoryCascadeService } from '../services/category-cascades.service';

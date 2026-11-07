@@ -1,12 +1,12 @@
-import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { GetFilteredTransfersRequest, Range, TransferDTO } from '@app/interfaces';
 
 import { ActivatedRoute } from '@angular/router';
-import { CoinageDataService } from '../services/coinage.data-service';
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { TableFilterFields } from '../transfers-table/transfers-table.component';
 import { PaginationQueryParams } from '../core/pagination/pagination.component';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { WindowService } from '../core/services/window-service/window-service.service';
+import { CoinageDataService } from '../services/coinage.data-service';
+import { TableFilterFields } from '../transfers-table/transfers-table.component';
 
 @Component({
     selector: 'app-transfers-list',

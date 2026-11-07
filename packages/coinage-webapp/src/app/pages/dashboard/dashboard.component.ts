@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs';
 
-import { Component, HostListener, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@app/interfaces';
 import { ChartDataset } from 'chart.js';
 

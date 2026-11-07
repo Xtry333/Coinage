@@ -14,18 +14,21 @@
             }
         },
         "build": {
-            "executor": "@angular-devkit/build-angular:browser",
-            "outputs": ["{options.outputPath}"],
+            "executor": "@angular/build:application",
+            "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
             "defaultConfiguration": "production",
             "options": {
-                "outputPath": "dist/packages/coinage-webapp",
+                "outputPath": {
+                    "base": "dist/packages/coinage-webapp",
+                    "browser": ""
+                },
                 "index": "packages/coinage-webapp/src/index.html",
-                "main": "packages/coinage-webapp/src/main.ts",
+                "browser": "packages/coinage-webapp/src/main.ts",
                 "polyfills": ["zone.js"],
                 "tsConfig": "packages/coinage-webapp/tsconfig.app.json",
                 "inlineStyleLanguage": "scss",
                 "assets": ["packages/coinage-webapp/src/favicon.ico", "packages/coinage-webapp/src/assets"],
-                "styles": ["packages/coinage-webapp/src/styles.scss"],
+                "styles": ["node_modules/@ng-select/ng-select/themes/default.theme.css", "packages/coinage-webapp/src/styles.scss"],
                 "scripts": [],
                 "allowedCommonJsDependencies": ["validator"]
             },
@@ -46,9 +49,7 @@
                     "outputHashing": "all"
                 },
                 "development": {
-                    "buildOptimizer": false,
                     "optimization": false,
-                    "vendorChunk": true,
                     "extractLicenses": false,
                     "sourceMap": true,
                     "namedChunks": true
@@ -56,7 +57,7 @@
             }
         },
         "serve": {
-            "executor": "@angular-devkit/build-angular:dev-server",
+            "executor": "@angular/build:dev-server",
             "continuous": true,
             "defaultConfiguration": "development",
             "options": {
@@ -76,7 +77,7 @@
             }
         },
         "extract-i18n": {
-            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "executor": "@angular/build:extract-i18n",
             "options": {
                 "buildTarget": "coinage-webapp:build"
             }

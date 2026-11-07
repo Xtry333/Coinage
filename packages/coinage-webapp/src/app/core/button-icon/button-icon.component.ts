@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { IconDefinition, SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 export type ButtonSize = 'sm' | 'md' | 'lg';

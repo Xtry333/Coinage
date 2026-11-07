@@ -1,5 +1,5 @@
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { CategoryDTO, CreateEditCategoryDTO } from '@app/interfaces';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 

@@ -1,4 +1,4 @@
-import { Component, ElementRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, HostListener } from '@angular/core';
 
 @Component({
     selector: 'app-dropdown-menu',

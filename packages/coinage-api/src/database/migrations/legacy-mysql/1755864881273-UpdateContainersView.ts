@@ -13,10 +13,11 @@ export class UpdateContainersView1755864881273 implements MigrationInterface {
         if (!(await queryRunner.hasColumn('item', 'container_size_unit'))) {
             await queryRunner.query(`ALTER TABLE \`item\` ADD \`container_size_unit\` varchar(16) NULL`);
         }
-        await queryRunner.query(
-            `DELETE FROM \`coinage-db\`.\`typeorm_metadata\` WHERE \`type\` = ? AND \`name\` = ? AND \`schema\` = ?`,
-            ['VIEW', 'items_with_containers', 'coinage-db'],
-        );
+        await queryRunner.query(`DELETE FROM \`coinage-db\`.\`typeorm_metadata\` WHERE \`type\` = ? AND \`name\` = ? AND \`schema\` = ?`, [
+            'VIEW',
+            'items_with_containers',
+            'coinage-db',
+        ]);
         await queryRunner.query(`DROP VIEW IF EXISTS \`items_with_containers\``);
         await queryRunner.query(`CREATE VIEW \`items_with_containers\` AS 
 SELECT 

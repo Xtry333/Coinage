@@ -1,4 +1,16 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnInit,
+    Output,
+    QueryList,
+    ViewChild,
+    ViewChildren,
+} from '@angular/core';
 import { IconDefinition, faCaretDown, faCheck, faEdit, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { deepCopy } from 'deep-copy-ts';
 
