@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs';
 
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 import { IconDefinition, faEdit, faFlagCheckered, faReceipt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import {
@@ -69,6 +69,7 @@ export type UiTableRow = UiTransfer | { isTodayMarkerRow: boolean };
     selector: 'app-transfers-table[transfers]',
     templateUrl: './transfers-table.component.html',
     styleUrls: ['./transfers-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class TransfersTableComponent implements OnInit, OnChanges {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -36,6 +36,7 @@ export interface NewTransferObject {
     selector: 'app-create-multiple-transfers',
     templateUrl: './create-multiple-transfers.component.html',
     styleUrls: ['./create-multiple-transfers.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class CreateMultipleTransfersComponent implements OnInit {

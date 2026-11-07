@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, OnInit, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { faBars, faBell, faUser, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { CurrentUserDataService } from '../../services/current-user.service';
@@ -8,6 +8,7 @@ import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component'
     selector: 'app-top-nav-bar',
     templateUrl: './top-nav-bar.component.html',
     styleUrls: ['./top-nav-bar.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class TopNavBarComponent implements OnInit {

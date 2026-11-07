@@ -6,15 +6,14 @@
  * across individual test files.
  */
 
-import 'jest-preset-angular/setup-env/zone';
+import { setupZoneTestEnv } from 'jest-preset-angular/setup-env/zone';
 import 'reflect-metadata';
 import 'zone.js';
 
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { getTestBed, TestBed } from '@angular/core/testing';
+import { TestBed } from '@angular/core/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 
 import { CurrencyPipe } from './app/pipes/currency.pipe';
@@ -44,7 +43,7 @@ jest.mock('ngx-socket-io', () => ({
     SocketIoConfig: {},
 }));
 
-getTestBed().initTestEnvironment(BrowserDynamicTestingModule, platformBrowserDynamicTesting());
+setupZoneTestEnv();
 
 class MockCoinageStorageService {
     get = jest.fn(() => null);

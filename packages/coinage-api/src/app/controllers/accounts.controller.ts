@@ -11,7 +11,7 @@ import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 
 @UseGuards(AuthGuard)
-@Controller('account(s)?')
+@Controller(['account', 'accounts'])
 export class AccountsController {
     public constructor(
         private readonly accountDao: AccountDao,
@@ -46,7 +46,11 @@ export class AccountsController {
         const asOfDate = new Date(dateParam);
         if (Number.isNaN(asOfDate.getTime())) throw new Error('Invalid parameters');
         const accounts = await this.accountDao.getForUserId(userId);
-        return this.getAccountSpendingsForUser(accounts.map((account) => account.id), asOfDate, userId);
+        return this.getAccountSpendingsForUser(
+            accounts.map((account) => account.id),
+            asOfDate,
+            userId,
+        );
     }
 
     @Get(':accountIds/spendings')

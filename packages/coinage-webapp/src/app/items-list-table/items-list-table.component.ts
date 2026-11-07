@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CategoryDTO, ItemWithContainerDTO } from '@app/interfaces';
 import { faBoxes, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Subject, takeUntil } from 'rxjs';
@@ -34,6 +34,7 @@ export type ItemsOptionsForCheckboxFilters = {
     selector: 'app-items-list-table',
     templateUrl: './items-list-table.component.html',
     styleUrls: ['./items-list-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ItemsListTableComponent implements OnInit, OnDestroy {

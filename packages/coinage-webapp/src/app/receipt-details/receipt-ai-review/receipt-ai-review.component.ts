@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 import { AccountDTO, ConfirmReceiptDTO, ConfirmReceiptItemDTO, NormalizedReceiptItemDTO, ReceiptAiResultDTO } from '@app/interfaces';
@@ -19,6 +19,7 @@ export interface ReviewItem extends NormalizedReceiptItemDTO {
     selector: 'app-receipt-ai-review',
     templateUrl: './receipt-ai-review.component.html',
     styleUrls: ['./receipt-ai-review.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ReceiptAiReviewComponent implements OnInit, OnDestroy {

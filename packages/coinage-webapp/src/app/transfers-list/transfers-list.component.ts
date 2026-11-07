@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { GetFilteredTransfersRequest, Range, TransferDTO } from '@app/interfaces';
 
 import { ActivatedRoute } from '@angular/router';
@@ -12,6 +12,7 @@ import { WindowService } from '../core/services/window-service/window-service.se
     selector: 'app-transfers-list',
     templateUrl: './transfers-list.component.html',
     styleUrls: ['./transfers-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class TransfersListComponent implements OnInit, OnDestroy {

@@ -4,41 +4,58 @@ Coinage is a personal project for keeping track of all expenses and incomes for 
 
 ## Core Libraries
 
--   NX
--   Angular
--   NestJS
--   TypeScript
+- NX
+- Angular
+- NestJS
+- TypeScript
+
+### Supported toolchain
+
+- Node.js 26.x, Yarn 4.18.1 (pinned in `package.json`)
+- Nx 24.0.5 and Angular 22.2.x
+- TypeScript 6.0.3: Angular 22 requires `>=6.0 <6.1`, so TypeScript 7 is not compatible yet.
+- NestJS 11.2.8: `@nx/nest` 24.0.5 requires NestJS `>=10 <12`; upgrade to NestJS 12 only after Nx declares support.
+- TypeORM stays on the latest 0.3.x release to satisfy `typeorm-naming-strategies`; Tailwind stays on 3.4.x for the existing SCSS/configuration. ESLint 9 and Stylelint 17 match their plugins' supported ranges.
+
+Dependencies are selected for compatibility, not by blindly installing every package's latest major. The unused Angular-17-only `ngx-popperjs` and obsolete lint/format adapters have been removed.
+
+Validate both applications with `yarn nx run-many --target=typecheck`, and build them with `yarn nx run-many --target=build --configuration=production`. Nx's Jest, ESLint, Cypress, and API webpack targets use the Nx 24 inference plugins rather than the removed executors. Angular's existing zone-based change detection is explicitly retained.
 
 ## Features
 
 Currently Coinage supports limited features:
 
--   Run in dockerized environment (3 containers)
--   Run in development mode (no docker)
--   Possibility to add contractors
--   Possibility to add categories
--   Possibility to add transfers from and to contractors
--   Possibility to add multiple accounts (currently only through database)
--   Virtual accounts (currently only through database)
--   Dashboard with all accounts and their balances for active user, with short summary of all recent transfers
--   Overall monthly spendings and incomes
--   Receipts for expenses that are not yet paid or partially paid
--   Notifications
--   Internal transfers between accounts
+- Run in dockerized environment (3 containers)
+- Run in development mode (no docker)
+- Possibility to add contractors
+- Possibility to add categories
+- Possibility to add transfers from and to contractors
+- Possibility to add multiple accounts (currently only through database)
+- Virtual accounts (currently only through database)
+- Dashboard with all accounts and their balances for active user, with short summary of all recent transfers
+- Overall monthly spendings and incomes
+- Receipts for expenses that are not yet paid or partially paid
+- Notifications
+- Internal transfers between accounts
 
 ## Planned features
 
 Features planned for the future (far or near):
 
--   Possibility to add multiple currencies
--   Possibility to add create transactions across multiple currencies
--   Summarize all expenses and incomes for each contractor
--   Notify users about upcoming payments
--   Adding testing to every component
+- Possibility to add multiple currencies
+- Possibility to add create transactions across multiple currencies
+- Summarize all expenses and incomes for each contractor
+- Notify users about upcoming payments
+- Adding testing to every component
 
 ## Quick Start
 
-For the hybrid development setup (Option A), Docker runs PostgreSQL and Node/Nx/Angular run natively for fast file watching. Install Node.js 22.18+ and run from the project root:
+For the hybrid development setup (Option A), Docker runs PostgreSQL and Node/Nx/Angular run natively for fast file watching. Install Node.js 26.x and run from the project root. Node 26 does not bundle Corepack; install it once if it is not already available:
+
+```powershell
+npm install --global corepack@0.36.0
+corepack enable
+```
 
 Set `COINAGE_ADMIN_USERNAME` and a unique `COINAGE_ADMIN_PASSWORD` in `.env` before the first database migration. The migration creates/promotes that system user once; changing the password in `.env` later does not reset it. Passwords are stored as salted scrypt hashes.
 

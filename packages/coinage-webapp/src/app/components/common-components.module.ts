@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
-import { NgChartsModule } from 'ng2-charts';
+import { BaseChartDirective } from 'ng2-charts';
 
 import { CoreModule } from '../core/core.module';
 import { AutoPaginationComponent } from './auto-pagination/auto-pagination.component';
@@ -12,7 +12,7 @@ import { MoneyAmountComponent } from './money-amount/money-amount.component';
 import { SectionComponent } from './section/section.component';
 
 @NgModule({
-    imports: [CoreModule, NgSelectModule, FormsModule, NgChartsModule],
+    imports: [CoreModule, NgSelectModule, FormsModule, BaseChartDirective],
     declarations: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent, MoneyAmountComponent, BulkEditTransfersModalComponent],
     exports: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent, MoneyAmountComponent, BulkEditTransfersModalComponent],
 })

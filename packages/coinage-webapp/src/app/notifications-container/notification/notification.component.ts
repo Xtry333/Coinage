@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { faExternalLinkAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { CoinageNotification, NotificationLevel } from '../../services/notification.service';
 
@@ -6,6 +6,7 @@ import { CoinageNotification, NotificationLevel } from '../../services/notificat
     selector: 'app-notification',
     templateUrl: './notification.component.html',
     styleUrls: ['./notification.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class NotificationComponent implements OnInit, OnDestroy {

@@ -77,7 +77,7 @@ export class CategoriesController {
         };
     }
 
-    @Get('/totalPerCategory/:year/:month/:day?')
+    @Get('/totalPerCategory/:year/:month{/:day}')
     public async getTotalPerCategory(
         @Param('year') year: string,
         @Param('month') month: string,

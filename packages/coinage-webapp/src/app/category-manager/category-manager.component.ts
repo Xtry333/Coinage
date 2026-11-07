@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 
 import { CategoryDTO } from '@app/interfaces';
 import { CoinageDataService } from '../services/coinage.data-service';
@@ -8,6 +8,7 @@ import { finalize } from 'rxjs/operators';
     selector: 'app-category-manager',
     templateUrl: './category-manager.component.html',
     styleUrls: ['./category-manager.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class CategoryManagerComponent implements OnInit {

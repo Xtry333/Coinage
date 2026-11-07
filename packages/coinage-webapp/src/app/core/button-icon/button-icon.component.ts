@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ChangeDetectionStrategy } from '@angular/core';
 import { IconDefinition, SizeProp } from '@fortawesome/fontawesome-svg-core';
 
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -7,6 +7,7 @@ export type ButtonSize = 'sm' | 'md' | 'lg';
     selector: 'app-button-icon',
     templateUrl: './button-icon.component.html',
     styleUrls: ['./button-icon.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ButtonIconComponent {

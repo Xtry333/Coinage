@@ -1,5 +1,5 @@
 /* eslint-disable */
-export default {
+module.exports = {
     displayName: 'coinage-webapp',
     preset: '../../jest.preset.js',
     setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
@@ -12,7 +12,7 @@ export default {
         '^.+\\.(ts|mjs|js|html)$': [
             'jest-preset-angular',
             {
-                tsConfig: '<rootDir>/tsconfig.spec.json',
+                tsconfig: '<rootDir>/tsconfig.spec.json',
                 stringifyContentPathRegex: '\\.(html|svg)$',
             },
         ],

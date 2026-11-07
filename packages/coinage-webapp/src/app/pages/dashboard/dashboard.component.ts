@@ -1,6 +1,6 @@
 import * as Rx from 'rxjs';
 
-import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@app/interfaces';
 import { ChartDataset } from 'chart.js';
 
@@ -27,6 +27,7 @@ interface UiTotalAmountPerMonth {
     selector: 'app-dashboard',
     templateUrl: './dashboard.component.html',
     styleUrls: ['./dashboard.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class DashboardComponent implements OnInit, OnDestroy {

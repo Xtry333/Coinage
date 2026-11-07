@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
 import { faMagicWandSparkles, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
 
@@ -22,6 +22,7 @@ export interface SelectedTransferItemDetails {
     selector: 'app-item-details-for-transfer',
     templateUrl: './item-details-for-transfer.component.html',
     styleUrls: ['./item-details-for-transfer.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class AddItemsToTransferComponent implements OnInit {

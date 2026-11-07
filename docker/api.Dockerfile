@@ -1,10 +1,11 @@
-FROM node:22.18
+FROM node:26.4.0
 
 ADD package.json /tmp/package.json
 ADD yarn.lock /tmp/yarn.lock
-RUN corepack enable && corepack prepare yarn@3.3.1 --activate
+ADD .yarnrc.yml /tmp/.yarnrc.yml
+RUN npm install --global --force corepack@0.36.0 && corepack enable
 ENV YARN_NODE_LINKER=node-modules
-RUN cd /tmp && yarn install
+RUN cd /tmp && CYPRESS_INSTALL_BINARY=0 yarn install --immutable
 RUN mkdir -p /app/api && cp -a /tmp/node_modules /app/api/
 
 WORKDIR /app/api

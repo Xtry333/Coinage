@@ -1,0 +1,19 @@
+import nx from '@nx/eslint-plugin';
+import baseConfig from '../../eslint.config.mjs';
+
+export default [
+    ...baseConfig,
+    ...nx.configs['flat/angular'],
+    ...nx.configs['flat/angular-template'],
+    {
+        files: ['**/*.ts'],
+        rules: {
+            // New preset defaults must not force an unrelated architecture migration.
+            '@angular-eslint/prefer-inject': 'off',
+            '@angular-eslint/prefer-standalone': 'off',
+            '@angular-eslint/prefer-on-push-component-change-detection': 'off',
+            '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'coinageApp', style: 'camelCase' }],
+            '@angular-eslint/component-selector': ['error', { type: 'element', prefix: 'coinage-app', style: 'kebab-case' }],
+        },
+    },
+];

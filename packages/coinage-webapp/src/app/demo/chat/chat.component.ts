@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CoinageSocketService } from '../../services/coinage-socket.service';
 import { WebSocketService } from '../../services/web-socket.service';
 
@@ -6,6 +6,7 @@ import { WebSocketService } from '../../services/web-socket.service';
     selector: 'app-chat',
     templateUrl: './chat.component.html',
     styleUrls: ['./chat.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ChatComponent implements OnInit {

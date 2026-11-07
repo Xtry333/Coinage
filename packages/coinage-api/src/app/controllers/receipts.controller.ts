@@ -74,7 +74,7 @@ const multerStorage = diskStorage({
 });
 
 @UseGuards(AuthGuard)
-@Controller('receipt(s)?')
+@Controller(['receipt', 'receipts'])
 export class ReceiptsController {
     private readonly logger = new Logger(ReceiptsController.name);
 

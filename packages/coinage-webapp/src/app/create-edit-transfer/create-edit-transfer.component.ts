@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren, ChangeDetectionStrategy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
@@ -38,6 +38,7 @@ export interface NewTransferObject {
     selector: 'app-create-transfer',
     templateUrl: './create-edit-transfer.component.html',
     styleUrls: ['./create-edit-transfer.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class CreateEditTransferComponent implements OnInit {

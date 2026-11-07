@@ -1,9 +1,10 @@
-import { Component, ElementRef, HostListener } from '@angular/core';
+import { Component, ElementRef, HostListener, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
     selector: 'app-dropdown-menu',
     templateUrl: './dropdown-menu.component.html',
     styleUrls: ['./dropdown-menu.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class DropdownMenuComponent {

@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, HostListener, OnDestroy, OnInit, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, HostListener, OnDestroy, OnInit, Output, ChangeDetectionStrategy } from '@angular/core';
 import { faCheck, faExternalLinkAlt, faHistory, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Subject, takeUntil } from 'rxjs';
 
@@ -8,6 +8,7 @@ import { CoinageNotification, NotificationService } from '../../services/notific
     selector: 'app-notifications-dropdown',
     templateUrl: './notifications-dropdown.component.html',
     styleUrls: ['./notifications-dropdown.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class NotificationsDropdownComponent implements OnInit, OnDestroy {

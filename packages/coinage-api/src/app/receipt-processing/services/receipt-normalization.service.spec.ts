@@ -247,7 +247,7 @@ describe('ReceiptNormalizationService', () => {
 
             await service.normalize({ items: [{ name: 'Test Itm', price: 1.0 }] });
 
-            const callArgs = (ollamaService.resolveEntityMatch as jest.Mock).mock.calls[0];
+            const callArgs = ollamaService.resolveEntityMatch.mock.calls[0];
             const categories = callArgs[2] as Array<{ type: string }>;
             expect(categories.every((c) => c.type === TransferTypeEnum.OUTCOME)).toBe(true);
             expect(categories.some((c) => c.type === TransferTypeEnum.INCOME)).toBe(false);

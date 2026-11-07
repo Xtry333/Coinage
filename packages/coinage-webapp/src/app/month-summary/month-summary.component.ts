@@ -1,7 +1,7 @@
 import { ActivatedRoute, Router } from '@angular/router';
 import { BalanceDTO, TransferDTO, TransferTypeEnum } from '@app/interfaces';
 import { ChartDataset, ChartOptions } from 'chart.js';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { DateParserService, PartedDate } from '../services/date-parser.service';
 import { Subscription, lastValueFrom } from 'rxjs';
 
@@ -19,6 +19,7 @@ export interface UiTotalInMonthByCategory {
     selector: 'app-summary',
     templateUrl: './month-summary.component.html',
     styleUrls: ['./month-summary.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class MonthSummaryComponent implements OnInit, OnDestroy {

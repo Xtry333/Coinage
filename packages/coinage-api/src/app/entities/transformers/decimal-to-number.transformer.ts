@@ -11,7 +11,7 @@ export class DecimalToNumberTransformer implements ValueTransformer {
         return parseFloat(value);
     }
 
-    // eslint-disable-next-line @typescript-eslint/ban-types
+    // eslint-disable-next-line @typescript-eslint/no-wrapper-object-types
     public to(value: Number | null): string | null | undefined {
         if (value === null) {
             return null;

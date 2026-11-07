@@ -1,5 +1,5 @@
 import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
-import { NgModule } from '@angular/core';
+import { NgModule, provideZoneChangeDetection } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
@@ -8,9 +8,9 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Chart } from 'chart.js';
 import zoomPlugin from 'chartjs-plugin-zoom';
-import { NgChartsModule } from 'ng2-charts';
-import { NgxPopperjsModule } from 'ngx-popperjs';
+import { BaseChartDirective, provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { SocketIoConfig, SocketIoModule } from 'ngx-socket-io';
+import type { ManagerOptions, SocketOptions } from 'socket.io-client';
 
 import { AppRoutingModule } from './app-routing/app-routing.module';
 import { AppComponent } from './app.component';
@@ -47,15 +47,16 @@ import { TransfersListComponent } from './transfers-list/transfers-list.componen
 import { TableFilterComponent } from './transfers-table/table-filter/table-filter.component';
 import { TransfersTableComponent } from './transfers-table/transfers-table.component';
 
+const socketIoOptions: Partial<ManagerOptions & SocketOptions> = {
+    path: '/ws/',
+    transports: ['websocket'],
+    auth: {
+        key: 'Key',
+    },
+};
 const socketIoConfig: SocketIoConfig = {
     url: '/',
-    options: {
-        path: '/ws/',
-        transports: ['websocket'],
-        auth: {
-            key: 'Key',
-        },
-    },
+    options: socketIoOptions,
 };
 Chart.register(zoomPlugin);
 
@@ -65,7 +66,6 @@ Chart.register(zoomPlugin);
         CommonComponentsModule,
         AuthModule,
         ItemizedTransfersModule,
-        NgxPopperjsModule,
         BrowserModule,
         HttpClientModule,
         BrowserAnimationsModule,
@@ -74,7 +74,7 @@ Chart.register(zoomPlugin);
         NgSelectModule,
         FormsModule,
         FontAwesomeModule,
-        NgChartsModule,
+        BaseChartDirective,
         SocketIoModule.forRoot(socketIoConfig),
     ],
     declarations: [
@@ -108,6 +108,8 @@ Chart.register(zoomPlugin);
         AccountDetailsPage,
     ],
     providers: [
+        provideZoneChangeDetection(),
+        provideCharts(withDefaultRegisterables()),
         {
             provide: HTTP_INTERCEPTORS,
             useClass: NetworkInterceptor,

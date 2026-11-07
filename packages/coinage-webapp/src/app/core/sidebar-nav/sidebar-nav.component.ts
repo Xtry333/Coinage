@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnInit, Output, ViewChild, ChangeDetectionStrategy } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 import { CoinageRoutes } from '../../app-routing/app-routes';
@@ -15,6 +15,7 @@ interface UiNavLink {
     selector: 'app-sidebar-nav',
     templateUrl: './sidebar-nav.component.html',
     styleUrls: ['./sidebar-nav.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class SidebarNavComponent implements OnInit {
