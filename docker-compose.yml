@@ -7,7 +7,7 @@ services:
             POSTGRES_USER: ${PG_USER:-postgres}
             POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
         ports:
-            - '127.0.0.1:${COINAGE_PG_PORT:-5432}:5432'
+            - '127.0.0.1:${PG_PORT:-5432}:5432'
         volumes:
             - ./.docker-data/postgres18:/var/lib/postgresql
         healthcheck:
@@ -23,7 +23,7 @@ services:
         image: coinage-api
         environment:
             PG_HOST: coinage-db
-            COINAGE_PG_PORT: '5432'
+            PG_PORT: '5432'
         env_file:
             - ./.env
         ports:

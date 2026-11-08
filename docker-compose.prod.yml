@@ -7,7 +7,7 @@ services:
             POSTGRES_USER: ${PG_USER:-postgres}
             POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
         ports:
-            - ${COINAGE_PG_PORT:-5432}:5432
+            - ${PG_PORT:-5432}:5432
         volumes:
             - ./docker/postgres-data:/var/lib/postgresql
         healthcheck:
@@ -22,7 +22,7 @@ services:
         image: ghcr.io/${COINAGE_REGISTRY_USER:-Xtry333}/coinage-api:latest
         environment:
             PG_HOST: coinage-db
-            COINAGE_PG_PORT: 5432
+            PG_PORT: 5432
             COINAGE_API_JWT_SECRET: ${COINAGE_API_JWT_SECRET:-change-me}
             COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:-}
             COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:-}
