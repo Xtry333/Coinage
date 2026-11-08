@@ -28,7 +28,7 @@
                 "tsConfig": "packages/coinage-webapp/tsconfig.app.json",
                 "inlineStyleLanguage": "scss",
                 "assets": ["packages/coinage-webapp/src/favicon.ico", "packages/coinage-webapp/src/assets"],
-                "styles": ["node_modules/@ng-select/ng-select/themes/default.theme.css", "packages/coinage-webapp/src/styles.scss"],
+                "styles": ["node_modules/@ng-select/ng-select/themes/default.theme.css", "packages/coinage-webapp/src/styles.css"],
                 "scripts": [],
                 "allowedCommonJsDependencies": ["validator"]
             },

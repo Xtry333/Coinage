@@ -1,4 +1,4 @@
-$border-color: #d1d1d1;
+@reference '../../styles.css';
 
 .category-path-list {
     @apply flex list-none p-0;
@@ -80,10 +80,10 @@ form {
         flex-direction: column;
         gap: 6px;
 
-        // Labels now use Tailwind classes for consistent styling
+        /* Labels use Tailwind classes for consistent styling. */
     }
 
-    // Form inputs now use Tailwind classes for consistent styling
+    /* Form inputs use Tailwind classes for consistent styling. */
 
     .ng-select ::ng-deep {
         .ng-select-container {
@@ -162,7 +162,5 @@ form {
         }
     }
 
-    // Form action buttons now use Tailwind classes, no custom SCSS needed
+    /* Form action buttons use Tailwind classes. */
 }
-
-// Remove this rule as it conflicts with Tailwind button styling

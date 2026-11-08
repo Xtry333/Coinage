@@ -5,6 +5,7 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
 import entities from './entities/_index';
+import { getPostgresConnectionOptions } from './postgres-connection-options';
 
 export function loadMigrations(): (Function | string)[] {
     // Detect webpack context via __webpack_require__ (injected by webpack at build time).
@@ -49,11 +50,7 @@ export class CustomNamingStrategy extends SnakeNamingStrategy {
 
 export const opts: PostgresConnectionOptions = {
     type: 'postgres',
-    host: process.env.PG_HOST || process.env.MYSQL_HOST || 'localhost',
-    port: Number(process.env.COINAGE_PG_PORT) || Number(process.env.COINAGE_MYSQL_PORT) || 5432,
-    username: process.env.PG_USER || process.env.MYSQL_USER,
-    password: process.env.PG_PASSWORD || process.env.MYSQL_PASSWORD,
-    database: process.env.PG_DATABASE || process.env.MYSQL_DATABASE,
+    ...getPostgresConnectionOptions(),
     synchronize: false,
     logging: false,
     migrationsRun: true,

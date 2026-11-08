@@ -36,7 +36,7 @@ export class TopNavBarComponent implements OnInit {
     public ngOnInit(): void {
         this.userDataService.userData$.subscribe((user) => {
             this.username = user['username'];
-            this.dateTime = new Date(user['date'] ?? 0).toLocaleString();
+            this.dateTime = user['date'] != null ? new Date(user['date']).toLocaleString() : new Date().toLocaleString();
             //console.log(user['date']);
         });
     }

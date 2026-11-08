@@ -138,10 +138,10 @@ Use these when trying to build for production deployment (slow process and runni
 Required environment variables for API:
 
 - `PG_HOST` - Database host (default: localhost)
+- `PG_PORT` - Database port (default: 5432)
 - `PG_USER` - Database username
 - `PG_PASSWORD` - Database password
 - `PG_DATABASE` - Database name
-- `COINAGE_PG_PORT` - Database port (default: 5432)
 
 ## Dependencies & Versions
 

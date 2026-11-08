@@ -37,7 +37,7 @@ export interface NewTransferObject {
 @Component({
     selector: 'app-create-transfer',
     templateUrl: './create-edit-transfer.component.html',
-    styleUrls: ['./create-edit-transfer.component.scss'],
+    styleUrls: ['./create-edit-transfer.component.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })

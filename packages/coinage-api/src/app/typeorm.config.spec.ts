@@ -1,5 +1,6 @@
 import { DataSource } from 'typeorm';
 
+import { getPostgresConnectionOptions } from './postgres-connection-options';
 import { dataSource, loadMigrations, opts } from './typeorm.config';
 
 describe('loadMigrations', () => {
@@ -74,15 +75,7 @@ describe('TypeORM config (PostgreSQL)', () => {
     });
 
     it('defaults to port 5432 when no env var is set', () => {
-        const originalEnv = { ...process.env };
-        delete process.env.COINAGE_PG_PORT;
-        delete process.env.COINAGE_MYSQL_PORT;
-
-        // Re-read opts requires re-import; instead check the default expression logic directly
-        const defaultPort = Number(process.env.COINAGE_PG_PORT) || Number(process.env.COINAGE_MYSQL_PORT) || 5432;
-        expect(defaultPort).toBe(5432);
-
-        process.env = originalEnv;
+        expect(getPostgresConnectionOptions(() => undefined).port).toBe(5432);
     });
 
     it('dataSource is instantiated', () => {

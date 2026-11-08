@@ -21,5 +21,8 @@
     "stylelint.packageManager": "yarn",
     "scss.validate": false,
     "stylelint.snippet": ["css", "less", "postcss", "scss"],
-    "stylelint.validate": ["css", "less", "postcss", "scss"]
+    "stylelint.validate": ["css", "less", "postcss", "scss", "tailwindcss"],
+    "files.associations": {
+        "**/packages/coinage-webapp/src/**/*.css": "tailwindcss"
+    }
 }

@@ -33,7 +33,7 @@ export type ItemsOptionsForCheckboxFilters = {
 @Component({
     selector: 'app-items-list-table',
     templateUrl: './items-list-table.component.html',
-    styleUrls: ['./items-list-table.component.scss'],
+    styleUrls: ['./items-list-table.component.css'],
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
