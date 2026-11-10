@@ -32,6 +32,7 @@
         "docker:dev": "docker compose -p coinage-postgres-dev -f docker-compose.dev.yml up -d",
         "docker:dev:logs": "docker compose -p coinage-postgres-dev -f docker-compose.dev.yml logs -f coinage-db",
         "docker:dev:down": "docker compose -p coinage-postgres-dev -f docker-compose.dev.yml down",
+        "db:dump": "node tools/db-dump.cjs",
         "test": "run-s test:api test:webapp",
         "test:api": "nx test coinage-api",
         "test:webapp": "nx test coinage-webapp",

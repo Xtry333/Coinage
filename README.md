@@ -101,6 +101,42 @@ corepack yarn dev:webapp # Starts the web application
 yarn migration:create <migration_name>
 ```
 
+## Database backups
+
+With Docker and PostgreSQL running, create a compressed, portable PostgreSQL custom-format archive:
+
+```bash
+yarn db:dump
+```
+
+The command detects the running `coinage-db` container for this checkout, reads `PG_USER`, `PG_DATABASE`, and `PG_PASSWORD` from the environment or `.env` (falling back to the container configuration), and writes `backups/<database>-<timestamp>.dump`. It works on Windows and Linux without a host PostgreSQL installation or binary shell redirection. Backups are Git-ignored, existing files are never overwritten, and failed dumps are removed.
+
+Optional output and container selection:
+
+```bash
+yarn db:dump --output backups/pi-move.dump
+yarn db:dump --container coinage-app-coinage-db-1
+yarn db:dump --help
+```
+
+The archive includes schema, data, sequences, and migration history, but not PostgreSQL roles or receipt uploads. Copy uploads separately (`uploads/` for native development; `.docker-data/uploads/` for the image-based stack). For a final transfer, stop the source API before dumping and copying uploads. Restore into an empty PostgreSQL 18 database before starting the destination API; the dump is portable between PC and Raspberry Pi ARM64.
+
+### Restoring on the same or another device
+
+Copy the dump to the destination checkout's `backups/` directory. Start PostgreSQL 18, but keep the destination API stopped (Ctrl+C for native development, or stop the `coinage-api` service for the Docker stack). The destination database and PostgreSQL user must already exist; a fresh database is recommended.
+
+Find the destination container with `docker ps --format "{{.Names}}"`. In these examples, replace the container name, `coinage-db-admin`, and `coinage-db` with the destination's container, `PG_USER`, and `PG_DATABASE` values:
+
+```bash
+docker cp backups/pi-move.dump coinage-app-coinage-db-1:/tmp/coinage-restore.dump
+docker exec coinage-app-coinage-db-1 pg_restore --username=coinage-db-admin --dbname=coinage-db --no-owner --no-privileges --single-transaction --exit-on-error /tmp/coinage-restore.dump
+docker exec coinage-app-coinage-db-1 rm /tmp/coinage-restore.dump
+```
+
+The restore uses the destination user rather than requiring source PostgreSQL roles. Only remove the temporary copy after `pg_restore` succeeds. To restore over an existing database, back it up first and add `--clean --if-exists` to `pg_restore`: **this drops and replaces objects covered by the dump**. Unrelated objects can remain, so use an empty database for a clean migration.
+
+Copy receipt uploads separately, configure the API with the destination database credentials, and restart it. Application accounts and their password hashes are included in the dump.
+
 ## Formatting the codebase
 
 ```bash
