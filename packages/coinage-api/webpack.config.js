@@ -18,6 +18,9 @@ module.exports = () => {
                 main: './src/main.ts',
                 tsConfig: './tsconfig.app.json',
                 assets: ['./src/assets'],
+                generatePackageJson: production,
+                // Nest adapters and the PostgreSQL driver are loaded dynamically.
+                runtimeDependencies: ['@nestjs/platform-express', '@nestjs/platform-socket.io', 'pg'],
                 outputHashing: 'none',
                 sourceMap: true,
                 optimization: production,

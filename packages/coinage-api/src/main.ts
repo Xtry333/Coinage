@@ -3,6 +3,8 @@
  * This is only a minimal backend to get started.
  */
 
+import 'reflect-metadata';
+
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import helmet from 'helmet';

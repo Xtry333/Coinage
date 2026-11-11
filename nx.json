@@ -3,6 +3,12 @@
         "packageManager": "yarn"
     },
     "extends": "nx/presets/npm.json",
+    "pluginsConfig": {
+        "@nx/js": {
+            "analyzeSourceFiles": true,
+            "analyzePackageJson": true
+        }
+    },
     "$schema": "./node_modules/nx/schemas/nx-schema.json",
     "generators": {
         "@nx/angular:application": {
@@ -21,7 +27,8 @@
     },
     "targetDefaults": {
         "build": {
-            "cache": true
+            "cache": true,
+            "inputs": ["default", "^default", "{workspaceRoot}/package.json", "{workspaceRoot}/yarn.lock", "{workspaceRoot}/.yarnrc.yml"]
         },
         "e2e": {
             "cache": true

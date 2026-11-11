@@ -1,6 +1,8 @@
 .git
 .env
 .env.*
+**/.env
+**/.env.*
 .docker-data
 docker/postgres-data
 node_modules
@@ -9,3 +11,5 @@ node_modules
 .angular
 coverage
 uploads
+dist/coinage-pi
+dist/.coinage-pi-*

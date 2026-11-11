@@ -5,13 +5,11 @@ services:
         environment:
             POSTGRES_DB: ${PG_DATABASE:-coinage-db}
             POSTGRES_USER: ${PG_USER:-postgres}
-            POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
-        ports:
-            - ${PG_PORT:-5432}:5432
+            POSTGRES_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the production env file}
         volumes:
             - ./docker/postgres-data:/var/lib/postgresql
         healthcheck:
-            test: ['CMD-SHELL', 'pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE:-postgres}']
+            test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
             interval: 5s
             timeout: 5s
             retries: 10
@@ -19,25 +17,26 @@ services:
 
     coinage-api:
         restart: unless-stopped
-        image: ghcr.io/${COINAGE_REGISTRY_USER:-Xtry333}/coinage-api:latest
+        image: ghcr.io/${COINAGE_REGISTRY_USER:-xtry333}/coinage-api:${COINAGE_IMAGE_TAG:?Set COINAGE_IMAGE_TAG to a published release tag}
         environment:
+            NODE_ENV: production
             PG_HOST: coinage-db
-            PG_PORT: 5432
-            COINAGE_API_JWT_SECRET: ${COINAGE_API_JWT_SECRET:-change-me}
-            COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:-}
-            COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:-}
+            PG_PORT: '5432'
+            COINAGE_API_JWT_SECRET: ${COINAGE_API_JWT_SECRET:?Set COINAGE_API_JWT_SECRET in the production env file}
+            COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:?Set COINAGE_ADMIN_USERNAME before the first migration}
+            COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:?Set COINAGE_ADMIN_PASSWORD before the first migration}
             PG_DATABASE: ${PG_DATABASE:-coinage-db}
             PG_USER: ${PG_USER:-postgres}
-            PG_PASSWORD: ${PG_PASSWORD:-password}
-        ports:
-            - ${COINAGE_API_PORT:-3333}:3333
+            PG_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the production env file}
+        volumes:
+            - ./.docker-data/uploads:/app/api/uploads
         depends_on:
             coinage-db:
                 condition: service_healthy
 
     coinage-webapp:
         restart: unless-stopped
-        image: ghcr.io/${COINAGE_REGISTRY_USER:-Xtry333}/coinage-webapp:latest
+        image: ghcr.io/${COINAGE_REGISTRY_USER:-xtry333}/coinage-webapp:${COINAGE_IMAGE_TAG:?Set COINAGE_IMAGE_TAG to a published release tag}
         ports:
             - ${COINAGE_WEBAPP_PORT:-4200}:80
         depends_on:

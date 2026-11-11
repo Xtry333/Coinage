@@ -9217,6 +9217,7 @@ __metadata:
     jest-util: "npm:30.5.1"
     jsdom: "npm:31.0.0"
     mini-css-extract-plugin: "npm:2.10.2"
+    multer: "npm:2.4.0"
     ng-mocks: "npm:14.18.5"
     ng2-charts: "npm:11.0.0"
     ngx-socket-io: "npm:4.11.1"
