@@ -1,4 +1,0 @@
-build:
-    docker:
-        webapp: docker/Dockerfile.webapp
-        api: docker/Dockerfile.api
