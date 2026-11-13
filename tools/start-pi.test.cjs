@@ -15,7 +15,7 @@ function setup(t) {
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
     const script = fs.readFileSync(path.join(__dirname, '../docker/start-pi.sh'), 'utf8').replace(/\r\n/g, '\n');
     fs.writeFileSync(path.join(root, 'start.sh'), script);
-    fs.writeFileSync(path.join(root, '.env'), 'PG_PASSWORD=keep-this-secret\n');
+    fs.writeFileSync(path.join(root, '.env'), 'COINAGE_POSTGRES_PASSWORD=keep-this-secret\n');
     for (const filename of ['images.tar', 'compose.yaml', 'README.md']) fs.writeFileSync(path.join(root, filename), 'fixture');
     const checksums = ['images.tar', 'compose.yaml', 'start.sh', 'README.md'].map((filename) => {
         const hash = createHash('sha256').update(fs.readFileSync(path.join(root, filename))).digest('hex');
@@ -47,7 +47,7 @@ for (const legacy of ['docker/postgres-data', '.docker-data/postgres18', '.docke
         assert.equal(result.calls.length, 1);
         assert.match(result.calls[0], /config --quiet$/);
         assert.equal(fs.readFileSync(path.join(root, legacy, 'keep'), 'utf8'), 'legacy data');
-        assert.equal(fs.readFileSync(path.join(root, '.env'), 'utf8'), 'PG_PASSWORD=keep-this-secret\n');
+        assert.equal(fs.readFileSync(path.join(root, '.env'), 'utf8'), 'COINAGE_POSTGRES_PASSWORD=keep-this-secret\n');
     });
 }
 
@@ -65,6 +65,6 @@ for (const existing of [false, true]) {
         assert.match(result.calls[1], /^image load --input/);
         assert.match(result.calls[2], /up -d --no-build --pull never --force-recreate$/);
         if (existing) assert.equal(fs.readFileSync(path.join(root, 'data/pg/keep'), 'utf8'), 'canonical data');
-        assert.equal(fs.readFileSync(path.join(root, '.env'), 'utf8'), 'PG_PASSWORD=keep-this-secret\n');
+        assert.equal(fs.readFileSync(path.join(root, '.env'), 'utf8'), 'COINAGE_POSTGRES_PASSWORD=keep-this-secret\n');
     });
 }

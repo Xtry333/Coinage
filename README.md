@@ -133,7 +133,7 @@ The script validates the transfer and existing `.env`, imports `images.tar`, and
 
 Compose cannot load archives itself. If you prefer to run Compose directly, first run `docker load --input images.tar`, then `docker compose up -d --no-build --pull never --force-recreate`. The shipped `compose.yaml` is discovered automatically, reads `.env`, and never attempts to build or pull images. `start.sh` also checks `SHA256SUMS` before importing.
 
-The target `.env` must contain `PG_PASSWORD`, `COINAGE_API_JWT_SECRET`, `COINAGE_ADMIN_USERNAME`, and `COINAGE_ADMIN_PASSWORD`; optional database/user, project-name, and web-port settings are reused. PostgreSQL lives at `data/pg/` and uploads at `data/uploads/`, matching every other Compose stack. **Older installations must migrate first**; `start.sh` refuses known legacy directories rather than silently starting an empty database. Follow the [one-time storage migration](docker/pi-README.md#one-time-storage-migration), also included in the bundle's `README.md`. Intentional edits to bundled files require refreshing their checksums after verifying the original transfer; see that README. Edits to `.env` do not require new checksums. Back up data before updates; API startup applies migrations. Copy any uploads trapped in an older API container out before replacing it.
+The target `.env` must contain `COINAGE_POSTGRES_PASSWORD`, `COINAGE_API_JWT_SECRET`, `COINAGE_ADMIN_USERNAME`, and `COINAGE_ADMIN_PASSWORD`; optional database/user, project-name, and web-port settings are reused. PostgreSQL lives at `data/pg/` and uploads at `data/uploads/`, matching every other Compose stack. **Older installations must migrate first**; `start.sh` refuses known legacy directories rather than silently starting an empty database. Follow the [one-time storage migration](docker/pi-README.md#one-time-storage-migration), also included in the bundle's `README.md`. Intentional edits to bundled files require refreshing their checksums after verifying the original transfer; see that README. Edits to `.env` do not require new checksums. Back up data before updates; API startup applies migrations. Copy any uploads trapped in an older API container out before replacing it.
 
 Prerequisites on the PC: Docker with Buildx and ARM64 build support, and Docker 28+ for platform-specific image export. The Pi needs a 64-bit OS, Docker with Compose, and `sha256sum`—no Node.js or Yarn. `yarn build:pi --dry-run` runs the app builds but only prints the Docker/export plan. The bundle command overwrites only its own generated files and refuses an output folder containing unexpected files such as `.env` or user data.
 
@@ -181,7 +181,7 @@ Only nginx's web port is published (4200 by default). PostgreSQL and the API sta
 
 Production PostgreSQL storage is `data/pg/`; receipt uploads persist at `data/uploads/`. Keep the deployment directory and `COMPOSE_PROJECT_NAME` stable between updates, and back up **both** the database and uploads. **Before upgrading an older layout**, stop the old stack and migrate `docker/postgres-data/` (or `.docker-data/postgres18/` for local/dev) to `data/pg/`, and `.docker-data/uploads/` to `data/uploads/`. See the [safe migration procedure](docker/pi-README.md#one-time-storage-migration); Compose alone does not migrate data or check legacy directories. Restore a dump when moving data between installations. If an older production API contains uploads only inside its container, copy `/app/api/uploads` out **before** replacing that container and place the files in `data/uploads/`.
 
-To update, back up data, publish a new tag, change `COINAGE_IMAGE_TAG` in the Pi's env file, and repeat pull/up. Do not delete persistent directories or run `down -v` as an update step. The API runs database migrations on startup; selecting an older image tag does not undo migrations, so database rollback may require a compatible backup. Changing `PG_PASSWORD` does not change an existing PostgreSQL role's password, and changing bootstrap admin settings does not reset an already-created application account.
+To update, back up data, publish a new tag, change `COINAGE_IMAGE_TAG` in the Pi's env file, and repeat pull/up. Do not delete persistent directories or run `down -v` as an update step. The API runs database migrations on startup; selecting an older image tag does not undo migrations, so database rollback may require a compatible backup. Changing `COINAGE_POSTGRES_PASSWORD` does not change an existing PostgreSQL role's password, and changing bootstrap admin settings does not reset an already-created application account.
 
 ## Development server
 
@@ -204,7 +204,7 @@ With Docker and PostgreSQL running, create a compressed, portable PostgreSQL cus
 yarn db:dump
 ```
 
-The command detects the running `coinage-db` container for this checkout, reads `PG_USER`, `PG_DATABASE`, and `PG_PASSWORD` from the environment or `.env` (falling back to the container configuration), and writes `backups/<database>-<timestamp>.dump`. It works on Windows and Linux without a host PostgreSQL installation or binary shell redirection. Backups are Git-ignored, existing files are never overwritten, and failed dumps are removed.
+The command detects the running `coinage-db` container for this checkout, reads `COINAGE_POSTGRES_USER`, `COINAGE_POSTGRES_DB`, and `COINAGE_POSTGRES_PASSWORD` from the environment or `.env` (falling back to the container configuration), and writes `backups/<database>-<timestamp>.dump`. It works on Windows and Linux without a host PostgreSQL installation or binary shell redirection. Backups are Git-ignored, existing files are never overwritten, and failed dumps are removed.
 
 Optional output and container selection:
 
@@ -220,7 +220,7 @@ The archive includes schema, data, sequences, and migration history, but not Pos
 
 Copy the dump to the destination checkout's `backups/` directory. Start PostgreSQL 18, but keep the destination API stopped (Ctrl+C for native development, or stop the `coinage-api` service for the Docker stack). The destination database and PostgreSQL user must already exist; a fresh database is recommended.
 
-Find the destination container with `docker ps --format "{{.Names}}"`. In these examples, replace the container name, `coinage-db-admin`, and `coinage-db` with the destination's container, `PG_USER`, and `PG_DATABASE` values:
+Find the destination container with `docker ps --format "{{.Names}}"`. In these examples, replace the container name, `coinage-db-admin`, and `coinage-db` with the destination's container, `COINAGE_POSTGRES_USER`, and `COINAGE_POSTGRES_DB` values:
 
 ```bash
 docker cp backups/pi-move.dump coinage-app-coinage-db-1:/tmp/coinage-restore.dump

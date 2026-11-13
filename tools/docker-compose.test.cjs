@@ -10,9 +10,9 @@ const productionEnvironment = {
     COINAGE_REGISTRY_USER: 'xtry333',
     COINAGE_IMAGE_TAG: 'test-release',
     COINAGE_WEBAPP_PORT: '4200',
-    PG_DATABASE: 'test-db',
-    PG_USER: 'test-user',
-    PG_PASSWORD: 'fixture-only-db-password',
+    COINAGE_POSTGRES_DB: 'test-db',
+    COINAGE_POSTGRES_USER: 'test-user',
+    COINAGE_POSTGRES_PASSWORD: 'fixture-only-db-password',
     COINAGE_API_JWT_SECRET: 'fixture-only-jwt-secret',
     COINAGE_ADMIN_USERNAME: 'test-admin',
     COINAGE_ADMIN_PASSWORD: 'fixture-only-admin-password',
@@ -39,10 +39,10 @@ test('production uses matching release images and publishes only the web port', 
     assert.equal(services['coinage-api'].ports, undefined);
     assert.equal(services['coinage-webapp'].ports.length, 1);
     assert.equal(services['coinage-api'].environment.NODE_ENV, 'production');
-    assert.equal(services['coinage-api'].environment.PG_HOST, 'coinage-db');
-    assert.equal(services['coinage-api'].environment.PG_PORT, '5432');
-    assert.equal(services['coinage-db'].environment.POSTGRES_PASSWORD, productionEnvironment.PG_PASSWORD);
-    assert.equal(services['coinage-api'].environment.PG_PASSWORD, productionEnvironment.PG_PASSWORD);
+    assert.equal(services['coinage-api'].environment.COINAGE_POSTGRES_HOST, 'coinage-db');
+    assert.equal(services['coinage-api'].environment.COINAGE_POSTGRES_PORT, '5432');
+    assert.equal(services['coinage-db'].environment.POSTGRES_PASSWORD, productionEnvironment.COINAGE_POSTGRES_PASSWORD);
+    assert.equal(services['coinage-api'].environment.COINAGE_POSTGRES_PASSWORD, productionEnvironment.COINAGE_POSTGRES_PASSWORD);
 });
 
 test('production persists PostgreSQL and uploads under data/', () => {
@@ -66,7 +66,7 @@ for (const filename of ['docker-compose.yml', 'docker-compose.dev.yml']) {
         const root = fs.mkdtempSync(path.join(parent, 'coinage-local-compose-test-'));
         t.after(() => fs.rmSync(root, { recursive: true, force: true }));
         fs.copyFileSync(path.join(__dirname, '..', filename), path.join(root, 'compose.yaml'));
-        fs.writeFileSync(path.join(root, '.env'), 'PG_PASSWORD=fixture-only\n');
+        fs.writeFileSync(path.join(root, '.env'), 'COINAGE_POSTGRES_PASSWORD=fixture-only\n');
         const environment = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(PG_|COINAGE_|COMPOSE_)/.test(key)));
         const result = spawnSync('docker', ['compose', 'config', '--format', 'json'], { cwd: root, env: environment, encoding: 'utf8' });
         if (result.error) throw result.error;
@@ -85,7 +85,7 @@ for (const filename of ['docker-compose.yml', 'docker-compose.dev.yml']) {
     });
 }
 
-for (const key of ['COINAGE_IMAGE_TAG', 'PG_PASSWORD', 'COINAGE_API_JWT_SECRET', 'COINAGE_ADMIN_USERNAME', 'COINAGE_ADMIN_PASSWORD']) {
+for (const key of ['COINAGE_IMAGE_TAG', 'COINAGE_POSTGRES_PASSWORD', 'COINAGE_API_JWT_SECRET', 'COINAGE_ADMIN_USERNAME', 'COINAGE_ADMIN_PASSWORD']) {
     test(`production refuses an empty ${key} instead of using an insecure default`, () => {
         const result = composeConfig({ [key]: '' });
         assert.notEqual(result.status, 0);

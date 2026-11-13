@@ -79,9 +79,9 @@ function createDump({ output, container: containerName, root = workspaceRoot, en
             return [entry.slice(0, separator), entry.slice(separator + 1)];
         }),
     );
-    const username = env.PG_USER || containerEnv.POSTGRES_USER || 'postgres';
-    const database = env.PG_DATABASE || containerEnv.POSTGRES_DB || 'coinage-db';
-    const password = env.PG_PASSWORD ?? containerEnv.POSTGRES_PASSWORD ?? '';
+    const username = env.COINAGE_POSTGRES_USER || containerEnv.POSTGRES_USER || 'postgres';
+    const database = env.COINAGE_POSTGRES_DB || containerEnv.POSTGRES_DB || 'coinage-db';
+    const password = env.COINAGE_POSTGRES_PASSWORD ?? containerEnv.POSTGRES_PASSWORD ?? '';
     const timestamp = now.toISOString().replace(/[:.]/g, '-');
     const filename = `${database.replace(/[^a-zA-Z0-9_.-]/g, '_')}-${timestamp}.dump`;
     const outputFile = path.resolve(root, output || path.join('backups', filename));

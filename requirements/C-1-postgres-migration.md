@@ -32,9 +32,9 @@ Coinage currently runs on MySQL (Community Server). The goal of this ticket is t
 | Area           | Detail                                                                                                                                                                                                                                                                            |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ORM / Driver   | TypeORM `type: 'postgres'`, `pg` client (already installed)                                                                                                                                                                                                                       |
-| TypeORM config | `type: 'postgres'`, host `PG_HOST` (or keep `MYSQL_HOST` alias), port `COINAGE_PG_PORT` (default 5432), user/pass/database env vars                                                                                                                                               |
+| TypeORM config | `type: 'postgres'`, host `COINAGE_POSTGRES_HOST` (or keep `MYSQL_HOST` alias), port `COINAGE_COINAGE_POSTGRES_PORT` (default 5432), user/pass/database env vars                                                                                                                                               |
 | Docker         | `coinage-db` service uses `image: postgres` (aligned version, e.g. `postgres:15-alpine`), port 5432, healthcheck via `pg_isready`, `POSTGRES_PASSWORD` / `POSTGRES_USER` / `POSTGRES_DB`, bind-mounted data at `./docker/postgres-data` (alongside Dockerfiles)                   |
-| Env vars       | `PG_DATABASE`, `PG_USER`, `PG_PASSWORD`, `PG_ROOT_PASSWORD` (or `POSTGRES_*`), `COINAGE_PG_PORT=5432`                                                                                                                                                                             |
+| Env vars       | `COINAGE_POSTGRES_DB`, `COINAGE_POSTGRES_USER`, `COINAGE_POSTGRES_PASSWORD`, `PG_ROOT_PASSWORD` (or `POSTGRES_*`), `COINAGE_COINAGE_POSTGRES_PORT=5432`                                                                                                                                                                             |
 | Migrations     | Rewritten to PostgreSQL syntax (`SERIAL` / `GENERATED ALWAYS AS IDENTITY`, no `ENGINE=InnoDB`, no `COLLATE`, `BOOLEAN` instead of `BIT(1)`, PostgreSQL enum or text+check, `'{}'::jsonb`, timestamp triggers instead of `ON UPDATE CURRENT_TIMESTAMP`, double-quoted identifiers) |
 | Entities       | `type: 'bit'` → `type: 'boolean'`; `type: 'json'` default `'{}'` instead of `json_object()`; `BooleanTransformer` no longer needs Buffer handling; `Bit` constant removed or repurposed                                                                                           |
 | Schema dump    | `coinage.sql` regenerated as PostgreSQL dump or retired                                                                                                                                                                                                                           |
@@ -44,7 +44,7 @@ Coinage currently runs on MySQL (Community Server). The goal of this ticket is t
 ### 1. `packages/coinage-api/src/app/typeorm.config.ts`
 
 - Change `type: 'mysql'` → `'postgres'`
-- Rename/alias env vars (`MYSQL_HOST` → `PG_HOST`, `COINAGE_MYSQL_PORT` → `COINAGE_PG_PORT`, `MYSQL_USER`/`PASSWORD`/`DATABASE` → `PG_*` or `POSTGRES_*`)
+- Rename/alias env vars (`MYSQL_HOST` → `COINAGE_POSTGRES_HOST`, `COINAGE_MYSQL_PORT` → `COINAGE_COINAGE_POSTGRES_PORT`, `MYSQL_USER`/`PASSWORD`/`DATABASE` → `PG_*` or `POSTGRES_*`)
 - Default port 3306 → 5432
 - Review `timezone: 'Z'` (keep, valid for Postgres)
 
@@ -52,14 +52,14 @@ Coinage currently runs on MySQL (Community Server). The goal of this ticket is t
 
 - `coinage-db` image `mysql` → `postgres:<version>`
 - Env: `MYSQL_ROOT_PASSWORD` → `POSTGRES_PASSWORD`, `MYSQL_DATABASE` → `POSTGRES_DB`, `MYSQL_USER` → `POSTGRES_USER`, `MYSQL_PASSWORD` → `POSTGRES_PASSWORD`
-- Port `3306` → `5432` (and `COINAGE_MYSQL_PORT` → `COINAGE_PG_PORT`)
+- Port `3306` → `5432` (and `COINAGE_MYSQL_PORT` → `COINAGE_COINAGE_POSTGRES_PORT`)
 - Healthcheck: `mysqladmin ping ...` → `pg_isready -U $POSTGRES_USER -d $POSTGRES_DB` (or `pg_isready`)
 - Data stored via bind mount `./docker/postgres-data:/var/lib/postgresql/data` (alongside Dockerfiles) instead of a named Docker volume
-- API env: `MYSQL_HOST` → `PG_HOST`, `COINAGE_MYSQL_PORT` → `COINAGE_PG_PORT`
+- API env: `MYSQL_HOST` → `COINAGE_POSTGRES_HOST`, `COINAGE_MYSQL_PORT` → `COINAGE_COINAGE_POSTGRES_PORT`
 
 ### 3. Environment files
 
-- `.env.template`: replace `MYSQL_*` / `COINAGE_MYSQL_PORT` with `PG_*` / `COINAGE_PG_PORT`
+- `.env.template`: replace `MYSQL_*` / `COINAGE_MYSQL_PORT` with `PG_*` / `COINAGE_COINAGE_POSTGRES_PORT`
 - `.env.production`: same replacement
 
 ### 4. Entities (`packages/coinage-api/src/app/entities/`)

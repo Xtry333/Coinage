@@ -90,7 +90,7 @@ Use these when trying to build for production deployment (slow process and runni
 - TypeORM with `synchronize: false` - migrations are source of truth
 - Custom naming strategy with prefixed constraints (FK*, UQ*, IDX\_)
 - Migration files: `packages/coinage-api/src/database/migrations/`
-- Environment variables required: PG_HOST, PG_USER, PG_PASSWORD, PG_DATABASE, COINAGE_PG_PORT
+- Environment variables required: COINAGE_POSTGRES_HOST, COINAGE_POSTGRES_USER, COINAGE_POSTGRES_PASSWORD, COINAGE_POSTGRES_DB, COINAGE_COINAGE_POSTGRES_PORT
 
 ### WebSocket Integration
 
@@ -137,11 +137,11 @@ Use these when trying to build for production deployment (slow process and runni
 
 Required environment variables for API:
 
-- `PG_HOST` - Database host (default: localhost)
-- `PG_PORT` - Database port (default: 5432)
-- `PG_USER` - Database username
-- `PG_PASSWORD` - Database password
-- `PG_DATABASE` - Database name
+- `COINAGE_POSTGRES_HOST` - Database host (default: localhost)
+- `COINAGE_POSTGRES_PORT` - Database port (default: 5432)
+- `COINAGE_POSTGRES_USER` - Database username
+- `COINAGE_POSTGRES_PASSWORD` - Database password
+- `COINAGE_POSTGRES_DB` - Database name
 
 ## Dependencies & Versions
 

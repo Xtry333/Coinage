@@ -22,7 +22,7 @@ This file gives focused, discoverable guidance for an AI coding agent working on
 
 - Nx-first: prefer `nx` commands for per-project operations (serve/build/test/dep-graph). Global scripts in `package.json` are convenience wrappers.
 - Yarn Berry (v3) is used; don't assume global `node_modules` layout. Use `yarn` and `yarn <script>`.
-- Environment: API expects env vars (e.g. PG_HOST, PG_USER, PG_PASSWORD, PG_DATABASE, COINAGE_PG_PORT). DB options are in `packages/coinage-api/src/app/typeorm.config.ts`.
+- Environment: API expects env vars (e.g. COINAGE_POSTGRES_HOST, COINAGE_POSTGRES_USER, COINAGE_POSTGRES_PASSWORD, COINAGE_POSTGRES_DB, COINAGE_COINAGE_POSTGRES_PORT). DB options are in `packages/coinage-api/src/app/typeorm.config.ts`.
 - TypeORM: synchronize=false and migrations are the source of truth. `synchronize` is intentionally off.
 - Naming strategy: a custom SnakeNamingStrategy is applied in `typeorm.config.ts`. When referencing DB constraints/indexes expect prefixed names like `FK_...`, `UQ_...`, `IDX_...`.
 

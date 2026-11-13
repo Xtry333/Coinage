@@ -50,7 +50,7 @@ test('rejects missing, unknown, and duplicate arguments', () => {
 
 test('creates a timestamped archive without altering binary bytes or exposing password arguments', (t) => {
     const fixture = setup(t);
-    fs.writeFileSync(path.join(fixture.root, '.env'), 'PG_USER=coinage-db-admin\nPG_DATABASE=coinage-db\nPG_PASSWORD=local-test-password\n');
+    fs.writeFileSync(path.join(fixture.root, '.env'), 'COINAGE_POSTGRES_USER=coinage-db-admin\nCOINAGE_POSTGRES_DB=coinage-db\nCOINAGE_POSTGRES_PASSWORD=local-test-password\n');
 
     const result = createDump(fixture);
 
@@ -67,12 +67,12 @@ test('creates a timestamped archive without altering binary bytes or exposing pa
 
 test('supports custom paths and explicit containers, with environment overrides', (t) => {
     const fixture = setup(t);
-    fs.writeFileSync(path.join(fixture.root, '.env'), 'PG_USER=file-user\nPG_DATABASE=file-db\nPG_PASSWORD=file-test-password\n');
+    fs.writeFileSync(path.join(fixture.root, '.env'), 'COINAGE_POSTGRES_USER=file-user\nCOINAGE_POSTGRES_DB=file-db\nCOINAGE_POSTGRES_PASSWORD=file-test-password\n');
     const result = createDump({
         ...fixture,
         container: 'chosen-database',
         output: 'folder with spaces/pi.dump',
-        environment: { PG_USER: 'override-user', PG_DATABASE: 'override-db', PG_PASSWORD: 'override-test-password' },
+        environment: { COINAGE_POSTGRES_USER: 'override-user', COINAGE_POSTGRES_DB: 'override-db', COINAGE_POSTGRES_PASSWORD: 'override-test-password' },
     });
 
     assert.equal(result.outputFile, path.join(fixture.root, 'folder with spaces', 'pi.dump'));
@@ -99,9 +99,9 @@ test('falls back to container credentials and preserves equals signs in password
 
 test('respects an explicitly empty environment password instead of falling back', (t) => {
     const fixture = setup(t);
-    fs.writeFileSync(path.join(fixture.root, '.env'), 'PG_PASSWORD=file-test-password\n');
+    fs.writeFileSync(path.join(fixture.root, '.env'), 'COINAGE_POSTGRES_PASSWORD=file-test-password\n');
 
-    createDump({ ...fixture, environment: { PG_PASSWORD: '' } });
+    createDump({ ...fixture, environment: { COINAGE_POSTGRES_PASSWORD: '' } });
 
     const dump = fixture.calls.find(({ args }) => args[0] === 'exec');
     assert.equal(dump.options.env.PGPASSWORD, '');

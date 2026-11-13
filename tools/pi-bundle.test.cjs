@@ -17,7 +17,7 @@ function setup(t) {
     fs.writeFileSync(path.join(root, 'docker-compose.pi.yml'), 'services:\r\n    coinage-api:\r\n        image: coinage-api:latest\r\n');
     fs.writeFileSync(path.join(root, 'docker/start-pi.sh'), '#!/bin/sh\r\necho start\r\n');
     fs.writeFileSync(path.join(root, 'docker/pi-README.md'), '# Pi bundle\r\n');
-    fs.writeFileSync(path.join(root, '.env'), 'PG_PASSWORD=never-transfer-this-build-machine-secret\n');
+    fs.writeFileSync(path.join(root, '.env'), 'COINAGE_POSTGRES_PASSWORD=never-transfer-this-build-machine-secret\n');
     const calls = [];
     const docker = (args, options) => {
         calls.push({ args, options });

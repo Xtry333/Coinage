@@ -6,7 +6,7 @@ No Node.js, Yarn, source checkout, registry login, or internet access is needed 
 ## Install or update
 
 1. Copy **all five bundle files** into your existing deployment folder. Merge/overwrite the generated files only: do not replace the folder or delete its `.env` or data directories.
-2. Keep your existing `.env` in that same folder. No env file or secrets are included in the bundle. The required settings are `PG_PASSWORD`, `COINAGE_API_JWT_SECRET`, `COINAGE_ADMIN_USERNAME`, and `COINAGE_ADMIN_PASSWORD`. Optional `PG_DATABASE`, `PG_USER`, `COINAGE_WEBAPP_PORT` (default 4200), and `COMPOSE_PROJECT_NAME` are reused too. Other API settings, including receipt AI configuration, are read from `.env` at runtime.
+2. Keep your existing `.env` in that same folder. No env file or secrets are included in the bundle. The required settings are `COINAGE_POSTGRES_PASSWORD`, `COINAGE_API_JWT_SECRET`, `COINAGE_ADMIN_USERNAME`, and `COINAGE_ADMIN_PASSWORD`. Optional `COINAGE_POSTGRES_DB`, `COINAGE_POSTGRES_USER`, `COINAGE_WEBAPP_PORT` (default 4200), and `COMPOSE_PROJECT_NAME` are reused too. Other API settings, including receipt AI configuration, are read from `.env` at runtime.
 3. Back up the database and receipt uploads before updating. **If upgrading an older layout, follow the one-time storage migration below before starting.** Run:
 
 ```sh
@@ -27,7 +27,7 @@ docker load --input images.tar
 docker compose up -d --no-build --pull never --force-recreate
 ```
 
-`compose.yaml` is discovered automatically and reads the folder's `.env`. All services have `pull_policy: never`, so missing images cause an error rather than a registry pull. The web port and PostgreSQL are published; the API remains internal. PostgreSQL publishes on all host interfaces by default, using `PG_PORT` from `.env` (default 5432). Connect using the Pi's LAN IP and that port; the API still connects internally on port 5432. Restrict database access with Docker-aware firewall rules and do not forward the database port on your router. Use `docker compose logs -f` to inspect startup.
+`compose.yaml` is discovered automatically and reads the folder's `.env`. All services have `pull_policy: never`, so missing images cause an error rather than a registry pull. The web port and PostgreSQL are published; the API remains internal. PostgreSQL publishes on all host interfaces by default, using `COINAGE_POSTGRES_PORT` from `.env` (default 5432). Connect using the Pi's LAN IP and that port; the API still connects internally on port 5432. Restrict database access with Docker-aware firewall rules and do not forward the database port on your router. Use `docker compose logs -f` to inspect startup.
 
 ## Data safety
 

@@ -7,11 +7,11 @@ services:
         pull_policy: never
         restart: unless-stopped
         environment:
-            POSTGRES_DB: ${PG_DATABASE:-coinage-db}
-            POSTGRES_USER: ${PG_USER:-postgres}
-            POSTGRES_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the target directory's .env}
+            POSTGRES_DB: ${COINAGE_POSTGRES_DB:-coinage-db}
+            POSTGRES_USER: ${COINAGE_POSTGRES_USER:-postgres}
+            POSTGRES_PASSWORD: ${COINAGE_POSTGRES_PASSWORD:?Set COINAGE_POSTGRES_PASSWORD in the target directory's .env}
         ports:
-            - '${PG_PORT:-5432}:5432'
+            - '${COINAGE_POSTGRES_PORT:-5432}:5432'
         volumes:
             - ./data/pg:/var/lib/postgresql
         healthcheck:
@@ -30,11 +30,11 @@ services:
             - ./.env
         environment:
             NODE_ENV: production
-            PG_HOST: coinage-db
-            PG_PORT: '5432'
-            PG_DATABASE: ${PG_DATABASE:-coinage-db}
-            PG_USER: ${PG_USER:-postgres}
-            PG_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the target directory's .env}
+            COINAGE_POSTGRES_HOST: coinage-db
+            COINAGE_POSTGRES_PORT: '5432'
+            COINAGE_POSTGRES_DB: ${COINAGE_POSTGRES_DB:-coinage-db}
+            COINAGE_POSTGRES_USER: ${COINAGE_POSTGRES_USER:-postgres}
+            COINAGE_POSTGRES_PASSWORD: ${COINAGE_POSTGRES_PASSWORD:?Set COINAGE_POSTGRES_PASSWORD in the target directory's .env}
             COINAGE_API_JWT_SECRET: ${COINAGE_API_JWT_SECRET:?Set COINAGE_API_JWT_SECRET in the target directory's .env}
             COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:?Set COINAGE_ADMIN_USERNAME for initial admin bootstrap}
             COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:?Set COINAGE_ADMIN_PASSWORD for initial admin bootstrap}
