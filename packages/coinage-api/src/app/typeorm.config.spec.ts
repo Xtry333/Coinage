@@ -82,4 +82,30 @@ describe('TypeORM config (PostgreSQL)', () => {
         expect(dataSource).toBeDefined();
         expect(dataSource instanceof DataSource).toBe(true);
     });
+
+    it('keeps migrations manual for local development and the TypeORM CLI', () => {
+        expect(opts.migrationsRun).toBe(false);
+        expect(opts.synchronize).toBe(false);
+    });
+
+    it('runs the entire pending migration batch in one transaction for rollback on failure', () => {
+        expect(opts.migrationsTransactionMode).toBe('all');
+    });
+});
+
+describe('TypeORM migration build settings', () => {
+    afterEach(() => {
+        jest.dontMock('../environments/environment');
+    });
+
+    it.each([false, true])('sets migrationsRun to the build production flag (%s)', (production) => {
+        jest.isolateModules(() => {
+            jest.doMock('../environments/environment', () => ({ environment: { production } }));
+            const { opts: buildOptions } = require('./typeorm.config') as typeof import('./typeorm.config');
+
+            expect(buildOptions.migrationsRun).toBe(production);
+            expect(buildOptions.migrationsTransactionMode).toBe('all');
+            expect(buildOptions.synchronize).toBe(false);
+        });
+    });
 });

@@ -4,6 +4,7 @@ import { DataSource, Table } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
+import { environment } from '../environments/environment';
 import entities from './entities/_index';
 import { getPostgresConnectionOptions } from './postgres-connection-options';
 
@@ -53,9 +54,10 @@ export const opts: PostgresConnectionOptions = {
     ...getPostgresConnectionOptions(),
     synchronize: false,
     logging: false,
-    migrationsRun: true,
+    migrationsRun: environment.production,
     migrations: loadMigrations(),
-    migrationsTransactionMode: 'each',
+    // Roll back the entire pending batch if any migration fails.
+    migrationsTransactionMode: 'all',
     entities: [...entities],
     namingStrategy: new CustomNamingStrategy(),
 };

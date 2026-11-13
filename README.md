@@ -66,7 +66,8 @@ Set `COINAGE_ADMIN_USERNAME` and a unique `COINAGE_ADMIN_PASSWORD` in `.env` bef
 ```powershell
 if (!(Test-Path .env)) { Copy-Item .env.template .env }
 corepack yarn install --immutable
-docker compose -p coinage-postgres-dev -f docker-compose.dev.yml up -d
+docker compose -p coinage-postgres-dev -f docker-compose.dev.yml up -d --wait
+corepack yarn migration:run
 corepack yarn dev
 ```
 
@@ -174,7 +175,13 @@ corepack yarn dev:api # Starts the API server
 corepack yarn dev:webapp # Starts the web application
 ```
 
-## Creating a migration for SQL
+## Database migrations
+
+Local development does **not** apply migrations automatically. With PostgreSQL ready and `.env` configured, run `yarn migration:run` before the first start and whenever new migrations are added.
+
+Production API builds (including Docker and Raspberry Pi bundles) apply pending migrations automatically at API startup, not while building. All pending migrations run in a single PostgreSQL transaction: if any migration fails, the entire pending batch is rolled back and API startup fails. Previously committed migrations are not undone, and replacing images does not roll them back.
+
+### Creating a migration for SQL
 
 ```bash
 yarn migration:create <migration_name>

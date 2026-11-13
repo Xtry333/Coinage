@@ -42,7 +42,7 @@ Missing or empty port settings retain the defaults above. Shell environment over
 - A bundle contains **no database contents or uploaded receipts**. Do not treat a freshly created database directory as a successful migration.
 - Copy any uploads trapped in an older API container out before replacing it.
 - Never delete data directories or run `docker compose down -v` as an update step.
-- API startup applies database migrations. Replacing images does not undo migrations.
+- Production API startup automatically applies pending database migrations in one transaction. If any migration fails, the entire pending batch is rolled back and API startup fails. Replacing images does not undo previously committed migrations.
 - Changing `.env` does not automatically reset an existing PostgreSQL role password or an already-created application's admin password.
 
 ### One-time storage migration
