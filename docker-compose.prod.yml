@@ -7,7 +7,7 @@ services:
             POSTGRES_USER: ${PG_USER:-postgres}
             POSTGRES_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the production env file}
         volumes:
-            - ./docker/postgres-data:/var/lib/postgresql
+            - ./data/pg:/var/lib/postgresql
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
             interval: 5s
@@ -29,7 +29,7 @@ services:
             PG_USER: ${PG_USER:-postgres}
             PG_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the production env file}
         volumes:
-            - ./.docker-data/uploads:/app/api/uploads
+            - ./data/uploads:/app/api/uploads
         depends_on:
             coinage-db:
                 condition: service_healthy

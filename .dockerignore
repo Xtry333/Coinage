@@ -4,6 +4,7 @@
 **/.env
 **/.env.*
 .docker-data
+/data
 docker/postgres-data
 node_modules
 **/node_modules

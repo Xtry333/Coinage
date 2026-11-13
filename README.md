@@ -78,7 +78,7 @@ If you change `package.json` or `yarn.lock`, install the updated dependencies on
 corepack yarn install --immutable
 ```
 
-PostgreSQL 18 data is stored under the project-local `.docker-data/postgres18` directory (ignored by Git); receipt files are written under the project-local `uploads/` directory. The image-based stack requires `.env` before starting.
+PostgreSQL 18 data is stored under the project-local `data/pg/` directory (ignored by Git); the native API writes receipt files under the project-local `uploads/` directory. All Docker stacks use `data/pg/` for PostgreSQL and `data/uploads/` for receipts. The API's internal container path remains `/app/api/uploads` so stored receipt paths stay valid. The image-based stack requires `.env` before starting. Existing installations must follow the [one-time storage migration](docker/pi-README.md#one-time-storage-migration) before using the new paths.
 
 Stop `corepack yarn dev` with Ctrl+C, then stop PostgreSQL without deleting its data:
 
@@ -86,7 +86,7 @@ Stop `corepack yarn dev` with Ctrl+C, then stop PostgreSQL without deleting its 
   docker compose -p coinage-postgres-dev -f docker-compose.dev.yml down
 ```
 
-PostgreSQL data remains in `.docker-data/postgres18` after stopping. Back it up before manually removing it to reset the database. The image-based stack remains available with `corepack yarn build` followed by `corepack yarn docker:up`.
+PostgreSQL data remains in `data/pg/` after stopping. Back it up before manually removing it to reset the database. The image-based stack remains available with `corepack yarn build` followed by `corepack yarn docker:up`. Local, dev, production, and Pi Compose files now use the same paths; do not run multiple database containers against the same `data/pg/` concurrently.
 
 ## Docker builds and Raspberry Pi deployment
 
@@ -133,7 +133,7 @@ The script validates the transfer and existing `.env`, imports `images.tar`, and
 
 Compose cannot load archives itself. If you prefer to run Compose directly, first run `docker load --input images.tar`, then `docker compose up -d --no-build --pull never --force-recreate`. The shipped `compose.yaml` is discovered automatically, reads `.env`, and never attempts to build or pull images. `start.sh` also checks `SHA256SUMS` before importing.
 
-The target `.env` must contain `PG_PASSWORD`, `COINAGE_API_JWT_SECRET`, `COINAGE_ADMIN_USERNAME`, and `COINAGE_ADMIN_PASSWORD`; optional database/user, project-name, and web-port settings are reused. PostgreSQL remains at `docker/postgres-data/` and uploads at `.docker-data/uploads/`, matching the production Compose paths. If your existing installation uses different paths, migrate/restore its data or adjust the generated Compose file before starting. Intentional edits to bundled files require refreshing their checksums after verifying the original transfer; see the bundle's `README.md`. Edits to `.env` do not require new checksums. Back up data before updates; API startup applies migrations. Copy any uploads trapped in an older API container out before replacing it.
+The target `.env` must contain `PG_PASSWORD`, `COINAGE_API_JWT_SECRET`, `COINAGE_ADMIN_USERNAME`, and `COINAGE_ADMIN_PASSWORD`; optional database/user, project-name, and web-port settings are reused. PostgreSQL lives at `data/pg/` and uploads at `data/uploads/`, matching every other Compose stack. **Older installations must migrate first**; `start.sh` refuses known legacy directories rather than silently starting an empty database. Follow the [one-time storage migration](docker/pi-README.md#one-time-storage-migration), also included in the bundle's `README.md`. Intentional edits to bundled files require refreshing their checksums after verifying the original transfer; see that README. Edits to `.env` do not require new checksums. Back up data before updates; API startup applies migrations. Copy any uploads trapped in an older API container out before replacing it.
 
 Prerequisites on the PC: Docker with Buildx and ARM64 build support, and Docker 28+ for platform-specific image export. The Pi needs a 64-bit OS, Docker with Compose, and `sha256sum`—no Node.js or Yarn. `yarn build:pi --dry-run` runs the app builds but only prints the Docker/export plan. The bundle command overwrites only its own generated files and refuses an output folder containing unexpected files such as `.env` or user data.
 
@@ -179,7 +179,7 @@ Compose does **not** automatically load `.env.production`; always pass `--env-fi
 
 Only nginx's web port is published (4200 by default). PostgreSQL and the API stay on the internal Compose network; API and WebSocket requests go through nginx. Use `docker compose --env-file .env.production -f docker-compose.prod.yml exec coinage-db psql -U postgres -d coinage-db` for database maintenance, adjusting the database/user to your configuration. Add HTTPS at a reverse proxy before exposing the app publicly.
 
-Production PostgreSQL storage remains at `docker/postgres-data/`; receipt uploads persist at `.docker-data/uploads/`. Keep the deployment directory and `COMPOSE_PROJECT_NAME` stable between updates, and back up **both** the database and uploads. The production database path is intentionally unchanged; switching Compose files does not automatically migrate a local database from `.docker-data/postgres18/`. Restore a dump when moving data between installations. If an older production API contains uploads only inside its container, copy `/app/api/uploads` out **before** replacing that container and place the files in `.docker-data/uploads/`.
+Production PostgreSQL storage is `data/pg/`; receipt uploads persist at `data/uploads/`. Keep the deployment directory and `COMPOSE_PROJECT_NAME` stable between updates, and back up **both** the database and uploads. **Before upgrading an older layout**, stop the old stack and migrate `docker/postgres-data/` (or `.docker-data/postgres18/` for local/dev) to `data/pg/`, and `.docker-data/uploads/` to `data/uploads/`. See the [safe migration procedure](docker/pi-README.md#one-time-storage-migration); Compose alone does not migrate data or check legacy directories. Restore a dump when moving data between installations. If an older production API contains uploads only inside its container, copy `/app/api/uploads` out **before** replacing that container and place the files in `data/uploads/`.
 
 To update, back up data, publish a new tag, change `COINAGE_IMAGE_TAG` in the Pi's env file, and repeat pull/up. Do not delete persistent directories or run `down -v` as an update step. The API runs database migrations on startup; selecting an older image tag does not undo migrations, so database rollback may require a compatible backup. Changing `PG_PASSWORD` does not change an existing PostgreSQL role's password, and changing bootstrap admin settings does not reset an already-created application account.
 
@@ -214,7 +214,7 @@ yarn db:dump --container coinage-app-coinage-db-1
 yarn db:dump --help
 ```
 
-The archive includes schema, data, sequences, and migration history, but not PostgreSQL roles or receipt uploads. Copy uploads separately (`uploads/` for native development; `.docker-data/uploads/` for the image-based stack). For a final transfer, stop the source API before dumping and copying uploads. Restore into an empty PostgreSQL 18 database before starting the destination API; the dump is portable between PC and Raspberry Pi ARM64.
+The archive includes schema, data, sequences, and migration history, but not PostgreSQL roles or receipt uploads. Copy uploads separately (`uploads/` for native development; `data/uploads/` for every Docker stack). For a final transfer, stop the source API before dumping and copying uploads. Restore into an empty PostgreSQL 18 database before starting the destination API; the dump is portable between PC and Raspberry Pi ARM64.
 
 ### Restoring on the same or another device
 

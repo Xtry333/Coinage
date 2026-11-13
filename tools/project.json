@@ -18,7 +18,7 @@
                 "{workspaceRoot}/.dockerignore"
             ],
             "options": {
-                "command": "node --test tools/db-dump.test.cjs tools/docker-images.test.cjs tools/pi-bundle.test.cjs"
+                "command": "node --test tools/db-dump.test.cjs tools/docker-images.test.cjs tools/pi-bundle.test.cjs tools/start-pi.test.cjs"
             }
         },
         "test-compose": {

@@ -69,11 +69,25 @@ test('standalone Compose uses local latest ARM64 images, never pulls/builds, and
     assert.equal(api.environment.PG_PORT, '5432');
     assert.equal(services['coinage-db'].environment.POSTGRES_PASSWORD, settings.PG_PASSWORD);
     assert.equal(api.ports, undefined);
-    assert.equal(services['coinage-db'].ports, undefined);
+    assert.equal(services['coinage-db'].ports[0].host_ip, undefined);
+    assert.equal(services['coinage-db'].ports[0].published, settings.PG_PORT);
+    assert.equal(services['coinage-db'].ports[0].target, 5432);
     assert.equal(services['coinage-webapp'].ports[0].published, '4200');
-    assert.match(api.volumes[0].source, /[/\\]\.docker-data[/\\]uploads$/);
-    assert.match(services['coinage-db'].volumes[0].source, /[/\\]docker[/\\]postgres-data$/);
+    assert.equal(api.volumes[0].type, 'bind');
+    assert.equal(api.volumes[0].source, path.join(fixture.root, 'data', 'uploads'));
+    assert.equal(api.volumes[0].target, '/app/api/uploads');
+    assert.equal(services['coinage-db'].volumes[0].type, 'bind');
+    assert.equal(services['coinage-db'].volumes[0].source, path.join(fixture.root, 'data', 'pg'));
+    assert.equal(services['coinage-db'].volumes[0].target, '/var/lib/postgresql');
     assert.equal(fs.readFileSync(path.join(fixture.root, '.env'), 'utf8'), fixture.envContent);
+});
+
+test('Pi Compose defaults the published PostgreSQL port to 5432 when PG_PORT is empty', (t) => {
+    const result = config(setup(t, { PG_PORT: '' }));
+    assert.equal(result.status, 0, result.stderr);
+    const { services } = JSON.parse(result.stdout);
+    assert.equal(services['coinage-db'].ports[0].published, '5432');
+    assert.equal(services['coinage-api'].environment.PG_PORT, '5432');
 });
 
 for (const key of ['PG_PASSWORD', 'COINAGE_API_JWT_SECRET', 'COINAGE_ADMIN_USERNAME', 'COINAGE_ADMIN_PASSWORD']) {

@@ -47,6 +47,7 @@ Thumbs.db
 coinage-data.sql
 /backups/
 *.dump
+/data/
 docker/postgres-data/
 .docker-data/
 

@@ -10,8 +10,10 @@ services:
             POSTGRES_DB: ${PG_DATABASE:-coinage-db}
             POSTGRES_USER: ${PG_USER:-postgres}
             POSTGRES_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the target directory's .env}
+        ports:
+            - '${PG_PORT:-5432}:5432'
         volumes:
-            - ./docker/postgres-data:/var/lib/postgresql
+            - ./data/pg:/var/lib/postgresql
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
             interval: 5s
@@ -37,7 +39,7 @@ services:
             COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:?Set COINAGE_ADMIN_USERNAME for initial admin bootstrap}
             COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:?Set COINAGE_ADMIN_PASSWORD for initial admin bootstrap}
         volumes:
-            - ./.docker-data/uploads:/app/api/uploads
+            - ./data/uploads:/app/api/uploads
         depends_on:
             coinage-db:
                 condition: service_healthy

@@ -9,7 +9,7 @@ services:
         ports:
             - '127.0.0.1:${PG_PORT:-5432}:5432'
         volumes:
-            - ./.docker-data/postgres18:/var/lib/postgresql
+            - ./data/pg:/var/lib/postgresql
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U ${PG_USER:-postgres} -d ${PG_DATABASE:-coinage-db}']
             interval: 5s
@@ -29,7 +29,7 @@ services:
         ports:
             - 3333:3333
         volumes:
-            - ./.docker-data/uploads:/app/api/uploads
+            - ./data/uploads:/app/api/uploads
         depends_on:
             coinage-db:
                 condition: service_healthy
