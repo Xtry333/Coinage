@@ -30,6 +30,7 @@ services:
             - ./.env
         environment:
             NODE_ENV: production
+            COINAGE_API_PORT: ${COINAGE_API_PORT:-3333}
             COINAGE_POSTGRES_HOST: coinage-db
             COINAGE_POSTGRES_PORT: '5432'
             COINAGE_POSTGRES_DB: ${COINAGE_POSTGRES_DB:-coinage-db}
@@ -49,6 +50,8 @@ services:
         platform: linux/arm64
         pull_policy: never
         restart: unless-stopped
+        environment:
+            COINAGE_API_PORT: ${COINAGE_API_PORT:-3333}
         ports:
             - ${COINAGE_WEBAPP_PORT:-4200}:80
         depends_on:

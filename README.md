@@ -21,7 +21,7 @@ Dependencies are selected for compatibility, not by blindly installing every pac
 
 Validate both applications with `yarn nx run-many --target=typecheck`, and build them with `yarn nx run-many --target=build --configuration=production`. Nx's Jest, ESLint, Cypress, and API webpack targets use the Nx 24 inference plugins rather than the removed executors. Angular's existing zone-based change detection is explicitly retained.
 
-The webapp uses `@angular/build:application` and the Vite-based `@angular/build:dev-server`. Browser output remains directly in `dist/packages/coinage-webapp` (without a `browser/` subdirectory) for the nginx image. Development requests under `/api`, `/ws`, and `/socket.io` are proxied to port 3333, including nested paths and query strings.
+The webapp uses `@angular/build:application` and the Vite-based `@angular/build:dev-server`. Browser output remains directly in `dist/packages/coinage-webapp` (without a `browser/` subdirectory) for the nginx image. Development requests under `/api`, `/ws`, and `/socket.io` are proxied to the configured API port, including nested paths and query strings.
 
 Tailwind is configured in `packages/coinage-webapp/src/styles.css`: `@theme` defines the primary colors, `@plugin` enables form styling, and `@source` includes shared libraries alongside automatic app-source detection. Component styles using `@apply` are plain CSS with an `@reference` to that entry point; unrelated Sass styles remain supported. Tailwind 4 requires Chrome 111+, Safari 16.4+, or Firefox 128+.
 
@@ -70,7 +70,31 @@ docker compose -p coinage-postgres-dev -f docker-compose.dev.yml up -d
 corepack yarn dev
 ```
 
-Open <http://localhost:4200>. The API is available at <http://localhost:3333/api>. Frontend and API edits are watched natively; no container rebuild/recreation is needed.
+With the default ports, open <http://localhost:4200>. The API is available at <http://localhost:3333/api>. Frontend and API edits are watched natively; no container rebuild/recreation is needed.
+
+### Ports
+
+Set ports in the project root's `.env` (or the Pi deployment folder's `.env`). Shell environment variables take precedence. Missing or empty values retain these defaults:
+
+| Variable                | Default | Native development                                                   | Docker / Pi bundle                                                                                        |
+| ----------------------- | ------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `COINAGE_WEBAPP_PORT`   | `4200`  | Angular dev-server port                                              | Published web port; nginx keeps port `80` inside its container                                            |
+| `COINAGE_API_PORT`      | `3333`  | API listener and REST/WebSocket proxy target                         | API listener and nginx upstream; local Docker publishes this same port, while the Pi API remains internal |
+| `COINAGE_POSTGRES_PORT` | `5432`  | API/TypeORM database connection and Docker database's published port | Published database port; container-to-container connections always use PostgreSQL's internal `5432`       |
+
+For example:
+
+```dotenv
+COINAGE_WEBAPP_PORT=14200
+COINAGE_API_PORT=13333
+COINAGE_POSTGRES_PORT=15432
+```
+
+The webapp is then at `http://localhost:14200`, and the native/local-Docker API is at `http://localhost:13333/api`. The frontend uses same-origin URLs, so REST and WebSocket traffic follows the configured proxy automatically; no browser build contains `.env` or secrets.
+
+`yarn dev`, `yarn dev:webapp`, and `yarn nx serve coinage-webapp` use the same environment-aware launcher in development and production configurations. `serve-angular` is the underlying Angular implementation target. An explicit `--port` overrides the native frontend port. Cypress's default base URL also follows `COINAGE_WEBAPP_PORT`; an explicit Cypress base URL can override it. The native API/proxy retain `PORT` as a legacy fallback only when `COINAGE_API_PORT` is missing or empty; Compose sets `COINAGE_API_PORT` explicitly to keep the API and nginx aligned.
+
+Restart native servers after changing ports. Recreate Docker containers with `yarn docker:up`, or rerun `sh start.sh` on the Pi. The first update to this port-aware version requires rebuilt API/web images (or a new Pi bundle); later port-only edits do not require rebuilding images. API and native web ports must be integers from `1` to `65535`.
 
 If you change `package.json` or `yarn.lock`, install the updated dependencies on the host, then restart `corepack yarn dev`:
 

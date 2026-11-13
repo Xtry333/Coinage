@@ -14,6 +14,9 @@ const settings = {
     COINAGE_POSTGRES_PASSWORD: 'fixture-db-secret',
     COINAGE_POSTGRES_HOST: 'old-host',
     COINAGE_POSTGRES_PORT: '12345',
+    COINAGE_API_PORT: '13333',
+    COINAGE_WEBAPP_PORT: '14200',
+    PORT: '19999',
     COINAGE_API_JWT_SECRET: 'fixture-jwt-secret',
     COINAGE_ADMIN_USERNAME: 'fixture-admin',
     COINAGE_ADMIN_PASSWORD: 'fixture-admin-secret',
@@ -65,12 +68,15 @@ test('standalone Compose uses local latest ARM64 images, never pulls/builds, and
     assert.equal(api.environment.OLLAMA_BASE_URL, settings.OLLAMA_BASE_URL);
     assert.equal(api.environment.COINAGE_POSTGRES_HOST, 'coinage-db');
     assert.equal(api.environment.COINAGE_POSTGRES_PORT, '5432');
+    assert.equal(api.environment.COINAGE_API_PORT, settings.COINAGE_API_PORT);
+    assert.equal(services['coinage-webapp'].environment.COINAGE_API_PORT, settings.COINAGE_API_PORT);
     assert.equal(services['coinage-db'].environment.POSTGRES_PASSWORD, settings.COINAGE_POSTGRES_PASSWORD);
     assert.equal(api.ports, undefined);
     assert.equal(services['coinage-db'].ports[0].host_ip, undefined);
     assert.equal(services['coinage-db'].ports[0].published, settings.COINAGE_POSTGRES_PORT);
     assert.equal(services['coinage-db'].ports[0].target, 5432);
-    assert.equal(services['coinage-webapp'].ports[0].published, '4200');
+    assert.equal(services['coinage-webapp'].ports[0].published, settings.COINAGE_WEBAPP_PORT);
+    assert.equal(services['coinage-webapp'].ports[0].target, 80);
     assert.equal(api.volumes[0].type, 'bind');
     assert.equal(api.volumes[0].source, path.join(fixture.root, 'data', 'uploads'));
     assert.equal(api.volumes[0].target, '/app/api/uploads');
@@ -80,12 +86,15 @@ test('standalone Compose uses local latest ARM64 images, never pulls/builds, and
     assert.equal(fs.readFileSync(path.join(fixture.root, '.env'), 'utf8'), fixture.envContent);
 });
 
-test('Pi Compose defaults the published PostgreSQL port to 5432 when COINAGE_POSTGRES_PORT is empty', (t) => {
-    const result = config(setup(t, { COINAGE_POSTGRES_PORT: '' }));
+test('Pi Compose defaults empty ports consistently for the API, nginx upstream, web, and PostgreSQL', (t) => {
+    const result = config(setup(t, { COINAGE_POSTGRES_PORT: '', COINAGE_API_PORT: '', COINAGE_WEBAPP_PORT: '' }));
     assert.equal(result.status, 0, result.stderr);
     const { services } = JSON.parse(result.stdout);
     assert.equal(services['coinage-db'].ports[0].published, '5432');
     assert.equal(services['coinage-api'].environment.COINAGE_POSTGRES_PORT, '5432');
+    assert.equal(services['coinage-api'].environment.COINAGE_API_PORT, '3333');
+    assert.equal(services['coinage-webapp'].environment.COINAGE_API_PORT, '3333');
+    assert.equal(services['coinage-webapp'].ports[0].published, '4200');
 });
 
 for (const key of ['COINAGE_POSTGRES_PASSWORD', 'COINAGE_API_JWT_SECRET', 'COINAGE_ADMIN_USERNAME', 'COINAGE_ADMIN_PASSWORD']) {

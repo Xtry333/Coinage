@@ -1,6 +1,10 @@
 FROM nginx:alpine
 
-COPY nginx.conf /etc/nginx/nginx.conf
+# The official entrypoint renders this at startup, so port changes need no image rebuild.
+ENV COINAGE_API_PORT=3333 \
+    NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx \
+    NGINX_ENVSUBST_FILTER=^COINAGE_API_PORT$
+COPY nginx.conf.template /etc/nginx/templates/nginx.conf.template
 
 EXPOSE 80
 

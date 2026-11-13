@@ -57,11 +57,30 @@
             }
         },
         "serve": {
+            "executor": "nx:run-commands",
+            "continuous": true,
+            "defaultConfiguration": "development",
+            "options": {
+                "command": "node tools/serve-webapp.cjs development"
+            },
+            "configurations": {
+                "production": {
+                    "command": "node tools/serve-webapp.cjs production"
+                },
+                "development": {
+                    "command": "node tools/serve-webapp.cjs development"
+                }
+            },
+            "readyWhen": {
+                "logMatches": "Local:"
+            }
+        },
+        "serve-angular": {
             "executor": "@angular/build:dev-server",
             "continuous": true,
             "defaultConfiguration": "development",
             "options": {
-                "proxyConfig": "packages/coinage-webapp/proxy.conf.json",
+                "proxyConfig": "packages/coinage-webapp/proxy.conf.cjs",
                 "buildTarget": "coinage-webapp:build:development"
             },
             "configurations": {

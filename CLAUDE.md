@@ -18,8 +18,10 @@ Run from repository root:
 Use these when working on any features and testing for any issues
 
 - `yarn dev` - Start both API and webapp servers simultaneously (the default command when testing for issues)
-- `yarn dev:api` - Start only the NestJS API server (port varies, see nx serve output)
-- `yarn dev:webapp` - Start only the Angular webapp (port varies, see nx serve output)
+- `yarn dev:api` - Start only the NestJS API server (`COINAGE_API_PORT`, default 3333)
+- `yarn dev:webapp` - Start only the Angular webapp (`COINAGE_WEBAPP_PORT`, default 4200)
+
+Ports come from the root `.env`, with shell overrides taking precedence. The public `coinage-webapp:serve` Nx target uses `tools/serve-webapp.cjs` to pass the configured port to the underlying `serve-angular` target. Its `proxy.conf.cjs` reads the API port for REST/WebSocket traffic; Cypress's base URL follows the webapp port too.
 
 ### Building (Production Mode)
 
@@ -58,6 +60,8 @@ Use these when trying to build for production deployment (slow process and runni
 
 Docker build scripts load only local `coinage-api:latest` and `coinage-webapp:latest` images; there is no application-image publishing or registry deployment workflow. For Pi deployment, run `yarn build:pi`, transfer the five files from `dist/coinage-pi/`, and run `sh start.sh` on the Pi. Runtime settings come from the target folder's existing `.env`.
 
+Compose uses `COINAGE_WEBAPP_PORT` for the published web port and `COINAGE_POSTGRES_PORT` for the published database port; their internal container ports stay 80 and 5432. `COINAGE_API_PORT` sets the API listener and nginx upstream together (published only in local Docker). `nginx.conf.template` is rendered by the web image at startup. Restart native servers or recreate containers after port changes; no runtime env files are baked into images.
+
 ## Architecture
 
 ### Monorepo Structure
@@ -85,14 +89,14 @@ Docker build scripts load only local `coinage-api:latest` and `coinage-webapp:la
 - WebSocket client using ngx-socket-io
 - Styling: SCSS with Tailwind CSS v3 (migrated from Bootstrap)
 - Charts: ng2-charts with Chart.js
-- Proxy configuration: `packages/coinage-webapp/proxy.conf.json`
+- Proxy configuration: `packages/coinage-webapp/proxy.conf.cjs`
 
 ### Database
 
 - TypeORM with `synchronize: false` - migrations are source of truth
 - Custom naming strategy with prefixed constraints (FK*, UQ*, IDX\_)
 - Migration files: `packages/coinage-api/src/database/migrations/`
-- Environment variables required: COINAGE_POSTGRES_HOST, COINAGE_POSTGRES_USER, COINAGE_POSTGRES_PASSWORD, COINAGE_POSTGRES_DB, COINAGE_COINAGE_POSTGRES_PORT
+- Environment variables required: COINAGE_POSTGRES_HOST, COINAGE_POSTGRES_USER, COINAGE_POSTGRES_PASSWORD, COINAGE_POSTGRES_DB, COINAGE_POSTGRES_PORT
 
 ### WebSocket Integration
 
@@ -127,7 +131,7 @@ Docker build scripts load only local `coinage-api:latest` and `coinage-webapp:la
 - `package.json` - Workspace scripts and dependencies
 - `nx.json` - Nx workspace configuration with custom generators
 - `packages/coinage-api/src/app/typeorm.config.ts` - Database configuration
-- `packages/coinage-webapp/proxy.conf.json` - Development proxy settings
+- `packages/coinage-webapp/proxy.conf.cjs` - Environment-aware development proxy settings
 - `.github/copilot-instructions.md` - Additional AI assistant guidance
 
 ## Project Planning & Roadmap
@@ -139,6 +143,8 @@ Docker build scripts load only local `coinage-api:latest` and `coinage-webapp:la
 
 Required environment variables for API:
 
+- `COINAGE_API_PORT` - API listener (default: 3333; native-only legacy fallback: `PORT`)
+- `COINAGE_WEBAPP_PORT` - Native frontend / published Docker web port (default: 4200)
 - `COINAGE_POSTGRES_HOST` - Database host (default: localhost)
 - `COINAGE_POSTGRES_PORT` - Database port (default: 5432)
 - `COINAGE_POSTGRES_USER` - Database username

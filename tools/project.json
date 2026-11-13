@@ -15,10 +15,14 @@
                 "{workspaceRoot}/docker-compose.pi.yml",
                 "{workspaceRoot}/docker/start-pi.sh",
                 "{workspaceRoot}/docker/pi-README.md",
+                "{workspaceRoot}/docker/webapp.Dockerfile",
+                "{workspaceRoot}/nginx.conf.template",
+                "{workspaceRoot}/packages/coinage-webapp/proxy.conf.cjs",
+                "{workspaceRoot}/packages/coinage-webapp/project.json",
                 "{workspaceRoot}/.dockerignore"
             ],
             "options": {
-                "command": "node --test tools/db-dump.test.cjs tools/docker-images.test.cjs tools/pi-bundle.test.cjs tools/start-pi.test.cjs"
+                "command": "node --test tools/db-dump.test.cjs tools/docker-images.test.cjs tools/pi-bundle.test.cjs tools/start-pi.test.cjs tools/ports.test.cjs"
             }
         },
         "test-compose": {
