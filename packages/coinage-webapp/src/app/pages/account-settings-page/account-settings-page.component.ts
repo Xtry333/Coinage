@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
 import { AccountDTO } from '@app/interfaces';
 
@@ -8,6 +8,7 @@ import { CoinageDataService } from '../../services/coinage.data-service';
     selector: 'app-account-settings-page',
     templateUrl: './account-settings-page.component.html',
     styleUrls: ['./account-settings-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class AccountSettingsPageComponent implements OnInit {

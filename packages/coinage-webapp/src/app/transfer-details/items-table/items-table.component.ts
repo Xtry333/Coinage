@@ -1,4 +1,4 @@
-import { Component, Input, OnChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { ContainerDTO, TransferItemDTO } from '@app/interfaces';
 import { CoinageRoutes } from '../../app-routing/app-routes';
 
@@ -22,6 +22,7 @@ export class UiTransferItemDTO extends TransferItemDTO {
     selector: 'app-items-table',
     templateUrl: './items-table.component.html',
     styleUrls: ['./items-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ItemsTableComponent implements OnChanges {

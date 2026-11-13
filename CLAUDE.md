@@ -90,7 +90,7 @@ Use these when trying to build for production deployment (slow process and runni
 - TypeORM with `synchronize: false` - migrations are source of truth
 - Custom naming strategy with prefixed constraints (FK*, UQ*, IDX\_)
 - Migration files: `packages/coinage-api/src/database/migrations/`
-- Environment variables required: MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE, COINAGE_MYSQL_PORT
+- Environment variables required: PG_HOST, PG_USER, PG_PASSWORD, PG_DATABASE, COINAGE_PG_PORT
 
 ### WebSocket Integration
 
@@ -137,11 +137,11 @@ Use these when trying to build for production deployment (slow process and runni
 
 Required environment variables for API:
 
-- `MYSQL_HOST` - Database host (default: localhost)
-- `MYSQL_USER` - Database username
-- `MYSQL_PASSWORD` - Database password
-- `MYSQL_DATABASE` - Database name
-- `COINAGE_MYSQL_PORT` - Database port (default: 3306)
+- `PG_HOST` - Database host (default: localhost)
+- `PG_PORT` - Database port (default: 5432)
+- `PG_USER` - Database username
+- `PG_PASSWORD` - Database password
+- `PG_DATABASE` - Database name
 
 ## Dependencies & Versions
 

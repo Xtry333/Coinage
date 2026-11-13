@@ -1,4 +1,7 @@
-import { loadMigrations } from './typeorm.config';
+import { DataSource } from 'typeorm';
+
+import { getPostgresConnectionOptions } from './postgres-connection-options';
+import { dataSource, loadMigrations, opts } from './typeorm.config';
 
 describe('loadMigrations', () => {
     describe('ts-node context (require.context unavailable)', () => {
@@ -35,8 +38,7 @@ describe('loadMigrations', () => {
             class Migration2 {}
 
             const moduleMap: Record<string, Record<string, unknown>> = {
-                './1000000000000-CreateTables.ts': { Migration1 },
-                './1654876993290-ReforgeForeignKeys.ts': { Migration2 },
+                './20261015000000-BaselinePostgres.ts': { Migration1 },
             };
 
             const mockContext = jest.fn((key: string) => moduleMap[key]);
@@ -45,7 +47,6 @@ describe('loadMigrations', () => {
             withWebpackContext(mockContext, () => {
                 const result = loadMigrations();
                 expect(result).toContain(Migration1);
-                expect(result).toContain(Migration2);
                 expect(result.every((m) => typeof m === 'function')).toBe(true);
             });
         });
@@ -65,5 +66,20 @@ describe('loadMigrations', () => {
                 expect(result.indexOf(Early)).toBeLessThan(result.indexOf(Late));
             });
         });
+    });
+});
+
+describe('TypeORM config (PostgreSQL)', () => {
+    it('uses the postgres driver type', () => {
+        expect(opts.type).toBe('postgres');
+    });
+
+    it('defaults to port 5432 when no env var is set', () => {
+        expect(getPostgresConnectionOptions(() => undefined).port).toBe(5432);
+    });
+
+    it('dataSource is instantiated', () => {
+        expect(dataSource).toBeDefined();
+        expect(dataSource instanceof DataSource).toBe(true);
     });
 });

@@ -6,18 +6,29 @@
     "prefix": "app",
     "tags": [],
     "targets": {
-        "build": {
-            "executor": "@angular-devkit/build-angular:browser",
-            "outputs": ["{options.outputPath}"],
+        "typecheck": {
+            "executor": "nx:run-commands",
+            "cache": true,
             "options": {
-                "outputPath": "dist/packages/coinage-webapp",
+                "command": "ngc --project packages/coinage-webapp/tsconfig.app.json --noEmit"
+            }
+        },
+        "build": {
+            "executor": "@angular/build:application",
+            "outputs": ["{workspaceRoot}/dist/{projectRoot}"],
+            "defaultConfiguration": "production",
+            "options": {
+                "outputPath": {
+                    "base": "dist/packages/coinage-webapp",
+                    "browser": ""
+                },
                 "index": "packages/coinage-webapp/src/index.html",
-                "main": "packages/coinage-webapp/src/main.ts",
+                "browser": "packages/coinage-webapp/src/main.ts",
                 "polyfills": ["zone.js"],
                 "tsConfig": "packages/coinage-webapp/tsconfig.app.json",
                 "inlineStyleLanguage": "scss",
                 "assets": ["packages/coinage-webapp/src/favicon.ico", "packages/coinage-webapp/src/assets"],
-                "styles": ["packages/coinage-webapp/src/styles.scss"],
+                "styles": ["node_modules/@ng-select/ng-select/themes/default.theme.css", "packages/coinage-webapp/src/styles.css"],
                 "scripts": [],
                 "allowedCommonJsDependencies": ["validator"]
             },
@@ -38,18 +49,21 @@
                     "outputHashing": "all"
                 },
                 "development": {
-                    "buildOptimizer": false,
                     "optimization": false,
-                    "vendorChunk": true,
                     "extractLicenses": false,
                     "sourceMap": true,
                     "namedChunks": true
                 }
-            },
-            "defaultConfiguration": "production"
+            }
         },
         "serve": {
-            "executor": "@angular-devkit/build-angular:dev-server",
+            "executor": "@angular/build:dev-server",
+            "continuous": true,
+            "defaultConfiguration": "development",
+            "options": {
+                "proxyConfig": "packages/coinage-webapp/proxy.conf.json",
+                "buildTarget": "coinage-webapp:build:development"
+            },
             "configurations": {
                 "production": {
                     "buildTarget": "coinage-webapp:build:production"
@@ -58,26 +72,14 @@
                     "buildTarget": "coinage-webapp:build:development"
                 }
             },
-            "defaultConfiguration": "development",
-            "options": {
-                "proxyConfig": "packages/coinage-webapp/proxy.conf.json",
-                "buildTarget": "coinage-webapp:build:development"
+            "readyWhen": {
+                "signal": true
             }
         },
         "extract-i18n": {
-            "executor": "@angular-devkit/build-angular:extract-i18n",
+            "executor": "@angular/build:extract-i18n",
             "options": {
-                "browserTarget": "coinage-webapp:build"
-            }
-        },
-        "lint": {
-            "executor": "@nx/eslint:lint"
-        },
-        "test": {
-            "executor": "@nx/jest:jest",
-            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-            "options": {
-                "jestConfig": "packages/coinage-webapp/jest.config.ts"
+                "buildTarget": "coinage-webapp:build"
             }
         }
     }

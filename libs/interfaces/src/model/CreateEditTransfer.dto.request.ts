@@ -34,6 +34,7 @@ export class GranularCreateEditTransferModelDTO {
         date: Date,
         receiptId: number | null,
         itemChanges: GranularTransferItemChanges,
+        targetAccountId: number | null = null,
     ) {
         this.id = id;
         this.description = description;
@@ -44,6 +45,7 @@ export class GranularCreateEditTransferModelDTO {
         this.date = date;
         this.receiptId = receiptId;
         this.itemChanges = itemChanges;
+        this.targetAccountId = targetAccountId;
     }
 
     @IsOptional()
@@ -82,6 +84,12 @@ export class GranularCreateEditTransferModelDTO {
     @Min(1)
     @IsNotIn([NaN])
     public receiptId: number | null;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(1)
+    @IsNotIn([NaN])
+    public targetAccountId: number | null;
 
     @IsDate()
     @Type(() => Date)
@@ -102,6 +110,7 @@ export class CreateEditTransferModelDTO {
         date: Date,
         receiptId: number | null,
         items: ShoppingListItem[] | undefined,
+        targetAccountId: number | null = null,
     ) {
         this.id = id;
         this.description = description;
@@ -112,6 +121,7 @@ export class CreateEditTransferModelDTO {
         this.date = date;
         this.receiptId = receiptId;
         this.items = items ?? [];
+        this.targetAccountId = targetAccountId;
     }
 
     @IsOptional()
@@ -150,6 +160,12 @@ export class CreateEditTransferModelDTO {
     @Min(1)
     @IsNotIn([NaN])
     public receiptId: number | null;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(1)
+    @IsNotIn([NaN])
+    public targetAccountId: number | null;
 
     @IsDate()
     @Type(() => Date)

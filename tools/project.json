@@ -1,0 +1,88 @@
+{
+    "name": "coinage-tools",
+    "$schema": "../node_modules/nx/schemas/project-schema.json",
+    "projectType": "library",
+    "targets": {
+        "test": {
+            "executor": "nx:run-commands",
+            "cache": true,
+            "inputs": [
+                "default",
+                "^default",
+                "{workspaceRoot}/package.json",
+                "{workspaceRoot}/nx.json",
+                "{workspaceRoot}/tsconfig.base.json",
+                "{workspaceRoot}/docker-compose.pi.yml",
+                "{workspaceRoot}/docker/start-pi.sh",
+                "{workspaceRoot}/docker/pi-README.md",
+                "{workspaceRoot}/.dockerignore"
+            ],
+            "options": {
+                "command": "node --test tools/db-dump.test.cjs tools/docker-images.test.cjs tools/pi-bundle.test.cjs tools/start-pi.test.cjs"
+            }
+        },
+        "test-compose": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "options": {
+                "command": "node --test tools/docker-compose.test.cjs tools/pi-compose.test.cjs"
+            }
+        },
+        "docker-bundle-pi": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-api", "coinage-webapp"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/pi-bundle.cjs" }
+        },
+        "docker-build": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-api", "coinage-webapp"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/docker-images.cjs build" }
+        },
+        "docker-build-api": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-api"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/docker-images.cjs build --image api" }
+        },
+        "docker-build-webapp": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-webapp"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/docker-images.cjs build --image webapp" }
+        },
+        "docker-publish": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-api", "coinage-webapp"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/docker-images.cjs publish" }
+        },
+        "docker-publish-api": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-api"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/docker-images.cjs publish --image api" }
+        },
+        "docker-publish-webapp": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-webapp"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/docker-images.cjs publish --image webapp" }
+        }
+    }
+}

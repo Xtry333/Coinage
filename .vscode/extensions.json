@@ -2,9 +2,11 @@
     "recommendations": [
         "nrwl.angular-console",
         "angular.ng-template",
+        "bradlc.vscode-tailwindcss",
         "esbenp.prettier-vscode",
         "firsttris.vscode-jest-runner",
         "chrisbibby.hide-node-modules",
-        "dbaeumer.vscode-eslint"
+        "dbaeumer.vscode-eslint",
+        "stylelint.vscode-stylelint"
     ]
 }

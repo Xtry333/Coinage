@@ -130,16 +130,17 @@ export class AccountBalanceService {
                             externalOutgoing: sumMonthlySubChange(account.id, 'originAccountId', externalOnlyValidSubChanges),
                         };
                     });
-                const subChange = accountMonthlyChanges.reduce((sum, a) => {
-                    return {
+                const subChange = accountMonthlyChanges.reduce(
+                    (sum, a) => ({
                         accountId: 0,
                         balance: sum.balance + a.balance,
                         totalIncoming: sum.totalIncoming + a.totalIncoming,
                         totalOutgoing: sum.totalOutgoing + a.totalOutgoing,
                         externalIncoming: sum.externalIncoming + a.externalIncoming,
                         externalOutgoing: sum.externalOutgoing + a.externalOutgoing,
-                    };
-                });
+                    }),
+                    { accountId: 0, balance: 0, totalIncoming: 0, totalOutgoing: 0, externalIncoming: 0, externalOutgoing: 0 },
+                );
                 return {
                     year: date.year,
                     month: date.month,

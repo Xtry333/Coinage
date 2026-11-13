@@ -1,0 +1,55 @@
+name: ${COMPOSE_PROJECT_NAME:-coinage-app}
+
+services:
+    coinage-db:
+        image: postgres:18.6-alpine
+        platform: linux/arm64
+        pull_policy: never
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${PG_DATABASE:-coinage-db}
+            POSTGRES_USER: ${PG_USER:-postgres}
+            POSTGRES_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the target directory's .env}
+        ports:
+            - '${PG_PORT:-5432}:5432'
+        volumes:
+            - ./data/pg:/var/lib/postgresql
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+            interval: 5s
+            timeout: 5s
+            retries: 10
+            start_period: 10s
+
+    coinage-api:
+        image: coinage-api:latest
+        platform: linux/arm64
+        pull_policy: never
+        restart: unless-stopped
+        env_file:
+            - ./.env
+        environment:
+            NODE_ENV: production
+            PG_HOST: coinage-db
+            PG_PORT: '5432'
+            PG_DATABASE: ${PG_DATABASE:-coinage-db}
+            PG_USER: ${PG_USER:-postgres}
+            PG_PASSWORD: ${PG_PASSWORD:?Set PG_PASSWORD in the target directory's .env}
+            COINAGE_API_JWT_SECRET: ${COINAGE_API_JWT_SECRET:?Set COINAGE_API_JWT_SECRET in the target directory's .env}
+            COINAGE_ADMIN_USERNAME: ${COINAGE_ADMIN_USERNAME:?Set COINAGE_ADMIN_USERNAME for initial admin bootstrap}
+            COINAGE_ADMIN_PASSWORD: ${COINAGE_ADMIN_PASSWORD:?Set COINAGE_ADMIN_PASSWORD for initial admin bootstrap}
+        volumes:
+            - ./data/uploads:/app/api/uploads
+        depends_on:
+            coinage-db:
+                condition: service_healthy
+
+    coinage-webapp:
+        image: coinage-webapp:latest
+        platform: linux/arm64
+        pull_policy: never
+        restart: unless-stopped
+        ports:
+            - ${COINAGE_WEBAPP_PORT:-4200}:80
+        depends_on:
+            - coinage-api

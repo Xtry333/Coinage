@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ContainerDTO, CreateEditItemDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
@@ -9,6 +9,7 @@ import { NotificationService } from '../../services/notification.service';
     selector: 'app-item-shopping-list',
     templateUrl: './item-shopping-list.component.html',
     styleUrls: ['./item-shopping-list.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ItemShoppingListComponent implements OnInit, OnChanges {

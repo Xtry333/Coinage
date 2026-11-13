@@ -1,5 +1,5 @@
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { CategoryDTO, CreateEditCategoryDTO } from '@app/interfaces';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 
@@ -7,6 +7,7 @@ import { CoinageDataService } from '../../services/coinage.data-service';
     selector: 'app-create-edit-category',
     templateUrl: './create-edit-category.component.html',
     styleUrls: ['./create-edit-category.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class CreateEditCategoryComponent implements OnInit, OnChanges {

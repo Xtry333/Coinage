@@ -6,7 +6,7 @@ export class CreateAdminUserFromEnv1793491202000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         const username = process.env.COINAGE_ADMIN_USERNAME?.trim();
         const password = process.env.COINAGE_ADMIN_PASSWORD;
-        const existingUsers = (await queryRunner.query(`SELECT \`id\` FROM \`user\` LIMIT 1`)) as Array<{ id: number }>;
+        const existingUsers = (await queryRunner.query(`SELECT "id" FROM "user" LIMIT 1`)) as Array<{ id: number }>;
 
         if (!username && !password && existingUsers.length > 0) {
             return;
@@ -18,15 +18,15 @@ export class CreateAdminUserFromEnv1793491202000 implements MigrationInterface {
             throw new Error('COINAGE_ADMIN_USERNAME must be at most 50 characters and COINAGE_ADMIN_PASSWORD at most 64 characters.');
         }
 
-        const existingAdmin = (await queryRunner.query(`SELECT \`id\` FROM \`user\` WHERE \`name\` = ? LIMIT 1`, [username])) as Array<{
+        const existingAdmin = (await queryRunner.query(`SELECT "id" FROM "user" WHERE "name" = $1 LIMIT 1`, [username])) as Array<{
             id: number;
         }>;
         if (existingAdmin.length > 0) {
-            await queryRunner.query(`UPDATE \`user\` SET \`is_system_user\` = b'1' WHERE \`id\` = ?`, [existingAdmin[0].id]);
+            await queryRunner.query(`UPDATE "user" SET "is_system_user" = TRUE WHERE "id" = $1`, [existingAdmin[0].id]);
             return;
         }
 
-        await queryRunner.query(`INSERT INTO \`user\` (\`name\`, \`password\`, \`is_system_user\`) VALUES (?, ?, b'1')`, [username, password]);
+        await queryRunner.query(`INSERT INTO "user" ("name", "password", "is_system_user") VALUES ($1, $2, TRUE)`, [username, password]);
     }
 
     public async down(_queryRunner: QueryRunner): Promise<void> {

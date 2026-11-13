@@ -2,9 +2,9 @@ import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 
 import { BaseResponseDTO, CategoryDTO, CreateEditCategoryDTO, TotalInMonthByCategory } from '@app/interfaces';
 
-import { CategoryDao as CategoryDao } from '../daos/category.dao';
+import { CategoryDao } from '../daos/category.dao';
 import { Category } from '../entities/Category.entity';
-import { AuthGuard } from '../services/auth.guard';
+import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { CategoryCascadeService } from '../services/category-cascades.service';
 
 @UseGuards(AuthGuard)
@@ -77,13 +77,18 @@ export class CategoriesController {
         };
     }
 
-    @Get('/totalPerCategory/:year/:month/:day?')
-    public async getTotalPerCategory(@Param('year') year: string, @Param('month') month: string, @Param('day') day: string): Promise<TotalInMonthByCategory[]> {
+    @Get('/totalPerCategory/:year/:month{/:day}')
+    public async getTotalPerCategory(
+        @Param('year') year: string,
+        @Param('month') month: string,
+        @Param('day') day: string,
+        @RequestingUser('id') userId: number,
+    ): Promise<TotalInMonthByCategory[]> {
         const yearNum = parseInt(year),
             monthNum = parseInt(month),
             dayNum = parseInt(day);
         if (yearNum) {
-            return await this.categoryDao.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : undefined, dayNum ? dayNum : undefined);
+            return await this.categoryDao.getTotalByCategoryMonth(yearNum, monthNum ? monthNum : undefined, dayNum ? dayNum : undefined, userId);
         } else {
             return [];
         }

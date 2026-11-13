@@ -3,6 +3,12 @@
         "packageManager": "yarn"
     },
     "extends": "nx/presets/npm.json",
+    "pluginsConfig": {
+        "@nx/js": {
+            "analyzeSourceFiles": true,
+            "analyzePackageJson": true
+        }
+    },
     "$schema": "./node_modules/nx/schemas/nx-schema.json",
     "generators": {
         "@nx/angular:application": {
@@ -21,34 +27,83 @@
     },
     "targetDefaults": {
         "build": {
-            "cache": true
+            "cache": true,
+            "inputs": ["default", "^default", "{workspaceRoot}/package.json", "{workspaceRoot}/yarn.lock", "{workspaceRoot}/.yarnrc.yml"]
         },
         "e2e": {
             "cache": true
         },
-        "@nx/jest:jest": {
-            "inputs": ["default", "^default", "{workspaceRoot}/jest.preset.js"],
-            "cache": true,
-            "options": {
-                "passWithNoTests": true
-            },
-            "configurations": {
-                "ci": {
-                    "ci": true,
-                    "codeCoverage": true
+        "lint": [
+            {
+                "filter": {
+                    "plugin": "@nx/eslint/plugin"
+                },
+                "inputs": [
+                    "default",
+                    "^default",
+                    "{workspaceRoot}/eslint.config.mjs",
+                    "{workspaceRoot}/tools/eslint-rules/**/*",
+                    {
+                        "externalDependencies": ["eslint"]
+                    }
+                ]
+            }
+        ],
+        "test": [
+            {
+                "filter": {
+                    "plugin": "@nx/jest/plugin"
+                },
+                "configurations": {
+                    "ci": {
+                        "ci": true,
+                        "coverage": true
+                    }
+                },
+                "options": {
+                    "passWithNoTests": true
                 }
             }
-        },
-        "@nx/eslint:lint": {
-            "inputs": ["default", "{workspaceRoot}/eslint.config.mjs"],
-            "cache": true
-        }
+        ]
     },
-    "useInferencePlugins": false,
     "defaultBase": "master",
     "nxCloudId": "689bc435b0c1aa692565e89c",
-    "useLegacyCache": true,
     "tui": {
         "enabled": false
-    }
+    },
+    "affected": {
+        "legacy": true
+    },
+    "plugins": [
+        {
+            "plugin": "@nx/webpack/plugin",
+            "include": ["packages/coinage-api/webpack.config.js"],
+            "options": {
+                "buildTargetName": "build",
+                "serveTargetName": "webpack-serve"
+            }
+        },
+        {
+            "plugin": "@nx/eslint/plugin",
+            "options": {
+                "targetName": "lint"
+            }
+        },
+        {
+            "plugin": "@nx/jest/plugin",
+            "options": {
+                "targetName": "test"
+            }
+        },
+        {
+            "plugin": "@nx/cypress/plugin",
+            "options": {
+                "targetName": "e2e",
+                "ciTargetName": "e2e-ci",
+                "componentTestingTargetName": "component-test",
+                "openTargetName": "open-cypress"
+            }
+        }
+    ],
+    "analytics": false
 }

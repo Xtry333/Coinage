@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NgSelectComponent } from '@ng-select/ng-select';
 import * as Rx from 'rxjs';
@@ -30,14 +30,15 @@ export interface NewTransferObject {
     categoryId?: number;
     contractorId?: number | null;
     accountId?: number;
-    targetAccountId?: number;
+    targetAccountId?: number | null;
     items?: ShoppingListItem[];
 }
 
 @Component({
     selector: 'app-create-transfer',
     templateUrl: './create-edit-transfer.component.html',
-    styleUrls: ['./create-edit-transfer.component.scss'],
+    styleUrls: ['./create-edit-transfer.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class CreateEditTransferComponent implements OnInit {
@@ -154,6 +155,7 @@ export class CreateEditTransferComponent implements OnInit {
                 new Date(this.selectedTransferInputs.date),
                 this.transferDTO?.receipt?.id ?? null,
                 itemChanges,
+                this.selectedTransferInputs.targetAccountId ?? null,
             );
             console.log('Granular save:', granularTransfer);
             this.coinageData.postGranularSaveTransfer(granularTransfer).subscribe((result) => {
@@ -171,6 +173,7 @@ export class CreateEditTransferComponent implements OnInit {
                 new Date(this.selectedTransferInputs.date),
                 this.transferDTO?.receipt?.id ?? null,
                 this.itemsInTransfer,
+                this.selectedTransferInputs.targetAccountId ?? null,
             );
             console.log('Regular save:', newTransfer);
             this.coinageData.postCreateSaveTransfer(newTransfer).subscribe((result) => {

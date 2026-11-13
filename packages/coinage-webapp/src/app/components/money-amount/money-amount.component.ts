@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { TransferTypeEnum } from '@app/interfaces';
 
 export namespace MoneyAmountComponentData {
@@ -26,6 +26,7 @@ export namespace MoneyAmountComponentData {
     selector: 'app-money-amount',
     templateUrl: './money-amount.component.html',
     styleUrls: ['./money-amount.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class MoneyAmountComponent {

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
     selector: 'app-items-list-page',
     templateUrl: './items-list-page.component.html',
-    styleUrls: ['./items-list-page.component.scss'],
+    styleUrls: ['./items-list-page.component.css'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ItemsListPageComponent {

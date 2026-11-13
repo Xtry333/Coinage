@@ -1,9 +1,7 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, CreateDateColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Account } from './Account.entity';
-import { BooleanTransformer } from './transformers/boolean.transformer';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
-import { Bit } from '../constants/booleanBuffer.const';
 
 @Entity()
 export class User {
@@ -23,7 +21,7 @@ export class User {
     @OneToMany(() => Account, (account) => account.user)
     public accounts!: Promise<Account[]>;
 
-    @Column({ type: 'bit', name: 'is_system_user', nullable: false, default: Bit.False, transformer: new BooleanTransformer() })
+    @Column({ type: 'boolean', name: 'is_system_user', nullable: false, default: false })
     public isSystemUser!: boolean;
 
     @CreateDateColumn({ type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })

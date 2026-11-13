@@ -1,4 +1,16 @@
-import { Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    ElementRef,
+    EventEmitter,
+    HostListener,
+    Input,
+    OnInit,
+    Output,
+    QueryList,
+    ViewChild,
+    ViewChildren,
+} from '@angular/core';
 import { IconDefinition, faCaretDown, faCheck, faEdit, faFilter, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { deepCopy } from 'deep-copy-ts';
 
@@ -56,6 +68,7 @@ export interface FilterOption {
     selector: 'app-table-filter[filterName]',
     templateUrl: './table-filter.component.html',
     styleUrls: ['./table-filter.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class TableFilterComponent implements OnInit {

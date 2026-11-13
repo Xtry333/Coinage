@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalSearchResponse } from '@app/interfaces';
 import { faBox, faExchangeAlt, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
@@ -11,6 +11,7 @@ import { SearchService } from '../../services/search.service';
     selector: 'app-search',
     templateUrl: './search.component.html',
     styleUrls: ['./search.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class SearchComponent implements OnInit, OnDestroy {

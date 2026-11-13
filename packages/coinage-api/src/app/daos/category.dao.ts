@@ -3,7 +3,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteResult, Equal, InsertResult, Repository } from 'typeorm';
 import { Account } from '../entities/Account.entity';
-import { Category } from '../entities/Category.entity';
+import { Category, TransferTypeEnum } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { BaseDao } from './base.dao';
 
@@ -36,25 +36,24 @@ export class CategoryDao extends BaseDao {
         return await this.categoryRepository.find({ order: { name: 'ASC' } });
     }
 
-    public async getTotalByCategoryMonth(year: number, month?: number, day?: number): Promise<TotalInMonthByCategory[]> {
-        return await this.dataSource
-            .createQueryBuilder<TotalInMonthByCategory>(Category, 'Category')
-            .select('Category.name', 'categoryName')
-            .addSelect('Category.id', 'categoryId')
-            .addSelect('Category.parent', 'categoryParentId')
-            .addSelect('SUM(Transfer.amount)', 'amount')
-            .addSelect('COUNT(Transfer.id)', 'numberOfTransfers')
-            // .from(Category, 'Category')
-            .leftJoin(Transfer, 'Transfer', 'Category.id = Transfer.category')
-            .leftJoin(Account, 'Account', 'Account.id = Transfer.account')
-            .where("Category.type = 'OUTCOME'")
-            .andWhere('YEAR(Transfer.date) = :year', { year })
-            .andWhere('(:month IS NULL OR MONTH(Transfer.date) = :month)', { month })
-            .andWhere('(:day IS NULL OR DAY(Transfer.date) = :day)', { day })
-            .andWhere('Account.userId = :userId', { userId: 1 })
-            // .andWhere('Transfer.isInternalBuffer = false')
-            .groupBy('categoryId')
-            .getRawMany();
+    public async getTotalByCategoryMonth(year: number, month: number | undefined, day: number | undefined, userId: number): Promise<TotalInMonthByCategory[]> {
+        const query = this.dataSource
+            .createQueryBuilder<TotalInMonthByCategory>(Category, 'category')
+            .select('category.name', 'categoryName')
+            .addSelect('category.id', 'categoryId')
+            .addSelect('category.parentId', 'categoryParentId')
+            .addSelect('SUM(transfer.amount)', 'amount')
+            .addSelect('COUNT(transfer.id)', 'numberOfTransfers')
+            .leftJoin(Transfer, 'transfer', 'category.id = transfer.category_id')
+            .leftJoin(Account, 'account', 'account.id = transfer.account_id')
+            .where('category.type = :type', { type: TransferTypeEnum.OUTCOME })
+            .andWhere('EXTRACT(YEAR FROM transfer.date) = :year', { year })
+            .andWhere('account.userId = :userId', { userId });
+
+        if (month !== undefined) query.andWhere('EXTRACT(MONTH FROM transfer.date) = :month', { month });
+        if (day !== undefined) query.andWhere('EXTRACT(DAY FROM transfer.date) = :day', { day });
+
+        return query.groupBy('category.id').getRawMany();
     }
 
     public async insert(category: Category): Promise<InsertResult> {

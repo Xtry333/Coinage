@@ -1,4 +1,4 @@
-import { Currency } from 'src/app/entities/Currency.entity';
+import { Currency } from '../../app/entities/Currency.entity';
 
 export function createMockCurrency(symbol: string): Currency {
     const currency = new Currency();

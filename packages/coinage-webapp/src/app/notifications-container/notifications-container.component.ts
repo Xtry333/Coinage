@@ -1,10 +1,11 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { CoinageNotification, NotificationService } from '../services/notification.service';
 
 @Component({
     selector: 'app-notifications-container',
     templateUrl: './notifications-container.component.html',
     styleUrls: ['./notifications-container.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class NotificationsContainerComponent implements OnInit {

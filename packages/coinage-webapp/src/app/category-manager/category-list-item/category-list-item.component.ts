@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { CategoryDTO } from '@app/interfaces';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
@@ -6,6 +6,7 @@ import { faEdit } from '@fortawesome/free-solid-svg-icons';
     selector: 'app-category-list-item',
     templateUrl: './category-list-item.component.html',
     styleUrls: ['./category-list-item.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class CategoryListItemComponent {

@@ -6,7 +6,7 @@
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700" for="description">Description</label>
                         <input
-                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                             id="description"
                             [(ngModel)]="selectedTransferInputs.description"
                             name="description"
@@ -19,7 +19,7 @@
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700" for="amount">Price</label>
                         <input
-                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                             id="amount"
                             [(ngModel)]="selectedTransferInputs.amount"
                             [min]="0"
@@ -47,7 +47,7 @@
                         <ng-select
                             #categorySelect
                             [(ngModel)]="selectedTransferInputs.categoryId"
-                            [clearable]="false"
+                            [clearable]="true"
                             [required]="true"
                             [editableSearchTerm]="true"
                             [items]="categories"
@@ -96,7 +96,7 @@
                         <label class="block text-sm font-medium text-gray-700" for="targetAccount">Target Account</label>
                         <ng-select
                             [(ngModel)]="selectedTransferInputs.targetAccountId"
-                            [clearable]="false"
+                            [clearable]="true"
                             [editableSearchTerm]="true"
                             [items]="accounts"
                             name="targetAccount"
@@ -109,7 +109,7 @@
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700" for="date">Date</label>
                         <input
-                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                             id="date"
                             [(ngModel)]="selectedTransferInputs.date"
                             name="date"
@@ -122,7 +122,7 @@
                 <!-- Action Buttons -->
                 <div class="flex flex-wrap gap-3 border-t border-gray-200 pt-6">
                     <button
-                        class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                         type="submit"
                     >
                         @if (editMode) {
@@ -133,7 +133,7 @@
                     </button>
                     @if (!editMode) {
                         <button
-                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                             (click)="clearInputData()"
                             type="button"
                         >
@@ -142,14 +142,14 @@
                     }
                     @if (editMode) {
                         <button
-                            class="inline-flex items-center rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors duration-200 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                            class="inline-flex items-center rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors duration-200 hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
                             (click)="onClickDeleteTransfer()"
                             type="button"
                         >
                             Delete
                         </button>
                         <button
-                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                            class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                             (click)="onClickCancelEdit()"
                             type="button"
                         >
@@ -177,7 +177,7 @@
                     <h3 class="mb-2 text-sm font-medium text-gray-900">No items added yet</h3>
                     <p class="mb-6 text-sm text-gray-500">Add individual items with quantities and prices to create a detailed itemized transfer.</p>
                     <button
-                        class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                         (click)="openShoppingList()"
                         type="button"
                     >

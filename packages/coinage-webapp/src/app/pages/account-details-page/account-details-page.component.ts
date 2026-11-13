@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
@@ -7,6 +7,7 @@ import { NotificationService } from '../../services/notification.service';
     selector: 'app-account-details-page',
     templateUrl: './account-details-page.component.html',
     styleUrls: ['./account-details-page.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class AccountDetailsPage implements OnInit {

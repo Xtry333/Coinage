@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, OnInit, Output, ViewChild } from '@angular/core';
 import { faBars, faBell, faUser, faXmark } from '@fortawesome/free-solid-svg-icons';
 
 import { CurrentUserDataService } from '../../services/current-user.service';
@@ -8,6 +8,7 @@ import { DropdownMenuComponent } from '../dropdown-menu/dropdown-menu.component'
     selector: 'app-top-nav-bar',
     templateUrl: './top-nav-bar.component.html',
     styleUrls: ['./top-nav-bar.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class TopNavBarComponent implements OnInit {
@@ -35,7 +36,7 @@ export class TopNavBarComponent implements OnInit {
     public ngOnInit(): void {
         this.userDataService.userData$.subscribe((user) => {
             this.username = user['username'];
-            this.dateTime = new Date(user['date'] ?? 0).toLocaleString();
+            this.dateTime = user['date'] != null ? new Date(user['date']).toLocaleString() : new Date().toLocaleString();
             //console.log(user['date']);
         });
     }

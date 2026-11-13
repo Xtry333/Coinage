@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { AccountDTO, BulkEditTransferDTO, CategoryDTO, ContractorDTO, ReceiptDTO, ScheduleDTO } from '@app/interfaces';
 import * as Rx from 'rxjs';
 import { CoinageDataService } from '../../services/coinage.data-service';
@@ -8,6 +8,7 @@ import { NotificationService } from '../../services/notification.service';
     selector: 'app-bulk-edit-transfers-modal',
     templateUrl: './bulk-edit-transfers-modal.component.html',
     styleUrls: ['./bulk-edit-transfers-modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class BulkEditTransfersModalComponent implements OnInit {

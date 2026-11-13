@@ -9,6 +9,7 @@ import controllers from './controllers/_index';
 import daos from './daos/_index';
 import entities from './entities/_index';
 import { EventsGateway } from './events/events.gateway';
+import { getPostgresConnectionOptions } from './postgres-connection-options';
 import { ReceiptProcessingModule } from './receipt-processing/receipt-processing.module';
 import services from './services/_index';
 import { opts } from './typeorm.config';
@@ -22,12 +23,7 @@ import { opts } from './typeorm.config';
             inject: [ConfigService],
             useFactory: (config: ConfigService) => ({
                 ...opts,
-                type: 'mysql' as const,
-                host: config.get<string>('MYSQL_HOST') || 'localhost',
-                port: Number(config.get<string>('COINAGE_MYSQL_PORT')) || 3306,
-                username: config.get<string>('MYSQL_USER'),
-                password: config.get<string>('MYSQL_PASSWORD'),
-                database: config.get<string>('MYSQL_DATABASE'),
+                ...getPostgresConnectionOptions((name) => config.get<string>(name)),
             }),
         }),
         ScheduleModule.forRoot(),

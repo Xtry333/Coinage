@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageDataService } from '../services/coinage.data-service';
@@ -7,6 +7,7 @@ import { CoinageDataService } from '../services/coinage.data-service';
     selector: 'app-receipt-upload',
     templateUrl: './receipt-upload.component.html',
     styleUrls: ['./receipt-upload.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ReceiptUploadPageComponent {

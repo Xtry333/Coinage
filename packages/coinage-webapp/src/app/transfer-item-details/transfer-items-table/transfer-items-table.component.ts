@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 import { ItemDetailsDTO, TransferWithItemDetailsDTO } from '@app/interfaces';
 import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
@@ -22,6 +22,7 @@ export enum TableColumn {
     selector: 'app-transfer-items-table',
     templateUrl: './transfer-items-table.component.html',
     styleUrls: ['./transfer-items-table.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class TransferItemsTableComponent {

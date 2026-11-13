@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
 import { CategoryDTO } from '@app/interfaces';
@@ -9,6 +9,7 @@ import { SelectedTransferItemDetails } from '../item-details-for-transfer/item-d
     selector: 'app-selected-items',
     templateUrl: './selected-items.component.html',
     styleUrls: ['./selected-items.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class SelectedItemsComponent implements OnChanges {

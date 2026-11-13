@@ -36,7 +36,7 @@
                             <span>{{ transfer.description }}</span>
                             @if (transfer.isEthereal) {
                                 <button
-                                    class="inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    class="inline-flex items-center rounded-md border border-gray-300 bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                     (click)="onClickCommit()"
                                 >
                                     <fa-icon class="mr-1" [icon]="etherealIcon" title="Transfer has not been commited"></fa-icon>
@@ -102,7 +102,9 @@
                         <div class="flex items-start justify-between">
                             <dt class="w-1/3 text-sm font-medium text-gray-500">Accounting Date</dt>
                             <dd class="w-2/3 text-sm text-gray-900">
-                                <time [dateTime]="transfer.accountingDate?.toJSON()">{{ transfer.accountingDate | date | ifNull }}</time>
+                                <time [dateTime]="$safeNavigationMigration(transfer.accountingDate?.toJSON())">{{
+                                    transfer.accountingDate | date | ifNull
+                                }}</time>
                             </dd>
                         </div>
                     }
@@ -185,7 +187,7 @@
         <app-section class="mb-6">
             <div class="flex flex-wrap gap-3">
                 <button
-                    class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                     (click)="onClickEditMode()"
                 >
                     <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,7 +202,7 @@
                 </button>
                 @if (isSplittable) {
                     <button
-                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                         (click)="onToggleShowSplit()"
                     >
                         <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -211,7 +213,7 @@
                 }
                 @if (transfer.isRefundable) {
                     <button
-                        class="inline-flex items-center rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors duration-200 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2"
+                        class="inline-flex items-center rounded-md border border-red-300 bg-red-100 px-4 py-2 text-sm font-medium text-red-700 shadow-sm transition-colors duration-200 hover:bg-red-200 focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:outline-none"
                         (click)="onClickRefundTransfer()"
                         type="button"
                     >
@@ -222,7 +224,7 @@
                     </button>
                 }
                 <button
-                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm transition-colors duration-200 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                     (click)="onClickDuplicateTransfer()"
                     type="button"
                 >
@@ -246,7 +248,7 @@
                     <div>
                         <label class="mb-1 block text-sm font-medium text-gray-700" for="description">Description</label>
                         <input
-                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                             id="description"
                             [(ngModel)]="splitTransfer.description"
                             type="text"
@@ -256,7 +258,7 @@
                     <div>
                         <label class="mb-1 block text-sm font-medium text-gray-700" for="amount">Price</label>
                         <input
-                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                             id="amount"
                             [(ngModel)]="splitTransfer.amount"
                             [min]="0"
@@ -269,7 +271,7 @@
                     <div>
                         <label class="mb-1 block text-sm font-medium text-gray-700" for="category">Category</label>
                         <select
-                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                             id="category"
                             [(ngModel)]="splitTransfer.categoryId"
                             required
@@ -282,7 +284,7 @@
                 </div>
                 <div class="mt-4">
                     <button
-                        class="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2"
+                        class="inline-flex items-center rounded-md border border-transparent bg-green-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:ring-offset-2 focus:outline-none"
                         (click)="onClickSplitTransfer()"
                     >
                         <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

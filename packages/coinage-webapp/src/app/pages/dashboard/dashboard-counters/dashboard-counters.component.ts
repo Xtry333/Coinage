@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
 import { BalanceDTO } from '@app/interfaces';
 import { CoinageDataService } from '../../../services/coinage.data-service';
@@ -7,6 +7,7 @@ import { CoinageDataService } from '../../../services/coinage.data-service';
     selector: 'app-dashboard-counters',
     templateUrl: './dashboard-counters.component.html',
     styleUrls: ['./dashboard-counters.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class DashboardCountersComponent implements OnInit {

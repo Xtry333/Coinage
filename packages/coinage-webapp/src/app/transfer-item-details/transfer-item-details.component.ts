@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import * as Rx from 'rxjs';
 
@@ -14,6 +14,7 @@ import { NotificationService } from '../services/notification.service';
     selector: 'app-transfer-item-details',
     templateUrl: './transfer-item-details.component.html',
     styleUrls: ['./transfer-item-details.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class TransferItemDetailsComponent implements OnInit, OnDestroy {

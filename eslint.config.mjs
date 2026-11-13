@@ -2,6 +2,7 @@ import { fixupConfigRules, fixupPluginRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
 import nx from '@nx/eslint-plugin';
+import stylistic from '@stylistic/eslint-plugin';
 import _import from 'eslint-plugin-import';
 import { defineConfig, globalIgnores } from 'eslint/config';
 import globals from 'globals';
@@ -17,24 +18,27 @@ const compat = new FlatCompat({
 });
 
 export default defineConfig([
-    globalIgnores(['**/*']),
+    globalIgnores(['**/node_modules/**', '**/dist/**', '**/coverage/**', '**/.nx/**', '**/.angular/**']),
     {
+        files: ['**/*.{ts,tsx,js,jsx,mjs,cjs}'],
         extends: fixupConfigRules(compat.extends('plugin:import/recommended', 'plugin:import/typescript', 'prettier')),
 
         plugins: {
             '@nx': nx,
+            '@stylistic': stylistic,
             import: fixupPluginRules(_import),
         },
 
         settings: {
             'import/resolver': {
                 typescript: {
-                    project: './tsconfig.json',
+                    project: path.join(__dirname, 'tsconfig.base.json'),
                 },
             },
         },
 
         rules: {
+            '@stylistic/no-extra-semi': 'error',
             'import/no-unresolved': 'error',
 
             'import/order': [
@@ -77,16 +81,14 @@ export default defineConfig([
         extends: compat.extends('plugin:@nx/typescript'),
 
         rules: {
-            '@typescript-eslint/no-extra-semi': 'error',
             'no-extra-semi': 'off',
         },
     },
     {
-        files: ['**/*.js', '**/*.jsx'],
+        files: ['**/*.js', '**/*.jsx', '**/*.mjs', '**/*.cjs'],
         extends: compat.extends('plugin:@nx/javascript'),
 
         rules: {
-            '@typescript-eslint/no-extra-semi': 'error',
             'no-extra-semi': 'off',
         },
     },
@@ -106,6 +108,17 @@ export default defineConfig([
 
         rules: {
             '@typescript-eslint/explicit-member-accessibility': ['warn'],
+            // Keep pre-upgrade policy; these newly enabled preset rules require unrelated source refactors.
+            '@typescript-eslint/no-empty-function': 'off',
+            '@typescript-eslint/no-inferrable-types': 'off',
+            '@typescript-eslint/no-namespace': 'off',
+            '@typescript-eslint/no-unsafe-function-type': 'off',
+            '@typescript-eslint/no-wrapper-object-types': 'off',
         },
+    },
+    {
+        files: ['**/*.{ts,tsx,js,jsx,mjs,cjs}'],
+        // Newly enabled preset defaults, not rules explicitly selected by this workspace.
+        rules: { 'prefer-const': 'off', 'no-empty': 'off' },
     },
 ]);

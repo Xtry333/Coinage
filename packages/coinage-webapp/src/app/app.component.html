@@ -3,10 +3,7 @@
 
 <!-- Mobile overlay -->
 @if (isMobileView && isSidebarDisplayed) {
-    <div
-        class="fixed bottom-0 left-0 right-0 top-[3.75rem] z-30 bg-gray-900 bg-opacity-50 transition-opacity duration-300 md:hidden"
-        (click)="closeSidebar()"
-    ></div>
+    <div class="fixed top-[3.75rem] right-0 bottom-0 left-0 z-30 bg-gray-900/50 transition-opacity duration-300 md:hidden" (click)="closeSidebar()"></div>
 }
 
 <!-- Sidebar -->

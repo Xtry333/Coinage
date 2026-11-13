@@ -17,4 +17,4 @@ const jestConfig: JestConfigWithTsJest = {
     moduleFileExtensions: ['ts', 'js', 'html'],
 };
 
-export default jestConfig;
+module.exports = jestConfig;

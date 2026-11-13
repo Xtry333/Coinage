@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { Socket } from 'ngx-socket-io';
 
@@ -17,6 +17,7 @@ import { TransfersListComponent } from './transfers-list/transfers-list.componen
     selector: 'app-root',
     templateUrl: './app.component.html',
     styleUrls: ['./app.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class AppComponent implements OnInit, OnDestroy {

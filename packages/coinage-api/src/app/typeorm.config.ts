@@ -1,10 +1,11 @@
 import * as path from 'path';
 
 import { DataSource, Table } from 'typeorm';
-import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
 import entities from './entities/_index';
+import { getPostgresConnectionOptions } from './postgres-connection-options';
 
 export function loadMigrations(): (Function | string)[] {
     // Detect webpack context via __webpack_require__ (injected by webpack at build time).
@@ -23,10 +24,7 @@ export function loadMigrations(): (Function | string)[] {
             .flatMap((key: string) => (Object.values(ctx(key)) as Function[]).filter((v) => typeof v === 'function'));
     }
     // ts-node context (TypeORM CLI): return glob patterns for TypeORM to resolve
-    return [
-        path.join(__dirname, '../database/migrations/[0-9]*.ts'),
-        path.join(__dirname, '../database/migrations/[0-9]*.js'),
-    ];
+    return [path.join(__dirname, '../database/migrations/[0-9]*.ts'), path.join(__dirname, '../database/migrations/[0-9]*.js')];
 }
 
 export class CustomNamingStrategy extends SnakeNamingStrategy {
@@ -50,20 +48,15 @@ export class CustomNamingStrategy extends SnakeNamingStrategy {
     }
 }
 
-export const opts: MysqlConnectionOptions = {
-    type: 'mysql',
-    host: process.env.MYSQL_HOST || 'localhost',
-    port: Number(process.env.COINAGE_MYSQL_PORT) || 3306,
-    username: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE,
+export const opts: PostgresConnectionOptions = {
+    type: 'postgres',
+    ...getPostgresConnectionOptions(),
     synchronize: false,
     logging: false,
     migrationsRun: true,
     migrations: loadMigrations(),
     migrationsTransactionMode: 'each',
     entities: [...entities],
-    timezone: 'Z',
     namingStrategy: new CustomNamingStrategy(),
 };
 

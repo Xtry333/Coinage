@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 import { AccountDTO, ConfirmReceiptDTO, ConfirmReceiptItemDTO, NormalizedReceiptItemDTO, ReceiptAiResultDTO } from '@app/interfaces';
@@ -19,6 +19,7 @@ export interface ReviewItem extends NormalizedReceiptItemDTO {
     selector: 'app-receipt-ai-review',
     templateUrl: './receipt-ai-review.component.html',
     styleUrls: ['./receipt-ai-review.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
@@ -178,16 +179,14 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
             accountId: this.selectedAccountId,
             date: this.overrideDate,
             contractorId: this.aiData.normalized.contractorId,
-            items: this.items.map(
-                (item): ConfirmReceiptItemDTO => ({
-                    itemId: item.itemId,
-                    name: item.name,
-                    price: item.price,
-                    quantity: item.quantity,
-                    isNew: item.isNew,
-                    included: item.included,
-                }),
-            ),
+            items: this.items.map((item): ConfirmReceiptItemDTO => ({
+                itemId: item.itemId,
+                name: item.name,
+                price: item.price,
+                quantity: item.quantity,
+                isNew: item.isNew,
+                included: item.included,
+            })),
         };
 
         try {

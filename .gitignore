@@ -45,12 +45,23 @@ Thumbs.db
 
 # DB Files
 coinage-data.sql
+/backups/
+*.dump
+/data/
+docker/postgres-data/
 .docker-data/
 
 # Environment
 .env
+.env.production
 nx-cloud.env
 
 .nx/cache
 .nx/workspace-data
 uploads/*
+
+.claude/worktrees
+.claude/settings.local.json
+.nx/polygraph
+.nx/self-healing
+.nx/migrate-runs

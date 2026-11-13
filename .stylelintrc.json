@@ -2,7 +2,6 @@
     "extends": ["stylelint-config-standard-scss"],
     "plugins": ["stylelint-scss"],
     "rules": {
-        "scss/at-import-partial-extension-blacklist": null,
         "selector-pseudo-element-no-unknown": [
             true,
             {
@@ -12,7 +11,7 @@
         "scss/at-rule-no-unknown": [
             true,
             {
-                "ignoreAtRules": ["tailwind", "apply", "variants", "responsive", "screen"]
+                "ignoreAtRules": ["apply", "reference", "theme", "source", "plugin", "utility", "custom-variant", "variant"]
             }
         ],
         "no-invalid-position-at-import-rule": null,

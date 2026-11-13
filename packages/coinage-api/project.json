@@ -5,51 +5,31 @@
     "projectType": "application",
     "tags": [],
     "targets": {
-        "build": {
-            "executor": "@nx/webpack:webpack",
-            "outputs": ["{options.outputPath}"],
+        "typecheck": {
+            "executor": "nx:run-commands",
+            "cache": true,
             "options": {
-                "target": "node",
-                "compiler": "tsc",
-                "outputPath": "dist/packages/coinage-api",
-                "main": "packages/coinage-api/src/main.ts",
-                "tsConfig": "packages/coinage-api/tsconfig.app.json",
-                "assets": ["packages/coinage-api/src/assets"],
-                "webpackConfig": "packages/coinage-api/webpack.config.js"
-            },
+                "command": "tsc --project packages/coinage-api/tsconfig.app.json --noEmit"
+            }
+        },
+        "build": {
+            "defaultConfiguration": "production",
             "configurations": {
-                "production": {
-                    "optimization": true,
-                    "extractLicenses": true,
-                    "inspect": false,
-                    "fileReplacements": [
-                        {
-                            "replace": "packages/coinage-api/src/environments/environment.ts",
-                            "with": "packages/coinage-api/src/environments/environment.prod.ts"
-                        }
-                    ]
-                }
+                "development": { "env": { "NODE_ENV": "development" } },
+                "production": { "env": { "NODE_ENV": "production" } }
             }
         },
         "serve": {
             "executor": "@nx/js:node",
+            "continuous": true,
             "options": {
-                "buildTarget": "coinage-api:build"
+                "buildTarget": "coinage-api:build:development"
             },
             "configurations": {
                 "production": {
+                    "inspect": false,
                     "buildTarget": "coinage-api:build:production"
                 }
-            }
-        },
-        "lint": {
-            "executor": "@nx/eslint:lint"
-        },
-        "test": {
-            "executor": "@nx/jest:jest",
-            "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
-            "options": {
-                "jestConfig": "packages/coinage-api/jest.config.ts"
             }
         }
     }

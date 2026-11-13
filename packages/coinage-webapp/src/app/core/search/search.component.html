@@ -7,7 +7,7 @@
         </div>
 
         <input
-            class="block w-full rounded-lg border border-gray-300 bg-gray-50 py-2.5 pl-10 pr-10 text-sm text-gray-900 placeholder-gray-500 transition-colors duration-200 focus:border-blue-500 focus:bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+            class="block w-full rounded-lg border border-gray-300 bg-gray-50 py-2.5 pr-10 pl-10 text-sm text-gray-900 placeholder-gray-500 transition-colors duration-200 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-500/20 focus:outline-none"
             #searchInput
             [(ngModel)]="searchQuery"
             (input)="onSearchInput($event)"
@@ -36,7 +36,7 @@
     <!-- Search Results Dropdown -->
     @if (showResults) {
         <div
-            class="absolute left-0 right-0 top-full z-[9999] mt-1 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-xl ring-1 ring-black ring-opacity-5"
+            class="absolute top-full right-0 left-0 z-[9999] mt-1 max-h-96 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-xl ring-1 ring-black/5"
         >
             <!-- Loading State -->
             @if (isLoading) {
@@ -61,7 +61,7 @@
                 <!-- Items Section -->
                 @if (searchResults.items && searchResults.items.length > 0) {
                     <div class="p-2">
-                        <h3 class="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Items</h3>
+                        <h3 class="mb-2 px-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Items</h3>
                         @for (item of searchResults.items; track item.id) {
                             <button
                                 class="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
@@ -93,7 +93,7 @@
                         <hr class="border-gray-200" />
                     }
                     <div class="p-2">
-                        <h3 class="mb-2 px-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Transfers</h3>
+                        <h3 class="mb-2 px-2 text-xs font-semibold tracking-wide text-gray-500 uppercase">Transfers</h3>
                         @for (transfer of searchResults.transfers; track transfer.id) {
                             <button
                                 class="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"

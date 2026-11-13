@@ -19,7 +19,7 @@ import { TransferItem } from '../entities/TransferItem.entity';
 import { AuthGuard } from '../services/auth.guard';
 
 @UseGuards(AuthGuard)
-@Controller('item(s)?')
+@Controller(['item', 'items'])
 export class ItemsController {
     public constructor(
         private readonly itemDao: ItemDao,

@@ -1,8 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { Bit } from '../constants/booleanBuffer.const';
 import { Currency } from './Currency.entity';
 
-import { BooleanTransformer } from './transformers/boolean.transformer';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
 import { User } from './User.entity';
 
@@ -30,10 +28,10 @@ export class Account {
     @JoinColumn({ name: 'user_id' })
     public user!: User;
 
-    @Column({ type: 'bit', name: 'is_contractor_account', nullable: false, default: Bit.False, transformer: new BooleanTransformer() })
+    @Column({ type: 'boolean', name: 'is_contractor_account', nullable: false, default: false })
     public isContractorAccount!: boolean;
 
-    @Column({ type: 'bit', name: 'is_active', nullable: false, default: Bit.True, transformer: new BooleanTransformer() })
+    @Column({ type: 'boolean', name: 'is_active', nullable: false, default: true })
     public isActive!: boolean;
 
     @CreateDateColumn({ type: 'timestamp', nullable: false, transformer: new TimestampTransformer() })

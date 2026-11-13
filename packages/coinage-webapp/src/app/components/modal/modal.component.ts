@@ -1,10 +1,11 @@
-import { Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
     selector: 'app-modal',
     templateUrl: './modal.component.html',
     styleUrls: ['./modal.component.scss'],
+    changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })
 export class ModalComponent implements OnInit, OnChanges {
@@ -65,7 +66,7 @@ export class ModalComponent implements OnInit, OnChanges {
         }
     }
 
-    @HostListener('document:mouseup', ['$event'])
+    @HostListener('document:mouseup')
     public onMouseUp() {
         if (this.moveable) {
             this.isGrabbed = false;

@@ -195,18 +195,53 @@ describe('CategoriesController', () => {
     });
 
     describe('getTotalPerCategory', () => {
+        it.each([
+            ['/category/totalPerCategory/2026/11', undefined],
+            ['/category/totalPerCategory/2026/11/7', 7],
+        ])('routes %s with the Express 5 optional day syntax', async (path, day) => {
+            const totals = [{ categoryId: 1, total: 500 }];
+            categoryDao.getTotalByCategoryMonth.mockResolvedValue(totals);
+            const module = await Test.createTestingModule({
+                controllers: [CategoriesController],
+                providers: [
+                    { provide: CategoryDao, useValue: categoryDao },
+                    { provide: CategoryCascadeService, useValue: categoryCascadeService },
+                ],
+            })
+                .overrideGuard(AuthGuard)
+                .useValue({
+                    canActivate: (context: import('@nestjs/common').ExecutionContext) => {
+                        context.switchToHttp().getRequest().user = { id: 10 };
+                        return true;
+                    },
+                })
+                .compile();
+            const app = module.createNestApplication();
+
+            try {
+                await app.listen(0, '127.0.0.1');
+                const response = await fetch(`${await app.getUrl()}${path}`);
+
+                expect(response.status).toBe(200);
+                expect(await response.json()).toEqual(totals);
+                expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2026, 11, day, 10);
+            } finally {
+                await app.close();
+            }
+        });
+
         it('delegates to categoryDao.getTotalByCategoryMonth with parsed year and month', async () => {
             const totals = [{ categoryId: 1, total: 500 }] as any;
             categoryDao.getTotalByCategoryMonth.mockResolvedValue(totals);
 
-            const result = await controller.getTotalPerCategory('2024', '3', undefined as any);
+            const result = await controller.getTotalPerCategory('2024', '3', undefined as any, 10);
 
-            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, undefined);
+            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, undefined, 10);
             expect(result).toBe(totals);
         });
 
         it('returns empty array when year is not a valid number', async () => {
-            const result = await controller.getTotalPerCategory('invalid', '3', undefined as any);
+            const result = await controller.getTotalPerCategory('invalid', '3', undefined as any, 10);
 
             expect(categoryDao.getTotalByCategoryMonth).not.toHaveBeenCalled();
             expect(result).toEqual([]);
@@ -216,17 +251,17 @@ describe('CategoriesController', () => {
             const totals: any[] = [];
             categoryDao.getTotalByCategoryMonth.mockResolvedValue(totals);
 
-            await controller.getTotalPerCategory('2024', 'abc', undefined as any);
+            await controller.getTotalPerCategory('2024', 'abc', undefined as any, 10);
 
-            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, undefined, undefined);
+            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, undefined, undefined, 10);
         });
 
         it('passes day param when it is a valid number', async () => {
             categoryDao.getTotalByCategoryMonth.mockResolvedValue([]);
 
-            await controller.getTotalPerCategory('2024', '3', '15');
+            await controller.getTotalPerCategory('2024', '3', '15', 10);
 
-            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, 15);
+            expect(categoryDao.getTotalByCategoryMonth).toHaveBeenCalledWith(2024, 3, 15, 10);
         });
     });
 });
