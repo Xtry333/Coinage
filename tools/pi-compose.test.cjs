@@ -9,8 +9,6 @@ const { databaseImage } = require('./pi-bundle.cjs');
 
 const settings = {
     COMPOSE_PROJECT_NAME: 'coinage-pi-config-test',
-    COINAGE_REGISTRY_USER: 'Unused-UPPERCASE-namespace',
-    COINAGE_IMAGE_TAG: '',
     COINAGE_POSTGRES_DB: 'fixture-db',
     COINAGE_POSTGRES_USER: 'fixture-user',
     COINAGE_POSTGRES_PASSWORD: 'fixture-db-secret',

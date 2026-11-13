@@ -35,7 +35,6 @@ test('Pi plan always builds ARM64 local latest images and includes PostgreSQL wi
         assert.ok(!command.includes('--push'));
         assert.ok(!command.includes('--build-arg'));
         assert.ok(!command.includes('--secret'));
-        assert.ok(!command.join(' ').includes('ghcr.io'));
     }
     assert.deepEqual(plan.commands[2], ['pull', '--platform', 'linux/arm64', 'postgres:18.6-alpine']);
     assert.deepEqual(plan.commands[3], ['image', 'save', '--platform', 'linux/arm64', '--output', 'folder with spaces/images.tar', ...imageNames]);

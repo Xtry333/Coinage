@@ -86,7 +86,7 @@ Stop `corepack yarn dev` with Ctrl+C, then stop PostgreSQL without deleting its 
   docker compose -p coinage-postgres-dev -f docker-compose.dev.yml down
 ```
 
-PostgreSQL data remains in `data/pg/` after stopping. Back it up before manually removing it to reset the database. The image-based stack remains available with `corepack yarn build` followed by `corepack yarn docker:up`. Local, dev, production, and Pi Compose files now use the same paths; do not run multiple database containers against the same `data/pg/` concurrently.
+PostgreSQL data remains in `data/pg/` after stopping. Back it up before manually removing it to reset the database. The image-based stack remains available with `corepack yarn build` followed by `corepack yarn docker:up`. Local, dev, and Pi Compose files use the same paths; do not run multiple database containers against the same `data/pg/` concurrently.
 
 ## Docker builds and Raspberry Pi deployment
 
@@ -102,7 +102,11 @@ Docker targets depend on the corresponding Nx production builds. A build failure
 
 The API build emits a production `package.json` and pruned `yarn.lock`. Its multi-stage Dockerfile installs those dependencies on the target Linux architecture, then copies them into a slim runtime image. Host `node_modules`, frontend tooling, and the dependency-install stage are not shipped as part of the runtime. The web image serves the compiled Angular files through nginx. The Dockerfiles package prebuilt artifacts; use the Yarn/Nx targets rather than building Dockerfiles against an old `dist/` directory.
 
-### Build a transfer bundle for your Pi (no registry or release tags)
+Local builds load only `coinage-api:latest` and `coinage-webapp:latest`, matching `docker-compose.yml`. `yarn docker:buildx` builds/loads ARM64 images locally; individual image variants are `yarn docker:buildx-api` and `yarn docker:buildx-webapp`. Cross-building ARM64 on an AMD64 machine requires emulation or a native ARM64 builder. `yarn build:docker --dry-run` still runs the Nx app builds, but only prints Docker commands without building images.
+
+Regression tests run with `yarn nx test coinage-tools`. `yarn test:docker` additionally validates local, development, and Pi Compose configuration, secret requirements, and storage paths using the Docker CLI (no daemon or containers required).
+
+### Build a transfer bundle for your Pi
 
 Run one command on the PC:
 
@@ -129,7 +133,7 @@ On the Pi, run from the deployment folder:
 sh start.sh
 ```
 
-The script validates the transfer and existing `.env`, imports `images.tar`, and runs Compose with local images only. It recreates the containers so the latest images and runtime settings are used; it does not delete persistent storage or overwrite `.env`. Docker's fixed `latest` name is used for both apps: **there is no tag/version argument to provide**, no GHCR login, and no registry environment variable needed. The bundle does not read/copy the build machine's env files; secrets enter the containers only from the target `.env` at runtime. Other API settings in that file (including receipt AI configuration) are reused too.
+The script validates the transfer and existing `.env`, imports `images.tar`, and runs Compose with local images only. It recreates the containers so the latest images and runtime settings are used; it does not delete persistent storage or overwrite `.env`. Docker's fixed `latest` name is used for both apps: **there is no tag/version argument to provide**. The bundle does not read/copy the build machine's env files; secrets enter the containers only from the target `.env` at runtime. Other API settings in that file (including receipt AI configuration) are reused too.
 
 Compose cannot load archives itself. If you prefer to run Compose directly, first run `docker load --input images.tar`, then `docker compose up -d --no-build --pull never --force-recreate`. The shipped `compose.yaml` is discovered automatically, reads `.env`, and never attempts to build or pull images. `start.sh` also checks `SHA256SUMS` before importing.
 
@@ -137,51 +141,7 @@ The target `.env` must contain `COINAGE_POSTGRES_PASSWORD`, `COINAGE_API_JWT_SEC
 
 Prerequisites on the PC: Docker with Buildx and ARM64 build support, and Docker 28+ for platform-specific image export. The Pi needs a 64-bit OS, Docker with Compose, and `sha256sum`—no Node.js or Yarn. `yarn build:pi --dry-run` runs the app builds but only prints the Docker/export plan. The bundle command overwrites only its own generated files and refuses an output folder containing unexpected files such as `.env` or user data.
 
-### Publish a release from your PC or CI (optional registry mode)
-
-Use a new release/commit tag for each deployment, and authenticate to GHCR with permission to push packages:
-
-```bash
-docker login ghcr.io -u xtry333
-yarn docker:publish --tag 2026.11.10-1
-```
-
-Publishing defaults to `linux/arm64` for a **64-bit Raspberry Pi OS**. It builds fresh production app artifacts, then builds and pushes both `ghcr.io/xtry333/coinage-api:2026.11.10-1` and `ghcr.io/xtry333/coinage-webapp:2026.11.10-1`. It never pushes an unrelated native-platform image from your local Docker store. Do not deploy the tag until both images have published successfully.
-
-Set `COINAGE_REGISTRY_USER` in the shell/CI environment to use another **lowercase** GitHub username or organization. `COINAGE_IMAGE_TAG` is an alternative to `--tag`; CLI arguments take precedence. Publishing requires a tag and rejects `latest`/`dev`. Build commands do not load production secrets or `.env.production`.
-
-```bash
-yarn docker:publish --tag 2026.11.10-1 --platform "linux/arm64,linux/amd64"
-yarn docker:publish --tag 2026.11.10-1 --dry-run
-yarn docker:buildx --tag arm64-test
-```
-
-Multi-platform publishing is optional and requires a Buildx builder that supports the requested platforms. Cross-building ARM64 on an AMD64 machine requires emulation or a native ARM64 builder. `--dry-run` still runs the Nx app builds, but only prints Docker commands: it does not build or push images. `docker:buildx` builds/loads ARM64 images locally without publishing. Local builds also tag `coinage-api:latest` and `coinage-webapp:latest` for `docker-compose.yml`; their registry-qualified tag defaults to `dev`.
-
-The existing `docker:push`, `docker:buildx-push`, and individual image build/push scripts remain aliases for the same guarded Nx workflow. Push aliases now **build and publish**, rather than pushing an arbitrary existing image. Regression tests run with `yarn nx test coinage-tools`. `yarn test:docker` additionally validates production Compose configuration, secret requirements, and storage paths using the Docker CLI (no daemon or containers required).
-
-### Deploy from the registry without a checkout (optional registry mode)
-
-The Pi only needs Docker with the Compose plugin, `docker-compose.prod.yml`, a private env file, and persistent data directories. No Node.js, Yarn, Nx, source code, or Dockerfiles are required there.
-
-1. Copy `docker-compose.prod.yml` and `.env.production.example` into a deployment directory.
-2. Copy the example to `.env.production` and fill in the release tag, a strong database password, a random JWT secret, and a unique initial admin password. For example, generate the JWT secret with `openssl rand -hex 32`. Restrict the env file to its owner (`chmod 600 .env.production`). This file is Git-ignored; never put real secrets in the example.
-3. If the GHCR packages are private, run `docker login ghcr.io` on the Pi with permission to read them.
-4. Validate, pull, and start the stack from that directory:
-
-```bash
-docker compose --env-file .env.production -f docker-compose.prod.yml config --quiet
-docker compose --env-file .env.production -f docker-compose.prod.yml pull
-docker compose --env-file .env.production -f docker-compose.prod.yml up -d --no-build
-```
-
-Compose does **not** automatically load `.env.production`; always pass `--env-file`. The equivalent checkout-only shortcuts are `yarn docker:prod:pull`, `yarn docker:prod:up`, and `yarn docker:prod:down`. Missing/empty release tags or required secrets stop Compose before deployment.
-
-Only nginx's web port is published (4200 by default). PostgreSQL and the API stay on the internal Compose network; API and WebSocket requests go through nginx. Use `docker compose --env-file .env.production -f docker-compose.prod.yml exec coinage-db psql -U postgres -d coinage-db` for database maintenance, adjusting the database/user to your configuration. Add HTTPS at a reverse proxy before exposing the app publicly.
-
-Production PostgreSQL storage is `data/pg/`; receipt uploads persist at `data/uploads/`. Keep the deployment directory and `COMPOSE_PROJECT_NAME` stable between updates, and back up **both** the database and uploads. **Before upgrading an older layout**, stop the old stack and migrate `docker/postgres-data/` (or `.docker-data/postgres18/` for local/dev) to `data/pg/`, and `.docker-data/uploads/` to `data/uploads/`. See the [safe migration procedure](docker/pi-README.md#one-time-storage-migration); Compose alone does not migrate data or check legacy directories. Restore a dump when moving data between installations. If an older production API contains uploads only inside its container, copy `/app/api/uploads` out **before** replacing that container and place the files in `data/uploads/`.
-
-To update, back up data, publish a new tag, change `COINAGE_IMAGE_TAG` in the Pi's env file, and repeat pull/up. Do not delete persistent directories or run `down -v` as an update step. The API runs database migrations on startup; selecting an older image tag does not undo migrations, so database rollback may require a compatible backup. Changing `COINAGE_POSTGRES_PASSWORD` does not change an existing PostgreSQL role's password, and changing bootstrap admin settings does not reset an already-created application account.
+Use a strong database password, a random JWT secret (for example, `openssl rand -hex 32`), and a unique initial admin password in the Pi's `.env`. Restrict it to its owner with `chmod 600 .env`. Add HTTPS at a reverse proxy before exposing the app publicly, and restrict access to the published PostgreSQL port.
 
 ## Development server
 

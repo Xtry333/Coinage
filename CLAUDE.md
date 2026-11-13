@@ -56,6 +56,8 @@ Use these when trying to build for production deployment (slow process and runni
 - `yarn docker:up` - Start docker-compose services
 - `yarn docker:down` - Stop docker-compose services
 
+Docker build scripts load only local `coinage-api:latest` and `coinage-webapp:latest` images; there is no application-image publishing or registry deployment workflow. For Pi deployment, run `yarn build:pi`, transfer the five files from `dist/coinage-pi/`, and run `sh start.sh` on the Pi. Runtime settings come from the target folder's existing `.env`.
+
 ## Architecture
 
 ### Monorepo Structure

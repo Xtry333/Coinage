@@ -13,7 +13,7 @@ No Node.js, Yarn, source checkout, registry login, or internet access is needed 
 sh start.sh
 ```
 
-This validates the transfer and `.env`, loads the API, webapp, and PostgreSQL ARM64 images, then runs Compose. Containers are recreated, but the persistent data directories are retained. The two app images always use `latest`; there are no release tags to select or change. Existing `COINAGE_IMAGE_TAG`/registry settings in `.env` are not used to select images.
+This validates the transfer and `.env`, loads the API, webapp, and PostgreSQL ARM64 images, then runs Compose. Containers are recreated, but the persistent data directories are retained. The two app images always use `latest`; there are no release tags to select or change.
 
 If Docker requires elevated permissions, run `sudo sh start.sh`. The script does not overwrite `.env`, source it as shell code, print its contents, or pass secrets as command-line arguments. Protect it with `chmod 600 .env`.
 
@@ -44,8 +44,8 @@ docker compose up -d --no-build --pull never --force-recreate
 Before the first start with this layout:
 
 1. Record the old containers' mount sources with `docker inspect`. Stop receipt writes (stop the API), back up the running database with `pg_dump`, and copy receipt uploads to a safe location **outside the deployment folder**. If uploads exist only inside an old API container, copy `/app/api/uploads` out before removing it.
-2. Stop the **old** stack using its existing Compose file, project name, and env file. For an older bundle, run `docker compose down` from its deployment folder. For registry deployments, use `docker compose --env-file .env.production -f docker-compose.prod.yml down`. Do not use `-v`. Never move a running PostgreSQL data directory.
-3. On the **same device**, move the existing PostgreSQL 18 directory and uploads to the new locations. For the former Pi/production layout, with both old directories present and neither destination present:
+2. Stop the **old** stack using its existing Compose file, project name, and env file. For an older bundle, run `docker compose down` from its deployment folder. Do not use `-v`. Never move a running PostgreSQL data directory.
+3. On the **same device**, move the existing PostgreSQL 18 directory and uploads to the new locations. For the former Pi layout, with both old directories present and neither destination present:
 
    ```sh
    mkdir -p data

@@ -20,8 +20,8 @@ Coinage currently runs on MySQL (Community Server). The goal of this ticket is t
 | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | ORM / Driver   | TypeORM `0.3.20`, `@nestjs/typeorm` `10.0.2`, `mysql2` `3.11.0`                                                                                                                                                                                         |
 | TypeORM config | `packages/coinage-api/src/app/typeorm.config.ts` — `type: 'mysql'`, host `MYSQL_HOST`, port `COINAGE_MYSQL_PORT` (default 3306)                                                                                                                         |
-| Docker         | `docker-compose.yml` / `docker-compose.prod.yml` — service `coinage-db` uses `image: mysql`, port 3306, healthcheck via `mysqladmin ping`                                                                                                               |
-| Env vars       | `.env.template`, `.env.production` — `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `COINAGE_MYSQL_PORT`                                                                                                                      |
+| Docker         | `docker-compose.yml` — service `coinage-db` uses `image: mysql`, port 3306, healthcheck via `mysqladmin ping`                                                                                                               |
+| Env vars       | `.env.template` — `MYSQL_DATABASE`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_ROOT_PASSWORD`, `COINAGE_MYSQL_PORT`                                                                                                                      |
 | Schema dump    | `coinage.sql` — MySQL 8.0.23 syntax (`ENGINE=InnoDB`, `COLLATE utf8mb4_0900_ai_ci`, `AUTO_INCREMENT`, backticks)                                                                                                                                        |
 | Migrations     | Raw MySQL SQL in `packages/coinage-api/src/database/migrations/` (e.g. `1000000000000-CreateTables.ts`) using `AUTO_INCREMENT`, `ENGINE=InnoDB`, `COLLATE`, `BIT(1)`, `ENUM(...)`, `json_object()`, `ON UPDATE CURRENT_TIMESTAMP`, backtick identifiers |
 | Entities       | MySQL-specific column types: `type: 'bit'` (Account, Contractor, Transfer, User), `type: 'enum'` (Category, Receipt, Schedule, Transfer), `type: 'json'` with `default: 'json_object()'` (Transfer.metadata), `Bit` constant (`b'0'` / `b'1'`)          |
@@ -48,7 +48,7 @@ Coinage currently runs on MySQL (Community Server). The goal of this ticket is t
 - Default port 3306 → 5432
 - Review `timezone: 'Z'` (keep, valid for Postgres)
 
-### 2. `docker-compose.yml` and `docker-compose.prod.yml`
+### 2. `docker-compose.yml`
 
 - `coinage-db` image `mysql` → `postgres:<version>`
 - Env: `MYSQL_ROOT_PASSWORD` → `POSTGRES_PASSWORD`, `MYSQL_DATABASE` → `POSTGRES_DB`, `MYSQL_USER` → `POSTGRES_USER`, `MYSQL_PASSWORD` → `POSTGRES_PASSWORD`
@@ -60,7 +60,6 @@ Coinage currently runs on MySQL (Community Server). The goal of this ticket is t
 ### 3. Environment files
 
 - `.env.template`: replace `MYSQL_*` / `COINAGE_MYSQL_PORT` with `PG_*` / `COINAGE_COINAGE_POSTGRES_PORT`
-- `.env.production`: same replacement
 
 ### 4. Entities (`packages/coinage-api/src/app/entities/`)
 
@@ -195,8 +194,8 @@ Given there are 18 existing MySQL-specific migrations (going back to 2022) that 
 ## Migration Path (suggested order)
 
 1. Add `pg`-based TypeORM config branch in `typeorm.config.ts` (keep `mysql` behind a flag/env for rollback).
-2. Update `docker-compose.yml` + `docker-compose.prod.yml` to use `postgres` image and `POSTGRES_*` env vars.
-3. Update `.env.template` and `.env.production`.
+2. Update `docker-compose.yml` to use `postgres` image and `POSTGRES_*` env vars.
+3. Update `.env.template`.
 4. Rewrite entities (`bit` → `boolean`, `json` default, enum audit).
 5. Rewrite all raw-SQL migrations to Postgres syntax.
 6. Remove/archive `coinage.sql` MySQL dump or regenerate.
@@ -213,8 +212,7 @@ Given there are 18 existing MySQL-specific migrations (going back to 2022) that 
 - [ ] Baseline migration applies cleanly against a **fresh** (empty) Postgres database via `yarn migration:run`.
 - [ ] API test suite (`nx test coinage-api`) passes against Postgres.
 - [ ] Decision log recorded: baseline migration is treated as irreversible (destructive `down()`); MySQL dump (`coinage.sql`) retained as rollback artifact.
-- [ ] `.env.template` / `.env.production` use Postgres variable names (no `MYSQL_*`).
-- [ ] `docker-compose.prod.yml` deploys Postgres instead of MySQL.
+- [ ] `.env.template` uses Postgres variable names (no `MYSQL_*`).
 - [ ] `coinage.sql` no longer contains MySQL-only syntax (or is archived/regenerated).
 
 ## Related

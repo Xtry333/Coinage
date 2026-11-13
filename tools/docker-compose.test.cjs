@@ -5,62 +5,8 @@ const os = require('node:os');
 const path = require('node:path');
 const { test } = require('node:test');
 
-const productionEnvironment = {
-    COMPOSE_PROJECT_NAME: 'coinage-config-test',
-    COINAGE_REGISTRY_USER: 'xtry333',
-    COINAGE_IMAGE_TAG: 'test-release',
-    COINAGE_WEBAPP_PORT: '4200',
-    COINAGE_POSTGRES_DB: 'test-db',
-    COINAGE_POSTGRES_USER: 'test-user',
-    COINAGE_POSTGRES_PASSWORD: 'fixture-only-db-password',
-    COINAGE_API_JWT_SECRET: 'fixture-only-jwt-secret',
-    COINAGE_ADMIN_USERNAME: 'test-admin',
-    COINAGE_ADMIN_PASSWORD: 'fixture-only-admin-password',
-};
-
-function composeConfig(overrides = {}) {
-    // `config` only resolves configuration: no daemon, containers, volumes or real secrets.
-    const result = spawnSync('docker', ['compose', '--env-file', '.env.production.example', '-f', 'docker-compose.prod.yml', 'config', '--format', 'json'], {
-        cwd: path.resolve(__dirname, '..'),
-        env: { ...process.env, ...productionEnvironment, ...overrides },
-        encoding: 'utf8',
-    });
-    if (result.error) throw result.error;
-    return result;
-}
-
-test('production uses matching release images and publishes only the web port', () => {
-    const result = composeConfig();
-    assert.equal(result.status, 0, result.stderr);
-    const { services } = JSON.parse(result.stdout);
-    assert.equal(services['coinage-api'].image, 'ghcr.io/xtry333/coinage-api:test-release');
-    assert.equal(services['coinage-webapp'].image, 'ghcr.io/xtry333/coinage-webapp:test-release');
-    assert.equal(services['coinage-db'].ports, undefined);
-    assert.equal(services['coinage-api'].ports, undefined);
-    assert.equal(services['coinage-webapp'].ports.length, 1);
-    assert.equal(services['coinage-api'].environment.NODE_ENV, 'production');
-    assert.equal(services['coinage-api'].environment.COINAGE_POSTGRES_HOST, 'coinage-db');
-    assert.equal(services['coinage-api'].environment.COINAGE_POSTGRES_PORT, '5432');
-    assert.equal(services['coinage-db'].environment.POSTGRES_PASSWORD, productionEnvironment.COINAGE_POSTGRES_PASSWORD);
-    assert.equal(services['coinage-api'].environment.COINAGE_POSTGRES_PASSWORD, productionEnvironment.COINAGE_POSTGRES_PASSWORD);
-});
-
-test('production persists PostgreSQL and uploads under data/', () => {
-    const result = composeConfig();
-    assert.equal(result.status, 0, result.stderr);
-    const { services } = JSON.parse(result.stdout);
-    const [uploads] = services['coinage-api'].volumes;
-    assert.equal(uploads.type, 'bind');
-    assert.equal(uploads.target, '/app/api/uploads');
-    assert.equal(uploads.source, path.resolve(__dirname, '../data/uploads'));
-    const [database] = services['coinage-db'].volumes;
-    assert.equal(database.target, '/var/lib/postgresql');
-    assert.equal(database.source, path.resolve(__dirname, '../data/pg'));
-    assert.match(services['coinage-db'].healthcheck.test[1], /POSTGRES_DB/);
-});
-
 for (const filename of ['docker-compose.yml', 'docker-compose.dev.yml']) {
-    test(`${filename} uses the same data/ layout as Pi and production`, (t) => {
+    test(`${filename} uses the same data/ layout as the Pi bundle`, (t) => {
         const parent = path.join(os.tmpdir(), 'opencode');
         fs.mkdirSync(parent, { recursive: true });
         const root = fs.mkdtempSync(path.join(parent, 'coinage-local-compose-test-'));
@@ -68,6 +14,7 @@ for (const filename of ['docker-compose.yml', 'docker-compose.dev.yml']) {
         fs.copyFileSync(path.join(__dirname, '..', filename), path.join(root, 'compose.yaml'));
         fs.writeFileSync(path.join(root, '.env'), 'COINAGE_POSTGRES_PASSWORD=fixture-only\n');
         const environment = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(PG_|COINAGE_|COMPOSE_)/.test(key)));
+        // `config` only resolves configuration: no daemon, containers, volumes or real secrets.
         const result = spawnSync('docker', ['compose', 'config', '--format', 'json'], { cwd: root, env: environment, encoding: 'utf8' });
         if (result.error) throw result.error;
         assert.equal(result.status, 0, result.stderr);
@@ -82,13 +29,5 @@ for (const filename of ['docker-compose.yml', 'docker-compose.dev.yml']) {
             assert.equal(uploads.source, path.join(root, 'data', 'uploads'));
             assert.equal(uploads.target, '/app/api/uploads');
         }
-    });
-}
-
-for (const key of ['COINAGE_IMAGE_TAG', 'COINAGE_POSTGRES_PASSWORD', 'COINAGE_API_JWT_SECRET', 'COINAGE_ADMIN_USERNAME', 'COINAGE_ADMIN_PASSWORD']) {
-    test(`production refuses an empty ${key} instead of using an insecure default`, () => {
-        const result = composeConfig({ [key]: '' });
-        assert.notEqual(result.status, 0);
-        assert.match(result.stderr, new RegExp(key));
     });
 }

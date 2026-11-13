@@ -13,6 +13,7 @@
 | Script              | Description                            |
 | ------------------- | -------------------------------------- |
 | `yarn build`        | Build API, webapp, and Docker images   |
+| `yarn build:pi`     | Build the offline ARM64 Pi bundle in `dist/coinage-pi/` |
 | `yarn build:api`    | Build NestJS API for production        |
 | `yarn build:webapp` | Build Angular webapp for production    |
 | `yarn build:docker` | Build Docker images for API and webapp |
@@ -21,21 +22,13 @@
 
 | Script                     | Description                                               |
 | -------------------------- | --------------------------------------------------------- |
-| `yarn docker:build-api`    | Build API Docker image locally (x86)                      |
-| `yarn docker:build-webapp` | Build webapp Docker image locally (x86)                   |
+| `yarn docker:build-api`    | Build and load the native-platform API image locally      |
+| `yarn docker:build-webapp` | Build and load the native-platform webapp image locally   |
 | `yarn docker:up`           | Start the image-based stack via Compose                   |
 | `yarn docker:down`         | Stop all containers                                       |
 | `yarn docker:dev`          | Start the Docker PostgreSQL service for local development |
 | `yarn docker:dev:logs`     | Follow Docker PostgreSQL logs                             |
 | `yarn docker:dev:down`     | Stop the Docker PostgreSQL service                        |
-
-## Docker (Push to Registry)
-
-| Script                    | Description                                               |
-| ------------------------- | --------------------------------------------------------- |
-| `yarn docker:push`        | Push local images to ghcr.io (requires `npm_config_user`) |
-| `yarn docker:push-api`    | Push API image to ghcr.io                                 |
-| `yarn docker:push-webapp` | Push webapp image to ghcr.io                              |
 
 ## Docker (ARM64 for Raspberry Pi)
 
@@ -44,7 +37,8 @@
 | `yarn docker:buildx`        | Build ARM64 images locally for Raspberry Pi                         |
 | `yarn docker:buildx-api`    | Build API image for ARM64                                           |
 | `yarn docker:buildx-webapp` | Build webapp image for ARM64                                        |
-| `yarn docker:buildx-push`   | Build and push ARM64 images to ghcr.io (requires `npm_config_user`) |
+
+All Docker build scripts load local `coinage-api:latest` / `coinage-webapp:latest` images; they never publish application images. Deploy to the Pi by transferring the `yarn build:pi` bundle and running its `sh start.sh`.
 
 ## Testing
 
