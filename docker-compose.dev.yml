@@ -1,4 +1,4 @@
-name: coinage-postgres-dev
+name: coinage-app
 
 services:
     coinage-db:
@@ -9,7 +9,7 @@ services:
             POSTGRES_USER: ${PG_USER:-postgres}
             POSTGRES_PASSWORD: ${PG_PASSWORD:-password}
         ports:
-            - '127.0.0.1:${PG_PORT:-5432}:5432'
+            - '${PG_PORT:-5432}:5432'
         volumes:
             - ./data/pg:/var/lib/postgresql
         healthcheck:
