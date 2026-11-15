@@ -3,6 +3,10 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { BigCounterComponent } from './big-counter.component';
 
+function formattedValue(value: number): string {
+    return new Intl.NumberFormat(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+}
+
 describe('BigCounterComponent', () => {
     let component: BigCounterComponent;
     let fixture: ComponentFixture<BigCounterComponent>;
@@ -18,6 +22,8 @@ describe('BigCounterComponent', () => {
     beforeEach(() => {
         originalRAF = window.requestAnimationFrame;
         originalCAF = window.cancelAnimationFrame;
+        window.requestAnimationFrame = jest.fn().mockReturnValue(1);
+        window.cancelAnimationFrame = jest.fn();
 
         fixture = TestBed.createComponent(BigCounterComponent);
         component = fixture.componentInstance;
@@ -28,6 +34,7 @@ describe('BigCounterComponent', () => {
         component.ngOnDestroy();
         window.requestAnimationFrame = originalRAF;
         window.cancelAnimationFrame = originalCAF;
+        jest.restoreAllMocks();
     });
 
     it('should create', () => {
@@ -49,12 +56,13 @@ describe('BigCounterComponent', () => {
         expect(rafSpy).toHaveBeenCalled();
     });
 
-    it('should set displayValue immediately on first change with zero value', () => {
+    it('should schedule animation on first change with zero value', () => {
         component.ngOnChanges({
             value: new SimpleChange(undefined, 0, true),
         });
 
         expect(component.displayValue).toBe('0.00');
+        expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
     });
 
     it('should set displayValue immediately when animate is false', () => {
@@ -66,6 +74,21 @@ describe('BigCounterComponent', () => {
 
         expect(component.displayValue).toContain('999');
         expect(component.displayValue).toContain('99');
+    });
+
+    it('should cancel a running animation when a new value disables animation', () => {
+        component.ngOnChanges({
+            value: new SimpleChange(0, 1000, true),
+        });
+
+        component.animate = false;
+        component.ngOnChanges({
+            value: new SimpleChange(1000, 250, false),
+        });
+
+        expect(window.cancelAnimationFrame).toHaveBeenCalledWith(1);
+        expect(window.requestAnimationFrame).toHaveBeenCalledTimes(1);
+        expect(component.displayValue).toBe(formattedValue(250));
     });
 
     it('should ignore changes that do not include value', () => {
@@ -93,12 +116,12 @@ describe('BigCounterComponent', () => {
         window.cancelAnimationFrame = cancelSpy;
         window.requestAnimationFrame = jest.fn().mockReturnValue(42);
 
-        // First change (no animation)
+        // First change starts animation.
         component.ngOnChanges({
             value: new SimpleChange(undefined, 100, true),
         });
 
-        // Second change starts animation
+        // Second change replaces the animation.
         component.ngOnChanges({
             value: new SimpleChange(100, 200, false),
         });
@@ -153,12 +176,13 @@ describe('BigCounterComponent', () => {
             value: new SimpleChange(undefined, 0, true),
         });
 
-        expect(component.displayValue).toBe('0.00');
+        expect(component.displayValue).toBe(formattedValue(0));
     });
 
     describe('tick animation', () => {
         let rafCallback: FrameRequestCallback;
         let rafSpy: jest.Mock;
+        let nowSpy: jest.SpyInstance;
 
         beforeEach(() => {
             rafSpy = jest.fn().mockImplementation((cb: FrameRequestCallback) => {
@@ -167,11 +191,14 @@ describe('BigCounterComponent', () => {
             });
             window.requestAnimationFrame = rafSpy;
             window.cancelAnimationFrame = jest.fn();
+            nowSpy = jest.spyOn(performance, 'now').mockReturnValue(1000);
 
             // Set initial value without animation
+            component.animate = false;
             component.ngOnChanges({
                 value: new SimpleChange(undefined, 0, true),
             });
+            component.animate = true;
         });
 
         it('should interpolate value during animation', () => {
@@ -182,11 +209,10 @@ describe('BigCounterComponent', () => {
             // Simulate frames: first sets animationStart, second is at midpoint
             const startTime = 1000;
             rafCallback(startTime);
-            rafCallback(startTime + 250); // 50% progress
+            rafCallback(startTime + 500); // 50% of the 1000ms duration
 
-            // At 50% progress with cubic ease-out: 1 - (1-0.5)^3 = 0.875
-            // Expected value: 0 + 1000 * 0.875 = 875
-            expect(component.displayValue).toContain('875');
+            // Quartic ease-out: 1 - (1 - 0.5)^4 = 0.9375.
+            expect(component.displayValue).toBe(formattedValue(937.5));
         });
 
         it('should reach exact target value at animation end', () => {
@@ -196,11 +222,9 @@ describe('BigCounterComponent', () => {
 
             const startTime = 1000;
             rafCallback(startTime);
-            rafCallback(startTime + 500); // 100% progress
+            rafCallback(startTime + 1000); // 100% progress
 
-            expect(component.displayValue).toContain('1');
-            expect(component.displayValue).toContain('000');
-            expect(component.displayValue).toContain('00');
+            expect(component.displayValue).toBe(formattedValue(1000));
         });
 
         it('should request next frame when animation is not complete', () => {
@@ -212,7 +236,7 @@ describe('BigCounterComponent', () => {
 
             const startTime = 1000;
             rafCallback(startTime);
-            rafCallback(startTime + 100); // 20% through, not done
+            rafCallback(startTime + 100); // 10% through, not done
 
             expect(rafSpy.mock.calls.length).toBeGreaterThan(callCountBefore);
         });
@@ -226,7 +250,7 @@ describe('BigCounterComponent', () => {
             rafCallback(startTime);
 
             const callCountBefore = rafSpy.mock.calls.length;
-            rafCallback(startTime + 600); // past duration
+            rafCallback(startTime + 1100); // past duration
 
             expect(rafSpy.mock.calls.length).toBe(callCountBefore);
         });
@@ -238,7 +262,9 @@ describe('BigCounterComponent', () => {
 
             const startTime = 1000;
             rafCallback(startTime);
-            rafCallback(startTime + 250); // partial progress, value ~875
+            rafCallback(startTime + 500); // partial progress, value 937.5
+            nowSpy.mockReturnValue(startTime + 500);
+            expect(component.displayValue).toBe(formattedValue(937.5));
 
             // Change target while animating
             component.ngOnChanges({
@@ -247,9 +273,12 @@ describe('BigCounterComponent', () => {
 
             const newStart = 2000;
             rafCallback(newStart);
-            rafCallback(newStart + 500); // complete new animation
+            expect(component.displayValue).toBe(formattedValue(937.5));
+            rafCallback(newStart + 500);
+            expect(component.displayValue).toBe(formattedValue(58.59375));
+            rafCallback(newStart + 1000); // complete new animation
 
-            expect(component.displayValue).toBe('0.00');
+            expect(component.displayValue).toBe(formattedValue(0));
         });
     });
 
@@ -257,15 +286,14 @@ describe('BigCounterComponent', () => {
         it('should render labels and value in the template', () => {
             fixture.componentRef.setInput('upperLabel', 'PLN');
             fixture.componentRef.setInput('lowerLabel', 'Main Account');
+            fixture.componentRef.setInput('animate', false);
             fixture.componentRef.setInput('value', 1500.75);
             fixture.detectChanges();
 
             const el: HTMLElement = fixture.nativeElement;
             expect(el.textContent).toContain('PLN');
             expect(el.textContent).toContain('Main Account');
-            expect(el.textContent).toContain('1');
-            expect(el.textContent).toContain('500');
-            expect(el.textContent).toContain('75');
+            expect(el.textContent).toContain(formattedValue(1500.75));
         });
     });
 });

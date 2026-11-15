@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
 import { Category } from '../../entities/Category.entity';
+import { getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
 
 export interface OllamaExtractedData {
     date?: string | null;
@@ -41,15 +41,16 @@ export class OllamaService {
     }
 
     public async isAvailable(): Promise<boolean> {
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), this.availabilityCheckTimeoutMs);
         try {
-            const controller = new AbortController();
-            const timer = setTimeout(() => controller.abort(), this.availabilityCheckTimeoutMs);
             const checkUrl = this.provider === 'lmstudio' ? `${this.baseUrl}/v1/models` : `${this.baseUrl}/api/tags`;
             const res = await fetch(checkUrl, { signal: controller.signal });
-            clearTimeout(timer);
             return res.ok;
         } catch {
             return false;
+        } finally {
+            clearTimeout(timer);
         }
     }
 

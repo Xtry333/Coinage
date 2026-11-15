@@ -25,7 +25,7 @@ export class Schedule extends WithDateEntity {
     @Column({ type: 'text', nullable: false })
     public name!: string;
 
-    @Column({ type: 'enum', enum: ScheduleRecurrenceEnum, default: ScheduleRecurrenceEnum.MONTHLY, nullable: false })
+    @Column({ type: 'varchar', length: 10, default: ScheduleRecurrenceEnum.MONTHLY, nullable: false })
     public recurrence!: ScheduleRecurrenceEnum;
 
     @Column({ type: 'timestamp', nullable: false, transformer: new DateTransformer(DateTransformerType.DATETIME) })

@@ -3,13 +3,13 @@ import { DataSource } from 'typeorm';
 
 import { makeCategory, makeContainer, makeContractor, makeItem, makeItemContainerPair } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
 
-import { OllamaService } from './ollama.service';
-import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
 import { ItemsWithContainersDao } from '../../daos/itemsWithContainers.dao';
 import { TransferTypeEnum } from '../../entities/Category.entity';
+import { OllamaService } from './ollama.service';
+import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -51,6 +51,10 @@ describe('parseContainerDimensions', () => {
         it.each([
             ['Jajka 10 szt', { itemCount: 10 }],
             ['Piwo 6x330ml', { itemCount: 6 }],
+            ['Piwo 6×330ml', { itemCount: 6 }],
+            ['Piwo 6 x 330ml', { itemCount: 6 }],
+            ['Jogurt 4-pack', { itemCount: 4 }],
+            ['Jogurt 4 pack', { itemCount: 4 }],
             ['Tabletki 20pak', { itemCount: 20 }],
         ])('"%s" → itemCount %o', (input, expected) => {
             expect(parseContainerDimensions(input)).toMatchObject(expected);
@@ -65,7 +69,7 @@ describe('parseContainerDimensions', () => {
     });
 
     describe('returns null when no dimensions present', () => {
-        it.each(['Chleb razowy', 'Ketchup Heinz', 'Zapałki', 'Szynka wieprzowa'])('"%s" → null', (input) => {
+        it.each(['Chleb razowy', 'Ketchup Heinz', 'Zapałki', 'Szynka wieprzowa', 'Produkt 6xyz'])('"%s" → null', (input) => {
             expect(parseContainerDimensions(input)).toBeNull();
         });
     });
@@ -234,8 +238,9 @@ describe('ReceiptNormalizationService', () => {
             const butter = makeItem(10, 'Masło extra', { brand: 'Łaciate', categoryId: 1 });
             itemDao.getAll.mockResolvedValue([butter]);
 
-            const result = await service.normalize({ items: [{ name: 'Masło extra', price: 4.99 }] });
+            const result = await service.normalize({ items: [{ name: 'Łaciate Masło extra', price: 4.99 }] });
 
+            expect(result.items[0].itemId).toBe(10);
             expect(result.items[0].brand).toBe('Łaciate');
             expect(result.items[0].categoryId).toBe(1);
         });
@@ -246,10 +251,12 @@ describe('ReceiptNormalizationService', () => {
             // trigger AI call with a partial name
             ollamaService.resolveEntityMatch.mockResolvedValue({ matchedId: 1, confidence: 0.9 });
 
-            await service.normalize({ items: [{ name: 'Test Itm', price: 1.0 }] });
+            await service.normalize({ items: [{ name: 'Test', price: 1.0 }] });
 
+            expect(ollamaService.resolveEntityMatch).toHaveBeenCalledTimes(1);
             const callArgs = ollamaService.resolveEntityMatch.mock.calls[0];
             const categories = callArgs[2] as Array<{ type: string }>;
+            expect(categories).toEqual([groceries]);
             expect(categories.every((c) => c.type === TransferTypeEnum.OUTCOME)).toBe(true);
             expect(categories.some((c) => c.type === TransferTypeEnum.INCOME)).toBe(false);
         });
@@ -267,18 +274,23 @@ describe('ReceiptNormalizationService', () => {
             expect(result.items[0].quantity).toBe(1);
         });
 
-        it('retries AI with fewer candidates when first attempt is unconfident', async () => {
-            const items = Array.from({ length: 10 }, (_, i) => makeItem(i + 1, `Item similar ${i}`));
+        it('retries AI with a wider candidate pool when first attempt is unconfident', async () => {
+            const items = Array.from({ length: 60 }, (_, i) => makeItem(i + 1, `Item similar ${i}`));
             itemDao.getAll.mockResolvedValue(items);
 
             ollamaService.resolveEntityMatch
                 .mockResolvedValueOnce({ matchedId: null, confidence: 0.4 }) // first pass: unconfident
-                .mockResolvedValueOnce({ matchedId: 1, confidence: 0.85 }); // retry: confident
+                .mockResolvedValueOnce({ matchedId: 11, confidence: 0.85 }); // retry: matches an additional candidate
 
-            const result = await service.normalize({ items: [{ name: 'Item similar 0', price: 1.0 }] });
+            const result = await service.normalize({ items: [{ name: 'Item sim', price: 1.0 }] });
 
             expect(ollamaService.resolveEntityMatch).toHaveBeenCalledTimes(2);
-            expect(result.items[0].itemId).toBe(1);
+            const [firstPass, retry] = ollamaService.resolveEntityMatch.mock.calls;
+            expect(firstPass[1]).toHaveLength(10);
+            expect(retry[1]).toHaveLength(50);
+            expect(firstPass[1]).not.toEqual(expect.arrayContaining([expect.objectContaining({ id: 11 })]));
+            expect(retry[1]).toEqual(expect.arrayContaining([expect.objectContaining({ id: 11 })]));
+            expect(result.items[0].itemId).toBe(11);
         });
     });
 
@@ -355,9 +367,10 @@ describe('ReceiptNormalizationService', () => {
                     { containerId: 8, lastUnitPrice: 20.0 },
                 ]);
                 // OCR name has no dimensions — no dimension match either
-                const result = await service.normalize({ items: [{ name: 'Mleko UHT', price: 2.49 }] });
+                const result = await service.normalize({ items: [{ name: 'Mleko UHT 3,2%', price: 2.49 }] });
                 const item = result.items[0];
 
+                expect(item.itemId).toBe(42);
                 expect(item.suggestedContainer).toBeNull();
                 expect(item.containerConfidence).toBe('none');
                 expect(item.needsContainerConfirmation).toBe(true);

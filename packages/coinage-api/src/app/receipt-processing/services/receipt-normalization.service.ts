@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-import { OllamaExtractedData, OllamaService } from './ollama.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
@@ -12,6 +11,7 @@ import { Container } from '../../entities/Container.entity';
 import { Contractor } from '../../entities/Contractor.entity';
 import { Item } from '../../entities/Item.entity';
 import { ItemsWithContainers } from '../../entities/views/ItemsWithContainers.view';
+import { OllamaExtractedData, OllamaService } from './ollama.service';
 
 /** Top N fuzzy candidates to send to AI on first attempt. */
 const FIRST_PASS_CANDIDATES = 10;
@@ -489,7 +489,7 @@ export function parseContainerDimensions(name: string): ParsedDimensions | null 
     }
 
     // Item count in a pack: "6x330ml", "6 szt", "4-pack", "12pak"
-    const countMatch = n.match(/(\d+)\s*(?:x|×|szt\.?|pak(?:iet)?|pack)\b/);
+    const countMatch = n.match(/(\d+)\s*(?:[x×](?=\s*\d)|(?:-\s*)?(?:szt\.?|pak(?:iet)?|pack)\b)/);
     if (countMatch) {
         result.itemCount = parseInt(countMatch[1]);
         found = true;

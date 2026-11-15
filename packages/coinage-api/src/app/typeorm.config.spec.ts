@@ -1,4 +1,9 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { Script } from 'node:vm';
+
 import { DataSource } from 'typeorm';
+import { ModuleKind, transpileModule } from 'typescript';
 
 import { getPostgresConnectionOptions } from './postgres-connection-options';
 import { dataSource, loadMigrations, opts } from './typeorm.config';
@@ -21,33 +26,41 @@ describe('loadMigrations', () => {
     });
 
     describe('webpack context (__webpack_require__ present)', () => {
-        function withWebpackContext(mockContext: jest.Mock, fn: () => void): void {
-            // Simulate webpack bundle: inject __webpack_require__ and require.context
-            (global as any).__webpack_require__ = true;
-            (require as any).context = jest.fn(() => mockContext);
-            try {
-                fn();
-            } finally {
-                delete (global as any).__webpack_require__;
-                delete (require as any).context;
-            }
+        function withWebpackContext(mockContext: jest.Mock, fn: (load: typeof loadMigrations) => void): void {
+            // Jest gives every module its own require function. Evaluate the config with
+            // a module-local webpack require instead of patching this test's require.
+            const filename = join(__dirname, 'typeorm.config.ts');
+            const { outputText } = transpileModule(readFileSync(filename, 'utf8'), {
+                compilerOptions: { module: ModuleKind.CommonJS },
+            });
+            const context = {
+                exports: {},
+                require: Object.assign((id: string) => require(id), { context: jest.fn(() => mockContext) }),
+                __dirname,
+                __webpack_require__: {},
+            };
+            new Script(outputText, { filename }).runInNewContext(context);
+            fn((context.exports as typeof import('./typeorm.config')).loadMigrations);
+
+            expect(context.require.context).toHaveBeenCalledWith(
+                '../database/migrations',
+                false,
+                expect.objectContaining({ source: /^\.\/(\d+\S*)\.(ts|js)$/.source }),
+            );
         }
 
         it('returns constructor functions extracted from each matched module', () => {
             class Migration1 {}
-            class Migration2 {}
 
             const moduleMap: Record<string, Record<string, unknown>> = {
-                './20261015000000-BaselinePostgres.ts': { Migration1 },
+                './20261015000000-BaselinePostgres.ts': { Migration1, notAMigration: 'ignore this export' },
             };
 
             const mockContext = jest.fn((key: string) => moduleMap[key]);
             Object.defineProperty(mockContext, 'keys', { value: jest.fn(() => Object.keys(moduleMap)) });
 
-            withWebpackContext(mockContext, () => {
-                const result = loadMigrations();
-                expect(result).toContain(Migration1);
-                expect(result.every((m) => typeof m === 'function')).toBe(true);
+            withWebpackContext(mockContext, (load) => {
+                expect(load()).toEqual([Migration1]);
             });
         });
 
@@ -61,8 +74,8 @@ describe('loadMigrations', () => {
             });
             Object.defineProperty(mockContext, 'keys', { value: () => ['./9999999999999-Late.ts', './1000000000000-Early.ts'] });
 
-            withWebpackContext(mockContext, () => {
-                const result = loadMigrations();
+            withWebpackContext(mockContext, (load) => {
+                const result = load();
                 expect(result.indexOf(Early)).toBeLessThan(result.indexOf(Late));
             });
         });

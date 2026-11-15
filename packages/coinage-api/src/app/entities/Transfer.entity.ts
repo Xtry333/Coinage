@@ -82,7 +82,7 @@ export class Transfer extends WithDateEntity {
     @JoinColumn({ name: 'receipt_id' })
     public receipt!: Promise<Receipt | null>;
 
-    @Column({ type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
+    @Column({ type: 'varchar', length: 10, default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
 
     @Column({ name: 'schedule_id', nullable: true })

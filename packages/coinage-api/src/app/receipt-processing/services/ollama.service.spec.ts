@@ -1,7 +1,7 @@
 import { makeCategory } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
 
-import { OllamaService } from './ollama.service';
 import { TransferTypeEnum } from '../../entities/Category.entity';
+import { OllamaService } from './ollama.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -20,11 +20,24 @@ function mockOllamaFetchOk(body: object) {
     } as unknown as Response);
 }
 
-/** Simulate a successful LM Studio OpenAI-compatible API response */
+/** Simulate LM Studio's streamed OpenAI-compatible response, including split SSE lines. */
 function mockLMStudioFetchOk(body: object) {
+    const content = JSON.stringify(body);
+    const midpoint = Math.floor(content.length / 2);
+    const events = [content.slice(0, midpoint), content.slice(midpoint)]
+        .map((part) => `data: ${JSON.stringify({ choices: [{ delta: { content: part } }] })}\n\n`)
+        .join('');
+    const bytes = new TextEncoder().encode(`${events}data: [DONE]\n\n`);
+    const stream = new ReadableStream<Uint8Array>({
+        start(controller) {
+            controller.enqueue(bytes.subarray(0, 19));
+            controller.enqueue(bytes.subarray(19));
+            controller.close();
+        },
+    });
     return jest.spyOn(global, 'fetch').mockResolvedValueOnce({
         ok: true,
-        json: jest.fn().mockResolvedValue({ choices: [{ message: { content: JSON.stringify(body) } }] }),
+        body: stream,
     } as unknown as Response);
 }
 
@@ -39,24 +52,39 @@ function mockFetchNotOk(status = 500) {
 // ─── OllamaService ────────────────────────────────────────────────────────────
 
 describe('OllamaService', () => {
+    const originalEnv = process.env;
+
+    beforeEach(() => {
+        process.env = { ...originalEnv };
+        for (const key of [
+            'RECEIPT_AI_PROVIDER',
+            'OLLAMA_BASE_URL',
+            'OLLAMA_MODEL',
+            'OLLAMA_TIMEOUT_MS',
+            'OLLAMA_RESOLVE_TIMEOUT_MS',
+            'LM_STUDIO_BASE_URL',
+            'LM_STUDIO_MODEL',
+        ]) {
+            delete process.env[key];
+        }
+        // No test should fall through to the developer's real AI server.
+        jest.spyOn(global, 'fetch').mockRejectedValue(new Error('Unexpected fetch call'));
+    });
+
     afterEach(() => {
         jest.restoreAllMocks();
-        delete process.env['RECEIPT_AI_PROVIDER'];
-        delete process.env['OLLAMA_BASE_URL'];
-        delete process.env['OLLAMA_MODEL'];
-        delete process.env['LM_STUDIO_BASE_URL'];
-        delete process.env['LM_STUDIO_MODEL'];
+        process.env = originalEnv;
     });
 
     // ── Ollama provider ────────────────────────────────────────────────────────
 
-    describe('Ollama provider (default)', () => {
+    describe('Ollama provider', () => {
         let service: OllamaService;
 
         beforeEach(() => {
+            process.env['RECEIPT_AI_PROVIDER'] = 'ollama';
             process.env['OLLAMA_BASE_URL'] = OLLAMA_BASE_URL;
             process.env['OLLAMA_MODEL'] = 'llava';
-            // RECEIPT_AI_PROVIDER not set → defaults to 'ollama'
             service = new OllamaService();
         });
 
@@ -121,10 +149,8 @@ describe('OllamaService', () => {
                 await service.resolveEntityMatch('query', [makeCandidate(10, 'Biedronka'), makeCandidate(11, 'Lidl')]);
 
                 const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
-                expect(body.prompt).toContain('id 10');
-                expect(body.prompt).toContain('Biedronka');
-                expect(body.prompt).toContain('id 11');
-                expect(body.prompt).toContain('Lidl');
+                expect(body.prompt).toContain('10 | Biedronka');
+                expect(body.prompt).toContain('11 | Lidl');
             });
 
             it('includes category names in the prompt when provided', async () => {
@@ -214,13 +240,13 @@ describe('OllamaService', () => {
                 expect(body.prompt).toBeUndefined();
             });
 
-            it('requests json_object response_format', async () => {
+            it('requests streaming output', async () => {
                 const fetchSpy = mockLMStudioFetchOk({ matchedId: null, confidence: 0 });
 
                 await service.resolveEntityMatch('query', [makeCandidate(1, 'item')]);
 
                 const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
-                expect(body.response_format).toEqual({ type: 'json_object' });
+                expect(body.stream).toBe(true);
             });
 
             it('includes candidate ids and names in the message content', async () => {
@@ -230,9 +256,8 @@ describe('OllamaService', () => {
 
                 const body = JSON.parse((fetchSpy.mock.calls[0][1] as RequestInit).body as string);
                 const content = body.messages[0].content as string;
-                expect(content).toContain('id 10');
-                expect(content).toContain('Biedronka');
-                expect(content).toContain('id 11');
+                expect(content).toContain('10 | Biedronka');
+                expect(content).toContain('11 | Lidl');
             });
 
             it('returns null on network error', async () => {
@@ -247,6 +272,15 @@ describe('OllamaService', () => {
         });
 
         describe('isAvailable()', () => {
+            it('defaults to LM Studio when no provider is configured', async () => {
+                delete process.env['RECEIPT_AI_PROVIDER'];
+                const defaultService = new OllamaService();
+                const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: true } as Response);
+
+                expect(await defaultService.isAvailable()).toBe(true);
+                expect(fetchSpy).toHaveBeenCalledWith(`${LM_STUDIO_BASE_URL}/v1/models`, expect.anything());
+            });
+
             it('checks the LM Studio /v1/models endpoint', async () => {
                 const fetchSpy = jest.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: true } as Response);
 
@@ -259,6 +293,24 @@ describe('OllamaService', () => {
                 mockFetchError();
                 expect(await service.isAvailable()).toBe(false);
             });
+        });
+    });
+
+    describe('availability timeout cleanup', () => {
+        it.each(['success', 'http-error', 'network-error'])('clears its timer after %s', async (outcome) => {
+            jest.useFakeTimers();
+            try {
+                if (outcome === 'network-error') {
+                    mockFetchError();
+                } else {
+                    jest.spyOn(global, 'fetch').mockResolvedValueOnce({ ok: outcome === 'success' } as Response);
+                }
+
+                expect(await new OllamaService().isAvailable()).toBe(outcome === 'success');
+                expect(jest.getTimerCount()).toBe(0);
+            } finally {
+                jest.useRealTimers();
+            }
         });
     });
 });

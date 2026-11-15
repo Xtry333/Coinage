@@ -47,8 +47,8 @@ export class Receipt {
 
     @Column({
         name: 'processing_status',
-        type: 'enum',
-        enum: ReceiptProcessingStatus,
+        type: 'varchar',
+        length: 20,
         default: ReceiptProcessingStatus.NONE,
         nullable: false,
     })

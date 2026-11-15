@@ -18,7 +18,7 @@ export class Category {
     @Column({ type: 'text', nullable: true })
     public description!: string | null;
 
-    @Column({ type: 'enum', enum: ['INCOME', 'OUTCOME'], default: 'OUTCOME', nullable: false })
+    @Column({ type: 'varchar', length: 10, default: 'OUTCOME', nullable: false })
     public type!: TransferTypeEnum;
 
     @Column({ nullable: true })
