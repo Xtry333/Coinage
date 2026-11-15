@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { formatDate } from '@angular/common';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { IconDefinition, faEdit, faFlagCheckered, faReceipt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
 
 import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
-
 
 import {
     FilterOption,
@@ -17,6 +17,7 @@ import {
     TableFilterComponent,
 } from './table-filter/table-filter.component';
 import { CoinageRoutes } from '../app-routing/app-routes';
+import { AppliedFilter } from '../components/applied-filters/applied-filters.component';
 import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../services/coinage.data-service';
@@ -121,6 +122,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     @Input() public enableBulkActions?: boolean = false;
 
     @Output() public tableFilter = new EventEmitter<TableFilterFields>();
+
+    @ViewChildren(TableFilterComponent) private columnFilters?: QueryList<TableFilterComponent>;
 
     public constructor(
         private readonly dataService: CoinageDataService,
@@ -291,12 +294,55 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     }
 
     public get isAnyFilterApplied(): boolean {
-        for (const key in this.filter) {
-            if (this.filter[key] !== undefined) {
-                return true;
+        return this.appliedFilters.length > 0;
+    }
+
+    public get appliedFilters(): AppliedFilter[] {
+        const filters: AppliedFilter[] = [];
+        const addTextFilter = (label: string, value?: string) => {
+            if (value?.trim()) {
+                filters.push({ label, value });
             }
+        };
+        const selectedNames = (ids: number[] | undefined, options: FilterOption[], fallback?: string) =>
+            ids?.length ? ids.map((id) => options.find((option) => option.id === id)?.uiText ?? `#${id}`).join(', ') : fallback;
+
+        addTextFilter('Category', selectedNames(this.filter.categoryIds, this.optionsForCheckboxFilters.categories, this.filter.category));
+        addTextFilter('Description', this.filter.description);
+        addTextFilter('Source account', selectedNames(this.filter.accountIds, this.optionsForCheckboxFilters.accounts, this.filter.account));
+        if (this.filter.amountFrom !== undefined && this.filter.amountTo !== undefined) {
+            filters.push({ label: 'Amount', value: `${this.filter.amountFrom} – ${this.filter.amountTo}` });
         }
-        return false;
+        addTextFilter('Contractor', selectedNames(this.filter.contractorIds, this.optionsForCheckboxFilters.contractors, this.filter.contractor));
+        if (this.filter.dateFrom !== undefined && this.filter.dateTo !== undefined) {
+            filters.push({
+                label: 'Date',
+                value: `${formatDate(this.filter.dateFrom, 'mediumDate', 'en-US')} – ${formatDate(this.filter.dateTo, 'mediumDate', 'en-US')}`,
+            });
+        }
+        if (this.filter.showPlanned) {
+            filters.push({ label: 'Show planned transfers' });
+        }
+        if (this.filter.showFlagged) {
+            filters.push({ label: 'Only flagged transfers' });
+        }
+        return filters;
+    }
+
+    public clearAllFilters(): void {
+        this.filter = {};
+        Object.values(this.optionsForCheckboxFilters).forEach((options) =>
+            options.forEach((option) => {
+                option.isSelected = false;
+                option.isDisplayed = true;
+            }),
+        );
+        this.columnFilters?.forEach((columnFilter) => columnFilter.reset());
+        if (this.filterCachePath) {
+            this.localStorage.setObject(this.filterCachePath, undefined);
+        }
+        this.tableFilter.emit(this.filter);
+        this.doFiltering();
     }
 
     public getTransferRowClass(row: UiTableRow): { [key: string]: boolean } {

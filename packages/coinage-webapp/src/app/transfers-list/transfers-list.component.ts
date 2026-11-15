@@ -89,7 +89,8 @@ export class TransfersListComponent implements OnInit, OnDestroy {
 
     public onPerformFilter(filterParams: TableFilterFields): void {
         this.filterParams = {
-            ...this.filterParams,
+            page: this.filterParams.page,
+            rowsPerPage: this.filterParams.rowsPerPage,
             ...filterParams,
             amount: this.mapRangeFilterParams(filterParams),
             date: this.mapDateRangeFilterParams(filterParams),

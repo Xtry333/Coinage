@@ -236,10 +236,15 @@ export class TableFilterComponent implements OnInit {
     }
 
     public onClear(): void {
+        this.reset();
+        this.filterEvent.emit(this.filterValue);
+    }
+
+    public reset(): void {
         this.filterValue = TableFilterComponent.createEmptyFilterValue(this.filterType, this.filterName);
         this.lastFilterValue = deepCopy(this.filterValue);
-        this.filterEvent.emit(this.filterValue);
         this.isPopupDisplayed = false;
+        this.touched = { from: false, to: false };
         this.onClearOptionsSearchValue();
         this.filterOptions?.forEach((option) => (option.isSelected = false));
     }

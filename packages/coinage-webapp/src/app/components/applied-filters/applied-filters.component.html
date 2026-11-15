@@ -1,0 +1,23 @@
+@if (filters.length > 0) {
+    <div class="flex flex-wrap items-center gap-2 text-sm" role="group" aria-label="Applied filters">
+        <span class="font-medium text-gray-700">Applied filters:</span>
+        <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
+            @for (filter of filters; track filter.label) {
+                <li class="rounded-md bg-blue-50 px-2 py-1 text-blue-900">
+                    <span class="font-medium">{{ filter.label }}</span>
+                    @if (filter.value) {
+                        <span>: {{ filter.value }}</span>
+                    }
+                </li>
+            }
+        </ul>
+        <button
+            class="shrink-0 rounded-sm text-blue-600 underline hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+            (click)="clearAll.emit()"
+            type="button"
+            aria-label="Clear all filters"
+        >
+            Clear all
+        </button>
+    </div>
+}

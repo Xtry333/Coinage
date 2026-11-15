@@ -4,6 +4,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { BaseChartDirective } from 'ng2-charts';
 
 import { CoreModule } from '../core/core.module';
+import { AppliedFiltersComponent } from './applied-filters/applied-filters.component';
 import { AutoPaginationComponent } from './auto-pagination/auto-pagination.component';
 import { BulkEditTransfersModalComponent } from './bulk-edit-transfers-modal/bulk-edit-transfers-modal.component';
 import { ChartComponent } from './chart/chart.component';
@@ -13,7 +14,23 @@ import { SectionComponent } from './section/section.component';
 
 @NgModule({
     imports: [CoreModule, NgSelectModule, FormsModule, BaseChartDirective],
-    declarations: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent, MoneyAmountComponent, BulkEditTransfersModalComponent],
-    exports: [SectionComponent, ModalComponent, ChartComponent, AutoPaginationComponent, MoneyAmountComponent, BulkEditTransfersModalComponent],
+    declarations: [
+        SectionComponent,
+        ModalComponent,
+        ChartComponent,
+        AutoPaginationComponent,
+        MoneyAmountComponent,
+        BulkEditTransfersModalComponent,
+        AppliedFiltersComponent,
+    ],
+    exports: [
+        SectionComponent,
+        ModalComponent,
+        ChartComponent,
+        AutoPaginationComponent,
+        MoneyAmountComponent,
+        BulkEditTransfersModalComponent,
+        AppliedFiltersComponent,
+    ],
 })
 export class CommonComponentsModule {}
