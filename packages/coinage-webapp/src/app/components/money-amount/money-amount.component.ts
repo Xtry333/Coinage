@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+
 import { TransferTypeEnum } from '@app/interfaces';
 
 export namespace MoneyAmountComponentData {

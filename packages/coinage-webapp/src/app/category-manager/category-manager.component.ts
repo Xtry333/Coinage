@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { finalize } from 'rxjs/operators';
 
 import { CategoryDTO } from '@app/interfaces';
-import { finalize } from 'rxjs/operators';
+
 import { CoinageDataService } from '../services/coinage.data-service';
 
 @Component({

@@ -1,4 +1,3 @@
-import { AuthController } from '../auth/auth.controller';
 import { AccountsController } from './accounts.controller';
 import { CategoriesController } from './categories.controller';
 import { ContainersController } from './containers.controller';
@@ -11,6 +10,7 @@ import { SearchController } from './search.controller';
 import { TagsController } from './tags.controller';
 import { TransferController } from './transfer.controller';
 import { TransfersController } from './transfers.controller';
+import { AuthController } from '../auth/auth.controller';
 import { UserController } from './user/user.controller';
 
 export default [

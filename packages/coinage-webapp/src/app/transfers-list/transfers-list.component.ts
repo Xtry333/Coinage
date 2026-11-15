@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+
 import { GetFilteredTransfersRequest, Range, TransferDTO } from '@app/interfaces';
 
-import { ActivatedRoute } from '@angular/router';
 import { PaginationQueryParams } from '../core/pagination/pagination.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { WindowService } from '../core/services/window-service/window-service.service';

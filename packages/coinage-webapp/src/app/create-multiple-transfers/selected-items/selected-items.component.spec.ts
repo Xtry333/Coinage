@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+
 import { SelectedItemsComponent } from './selected-items.component';
 
 describe('SelectedItemsComponent', () => {

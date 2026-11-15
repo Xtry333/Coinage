@@ -14,12 +14,12 @@ import {
 } from '@app/interfaces';
 
 import { NavigatorService } from '../app-routing/navigator.service';
+import { SelectedTransferItemDetails } from './item-details-for-transfer/item-details-for-transfer.component';
+import { NewTransferDetailsComponent, SelectedDetails } from './new-transfer-details/new-transfer-details.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { StorageScope } from '../core/services/storage-service/storage-scope.enum';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NotificationService } from '../services/notification.service';
-import { SelectedTransferItemDetails } from './item-details-for-transfer/item-details-for-transfer.component';
-import { NewTransferDetailsComponent, SelectedDetails } from './new-transfer-details/new-transfer-details.component';
 
 export interface NewTransferObject {
     description: string;

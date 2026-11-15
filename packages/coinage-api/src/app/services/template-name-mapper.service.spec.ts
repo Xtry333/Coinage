@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { TemplateNameMapperService } from './template-name-mapper.service';
 import { Account } from '../entities/Account.entity';
 import { Contractor } from '../entities/Contractor.entity';
 import { Transfer } from '../entities/Transfer.entity';
-import { TemplateNameMapperService } from './template-name-mapper.service';
 
 describe('TemplateNameMapperService', () => {
     let service: TemplateNameMapperService;

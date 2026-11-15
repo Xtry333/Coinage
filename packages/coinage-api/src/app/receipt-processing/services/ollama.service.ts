@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 
-import { Category } from '../../entities/Category.entity';
 import { getEntityMatchPrompt, getReceiptExtractionPromptPolish } from './prompts.model';
+import { Category } from '../../entities/Category.entity';
 
 export interface OllamaExtractedData {
     date?: string | null;

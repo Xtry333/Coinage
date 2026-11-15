@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 
 import { BalanceDTO } from '@app/interfaces';
+
 import { CoinageDataService } from '../../../services/coinage.data-service';
 
 @Component({

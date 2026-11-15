@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { CategoriesController } from './categories.controller';
 import { PartialProvider } from '../../test/partial-provider';
 import { AuthService } from '../auth/auth.service';
 import { CategoryDao } from '../daos/category.dao';
@@ -7,7 +8,6 @@ import { UserDao } from '../daos/user.dao';
 import { Category } from '../entities/Category.entity';
 import { AuthGuard } from '../services/auth.guard';
 import { CategoryCascadeService } from '../services/category-cascades.service';
-import { CategoriesController } from './categories.controller';
 
 function makeCategory(id: number, name: string, parentId: number | null = null, tag?: string): Category {
     const c = new Category();

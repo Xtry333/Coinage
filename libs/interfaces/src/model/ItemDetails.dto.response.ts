@@ -1,5 +1,7 @@
-import { Unit } from '@app/common-units';
 import { Type } from 'class-transformer';
+
+import { Unit } from '@app/common-units';
+
 import { TagDTO } from '../lib/TagDTO.response';
 
 export class ItemDetailsDTO {

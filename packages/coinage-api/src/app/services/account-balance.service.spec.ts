@@ -1,8 +1,8 @@
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
-import { AccountDao } from '../daos/account.dao';
-import { DateParserService } from './date-parser.service';
 import { AccountBalanceService } from './account-balance.service';
+import { DateParserService } from './date-parser.service';
+import { AccountDao } from '../daos/account.dao';
 
 describe('AccountBalanceService', () => {
     let service: AccountBalanceService;

@@ -1,4 +1,3 @@
-import { AuthService } from '../auth/auth.service';
 import { AccountBalanceService } from './account-balance.service';
 import { AccountsService } from './accounts/accounts.service';
 import { AuthGuard } from './auth.guard';
@@ -10,8 +9,9 @@ import { ItemsService } from './items.service';
 import { SearchService } from './search.service';
 import { TemplateNameMapperService } from './template-name-mapper.service';
 import { TransferItemsService } from './transfer-items.service';
-import { TransfersService } from './transfers.service';
 import { SaveTransfersService } from './transfers/save-transfers.service';
+import { TransfersService } from './transfers.service';
+import { AuthService } from '../auth/auth.service';
 
 export default [
     DatabaseSourceService,

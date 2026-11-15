@@ -1,9 +1,11 @@
 import { ChangeDetectionStrategy, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { GlobalSearchResponse } from '@app/interfaces';
 import { faBox, faExchangeAlt, faSearch, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+
+import { GlobalSearchResponse } from '@app/interfaces';
+
 import { CoinageRoutes } from '../../app-routing/app-routes';
 import { SearchService } from '../../services/search.service';
 

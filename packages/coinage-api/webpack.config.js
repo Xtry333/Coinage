@@ -1,5 +1,6 @@
-const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 const { join } = require('node:path');
+
+const { NxAppWebpackPlugin } = require('@nx/webpack/app-plugin');
 
 module.exports = () => {
     const production = process.env.NODE_ENV === 'production';

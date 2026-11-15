@@ -1,4 +1,4 @@
-/* eslint-disable */
+ 
 module.exports = {
     displayName: 'coinage-webapp',
     preset: '../../jest.preset.js',

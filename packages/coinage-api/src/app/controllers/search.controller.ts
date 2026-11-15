@@ -1,7 +1,9 @@
-import { GlobalSearchRequest, GlobalSearchResponse } from '@app/interfaces';
 import { Controller, Get, Query, UseGuards, ValidationPipe } from '@nestjs/common';
 import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsNumber, IsOptional, IsString, Max, Min } from 'class-validator';
+
+import { GlobalSearchRequest, GlobalSearchResponse } from '@app/interfaces';
+
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { SearchService } from '../services/search.service';
 

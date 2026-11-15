@@ -1,5 +1,6 @@
-import { TransferDTO } from './FilteredTransferDTO.response';
 import { Type } from 'class-transformer';
+
+import { TransferDTO } from './FilteredTransferDTO.response';
 
 export class ReceiptDetailsDTO {
     id!: number;

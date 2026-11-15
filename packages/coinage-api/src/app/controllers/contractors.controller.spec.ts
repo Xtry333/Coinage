@@ -1,12 +1,12 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { ContractorController } from './contractors.controller';
 import { PartialProvider } from '../../test/partial-provider';
 import { AuthService } from '../auth/auth.service';
 import { ContractorDao } from '../daos/contractor.dao';
 import { UserDao } from '../daos/user.dao';
 import { Contractor } from '../entities/Contractor.entity';
 import { AuthGuard } from '../services/auth.guard';
-import { ContractorController } from './contractors.controller';
 
 function makeContractor(id: number, name: string): Contractor {
     const c = new Contractor();

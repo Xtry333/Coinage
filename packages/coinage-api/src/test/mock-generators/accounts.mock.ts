@@ -1,5 +1,5 @@
-import { Account } from '../../app/entities/Account.entity';
 import { createMockCurrency } from './currency.mock';
+import { Account } from '../../app/entities/Account.entity';
 
 export function createMockAccounts(count: number): Account[] {
     const accounts: Account[] = [];

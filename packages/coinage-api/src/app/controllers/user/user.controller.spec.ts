@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { UserController } from './user.controller';
 import { PartialProvider } from '../../../test/partial-provider';
 import { AuthService } from '../../auth/auth.service';
 import { UserDao } from '../../daos/user.dao';
 import { AuthGuard } from '../../services/auth.guard';
-import { UserController } from './user.controller';
 
 describe('UserController', () => {
     let controller: UserController;

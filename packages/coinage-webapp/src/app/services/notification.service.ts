@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 
 export enum NotificationLevel {

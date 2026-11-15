@@ -1,6 +1,6 @@
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { Currency } from './Currency.entity';
 
+import { Currency } from './Currency.entity';
 import { TimestampTransformer } from './transformers/timestamp.transformer';
 import { User } from './User.entity';
 

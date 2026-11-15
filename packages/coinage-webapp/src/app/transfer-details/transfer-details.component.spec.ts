@@ -1,11 +1,11 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
-import { CoinageDataService } from '../services/coinage.data-service';
+
 import { TransferDetailsComponent } from './transfer-details.component';
+import { CoinageDataService } from '../services/coinage.data-service';
 
 describe('TransferDetailsComponent', () => {
     let component: TransferDetailsComponent;

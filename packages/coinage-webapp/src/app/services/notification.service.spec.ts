@@ -1,8 +1,8 @@
 import { TestBed } from '@angular/core/testing';
 import { firstValueFrom } from 'rxjs';
 
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageNotification, NotificationLevel, NotificationService } from './notification.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 
 function makeMockStorageService(): jest.Mocked<CoinageStorageService> {
     return {

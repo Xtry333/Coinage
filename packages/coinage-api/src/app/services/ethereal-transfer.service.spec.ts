@@ -2,8 +2,8 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { EtherealTransferService } from './ethereal-transfer.service';
 import { PartialProvider } from '../../test/partial-provider';
-import { TransferDao } from '../daos/transfer.dao';
 import { AccountDao } from '../daos/account.dao';
+import { TransferDao } from '../daos/transfer.dao';
 
 describe('EtherealTransferService', () => {
     let service: EtherealTransferService;

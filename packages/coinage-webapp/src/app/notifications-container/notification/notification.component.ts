@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { faExternalLinkAlt, faTimes } from '@fortawesome/free-solid-svg-icons';
+
 import { CoinageNotification, NotificationLevel } from '../../services/notification.service';
 
 @Component({

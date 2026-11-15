@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, In, Repository } from 'typeorm';
+import { Equal, In, IsNull, Repository } from 'typeorm';
+
+import { BaseDao } from './base.dao';
 import { Item } from '../entities/Item.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { Writeable } from '../types/Writeable.type';
-import { BaseDao } from './base.dao';
 
 @Injectable()
 export class TransferItemDao extends BaseDao {
@@ -22,18 +23,30 @@ export class TransferItemDao extends BaseDao {
     }
 
     public async save(transferItem: Writeable<TransferItem>): Promise<TransferItem> {
-        return await this.transferItemRepository.save(transferItem);
+        // Loaded relations can override changed foreign keys during TypeORM save.
+        // Persist only column values so the requested container (including null) wins.
+        return await this.transferItemRepository.save({
+            id: transferItem.id,
+            transferId: transferItem.transferId,
+            itemId: transferItem.itemId,
+            containerId: transferItem.containerId,
+            quantity: transferItem.quantity,
+            unitPrice: transferItem.unitPrice,
+            totalSetPrice: transferItem.totalSetPrice,
+            totalSetDiscount: transferItem.totalSetDiscount,
+        });
     }
 
     public async removeTransferItemsForTransferId(transferId: number): Promise<number> {
         return (await this.transferItemRepository.delete({ transferId: Equal(transferId) })).affected ?? 0;
     }
 
-    public async findUnique(transferId: number, itemId: number, itemPrice: number): Promise<TransferItem | null> {
+    public async findUnique(transferId: number, itemId: number, itemPrice: number, containerId: number | null): Promise<TransferItem | null> {
         const item = await this.transferItemRepository.findOneBy({
             transferId: Equal(transferId),
             itemId: Equal(itemId),
             unitPrice: Equal(itemPrice),
+            containerId: containerId === null ? IsNull() : Equal(containerId),
         });
         return item;
     }

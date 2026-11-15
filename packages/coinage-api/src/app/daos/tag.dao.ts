@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, Repository } from 'typeorm';
 
-import { Tag } from '../entities/Tag.entity';
 import { BaseDao } from './base.dao';
+import { Tag } from '../entities/Tag.entity';
 
 @Injectable()
 export class TagDao extends BaseDao {

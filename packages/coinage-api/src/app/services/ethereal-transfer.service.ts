@@ -1,7 +1,8 @@
-import { AccountDao } from '../daos/account.dao';
 import { Injectable } from '@nestjs/common';
-import { Transfer } from '../entities/Transfer.entity';
+
+import { AccountDao } from '../daos/account.dao';
 import { TransferDao } from '../daos/transfer.dao';
+import { Transfer } from '../entities/Transfer.entity';
 
 @Injectable()
 export class EtherealTransferService {

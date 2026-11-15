@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { CategoryDTO, ItemWithContainerDTO } from '@app/interfaces';
 import { faBoxes, faEdit, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { Subject, takeUntil } from 'rxjs';
+
+import { CategoryDTO, ItemWithContainerDTO } from '@app/interfaces';
 
 import { CoinageRoutes } from '../app-routing/app-routes';
 import { CoinageDataService } from '../services/coinage.data-service';

@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
+
 import { UserDao } from './user.dao';
 
 describe('UserDao', () => {

@@ -1,8 +1,10 @@
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { IconDefinition, faEdit, faFlagCheckered, faReceipt, faTrash } from '@fortawesome/free-solid-svg-icons';
 import * as Rx from 'rxjs';
 
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
-import { IconDefinition, faEdit, faFlagCheckered, faReceipt, faTrash } from '@fortawesome/free-solid-svg-icons';
+
+
 import {
     FilterOption,
     FilterType,
@@ -14,7 +16,6 @@ import {
     PopupSide,
     TableFilterComponent,
 } from './table-filter/table-filter.component';
-
 import { CoinageRoutes } from '../app-routing/app-routes';
 import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';

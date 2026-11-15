@@ -1,4 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
+
 import { TransferItemDao } from '../daos/transferItem.dao';
 import { TransferItem } from '../entities/TransferItem.entity';
 
@@ -14,7 +15,7 @@ export class TransferItemsService {
             if (item.id !== undefined) {
                 entity = await this.transferItemDao.getById(item.id);
             } else {
-                entity = (await this.transferItemDao.findUnique(item.transferId, item.itemId, item.unitPrice)) ?? new TransferItem();
+                entity = (await this.transferItemDao.findUnique(item.transferId, item.itemId, item.unitPrice, item.containerId ?? null)) ?? new TransferItem();
                 Logger.log(`Fetched item ${entity.id}`, 'TransferItemsService');
             }
 
@@ -24,7 +25,7 @@ export class TransferItemsService {
             entity.unitPrice = item.unitPrice;
             entity.totalSetPrice = item.totalSetPrice;
             entity.totalSetDiscount = item.totalSetDiscount;
-            entity.containerId = item.containerId;
+            entity.containerId = item.containerId ?? null;
 
             entity = await this.transferItemDao.save(entity);
 

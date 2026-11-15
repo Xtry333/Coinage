@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { TransfersController } from './transfers.controller';
 import { PartialProvider } from '../../test/partial-provider';
 import { AuthService } from '../auth/auth.service';
 import { AccountDao } from '../daos/account.dao';
@@ -12,9 +13,8 @@ import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
-import { TransfersController } from './transfers.controller';
+import { TransfersService } from '../services/transfers.service';
 
 describe('TransfersController', () => {
     let controller: TransfersController;

@@ -1,8 +1,8 @@
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
+import { TransferItemsService } from './transfer-items.service';
 import { TransferItemDao } from '../daos/transferItem.dao';
 import { TransferItem } from '../entities/TransferItem.entity';
-import { TransferItemsService } from './transfer-items.service';
 
 function makeMockTransferItem(overrides: Partial<TransferItem> = {}): TransferItem {
     const item = new TransferItem();
@@ -46,8 +46,20 @@ describe('TransferItemsService', () => {
 
             await service.save(input);
 
-            expect(transferItemDao.findUnique).toHaveBeenCalledWith(input.transferId, input.itemId, input.unitPrice);
+            expect(transferItemDao.findUnique).toHaveBeenCalledWith(input.transferId, input.itemId, input.unitPrice, null);
             expect(transferItemDao.getById).not.toHaveBeenCalled();
+        });
+
+        it('includes the selected container when looking for an existing transfer item', async () => {
+            const input = makeMockTransferItem({ containerId: 5 });
+            transferItemDao.findUnique.mockResolvedValue(null);
+            transferItemDao.save.mockImplementation(async (entity) => entity as TransferItem);
+
+            const result = await service.save(input);
+
+            expect(transferItemDao.findUnique).toHaveBeenCalledWith(input.transferId, input.itemId, input.unitPrice, 5);
+            expect(result.id).toBeUndefined();
+            expect(result.containerId).toBe(5);
         });
 
         it('creates a new TransferItem when findUnique returns null', async () => {

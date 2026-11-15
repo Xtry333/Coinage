@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteResult, Equal, Repository, UpdateResult } from 'typeorm';
-import { Contractor } from '../entities/Contractor.entity';
+
 import { BaseDao } from './base.dao';
+import { Contractor } from '../entities/Contractor.entity';
 
 @Injectable()
 export class ContractorDao extends BaseDao {

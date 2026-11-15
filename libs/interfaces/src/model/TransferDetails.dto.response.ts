@@ -1,8 +1,9 @@
+import { Type } from 'class-transformer';
+
+import { TransferDTO } from '../lib/FilteredTransferDTO.response';
 import { AccountDTO, CategoryPathDTO, ReceiptDTO } from '../lib/interfaces';
 import { TagDTO } from '../lib/TagDTO.response';
 
-import { Type } from 'class-transformer';
-import { TransferDTO } from '../lib/FilteredTransferDTO.response';
 
 export class TransferItemDTO {
     public id!: number;

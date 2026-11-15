@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+
 import { CoinageNotification, NotificationService } from '../services/notification.service';
 
 @Component({

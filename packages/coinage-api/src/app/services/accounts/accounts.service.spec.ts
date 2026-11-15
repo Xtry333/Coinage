@@ -1,8 +1,10 @@
-import { createMockAccounts } from '@coinage-app/test/mock-generators/accounts.mock';
 import { Chance } from 'chance';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
-import { AccountDao } from '../../daos/account.dao';
+
+import { createMockAccounts } from '@coinage-app/test/mock-generators/accounts.mock';
+
 import { AccountsService } from './accounts.service';
+import { AccountDao } from '../../daos/account.dao';
 
 describe('AccountsService', () => {
     let service: AccountsService, accountDao: Spy<AccountDao>;

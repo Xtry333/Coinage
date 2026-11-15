@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-
-import { ItemDetailsDTO, TransferWithItemDetailsDTO } from '@app/interfaces';
 import { faReceipt, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
 import { toKg, toLiters, Unit } from '@app/common-units';
+import { ItemDetailsDTO, TransferWithItemDetailsDTO } from '@app/interfaces';
+
 import { CoinageRoutes } from '../../app-routing/app-routes';
 import { CoinageStorageService } from '../../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../../services/coinage.data-service';

@@ -1,4 +1,5 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+
 import { Transfer } from '../../../app/entities/Transfer.entity';
 
 export class FuelMigration1657578654226 implements MigrationInterface {

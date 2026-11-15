@@ -1,14 +1,15 @@
-import * as Rx from 'rxjs';
-
 import { ChangeDetectionStrategy, Component, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@app/interfaces';
 import { ChartDataset } from 'chart.js';
-
+import * as Rx from 'rxjs';
 import { finalize } from 'rxjs/operators';
+
+import { NewMonthlyUserStatsDTO, PartialDate, TransferDTO } from '@app/interfaces';
+
+
+import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
 import { CoinageRoutes } from '../../app-routing/app-routes';
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { DateParserService } from '../../services/date-parser.service';
-import { DashboardCountersComponent } from './dashboard-counters/dashboard-counters.component';
 
 interface UiTotalAmountPerMonth {
     date: string;

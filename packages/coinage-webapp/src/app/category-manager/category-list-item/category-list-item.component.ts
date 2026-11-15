@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { CategoryDTO } from '@app/interfaces';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
+
+import { CategoryDTO } from '@app/interfaces';
 
 @Component({
     selector: 'app-category-list-item',

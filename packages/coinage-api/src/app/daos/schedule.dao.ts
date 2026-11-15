@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Equal, Repository } from 'typeorm';
 
+import { BaseDao } from './base.dao';
 import { Schedule } from '../entities/Schedule.entity';
 import { Writeable } from '../types/Writeable.type';
-import { BaseDao } from './base.dao';
 
 @Injectable()
 export class ScheduleDao extends BaseDao {

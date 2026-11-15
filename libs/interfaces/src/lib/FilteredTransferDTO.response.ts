@@ -1,7 +1,7 @@
+import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
-import { Type } from 'class-transformer';
 
 export class FilteredTransfersDTO {
     @Type(() => TransferDTO) public transfers!: TransferDTO[];

@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccountDTO, BulkEditTransferDTO, CategoryDTO, ContractorDTO, ReceiptDTO, ScheduleDTO } from '@app/interfaces';
 import * as Rx from 'rxjs';
+
+import { AccountDTO, BulkEditTransferDTO, CategoryDTO, ContractorDTO, ReceiptDTO, ScheduleDTO } from '@app/interfaces';
+
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
 

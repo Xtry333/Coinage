@@ -1,11 +1,12 @@
-import { TransferTypeEnum } from '@app/interfaces';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
+import { TransferTypeEnum } from '@app/interfaces';
+
+import { TransfersService } from './transfers.service';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
-import { TransfersService } from './transfers.service';
 
 function createMockCategory(id: number, name: string): Category {
     const cat = new Category();

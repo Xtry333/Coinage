@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { ItemsWithContainers } from '../entities/views/ItemsWithContainers.view';
 import { BaseDao } from './base.dao';
+import { ItemsWithContainers } from '../entities/views/ItemsWithContainers.view';
 
 @Injectable()
 export class ItemsWithContainersDao extends BaseDao {

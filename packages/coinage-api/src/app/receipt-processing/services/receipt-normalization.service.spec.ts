@@ -1,14 +1,15 @@
-import { makeCategory, makeContainer, makeContractor, makeItem, makeItemContainerPair } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 import { DataSource } from 'typeorm';
 
+import { makeCategory, makeContainer, makeContractor, makeItem, makeItemContainerPair } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
+
+import { OllamaService } from './ollama.service';
+import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
 import { ItemsWithContainersDao } from '../../daos/itemsWithContainers.dao';
 import { TransferTypeEnum } from '../../entities/Category.entity';
-import { OllamaService } from './ollama.service';
-import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

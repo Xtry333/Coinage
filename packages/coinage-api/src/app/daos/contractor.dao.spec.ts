@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { ContractorDao } from './contractor.dao';
 
 describe('ContractorDao', () => {

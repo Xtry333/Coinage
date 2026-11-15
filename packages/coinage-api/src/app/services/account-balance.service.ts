@@ -1,8 +1,10 @@
-import { NewMonthlyUserStatsDTO } from '@app/interfaces';
 import { Injectable } from '@nestjs/common';
+
+import { NewMonthlyUserStatsDTO } from '@app/interfaces';
+
+import { DateParserService } from './date-parser.service';
 import { AccountDao } from '../daos/account.dao';
 import { AccountMonthlySubChange } from '../daos/daoDtos/AccountMonthlySubBalance.dto';
-import { DateParserService } from './date-parser.service';
 
 @Injectable()
 export class AccountBalanceService {

@@ -1,6 +1,6 @@
-import { PagedRequest } from '../partial/Paged.request';
 import { Range } from './interfaces';
 import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
+import { PagedRequest } from '../partial/Paged.request';
 
 export class GetFilteredTransfersRequest extends PagedRequest {
     public transferIds?: number[];

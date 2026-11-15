@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { CategoryCascadeService } from './category-cascades.service';
 import { PartialProvider } from '../../test/partial-provider';
 import { CategoryDao } from '../daos/category.dao';
 import { Category } from '../entities/Category.entity';
-import { CategoryCascadeService } from './category-cascades.service';
 
 describe('CategoryCascadeService', () => {
     let service: CategoryCascadeService;

@@ -12,8 +12,8 @@ import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
+import { TransfersService } from '../services/transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfers')

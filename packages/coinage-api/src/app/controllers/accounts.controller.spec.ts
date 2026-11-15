@@ -1,5 +1,8 @@
-import { createMockAccounts } from '@coinage-app/test/mock-generators/accounts.mock';
 import { Test, TestingModule } from '@nestjs/testing';
+
+import { createMockAccounts } from '@coinage-app/test/mock-generators/accounts.mock';
+
+import { AccountsController } from './accounts.controller';
 import { PartialProvider } from '../../test/partial-provider';
 import { AuthService } from '../auth/auth.service';
 import { AccountDao } from '../daos/account.dao';
@@ -9,7 +12,6 @@ import { AccountsService } from '../services/accounts/accounts.service';
 import { AuthGuard } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
-import { AccountsController } from './accounts.controller';
 
 describe('AccountsController', () => {
     let controller: AccountsController, accountsService: AccountsService;

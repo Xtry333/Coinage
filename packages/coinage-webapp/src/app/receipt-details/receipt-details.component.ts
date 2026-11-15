@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
-import { ReceiptAiResultDTO, ReceiptDetailsDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferType } from '@app/interfaces';
+import { ActivatedRoute } from '@angular/router';
 import { Subscription } from 'rxjs';
 
-import { ActivatedRoute } from '@angular/router';
+import { ReceiptAiResultDTO, ReceiptDetailsDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferType } from '@app/interfaces';
+
+
 import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { SocketService } from '../services/socket.service';

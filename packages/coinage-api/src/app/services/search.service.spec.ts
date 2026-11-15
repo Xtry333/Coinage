@@ -1,12 +1,13 @@
 import 'reflect-metadata';
 
-import { GlobalSearchRequest } from '@app/interfaces';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
+import { GlobalSearchRequest } from '@app/interfaces';
+
+import { SearchService } from './search.service';
 import { ItemDao } from '../daos/item.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
-import { SearchService } from './search.service';
 
 describe('SearchService', () => {
     let service: SearchService;

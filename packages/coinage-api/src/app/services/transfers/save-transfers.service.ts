@@ -1,5 +1,6 @@
-import { CategoryDao } from '../../daos/category.dao';
 import { Injectable } from '@nestjs/common';
+
+import { CategoryDao } from '../../daos/category.dao';
 import { TransferDao } from '../../daos/transfer.dao';
 
 @Injectable()

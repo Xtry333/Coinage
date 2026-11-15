@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, DeleteResult, Equal, InsertResult, Not, Repository } from 'typeorm';
+
+import { BaseDao } from './base.dao';
 import { Receipt, ReceiptProcessingStatus } from '../entities/Receipt.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
-import { BaseDao } from './base.dao';
 
 @Injectable()
 export class ReceiptDao extends BaseDao {

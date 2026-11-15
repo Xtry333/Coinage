@@ -4,8 +4,8 @@ import { Equal, ILike, In, Repository } from 'typeorm';
 
 import { ItemWithLastUsedPriceDTO } from '@app/interfaces';
 
-import { Item } from '../entities/Item.entity';
 import { BaseDao } from './base.dao';
+import { Item } from '../entities/Item.entity';
 
 interface ItemWithLastUsedPriceDBObject {
     id: number;

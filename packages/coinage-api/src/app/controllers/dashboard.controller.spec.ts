@@ -1,6 +1,7 @@
 import { HttpService } from '@nestjs/axios';
 import { Test, TestingModule } from '@nestjs/testing';
 
+import { DashboardComponent } from './dashboard.controller';
 import { createMockAccounts } from '../../test/mock-generators/accounts.mock';
 import { PartialProvider } from '../../test/partial-provider';
 import { AuthService } from '../auth/auth.service';
@@ -8,7 +9,6 @@ import { AccountDao } from '../daos/account.dao';
 import { UserDao } from '../daos/user.dao';
 import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard } from '../services/auth.guard';
-import { DashboardComponent } from './dashboard.controller';
 
 describe('DashboardController', () => {
     let controller: DashboardComponent;

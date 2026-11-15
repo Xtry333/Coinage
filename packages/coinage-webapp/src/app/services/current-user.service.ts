@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
 import { BehaviorSubject, delay, lastValueFrom, Observable } from 'rxjs';
+
 import { WebSocketService } from './web-socket.service';
 
 export interface CurrentUserData {

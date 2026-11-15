@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+
 import { TransferDao } from './transfer.dao';
+import { TemplateNameMapperService } from '../services/template-name-mapper.service';
 
 describe('TransferDao', () => {
     let dao: TransferDao;

@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Equal, Repository } from 'typeorm';
 
-import { User } from '../entities/User.entity';
-import { ItemsWithContainers } from '../entities/views/ItemsWithContainers.view';
 import { BaseDao } from './base.dao';
 import { Item } from '../entities/Item.entity';
+import { User } from '../entities/User.entity';
+import { ItemsWithContainers } from '../entities/views/ItemsWithContainers.view';
 
 @Injectable()
 export class UserDao extends BaseDao {

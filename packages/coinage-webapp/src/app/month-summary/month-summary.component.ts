@@ -1,11 +1,12 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { BalanceDTO, TransferDTO, TransferTypeEnum } from '@app/interfaces';
 import { ChartDataset, ChartOptions } from 'chart.js';
 import { Subscription, lastValueFrom } from 'rxjs';
-import { DateParserService, PartedDate } from '../services/date-parser.service';
+
+import { BalanceDTO, TransferDTO, TransferTypeEnum } from '@app/interfaces';
 
 import { CoinageDataService } from '../services/coinage.data-service';
+import { DateParserService, PartedDate } from '../services/date-parser.service';
 import { TableFilterFields } from '../transfers-table/transfers-table.component';
 
 export interface UiTotalInMonthByCategory {

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
-import { CoinageSocketNamespace } from '@app/common';
 import { Socket } from 'ngx-socket-io';
+
+import { CoinageSocketNamespace } from '@app/common';
 
 @Injectable({
     providedIn: 'root',

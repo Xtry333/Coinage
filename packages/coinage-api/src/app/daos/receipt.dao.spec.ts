@@ -1,7 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
-import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+
 import { ReceiptDao } from './receipt.dao';
+import { TemplateNameMapperService } from '../services/template-name-mapper.service';
 
 describe('ReceiptDao', () => {
     let dao: ReceiptDao;

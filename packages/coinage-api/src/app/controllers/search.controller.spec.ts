@@ -2,12 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 
 import { GlobalSearchRequest, GlobalSearchResponse } from '@app/interfaces';
 
+import { SearchController } from './search.controller';
 import { PartialProvider } from '../../test/partial-provider';
 import { AuthService } from '../auth/auth.service';
 import { UserDao } from '../daos/user.dao';
 import { AuthGuard } from '../services/auth.guard';
 import { SearchService } from '../services/search.service';
-import { SearchController } from './search.controller';
 
 describe('SearchController', () => {
     let controller: SearchController;

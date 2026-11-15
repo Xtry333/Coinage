@@ -1,8 +1,8 @@
 import * as path from 'path';
 
 import { DataSource, Table } from 'typeorm';
-import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
+import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import { environment } from '../environments/environment';
 import entities from './entities/_index';

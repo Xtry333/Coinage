@@ -1,8 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DataSource } from 'typeorm';
+
+import { AccountDao } from './account.dao';
 import { DatabaseSourceService } from '../services/database-source.service';
 import { DateParserService } from '../services/date-parser.service';
-import { AccountDao } from './account.dao';
 
 describe('AccountDao', () => {
     let dao: AccountDao;
