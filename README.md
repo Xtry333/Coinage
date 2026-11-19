@@ -175,6 +175,19 @@ corepack yarn dev:api # Starts the API server
 corepack yarn dev:webapp # Starts the web application
 ```
 
+### Automatic development login
+
+To sign in automatically and skip the login screen, set both variables in the root `.env` to an existing user's credentials, then restart the API:
+
+```dotenv
+COINAGE_FORCED_LOGIN="your-development-username"
+COINAGE_FORCED_PASSWORD="your-development-password"
+```
+
+The development webapp signs in before initial navigation, including when opening a protected page directly, and replaces any previously saved session with the configured user's session. Missing or empty variables disable automatic login; invalid credentials or an unavailable API leave the normal login flow available. This does not create users or reset passwords.
+
+Credentials stay on the API server and are never included in browser builds. Production API builds and production-mode webapps disable this feature. **Do not expose a development API with forced login enabled to untrusted networks:** anyone who can reach it can obtain the configured user's session.
+
 ## Database migrations
 
 Local development does **not** apply migrations automatically. With PostgreSQL ready and `.env` configured, run `yarn migration:run` before the first start and whenever new migrations are added.

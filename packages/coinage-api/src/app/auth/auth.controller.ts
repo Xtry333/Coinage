@@ -1,7 +1,7 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Header, Post, UseGuards } from '@nestjs/common';
 
-import { AuthService } from './auth.service';
 import { AuthGuard } from '../services/auth.guard';
+import { AuthService } from './auth.service';
 
 @Controller('auth')
 export class AuthController {
@@ -10,6 +10,13 @@ export class AuthController {
     @Post('login')
     public async login(@Body() credentials: { username: string; password: string }) {
         const token = await this.authService.loginUser(credentials.username, credentials.password);
+        return { token };
+    }
+
+    @Post('forced-login')
+    @Header('Cache-Control', 'no-store')
+    public async forcedLogin() {
+        const token = await this.authService.forcedLogin();
         return { token };
     }
 

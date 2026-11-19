@@ -1,9 +1,9 @@
-import { Injectable } from '@angular/core';
+import { Injectable, isDevMode } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { AuthDataService } from './auth.dataservice';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NotificationService } from '../services/notification.service';
+import { AuthDataService } from './auth.dataservice';
 
 @Injectable({
     providedIn: 'root',
@@ -18,6 +18,21 @@ export class AuthService {
         private router: Router,
         private notificationService: NotificationService,
     ) {}
+
+    public async initializeForcedLogin(): Promise<void> {
+        if (!isDevMode()) {
+            return;
+        }
+
+        try {
+            const response = await this.authDataService.forcedLogin();
+            if (response.token) {
+                this.coinageStorageService.setString(AuthService.USER_ACCESS_TOKEN, response.token);
+            }
+        } catch {
+            console.warn('Forced development login unavailable; using the normal login flow.');
+        }
+    }
 
     public async login(username: string, password: string): Promise<void> {
         try {

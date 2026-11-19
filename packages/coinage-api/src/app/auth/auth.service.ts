@@ -1,9 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
-import { verifyPassword } from './password-hash.util';
+import { environment } from '../../environments/environment';
 import { UserDao } from '../daos/user.dao';
 import { User } from '../entities/User.entity';
+import { verifyPassword } from './password-hash.util';
 
 interface JwtPayload {
     username: string;
@@ -15,6 +17,7 @@ export class AuthService {
     public constructor(
         private readonly jwtService: JwtService,
         private readonly userDao: UserDao,
+        private readonly configService: ConfigService,
     ) {}
 
     public async validateUser(token: string): Promise<User | undefined> {
@@ -25,6 +28,24 @@ export class AuthService {
         } catch (error) {
             console.error('Error:', error);
             return undefined;
+        }
+    }
+
+    public async forcedLogin(): Promise<string | null> {
+        if (environment.production || this.configService.get<string>('NODE_ENV') === 'production') {
+            return null;
+        }
+
+        const username = this.configService.get<string>('COINAGE_FORCED_LOGIN');
+        const password = this.configService.get<string>('COINAGE_FORCED_PASSWORD');
+        if (!username || !password) {
+            return null;
+        }
+
+        try {
+            return await this.loginUser(username, password);
+        } catch {
+            throw new UnauthorizedException('Forced development login failed.');
         }
     }
 

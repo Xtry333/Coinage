@@ -1,7 +1,6 @@
 import { Routes } from '@angular/router';
 
-import { CoinageRoute } from './CoinageRoute.class';
-import { authGuard } from '../auth/auth.guard';
+import { authGuard, loginGuard } from '../auth/auth.guard';
 import { LoginComponent } from '../auth/login/login.component.page';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
@@ -17,11 +16,12 @@ import { ReceiptUploadPageComponent } from '../receipt-upload/receipt-upload.com
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
 import { TransfersListComponent } from '../transfers-list/transfers-list.component';
+import { CoinageRoute } from './CoinageRoute.class';
 
 const guarded = { canActivate: [authGuard] };
 
 export const CoinageRoutes = {
-    LoginPage: new CoinageRoute('login', LoginComponent),
+    LoginPage: new CoinageRoute('login', LoginComponent, { canActivate: [loginGuard] }),
     NotFoundPage: new CoinageRoute('notFound', DashboardComponent, guarded),
     DashboardPage: new CoinageRoute('dashboard', DashboardComponent, guarded),
     AccountDetailsPage: new CoinageRoute('account/:id', AccountDetailsPage, guarded, { id: 'number' }),
