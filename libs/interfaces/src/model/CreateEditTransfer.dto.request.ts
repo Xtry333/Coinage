@@ -1,5 +1,7 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsDate, IsInt, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+
+import { TagDTO } from '../lib/TagDTO.response';
 
 export class ShoppingListItem {
     public constructor(
@@ -12,6 +14,7 @@ export class ShoppingListItem {
         public categoryId: number | null,
         public containerId?: number | null,
         public transferItemId?: number | null,
+        public tags: TagDTO[] = [],
     ) {}
 }
 
@@ -35,6 +38,7 @@ export class GranularCreateEditTransferModelDTO {
         receiptId: number | null,
         itemChanges: GranularTransferItemChanges,
         targetAccountId: number | null = null,
+        tagIds?: number[],
     ) {
         this.id = id;
         this.description = description;
@@ -46,6 +50,7 @@ export class GranularCreateEditTransferModelDTO {
         this.receiptId = receiptId;
         this.itemChanges = itemChanges;
         this.targetAccountId = targetAccountId;
+        this.tagIds = tagIds;
     }
 
     @IsOptional()
@@ -97,6 +102,12 @@ export class GranularCreateEditTransferModelDTO {
 
     @Type(() => GranularTransferItemChanges)
     public itemChanges: GranularTransferItemChanges;
+
+    @IsOptional()
+    @IsArray()
+    @IsInt({ each: true })
+    @Min(1, { each: true })
+    public tagIds?: number[];
 }
 
 export class CreateEditTransferModelDTO {
@@ -111,6 +122,7 @@ export class CreateEditTransferModelDTO {
         receiptId: number | null,
         items: ShoppingListItem[] | undefined,
         targetAccountId: number | null = null,
+        tagIds?: number[],
     ) {
         this.id = id;
         this.description = description;
@@ -122,6 +134,7 @@ export class CreateEditTransferModelDTO {
         this.receiptId = receiptId;
         this.items = items ?? [];
         this.targetAccountId = targetAccountId;
+        this.tagIds = tagIds;
     }
 
     @IsOptional()
@@ -173,4 +186,10 @@ export class CreateEditTransferModelDTO {
 
     @Type(() => ShoppingListItem)
     public items: ShoppingListItem[];
+
+    @IsOptional()
+    @IsArray()
+    @IsInt({ each: true })
+    @Min(1, { each: true })
+    public tagIds?: number[];
 }

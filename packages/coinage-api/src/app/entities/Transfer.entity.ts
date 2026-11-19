@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Account } from './Account.entity';
 import { Category } from './Category.entity';
@@ -6,6 +6,7 @@ import { Contractor } from './Contractor.entity';
 import { Currency } from './Currency.entity';
 import { Receipt } from './Receipt.entity';
 import { Schedule } from './Schedule.entity';
+import { Tag } from './Tag.entity';
 import { TransferItem } from './TransferItem.entity';
 import { DateTransformer, DateTransformerType } from './transformers/date.transformer';
 import { DecimalToNumberTransformer } from './transformers/decimal-to-number.transformer';
@@ -117,6 +118,15 @@ export class Transfer extends WithDateEntity {
 
     @OneToMany(() => TransferItem, (transferItem) => transferItem.transfer, { eager: true, cascade: ['insert'] })
     public transferItems!: TransferItem[];
+
+    /** Only direct assignments. Inherited item tags must never be persisted here. */
+    @ManyToMany(() => Tag, (tag) => tag.transfers, { eager: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinTable({
+        name: 'transfer_tag',
+        joinColumn: { name: 'transfer_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
+    })
+    public tags!: Tag[];
 }
 
 interface TransferMetadata {

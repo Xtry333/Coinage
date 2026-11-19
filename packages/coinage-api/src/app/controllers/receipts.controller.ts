@@ -22,7 +22,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import { diskStorage } from 'multer';
 
-
 import {
     BaseResponseDTO,
     ConfirmReceiptDTO,
@@ -47,6 +46,7 @@ import { TransferItem } from '../entities/TransferItem.entity';
 import { User } from '../entities/User.entity';
 import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.event';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
+import { getReceiptTags, getTransferTags } from '../services/tag-mapper';
 import { TransfersService } from '../services/transfers.service';
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads', 'receipts');
@@ -214,6 +214,7 @@ export class ReceiptsController {
             amount: receipt.amount,
             contractor: receipt.contractor?.name,
             transferIds: receipt.transfers?.map((t) => t.id) || [],
+            tags: getReceiptTags(receipt.transfers),
         }));
     }
 
@@ -323,6 +324,7 @@ export class ReceiptsController {
             contractorId: receipt.contractor?.id ?? null,
             contractorName: receipt.contractor?.name ?? null,
             allTransfers: receipt.transfers.map((t) => this.toTransferDTO(t)),
+            tags: getReceiptTags(receipt.transfers),
         };
     }
 
@@ -350,6 +352,7 @@ export class ReceiptsController {
             accountName: transfer.originAccount.name,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
+            tags: getTransferTags(transfer),
         };
     }
 

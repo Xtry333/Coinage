@@ -13,6 +13,7 @@ export interface SelectedDetails {
     accountId: number | undefined;
     contractorId: number | undefined;
     transferDate: string;
+    tagIds?: number[];
 }
 
 @Component({
@@ -48,6 +49,7 @@ export class NewTransferDetailsComponent implements OnInit {
             accountId: 0,
             contractorId: 0,
             transferDate: '',
+            tagIds: [],
         };
     }
 
@@ -91,6 +93,11 @@ export class NewTransferDetailsComponent implements OnInit {
     }
 
     public onDateChanged(): void {
+        this.detailsChanged.emit(this.selected);
+    }
+
+    public onTagsChanged(tagIds: number[]): void {
+        this.selected.tagIds = [...new Set(tagIds)];
         this.detailsChanged.emit(this.selected);
     }
 

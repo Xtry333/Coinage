@@ -5,6 +5,11 @@ import * as Rx from 'rxjs';
 
 import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 
+import { CoinageRoutes } from '../app-routing/app-routes';
+import { AppliedFilter } from '../components/applied-filters/applied-filters.component';
+import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
+import { CoinageDataService } from '../services/coinage.data-service';
 import {
     FilterOption,
     FilterType,
@@ -16,15 +21,11 @@ import {
     PopupSide,
     TableFilterComponent,
 } from './table-filter/table-filter.component';
-import { CoinageRoutes } from '../app-routing/app-routes';
-import { AppliedFilter } from '../components/applied-filters/applied-filters.component';
-import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { CoinageDataService } from '../services/coinage.data-service';
 
 export enum TableColumn {
     Category = 'Category',
     Description = 'Description',
+    Tags = 'Tags',
     Account = 'Account',
     Amount = 'Amount',
     Contractor = 'Contractor',
@@ -34,6 +35,7 @@ export enum TableColumn {
 export const TableColumnsFilterTypes: Record<TableColumn, FilterType> & { [key: string]: FilterType } = {
     Category: FilterType.MultiCheckbox,
     Description: FilterType.TextBox,
+    Tags: FilterType.MultiCheckbox,
     Contractor: FilterType.MultiCheckbox,
     Account: FilterType.MultiCheckbox,
     Amount: FilterType.NumericRange,
@@ -44,12 +46,14 @@ export type OptionsForCheckboxFilters = {
     categories: FilterOption[];
     contractors: FilterOption[];
     accounts: FilterOption[];
+    tags: FilterOption[];
 };
 
 export interface TableFilterFields {
     categoryIds?: number[];
     contractorIds?: number[];
     accountIds?: number[];
+    tagIds?: number[];
     category?: string;
     description?: string;
     contractor?: string;
@@ -107,6 +111,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         categories: [],
         accounts: [],
         contractors: [],
+        tags: [],
     };
 
     public currentPage = 1;
@@ -144,19 +149,23 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                     this.filter = cachedFilters;
                 }
             }
-            Rx.zip(this.dataService.getCategoryList(), this.dataService.getContractorList(), this.dataService.getAllAvailableAccounts()).subscribe(
-                ([categories, contractors, accounts]) => {
-                    this.optionsForCheckboxFilters.categories = categories.map((c) =>
-                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.categoryIds),
-                    );
-                    this.optionsForCheckboxFilters.contractors = contractors.map((c) =>
-                        TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.contractorIds),
-                    );
-                    this.optionsForCheckboxFilters.accounts = accounts
-                        .map((a) => TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds))
-                        .sort((a, b) => a.uiText.localeCompare(b.uiText));
-                },
-            );
+            Rx.zip(
+                this.dataService.getCategoryList(),
+                this.dataService.getContractorList(),
+                this.dataService.getAllAvailableAccounts(),
+                this.dataService.getTags(),
+            ).subscribe(([categories, contractors, accounts, tags]) => {
+                this.optionsForCheckboxFilters.categories = categories.map((c) =>
+                    TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.categoryIds),
+                );
+                this.optionsForCheckboxFilters.contractors = contractors.map((c) =>
+                    TableFilterComponent.mapToFilterOptions(c.id, c.name, this.filter.contractorIds),
+                );
+                this.optionsForCheckboxFilters.accounts = accounts
+                    .map((a) => TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds))
+                    .sort((a, b) => a.uiText.localeCompare(b.uiText));
+                this.optionsForCheckboxFilters.tags = tags.map((tag) => TableFilterComponent.mapToFilterOptions(tag.id, tag.name, this.filter.tagIds));
+            });
         }
 
         this.doFiltering();
@@ -179,6 +188,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             this.filter.contractorIds = event.selectedIds;
         } else if (this.checkFilterEventColumnName<OnMultiCheckboxFilterEvent>(event, TableColumn.Account)) {
             this.filter.accountIds = event.selectedIds;
+        } else if (this.checkFilterEventColumnName<OnMultiCheckboxFilterEvent>(event, TableColumn.Tags)) {
+            this.filter.tagIds = [...new Set(event.selectedIds)];
         } else if (this.checkFilterEventColumnName<OnNumericRangeFilterEvent>(event, TableColumn.Amount)) {
             this.filter.amountFrom = event.range.from;
             this.filter.amountTo = event.range.to;
@@ -309,6 +320,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
         addTextFilter('Category', selectedNames(this.filter.categoryIds, this.optionsForCheckboxFilters.categories, this.filter.category));
         addTextFilter('Description', this.filter.description);
+        addTextFilter('Tags (any)', selectedNames(this.filter.tagIds, this.optionsForCheckboxFilters.tags));
         addTextFilter('Source account', selectedNames(this.filter.accountIds, this.optionsForCheckboxFilters.accounts, this.filter.account));
         if (this.filter.amountFrom !== undefined && this.filter.amountTo !== undefined) {
             filters.push({ label: 'Amount', value: `${this.filter.amountFrom} – ${this.filter.amountTo}` });
@@ -393,6 +405,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             typeSymbol: TransferType.OUTCOME.symbol,
             isTodayMarkerRow: true,
             isFlagged: false,
+            tags: [],
         };
     }
 

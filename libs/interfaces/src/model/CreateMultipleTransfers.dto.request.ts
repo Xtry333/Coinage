@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsDate, IsNotIn, IsNumber, IsOptional, IsPositive, IsString, Min } from 'class-validator';
+import { IsArray, IsDate, IsInt, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class ExistingItem {
     @IsNumber()
@@ -76,6 +76,12 @@ export class FakeItem {
 }
 
 export class CreateMultipleTransfersDTO {
+    @IsOptional()
+    @IsArray()
+    @IsInt({ each: true })
+    @Min(1, { each: true })
+    public tagIds?: number[];
+
     @IsOptional()
     @IsString()
     public description?: string;

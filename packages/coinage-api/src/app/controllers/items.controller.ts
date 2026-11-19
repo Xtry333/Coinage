@@ -10,13 +10,16 @@ import {
     ItemWithContainerDTO,
     ItemWithLastUsedPriceDTO,
     TransferWithItemDetailsDTO,
+    uniqueTags,
 } from '@app/interfaces';
 
 import { ItemDao } from '../daos/item.dao';
+import { TagDao } from '../daos/tag.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
 import { Item } from '../entities/Item.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { AuthGuard } from '../services/auth.guard';
+import { getTransferTags } from '../services/tag-mapper';
 
 @UseGuards(AuthGuard)
 @Controller(['item', 'items'])
@@ -24,6 +27,7 @@ export class ItemsController {
     public constructor(
         private readonly itemDao: ItemDao,
         private readonly transferItemDao: TransferItemDao,
+        private readonly tagDao: TagDao,
     ) {}
 
     @Get('/all')
@@ -60,6 +64,7 @@ export class ItemsController {
                 brand: item?.brand || null,
                 categoryId: category?.id || 0,
                 categoryName: category?.name || null,
+                tags: uniqueTags(item?.tags),
                 // Deprecated fields marked
                 containerSize: item?.containerSize || null,
                 containerSizeUnit: item?.containerSizeUnit || null,
@@ -86,6 +91,25 @@ export class ItemsController {
             }
 
             itemContainerMap.set(key, itemData);
+        }
+
+        // Include unused catalog items too, so their tags can be found and edited.
+        const usedItemIds = new Set([...itemContainerMap.values()].map((item) => item.id));
+        for (const item of await this.itemDao.getAll()) {
+            if (usedItemIds.has(item.id)) continue;
+            const category = await item.category;
+            itemContainerMap.set(`${item.id}-no-container`, {
+                id: item.id,
+                name: item.name,
+                brand: item.brand,
+                categoryId: item.categoryId ?? 0,
+                categoryName: category?.name ?? null,
+                tags: uniqueTags(item.tags),
+                containerSize: item.containerSize,
+                containerSizeUnit: item.containerSizeUnit,
+                lastUsedDate: null,
+                lastUnitPrice: null,
+            });
         }
 
         return Array.from(itemContainerMap.values()).sort((a, b) => {
@@ -147,7 +171,7 @@ export class ItemsController {
             itemName: item.name,
             categoryId: category?.id ?? null,
             categoryName: category?.name ?? null,
-            tags: (item.tags ?? []).map((tag) => ({ id: tag.id, name: tag.name, color: tag.color })),
+            tags: uniqueTags(item.tags),
             container: container,
             createdDate: item.createdDate,
             editedDate: item.editedDate,
@@ -165,6 +189,9 @@ export class ItemsController {
         entity.categoryId = item.categoryId;
         entity.containerSize = item.containerSize;
         entity.containerSizeUnit = item.containerSizeUnit;
+        if (item.tagIds !== undefined) {
+            entity.tags = await this.tagDao.getByIds(item.tagIds);
+        }
 
         const inserted = await this.itemDao.save(entity);
 
@@ -194,6 +221,7 @@ export class ItemsController {
         return {
             transferId: transfer.id,
             transferName: transfer.description,
+            tags: getTransferTags(transfer),
             transferContractorId: transfer.contractor?.id ?? null,
             transferContractorName: transfer.contractor?.name ?? null,
             accountId: transfer.originAccountId,

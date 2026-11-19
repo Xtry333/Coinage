@@ -27,22 +27,23 @@
                         </div>
                     }
 
-                    @if (item.tags && item.tags.length > 0) {
-                        <div class="flex items-start justify-between">
-                            <dt class="w-1/3 text-sm font-medium text-gray-500">Tags</dt>
-                            <dd class="flex w-2/3 flex-wrap gap-1 text-sm text-gray-900">
-                                @for (tag of item.tags; track tag.id) {
-                                    <span
-                                        class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
-                                        [style.background-color]="tag.color ? tag.color + '20' : '#e5e7eb'"
-                                        [style.color]="tag.color || '#374151'"
-                                    >
-                                        {{ tag.name }}
-                                    </span>
-                                }
-                            </dd>
-                        </div>
-                    }
+                    <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Tags</dt>
+                        <dd class="w-2/3 space-y-2 text-sm text-gray-900">
+                            <app-tag-badges [tags]="item.tags"></app-tag-badges>
+                            <label class="block text-sm font-medium text-gray-700" for="itemTags">Edit item tags</label>
+                            <app-tag-selector [(tagIds)]="selectedTagIds" [disabled]="savingTags" inputId="itemTags"></app-tag-selector>
+                            <p class="text-xs text-gray-500">All transfers containing this item inherit these tags automatically.</p>
+                            <button
+                                class="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+                                [disabled]="savingTags"
+                                (click)="saveTags()"
+                                type="button"
+                            >
+                                {{ savingTags ? 'Saving…' : 'Save tags' }}
+                            </button>
+                        </dd>
+                    </div>
 
                     @if (item.itemContainers && item.itemContainers.length > 0) {
                         <div class="flex items-start justify-between">

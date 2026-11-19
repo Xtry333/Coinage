@@ -1,6 +1,4 @@
-import { IsNumber, Min } from 'class-validator';
-
-import { TransferDTO } from './FilteredTransferDTO.response';
+import { EffectiveTagDTO } from './TagDTO.response';
 
 export interface Message {
     message: string;
@@ -24,6 +22,7 @@ export interface ReceiptDTO {
     amount: number | null;
     contractor?: string;
     transferIds: number[];
+    tags: EffectiveTagDTO[];
 }
 
 export class Range<T> {

@@ -1,0 +1,15 @@
+<span class="inline-flex flex-wrap gap-1">
+    @for (tag of displayedTags; track tag.id) {
+        <span
+            class="inline-flex items-center rounded-full px-2 py-1 text-xs font-medium"
+            [style.background-color]="tag.color ? tag.color + '20' : '#e5e7eb'"
+            [style.color]="tag.color || '#374151'"
+            [title]="title(tag)"
+        >
+            {{ tag.name }}
+            @if (isInherited(tag)) {
+                <span class="ml-1">(inherited)</span>
+            }
+        </span>
+    }
+</span>

@@ -22,8 +22,12 @@ export class Item extends WithDateEntity {
     @JoinColumn({ name: 'category_id' })
     public category!: Promise<Category | null>;
 
-    @ManyToMany(() => Tag, (tag) => tag.items, { eager: true })
-    @JoinTable({ name: 'item_tag' })
+    @ManyToMany(() => Tag, (tag) => tag.items, { eager: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    @JoinTable({
+        name: 'item_tag',
+        joinColumn: { name: 'item_id', referencedColumnName: 'id' },
+        inverseJoinColumn: { name: 'tag_id', referencedColumnName: 'id' },
+    })
     public tags!: Tag[];
 
     @Column({ type: 'float', nullable: true })

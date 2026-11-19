@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
-import { GlobalSearchItemResult, GlobalSearchRequest, GlobalSearchResponse, GlobalSearchTransferResult } from '@app/interfaces';
+import { GlobalSearchItemResult, GlobalSearchRequest, GlobalSearchResponse, GlobalSearchTransferResult, uniqueTags } from '@app/interfaces';
 
 import { ItemDao } from '../daos/item.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
+import { getTransferTags } from './tag-mapper';
 
 @Injectable()
 export class SearchService {
@@ -32,7 +33,9 @@ export class SearchService {
         return Promise.all(
             items.map(async (item) => {
                 const category = await item.category;
-                return new GlobalSearchItemResult(item.id, item.name, item.brand, category?.name || null);
+                const result = new GlobalSearchItemResult(item.id, item.name, item.brand, category?.name || null);
+                result.tags = uniqueTags(item.tags);
+                return result;
             }),
         );
     }
@@ -40,17 +43,18 @@ export class SearchService {
     private async searchTransfers(query: string, userAccountIds: number[], limit: number): Promise<GlobalSearchTransferResult[]> {
         const transfers = await this.transferDao.searchByDescription(query, userAccountIds, limit);
 
-        return transfers.map(
-            (transfer) =>
-                new GlobalSearchTransferResult(
-                    transfer.id,
-                    transfer.description,
-                    transfer.amount,
-                    transfer.currency.symbol,
-                    transfer.date,
-                    transfer.category.name,
-                    transfer.contractor?.name || null,
-                ),
-        );
+        return transfers.map((transfer) => {
+            const result = new GlobalSearchTransferResult(
+                transfer.id,
+                transfer.description,
+                transfer.amount,
+                transfer.currency.symbol,
+                transfer.date,
+                transfer.category.name,
+                transfer.contractor?.name || null,
+            );
+            result.tags = getTransferTags(transfer);
+            return result;
+        });
     }
 }

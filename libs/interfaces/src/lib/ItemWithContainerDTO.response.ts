@@ -1,11 +1,14 @@
 import { Unit } from '@app/common-units';
 
+import { TagDTO } from './TagDTO.response';
+
 export class ItemWithContainerDTO {
     public id!: number;
     public name!: string;
     public brand?: string | null;
     public categoryId!: number;
     public categoryName?: string | null;
+    public tags!: TagDTO[];
 
     // Deprecated item-level container fields (marked for removal)
     /** @deprecated Use containerName, containerWeight, containerVolume instead */

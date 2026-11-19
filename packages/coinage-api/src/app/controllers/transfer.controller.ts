@@ -11,12 +11,14 @@ import {
     TransferDetailsDTO,
     TransferDTO,
     TransferType,
+    uniqueTags,
 } from '@app/interfaces';
 
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { ContractorDao } from '../daos/contractor.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
+import { TagDao } from '../daos/tag.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Category } from '../entities/Category.entity';
 import { Transfer } from '../entities/Transfer.entity';
@@ -26,9 +28,10 @@ import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { ItemsService } from '../services/items.service';
+import { getReceiptTags, getTransferTags } from '../services/tag-mapper';
 import { TransferItemsService } from '../services/transfer-items.service';
-import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 import { TransfersService } from '../services/transfers.service';
+import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfer')
@@ -47,6 +50,7 @@ export class TransferController {
         private readonly saveTransfersService: SaveTransfersService,
         private readonly itemsService: ItemsService,
         private readonly transferItemsService: TransferItemsService,
+        private readonly tagDao: TagDao,
     ) {}
 
     @Get(':transferId/details')
@@ -96,6 +100,7 @@ export class TransferController {
                   date: receipt.date,
                   contractor: receipt.contractor?.name ?? '',
                   transferIds: receipt.transfers.map((t) => t.id) ?? [],
+                  tags: getReceiptTags(receipt.transfers),
               }
             : null;
 
@@ -116,6 +121,7 @@ export class TransferController {
             contractor: transfer.contractor?.name,
             contractorId: transfer.contractor?.id,
             categoryId: transfer.category.id,
+            tags: getTransferTags(transfer),
             account: { id: transfer.originAccount?.id ?? 0, name: transfer.originAccount?.name ?? '' },
             targetAccount: { id: transfer.targetAccount?.id ?? 0, name: transfer.targetAccount?.name ?? '' },
             otherTransfers: otherTransfers,
@@ -134,7 +140,7 @@ export class TransferController {
                     setDiscount: item.totalSetDiscount,
                     containerId: item.containerId,
                     transferItemId: item.id,
-                    tags: (item.item.tags ?? []).map((tag) => ({ id: tag.id, name: tag.name, color: tag.color })),
+                    tags: uniqueTags(item.item.tags),
                 };
             }),
             isPlanned: transfer.date > new Date(),
@@ -163,6 +169,7 @@ export class TransferController {
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
+            tags: getTransferTags(transfer),
         };
     }
 
@@ -198,6 +205,7 @@ export class TransferController {
 
     @Post('createAdvanced')
     public async createTransfersFromAdvancedObject(@RequestingUser() user: User, @Body() requestBody: CreateMultipleTransfersDTO): Promise<BaseResponseDTO> {
+        const directTags = requestBody.tagIds !== undefined ? await this.tagDao.getByIds(requestBody.tagIds) : [];
         const transferEntities: Transfer[] = [];
         const items = await this.itemsService.getByIds(requestBody.items.map((item) => item.itemId));
         const contractor = requestBody.contractorId !== null ? await this.contractorDao.getById(requestBody.contractorId) : null;
@@ -224,6 +232,7 @@ export class TransferController {
             entity.date = requestBody.date;
             entity.categoryId = category.id;
             entity.type = category.type;
+            entity.tags = directTags;
             entity.contractorId = contractor?.id ?? null;
 
             entity.ownerUserId = user.id;
@@ -262,6 +271,7 @@ export class TransferController {
 
     @Post('save')
     public async saveTransferObject(@RequestingUser() user: User, @Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
+        const directTags = transfer.tagIds !== undefined ? await this.tagDao.getByIds(transfer.tagIds) : undefined;
         let entity: Transfer;
         const category = await this.categoryDao.getById(transfer.categoryId);
         const account = await this.accountDao.getById(transfer.accountId);
@@ -282,6 +292,7 @@ export class TransferController {
         entity.category = category;
         entity.categoryId = category.id;
         entity.type = category.type;
+        if (directTags !== undefined) entity.tags = directTags;
 
         if (entity.ownerUserId === undefined) {
             entity.ownerUser = user;
@@ -365,6 +376,7 @@ export class TransferController {
         if (!transfer.id) {
             throw new BadRequestException('Transfer ID is required for granular save');
         }
+        const directTags = transfer.tagIds !== undefined ? await this.tagDao.getByIds(transfer.tagIds) : undefined;
 
         let entity: Transfer;
         const category = await this.categoryDao.getById(transfer.categoryId);
@@ -383,6 +395,7 @@ export class TransferController {
         entity.category = category;
         entity.categoryId = category.id;
         entity.type = category.type;
+        if (directTags !== undefined) entity.tags = directTags;
 
         entity.originAccount = account;
         entity.originAccountId = account.id;

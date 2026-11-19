@@ -1,0 +1,20 @@
+<ng-select
+    [ngModel]="tagIds ?? []"
+    [ngModelOptions]="{ standalone: true }"
+    [items]="tags"
+    [multiple]="true"
+    [closeOnSelect]="false"
+    [hideSelected]="true"
+    [loading]="loading"
+    [disabled]="disabled || loading || loadFailed"
+    [addTag]="addTag.bind(this)"
+    [labelForId]="inputId"
+    (ngModelChange)="onChange($event)"
+    bindValue="id"
+    bindLabel="name"
+    addTagText="Create tag"
+    placeholder="Select or create tags"
+></ng-select>
+@if (error) {
+    <p class="mt-1 text-sm text-red-700" role="alert">{{ error }}</p>
+}

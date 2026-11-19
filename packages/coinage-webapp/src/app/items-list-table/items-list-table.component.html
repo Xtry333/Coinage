@@ -37,6 +37,18 @@
                         ></app-table-filter>
                     }
                 </th>
+                <th class="text-left">
+                    <span title="Matches any selected tag">Tags</span>
+                    @if (showFilters) {
+                        <app-table-filter
+                            [filterName]="ItemTableColumn.Tags"
+                            [filterType]="FilterType.MultiCheckbox"
+                            [filterOptions]="optionsForCheckboxFilters.tags"
+                            [popupSide]="PopupSide.ToRight"
+                            (filterEvent)="onPerformFilter($event)"
+                        ></app-table-filter>
+                    }
+                </th>
                 <th class="text-right">
                     <span>Container</span>
                     @if (showFilters) {
@@ -94,6 +106,7 @@
                         </a>
                     </td>
                     <td>{{ getCategoryName(item) }}</td>
+                    <td><app-tag-badges [tags]="item.tags"></app-tag-badges></td>
                     <td class="text-right font-mono">{{ formatContainer(item) }}</td>
                     <td class="text-right font-mono">
                         {{ item.lastUnitPrice | appCurrency: getCurrencyCode(item) }}
@@ -113,14 +126,22 @@
                     </td>
                     <td class="text-center">
                         <div class="flex items-center justify-center gap-1">
-                            <app-button-icon [icon]="editIcon" size="sm" variant="ghost" ariaLabel="Edit item" title="Edit item"></app-button-icon>
+                            <a [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })">
+                                <app-button-icon
+                                    [icon]="editIcon"
+                                    size="sm"
+                                    variant="ghost"
+                                    ariaLabel="Edit item tags"
+                                    title="Edit item tags"
+                                ></app-button-icon>
+                            </a>
                         </div>
                     </td>
                 </tr>
             }
             @if (noRowsFound) {
                 <tr>
-                    <td class="py-8 text-center text-gray-500" colspan="8">
+                    <td class="py-8 text-center text-gray-500" colspan="9">
                         <div class="flex flex-col items-center gap-2">
                             <fa-icon class="text-4xl text-gray-300" [icon]="boxesIcon"></fa-icon>
                             <span class="font-medium">No items found</span>

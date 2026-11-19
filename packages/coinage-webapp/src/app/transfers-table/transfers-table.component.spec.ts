@@ -3,11 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
-import { FilterType, TableFilterComponent } from './table-filter/table-filter.component';
-import { TransfersTableComponent } from './transfers-table.component';
 import { AppliedFiltersComponent } from '../components/applied-filters/applied-filters.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../services/coinage.data-service';
+import { FilterType, TableFilterComponent } from './table-filter/table-filter.component';
+import { TransfersTableComponent } from './transfers-table.component';
 
 describe('TransferTableComponent', () => {
     let component: TransfersTableComponent;
@@ -16,6 +16,7 @@ describe('TransferTableComponent', () => {
         getCategoryList: jest.fn(() => of([{ id: 1, name: 'Groceries' }])),
         getAllAvailableAccounts: jest.fn(() => of([{ id: 2, name: 'Cash' }])),
         getContractorList: jest.fn(() => of([{ id: 3, name: 'Store' }])),
+        getTags: jest.fn(() => of([{ id: 4, name: 'Holiday', color: null }])),
     };
     const storage = {
         getBoolean: jest.fn(),
@@ -186,5 +187,23 @@ describe('TransferTableComponent', () => {
         fixture.detectChanges();
 
         expect(fixture.nativeElement.querySelector('app-applied-filters')).toBeNull();
+    });
+
+    it('restores cached tag selections and describes the any-tag filter', () => {
+        storage.getObject.mockReturnValue({ tagIds: [4] });
+        fixture.detectChanges();
+
+        expect(component.optionsForCheckboxFilters.tags[0].isSelected).toBe(true);
+        expect(component.appliedFilters).toEqual([{ label: 'Tags (any)', value: 'Holiday' }]);
+    });
+
+    it('emits distinct tag IDs for server-side filtering', () => {
+        fixture.detectChanges();
+        const emitted = jest.spyOn(component.tableFilter, 'emit');
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: 'Tags', selectedIds: [4, 4] });
+
+        expect(emitted).toHaveBeenLastCalledWith({ tagIds: [4] });
+        expect(storage.setObject).toHaveBeenLastCalledWith('test.filters', { tagIds: [4] });
+        expect(component.currentPage).toBe(1);
     });
 });

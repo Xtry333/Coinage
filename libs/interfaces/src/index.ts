@@ -33,6 +33,7 @@ export * from './model/TransferDetails.dto.response';
 export * from './model/PartialDate';
 
 export * from './utils/Expand';
+export * from './utils/tag-sets';
 
 export * from './lib/ReceiptAiReviewDTO';
 export * from './lib/ReceiptImageDTO';

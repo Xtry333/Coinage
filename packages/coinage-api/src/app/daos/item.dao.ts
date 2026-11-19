@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Equal, ILike, In, Repository } from 'typeorm';
+import { Equal, ILike, In, Raw, Repository } from 'typeorm';
 
-import { ItemWithLastUsedPriceDTO } from '@app/interfaces';
+import { ItemWithLastUsedPriceDTO, TagDTO } from '@app/interfaces';
 
-import { BaseDao } from './base.dao';
 import { Item } from '../entities/Item.entity';
+import { BaseDao } from './base.dao';
 
 interface ItemWithLastUsedPriceDBObject {
     id: number;
@@ -16,6 +16,7 @@ interface ItemWithLastUsedPriceDBObject {
     category_id: number;
     container_size: number | null;
     container_size_unit: string | null;
+    tags: TagDTO[];
 }
 
 @Injectable()
@@ -47,7 +48,12 @@ export class ItemDao extends BaseDao {
                 FROM transfer_item AS ti
                 JOIN transfer AS t ON t.id = ti.transfer_id
             )
-            SELECT i.*, lti.date AS last_used_date, lti.unit_price AS last_unit_price
+            SELECT i.*, lti.date AS last_used_date, lti.unit_price AS last_unit_price,
+                COALESCE((
+                    SELECT jsonb_agg(jsonb_build_object('id', t.id, 'name', t.name, 'color', t.color) ORDER BY t.name, t.id)
+                    FROM item_tag it JOIN tag t ON t.id = it.tag_id
+                    WHERE it.item_id = i.id
+                ), '[]'::jsonb) AS tags
             FROM item i
             LEFT JOIN latest_transfer_item lti ON i.id = lti.item_id AND rn = 1
             ORDER BY i.name;
@@ -62,6 +68,7 @@ export class ItemDao extends BaseDao {
                     item.last_used_date,
                     item.last_unit_price ?? 0,
                     item.category_id,
+                    item.tags,
                 ),
         );
     }
@@ -76,7 +83,20 @@ export class ItemDao extends BaseDao {
 
     public async searchByNameOrBrand(query: string, limit: number): Promise<Item[]> {
         return this.itemRepository.find({
-            where: [{ name: ILike(`%${query}%`) }, { brand: ILike(`%${query}%`) }],
+            where: [
+                { name: ILike(`%${query}%`) },
+                { brand: ILike(`%${query}%`) },
+                {
+                    id: Raw(
+                        (alias) => `EXISTS (
+                        SELECT 1 FROM item_tag search_item_tag
+                        JOIN tag search_tag ON search_tag.id = search_item_tag.tag_id
+                        WHERE search_item_tag.item_id = ${alias} AND search_tag.name ILIKE :tagQuery
+                    )`,
+                        { tagQuery: `%${query}%` },
+                    ),
+                },
+            ],
             order: { name: 'ASC' },
             take: limit,
         });

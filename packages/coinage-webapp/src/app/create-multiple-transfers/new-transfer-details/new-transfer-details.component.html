@@ -38,7 +38,7 @@
     <div class="flex flex-col">
         <label for="transferDateInput">Transfer Date</label>
         <input
-            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
             id="transferDateInput"
             [(ngModel)]="selected.transferDate"
             (change)="onDateChanged()"
@@ -47,5 +47,10 @@
             placeholder="Date"
             aria-label="Transfer Date"
         />
+    </div>
+    <div class="flex flex-col md:col-span-3">
+        <label for="multipleTransferTags">Direct tags for each new transfer</label>
+        <app-tag-selector [tagIds]="selected.tagIds" (tagIdsChange)="onTagsChanged($event)" inputId="multipleTransferTags"></app-tag-selector>
+        <p class="mt-1 text-xs text-gray-500">Item tags are inherited separately and are not stored as direct transfer tags.</p>
     </div>
 </div>

@@ -2,8 +2,7 @@ import { Type } from 'class-transformer';
 
 import { TransferDTO } from '../lib/FilteredTransferDTO.response';
 import { AccountDTO, CategoryPathDTO, ReceiptDTO } from '../lib/interfaces';
-import { TagDTO } from '../lib/TagDTO.response';
-
+import { EffectiveTagDTO, TagDTO } from '../lib/TagDTO.response';
 
 export class TransferItemDTO {
     public id!: number;
@@ -27,6 +26,7 @@ export class TransferDetailsDTO {
     public targetAccount!: AccountDTO;
     public categoryPath!: CategoryPathDTO[];
     public categoryId!: number;
+    public tags!: EffectiveTagDTO[];
     public contractor?: string;
     public contractorId?: number;
     @Type(() => Date) public date!: Date;

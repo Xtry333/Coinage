@@ -38,6 +38,10 @@
                 <th>Contractor</th>
                 <td>{{ receiptDetails.contractorName | ifNull }}</td>
             </tr>
+            <tr>
+                <th>Tags</th>
+                <td><app-tag-badges [tags]="receiptDetails.tags" [receipt]="true"></app-tag-badges></td>
+            </tr>
         </table>
 
         <!-- Receipt Image Upload Section -->

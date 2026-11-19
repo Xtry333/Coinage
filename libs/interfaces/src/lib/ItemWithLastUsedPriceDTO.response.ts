@@ -1,3 +1,5 @@
+import { TagDTO } from './TagDTO.response';
+
 export class ItemWithLastUsedPriceDTO {
     public constructor(
         public id: number,
@@ -7,5 +9,6 @@ export class ItemWithLastUsedPriceDTO {
         public lastUsedDate: Date | null,
         public lastUnitPrice: number | null,
         public categoryId: number,
+        public tags: TagDTO[] = [],
     ) {}
 }

@@ -13,8 +13,10 @@ import {
     GranularCreateEditTransferModelDTO,
     GranularTransferItemChanges,
     ShoppingListItem,
+    TagDTO,
     TransferDetailsDTO,
     TransferItemDTO,
+    effectiveTags,
 } from '@app/interfaces';
 
 import { CoinageRoutes } from '../app-routing/app-routes';
@@ -32,6 +34,7 @@ export interface NewTransferObject {
     accountId?: number;
     targetAccountId?: number | null;
     items?: ShoppingListItem[];
+    tagIds?: number[];
 }
 
 @Component({
@@ -50,6 +53,7 @@ export class CreateEditTransferComponent implements OnInit {
     public contractors: ContractorDTO[] = [];
     public containers: ContainerDTO[] = [];
     public accounts: AccountDTO[] = [];
+    public availableTags: TagDTO[] = [];
     public editMode = false;
     public transferDTO?: TransferDetailsDTO;
     public transferId!: number;
@@ -104,6 +108,7 @@ export class CreateEditTransferComponent implements OnInit {
                         contractorId: transfer.contractorId ?? undefined,
                         accountId: transfer.account.id,
                         targetAccountId: transfer.targetAccount.id,
+                        tagIds: (transfer.tags ?? []).filter((tag) => tag.isDirect).map((tag) => tag.id),
                     };
                 });
             } else if (this.initialData) {
@@ -115,6 +120,7 @@ export class CreateEditTransferComponent implements OnInit {
                     contractorId: this.initialData.contractorId,
                     accountId: this.initialData.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
                     targetAccountId: this.initialData.targetAccountId,
+                    tagIds: [...new Set(this.initialData.tagIds ?? [])],
                 };
                 if (this.initialData.items && this.initialData.items.length > 0) {
                     this.itemsInTransfer = [...this.initialData.items];
@@ -156,6 +162,7 @@ export class CreateEditTransferComponent implements OnInit {
                 this.transferDTO?.receipt?.id ?? null,
                 itemChanges,
                 this.selectedTransferInputs.targetAccountId ?? null,
+                [...new Set(this.selectedTransferInputs.tagIds ?? [])],
             );
             console.log('Granular save:', granularTransfer);
             this.coinageData.postGranularSaveTransfer(granularTransfer).subscribe((result) => {
@@ -174,6 +181,7 @@ export class CreateEditTransferComponent implements OnInit {
                 this.transferDTO?.receipt?.id ?? null,
                 this.itemsInTransfer,
                 this.selectedTransferInputs.targetAccountId ?? null,
+                [...new Set(this.selectedTransferInputs.tagIds ?? [])],
             );
             console.log('Regular save:', newTransfer);
             this.coinageData.postCreateSaveTransfer(newTransfer).subscribe((result) => {
@@ -264,6 +272,7 @@ export class CreateEditTransferComponent implements OnInit {
                 contractorId: this.initialData.contractorId,
                 accountId: this.initialData.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
                 targetAccountId: this.initialData.targetAccountId,
+                tagIds: [...new Set(this.initialData.tagIds ?? [])],
             };
             if (this.initialData.items && this.initialData.items.length > 0) {
                 this.itemsInTransfer = [...this.initialData.items];
@@ -280,6 +289,7 @@ export class CreateEditTransferComponent implements OnInit {
                 categoryId: this.selectedTransferInputs?.categoryId,
                 contractorId: this.selectedTransferInputs?.contractorId,
                 accountId: this.selectedTransferInputs?.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
+                tagIds: [],
             };
             this.itemsInTransfer = [];
             this.shouldDisplayShoppingList = false;
@@ -308,6 +318,14 @@ export class CreateEditTransferComponent implements OnInit {
         }
     }
 
+    public get effectiveTags() {
+        const directIds = new Set(this.selectedTransferInputs.tagIds ?? []);
+        return effectiveTags(
+            this.availableTags.filter((tag) => directIds.has(tag.id)),
+            this.itemsInTransfer.map((item) => item.tags ?? []),
+        );
+    }
+
     public onItemAddedToList(item: ShoppingListItem): void {
         console.log(item);
         if (this.selectedTransferInputs.categoryId == undefined && item.categoryId !== null) {
@@ -327,6 +345,7 @@ export class CreateEditTransferComponent implements OnInit {
                 0,
                 item.containerId,
                 item.transferItemId,
+                item.tags,
             );
         });
     }

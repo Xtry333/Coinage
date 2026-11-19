@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, LessThanOrEqual, Repository } from 'typeorm';
+import { Between, DeleteResult, Equal, FindOptionsWhere, ILike, In, InsertResult, LessThanOrEqual, Raw, Repository } from 'typeorm';
 
 import { GetFilteredTransfersRequest, Range, TransferType } from '@app/interfaces';
 
-import { BaseDao } from './base.dao';
+import { Tag } from '../entities/Tag.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
 import { Writeable } from '../types/Writeable.type';
+import { BaseDao } from './base.dao';
+import { transferTagExistsCondition } from './tag-search';
 
 type KeysOfType<O, T> = {
     [P in keyof Required<O>]: Required<O>[P] extends T ? P : never;
@@ -62,7 +64,7 @@ export class TransferDao extends BaseDao {
         const filterArray: FindOptionsWhere<Transfer>[] = [];
         const accountKeys: KeysOfType<Transfer, number | null>[] = ['originAccountId', 'targetAccountId'];
         for (const accountKey of accountKeys) {
-            if (filterArray.length > 0) {
+            if (filterArray.length > 0 && !params.accountIds?.length) {
                 break;
             }
             const filter: FindOptionsWhere<Transfer> = {};
@@ -71,6 +73,14 @@ export class TransferDao extends BaseDao {
             this.assignInFilterIfExists(filter, accountKey, params.accountIds);
             this.assignInFilterIfExists(filter, 'categoryId', params.categoryIds);
             this.assignInFilterIfExists(filter, 'id', params.transferIds);
+            if (params.tagIds?.length) {
+                filter.id = Raw(
+                    (alias) =>
+                        transferTagExistsCondition(alias, 'search_tag.id IN (:...tagIds)') +
+                        (params.transferIds?.length ? ` AND ${alias} IN (:...transferIds)` : ''),
+                    { tagIds: [...new Set(params.tagIds)], transferIds: params.transferIds },
+                );
+            }
             this.assignBetweenFilterIfExists(filter, 'date', params.date);
             this.assignBetweenFilterIfExists(filter, 'amount', params.amount);
 
@@ -118,6 +128,10 @@ export class TransferDao extends BaseDao {
             .leftJoinAndSelect('originAccount.user', 'originUser')
             .leftJoinAndSelect('targetAccount.user', 'targetUser')
             .leftJoinAndSelect('transfer.currency', 'currency')
+            .leftJoinAndSelect('transfer.tags', 'tags')
+            .leftJoinAndSelect('transfer.transferItems', 'transferItems')
+            .leftJoinAndSelect('transferItems.item', 'item')
+            .leftJoinAndSelect('item.tags', 'itemTags')
             .orderBy('transfer.editedDate', 'DESC')
             .addOrderBy('transfer.id', 'DESC')
             .where('originUser.id = :userId', { userId })
@@ -159,6 +173,11 @@ export class TransferDao extends BaseDao {
         return await this.transferRepository.save(transfer);
     }
 
+    public async setTags(id: number, tags: Tag[]): Promise<void> {
+        // Do not re-save computed transfer types, template descriptions, or item lines.
+        await this.transferRepository.save({ id, tags, editedDate: new Date() });
+    }
+
     public async deleteById(id: number): Promise<DeleteResult> {
         return await this.transferRepository.delete({ id: Equal(id) });
     }
@@ -178,6 +197,8 @@ export class TransferDao extends BaseDao {
     }
 
     public async searchByDescription(query: string, userAccountIds: number[], limit: number): Promise<Transfer[]> {
+        if (userAccountIds.length === 0) return [];
+        const tagMatch = Raw((alias) => transferTagExistsCondition(alias, 'search_tag.name ILIKE :tagQuery'), { tagQuery: `%${query}%` });
         return this.transferRepository.find({
             where: [
                 {
@@ -188,6 +209,8 @@ export class TransferDao extends BaseDao {
                     description: ILike(`%${query}%`),
                     targetAccountId: In(userAccountIds),
                 },
+                { id: tagMatch, originAccountId: In(userAccountIds) },
+                { id: tagMatch, targetAccountId: In(userAccountIds) },
             ],
             order: { date: 'DESC' },
             take: limit,

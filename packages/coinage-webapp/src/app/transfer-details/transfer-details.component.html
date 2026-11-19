@@ -154,6 +154,13 @@
                     </div>
 
                     <div class="flex items-start justify-between">
+                        <dt class="w-1/3 text-sm font-medium text-gray-500">Tags</dt>
+                        <dd class="w-2/3 text-sm text-gray-900">
+                            <app-tag-badges [tags]="transfer.tags"></app-tag-badges>
+                        </dd>
+                    </div>
+
+                    <div class="flex items-start justify-between">
                         <dt class="w-1/3 text-sm font-medium text-gray-500">Account</dt>
                         <dd class="w-2/3 text-sm text-gray-900">{{ transfer.account.name }} → {{ transfer.targetAccount.name }}</dd>
                     </div>

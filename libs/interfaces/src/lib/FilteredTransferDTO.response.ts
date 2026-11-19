@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 import { IsBoolean, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
+import { EffectiveTagDTO } from './TagDTO.response';
 
 export class FilteredTransfersDTO {
     @Type(() => TransferDTO) public transfers!: TransferDTO[];
@@ -23,5 +24,6 @@ export class TransferDTO {
     @IsString() public accountName!: string;
     @IsNumber() public receiptId!: number | null;
     @IsBoolean() public isFlagged!: boolean;
+    public tags!: EffectiveTagDTO[];
     @Type(() => Date) public date!: Date;
 }

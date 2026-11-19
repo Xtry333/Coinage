@@ -11,6 +11,7 @@ import { FilterOption, FilterType, OnFilterEvent, PopupSide, TableFilterComponen
 export enum ItemTableColumn {
     ItemName = 'ItemName',
     Category = 'Category',
+    Tags = 'Tags',
     Container = 'Container',
     LastPrice = 'LastPrice',
     LastUsed = 'LastUsed',
@@ -19,6 +20,7 @@ export enum ItemTableColumn {
 export interface ItemTableFilterFields {
     itemName?: string;
     categoryIds?: number[];
+    tagIds?: number[];
     containerIds?: number[];
     lastPriceFrom?: number;
     lastPriceTo?: number;
@@ -29,6 +31,7 @@ export interface ItemTableFilterFields {
 export type ItemsOptionsForCheckboxFilters = {
     categories: FilterOption[];
     containers: FilterOption[];
+    tags: FilterOption[];
 };
 
 @Component({
@@ -58,6 +61,7 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
     public optionsForCheckboxFilters: ItemsOptionsForCheckboxFilters = {
         categories: [],
         containers: [],
+        tags: [],
     };
 
     // Expose enums to template
@@ -107,6 +111,12 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
                     TableFilterComponent.mapToFilterOptions(category.id, category.name, this.filter.categoryIds),
                 );
             });
+        this.dataService
+            .getTags()
+            .pipe(takeUntil(this.destroy$))
+            .subscribe((tags) => {
+                this.optionsForCheckboxFilters.tags = tags.map((tag) => TableFilterComponent.mapToFilterOptions(tag.id, tag.name, this.filter.tagIds));
+            });
     }
 
     private setupContainerFilterOptions(): void {
@@ -135,6 +145,9 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
                 break;
             case ItemTableColumn.Category:
                 this.filter.categoryIds = filterEvent.filterType === FilterType.MultiCheckbox ? filterEvent.selectedIds : undefined;
+                break;
+            case ItemTableColumn.Tags:
+                this.filter.tagIds = filterEvent.filterType === FilterType.MultiCheckbox ? [...new Set(filterEvent.selectedIds)] : undefined;
                 break;
             case ItemTableColumn.Container:
                 this.filter.containerIds = filterEvent.filterType === FilterType.MultiCheckbox ? filterEvent.selectedIds : undefined;
@@ -178,6 +191,12 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
             filtered = filtered.filter((item) => this.filter.categoryIds!.includes(item.categoryId));
         }
 
+        // Match any selected item tag.
+        if (this.filter.tagIds?.length) {
+            const selected = new Set(this.filter.tagIds);
+            filtered = filtered.filter((item) => (item.tags ?? []).some((tag) => selected.has(tag.id)));
+        }
+
         // Container filter
         if (this.filter.containerIds?.length) {
             filtered = filtered.filter((item) => {
@@ -218,6 +237,7 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
         this.isAnyFilterApplied =
             !!this.filter.itemName?.trim() ||
             !!this.filter.categoryIds?.length ||
+            !!this.filter.tagIds?.length ||
             !!this.filter.containerIds?.length ||
             this.filter.lastPriceFrom !== undefined ||
             this.filter.lastPriceTo !== undefined ||

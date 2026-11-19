@@ -1,6 +1,7 @@
 import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Item } from './Item.entity';
+import { Transfer } from './Transfer.entity';
 
 @Entity()
 export class Tag {
@@ -13,6 +14,9 @@ export class Tag {
     @Column({ type: 'varchar', length: 7, nullable: true })
     public color!: string | null;
 
-    @ManyToMany(() => Item, (item) => item.tags)
+    @ManyToMany(() => Item, (item) => item.tags, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
     public items!: Item[];
+
+    @ManyToMany(() => Transfer, (transfer) => transfer.tags, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+    public transfers!: Transfer[];
 }

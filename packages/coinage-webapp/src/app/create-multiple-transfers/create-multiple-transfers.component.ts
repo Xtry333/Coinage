@@ -14,12 +14,12 @@ import {
 } from '@app/interfaces';
 
 import { NavigatorService } from '../app-routing/navigator.service';
-import { SelectedTransferItemDetails } from './item-details-for-transfer/item-details-for-transfer.component';
-import { NewTransferDetailsComponent, SelectedDetails } from './new-transfer-details/new-transfer-details.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { StorageScope } from '../core/services/storage-service/storage-scope.enum';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NotificationService } from '../services/notification.service';
+import { SelectedTransferItemDetails } from './item-details-for-transfer/item-details-for-transfer.component';
+import { NewTransferDetailsComponent, SelectedDetails } from './new-transfer-details/new-transfer-details.component';
 
 export interface NewTransferObject {
     description: string;
@@ -137,6 +137,7 @@ export class CreateMultipleTransfersComponent implements OnInit {
             receiptId: null,
             date: new Date(`${this.selectedDetails.transferDate} 12:00`),
             items: this.itemsInTransfers.map((i) => new ExistingItem(i.id ?? 0, i.amount, i.unitPrice, i.totalPrice, i.setDiscount ?? 0)),
+            tagIds: [...new Set(this.selectedDetails.tagIds ?? [])],
         };
         const result = await this.dataService.postCreateAdvancedTransfers(dto);
         console.log(result);

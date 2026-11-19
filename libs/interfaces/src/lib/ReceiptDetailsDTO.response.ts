@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 
 import { TransferDTO } from './FilteredTransferDTO.response';
+import { EffectiveTagDTO } from './TagDTO.response';
 
 export class ReceiptDetailsDTO {
     id!: number;
@@ -12,5 +13,6 @@ export class ReceiptDetailsDTO {
     contractorName?: string | null;
     date?: Date | null;
     nextTransferDate?: Date;
+    tags!: EffectiveTagDTO[];
     @Type(() => TransferDTO) allTransfers!: TransferDTO[];
 }

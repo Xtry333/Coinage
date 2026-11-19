@@ -2,7 +2,7 @@ import { Type } from 'class-transformer';
 
 import { Unit } from '@app/common-units';
 
-import { TagDTO } from '../lib/TagDTO.response';
+import { EffectiveTagDTO, TagDTO } from '../lib/TagDTO.response';
 
 export class ItemDetailsDTO {
     public id!: number;
@@ -25,6 +25,7 @@ export class ItemDetailsDTO {
 export class TransferWithItemDetailsDTO {
     public transferId!: number;
     public transferName!: string;
+    public tags!: EffectiveTagDTO[];
     public transferContractorId!: number | null;
     public transferContractorName!: string | null;
     public accountId!: number;

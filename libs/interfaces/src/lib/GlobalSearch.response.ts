@@ -1,10 +1,13 @@
 import { Type } from 'class-transformer';
 
+import { EffectiveTagDTO, TagDTO } from './TagDTO.response';
+
 export class GlobalSearchItemResult {
     public id: number;
     public name: string;
     public brand?: string | null;
     public categoryName?: string | null;
+    public tags: TagDTO[] = [];
 
     public constructor(id: number, name: string, brand?: string | null, categoryName?: string | null) {
         this.id = id;
@@ -19,12 +22,13 @@ export class GlobalSearchTransferResult {
     public description: string;
     public amount: number;
     public currencySymbol: string;
-    
+
     @Type(() => Date)
     public date: Date;
-    
+
     public contractorName?: string | null;
     public categoryName: string;
+    public tags: EffectiveTagDTO[] = [];
 
     public constructor(
         id: number,

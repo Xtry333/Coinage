@@ -9,7 +9,7 @@
                     (ngModelChange)="showAllChecked($event)"
                     type="checkbox"
                 />
-                <label class="mb-0 cursor-pointer select-none text-sm font-medium text-gray-700" for="showAllCheckbox">Show planned transfers</label>
+                <label class="mb-0 cursor-pointer text-sm font-medium text-gray-700 select-none" for="showAllCheckbox">Show planned transfers</label>
             </div>
             <div class="mr-5 inline-flex items-center gap-2">
                 <input
@@ -19,7 +19,7 @@
                     (ngModelChange)="showFlaggedChecked($event)"
                     type="checkbox"
                 />
-                <label class="mb-0 cursor-pointer select-none text-sm font-medium text-gray-700" for="showFlaggedCheckbox">Only flagged transfers</label>
+                <label class="mb-0 cursor-pointer text-sm font-medium text-gray-700 select-none" for="showFlaggedCheckbox">Only flagged transfers</label>
             </div>
             @if (enableBulkActions) {
                 <div class="mr-5 inline-flex items-center gap-2">
@@ -30,7 +30,7 @@
                         (ngModelChange)="onBulkEditModeChanged()"
                         type="checkbox"
                     />
-                    <label class="mb-0 cursor-pointer select-none text-sm font-medium text-gray-700" for="bulkEditModeCheckbox">Bulk Edit Mode</label>
+                    <label class="mb-0 cursor-pointer text-sm font-medium text-gray-700 select-none" for="bulkEditModeCheckbox">Bulk Edit Mode</label>
                 </div>
             }
         </div>
@@ -104,6 +104,18 @@
                             [filterType]="FilterType.TextBox"
                             [popupSide]="PopupSide.ToLeft"
                             [cachedFilterValue]="filter.description"
+                            (filterEvent)="onPerformFilter($event)"
+                        ></app-table-filter>
+                    }
+                </th>
+                <th class="text-left">
+                    <span title="Matches any selected direct or inherited tag">Tags</span>
+                    @if (showFilters) {
+                        <app-table-filter
+                            [filterName]="TableColumn.Tags"
+                            [filterType]="FilterType.MultiCheckbox"
+                            [filterOptions]="optionsForCheckboxFilters.tags"
+                            [popupSide]="PopupSide.ToLeft"
                             (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>
                     }
@@ -190,6 +202,7 @@
                                 </span>
                             }
                         </td>
+                        <td><app-tag-badges [tags]="transfer.tags"></app-tag-badges></td>
                         <td>{{ transfer.accountName }}</td>
                         <td class="currency whitespace-nowrap">
                             <app-money-amount
@@ -203,7 +216,7 @@
                         <!-- <td colspan="2">
             <app-money-amount [accountToAccountTransfer]="getTransferValueDetails(transfer)"></app-money-amount>
           </td> -->
-                        <td class="whitespace-nowrap text-right">
+                        <td class="text-right whitespace-nowrap">
                             <a [routerLink]="getSummaryPageUrl(transfer)">{{ transfer.date | date }}</a>
                         </td>
                     }
@@ -214,7 +227,7 @@
                     @if (enableBulkActions && isBulkEditMode) {
                         <td></td>
                     }
-                    <td colspan="2">Expenses Sum</td>
+                    <td colspan="3">Expenses Sum</td>
                     <td>{{ outcomesCount }}</td>
                     <td class="currency">{{ outcomesSum | plnCurrency }}</td>
                     <td colspan="2"></td>
@@ -225,7 +238,7 @@
                     @if (enableBulkActions && isBulkEditMode) {
                         <td></td>
                     }
-                    <td colspan="2">Incomes Sum</td>
+                    <td colspan="3">Incomes Sum</td>
                     <td>{{ incomesCount }}</td>
                     <td class="currency">{{ incomesSum | plnCurrency }}</td>
                     <td colspan="2"></td>
@@ -233,7 +246,7 @@
             }
             @if (noRowsFound) {
                 <tr>
-                    <td [attr.colspan]="enableBulkActions && isBulkEditMode ? 7 : 6">
+                    <td [attr.colspan]="enableBulkActions && isBulkEditMode ? 8 : 7">
                         <span>No transfers found.</span>
                         @if (isAnyFilterApplied && !noRows) {
                             <span> Please check filters, there are {{ transfers?.length }} unmatched transfers. </span>

@@ -14,7 +14,7 @@
             (keydown)="onSearchKeyDown($event)"
             (focus)="onSearchFocus()"
             type="text"
-            placeholder="Search items and transfers..."
+            placeholder="Search items, transfers, or tags..."
             autocomplete="off"
         />
 
@@ -79,6 +79,7 @@
                                         @if (item.categoryName) {
                                             <div class="text-xs text-gray-500">{{ item.categoryName }}</div>
                                         }
+                                        <app-tag-badges [tags]="item.tags"></app-tag-badges>
                                     </div>
                                     <fa-icon class="text-gray-400" [icon]="itemIcon" size="sm"></fa-icon>
                                 </div>
@@ -112,6 +113,7 @@
                                             <span>•</span>
                                             <span>{{ transfer.categoryName }}</span>
                                         </div>
+                                        <app-tag-badges [tags]="transfer.tags"></app-tag-badges>
                                     </div>
                                     <div class="text-right">
                                         <div class="font-semibold text-gray-900">{{ transfer.amount | number: '1.2-2' }} {{ transfer.currencySymbol }}</div>

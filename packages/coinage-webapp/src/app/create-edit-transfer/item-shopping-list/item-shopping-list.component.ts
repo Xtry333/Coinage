@@ -136,6 +136,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             lastUsedDate: null,
             containerSize: null,
             containerSizeUnit: null,
+            tags: [],
         };
         this.allItems.push(addedItem);
         return addedItem;
@@ -154,6 +155,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             item?.categoryId ?? 0,
             this.selectedItem.containerId,
             null,
+            item?.tags ?? [],
         );
         this.itemList.push(shoppingItem);
         if (this.shouldOverrideTotalCostOnChange) {

@@ -18,6 +18,7 @@ import { SearchComponent } from './search/search.component';
 import { CoinageStorageService } from './services/storage-service/coinage-storage.service';
 import { WindowService } from './services/window-service/window-service.service';
 import { SidebarNavComponent } from './sidebar-nav/sidebar-nav.component';
+import { TagBadgesComponent } from './tag-badges/tag-badges.component';
 import { TopNavBarComponent } from './top-nav-bar/top-nav-bar.component';
 
 const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe, CurrencyPipe];
@@ -35,6 +36,7 @@ const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe, CurrencyPipe];
         SidebarNavComponent,
         DropdownMenuComponent,
         SearchComponent,
+        TagBadgesComponent,
     ],
     providers: [...pipes, WindowService, CoinageStorageService],
     exports: [
@@ -48,6 +50,7 @@ const pipes = [PlnCurrencyPipe, ReplacePipe, MathAbsPipe, CurrencyPipe];
         SidebarNavComponent,
         DropdownMenuComponent,
         SearchComponent,
+        TagBadgesComponent,
         FontAwesomeModule,
         CommonModule,
     ],

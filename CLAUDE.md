@@ -114,6 +114,15 @@ Compose uses `COINAGE_WEBAPP_PORT` for the published web port and `COINAGE_POSTG
 4. Update frontend components in `coinage-webapp`
 5. Update WebSocket contracts in both API gateway and frontend services if needed
 
+### Tag contracts
+
+- Tags use the shared `tag` catalog and many-to-many `item_tag` / `transfer_tag` junctions.
+- Transfer/receipt `tags` DTOs are unique effective sets with `isDirect` and `isInherited` provenance. Inheritance is calculated from catalog item tags, never stored on transfers or receipts.
+- Item/full-transfer/granular-transfer saves accept optional `tagIds`: omit to preserve, `[]` to clear direct assignments. Advanced multi-transfer creation accepts direct `tagIds` for each new transfer.
+- `POST /api/tags/items/:itemId` and `POST /api/tags/transfers/:transferId` replace direct assignments; legacy item assign/unassign routes remain supported.
+- Global search matches tag names. Transfer filters accept `tagIds` (any selected tag, direct or inherited); item-table tag filtering uses the same any-tag semantics.
+- The requirements, edge cases, schema migration, and deployment checks are documented in `requirements/docs/tag-system.md`.
+
 ### Database Schema Changes
 
 1. Modify entities in `packages/coinage-api/src/app/entities/`

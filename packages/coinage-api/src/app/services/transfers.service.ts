@@ -5,6 +5,7 @@ import { GetFilteredTransfersRequest, TransferDTO, TransferType } from '@app/int
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Transfer } from '../entities/Transfer.entity';
+import { getTransferTags } from './tag-mapper';
 
 @Injectable()
 export class TransfersService {
@@ -54,6 +55,7 @@ export class TransfersService {
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
+            tags: getTransferTags(transfer),
         };
     }
 

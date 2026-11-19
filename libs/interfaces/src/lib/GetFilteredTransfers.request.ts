@@ -1,6 +1,8 @@
-import { Range } from './interfaces';
+import { IsArray, IsInt, IsOptional, Min } from 'class-validator';
+
 import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
 import { PagedRequest } from '../partial/Paged.request';
+import { Range } from './interfaces';
 
 export class GetFilteredTransfersRequest extends PagedRequest {
     public transferIds?: number[];
@@ -8,6 +10,11 @@ export class GetFilteredTransfersRequest extends PagedRequest {
     public amount?: Range<number>;
     public contractorIds?: number[];
     public categoryIds?: number[];
+    @IsOptional()
+    @IsArray()
+    @IsInt({ each: true })
+    @Min(1, { each: true })
+    public tagIds?: number[];
     public accountIds?: number[];
     public userId?: number;
     public type?: TransferTypeEnum;

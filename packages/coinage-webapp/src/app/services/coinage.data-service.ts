@@ -16,6 +16,7 @@ import {
     CreateEditCategoryDTO,
     CreateEditContractorDTO,
     CreateEditItemDTO,
+    CreateEditTagDTO,
     CreateEditTransferModelDTO,
     CreateMultipleTransfersDTO,
     CreateScheduleDTO,
@@ -33,6 +34,7 @@ import {
     RefundTransferDTO,
     ScheduleDTO,
     SplitTransferDTO,
+    TagDTO,
     TotalInMonthByCategory,
     TransferDTO,
     TransferDetailsDTO,
@@ -151,6 +153,22 @@ export class CoinageDataService {
 
     public getContainerList(): Observable<ContainerDTO[]> {
         return this.http.get<ContainerDTO[]>(`${CoinageDataService.API_URL}containers`);
+    }
+
+    public getTags(): Observable<TagDTO[]> {
+        return this.http.get<TagDTO[]>(`${CoinageDataService.API_URL}tags`);
+    }
+
+    public saveTag(tag: CreateEditTagDTO): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}tags`, tag));
+    }
+
+    public setItemTags(itemId: number, tagIds: number[]): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}tags/items/${itemId}`, { tagIds: [...new Set(tagIds)] }));
+    }
+
+    public setTransferTags(transferId: number, tagIds: number[]): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}tags/transfers/${transferId}`, { tagIds: [...new Set(tagIds)] }));
     }
 
     public getContainersUsedWithItem(itemId: number): Promise<ContainerDTO[]> {

@@ -11,6 +11,7 @@ import { ChartComponent } from './chart/chart.component';
 import { ModalComponent } from './modal/modal.component';
 import { MoneyAmountComponent } from './money-amount/money-amount.component';
 import { SectionComponent } from './section/section.component';
+import { TagSelectorComponent } from './tag-selector/tag-selector.component';
 
 @NgModule({
     imports: [CoreModule, NgSelectModule, FormsModule, BaseChartDirective],
@@ -22,6 +23,7 @@ import { SectionComponent } from './section/section.component';
         MoneyAmountComponent,
         BulkEditTransfersModalComponent,
         AppliedFiltersComponent,
+        TagSelectorComponent,
     ],
     exports: [
         SectionComponent,
@@ -31,6 +33,7 @@ import { SectionComponent } from './section/section.component';
         MoneyAmountComponent,
         BulkEditTransfersModalComponent,
         AppliedFiltersComponent,
+        TagSelectorComponent,
     ],
 })
 export class CommonComponentsModule {}

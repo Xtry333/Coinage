@@ -4,6 +4,9 @@ import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
+import { ShoppingListItem } from '@app/interfaces';
+
+import { CoinageDataService } from '../services/coinage.data-service';
 import { CreateEditTransferComponent } from './create-edit-transfer.component';
 
 describe('CreateEditTransferComponent', () => {
@@ -36,5 +39,33 @@ describe('CreateEditTransferComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('shows one effective tag when direct and inherited assignments overlap', () => {
+        const tag = { id: 1, name: 'Holiday', color: null };
+        component.availableTags = [tag];
+        component.selectedTransferInputs = { amount: 10, date: '2026-11-01', description: 'Test', tagIds: [1] };
+        component.itemsInTransfer = [new ShoppingListItem(10, 'Sunscreen', 1, 10, 10, 0, 1, null, null, [tag])];
+        expect(component.effectiveTags).toEqual([{ ...tag, isDirect: true, isInherited: true }]);
+
+        component.selectedTransferInputs.tagIds = [];
+        expect(component.effectiveTags).toEqual([{ ...tag, isDirect: false, isInherited: true }]);
+
+        component.itemsInTransfer = [];
+        expect(component.effectiveTags).toEqual([]);
+    });
+
+    it('saves only direct tag IDs, never inherited tags, in granular edits', () => {
+        const data = TestBed.inject(CoinageDataService);
+        const save = jest.spyOn(data, 'postGranularSaveTransfer').mockReturnValue(of({}));
+        component.editMode = true;
+        component.transferId = 3;
+        component.redirectAfterSave = false;
+        component.selectedTransferInputs = { amount: 10, date: '2026-11-01', description: 'Test', tagIds: [1, 1] };
+        component.itemsInTransfer = [new ShoppingListItem(10, 'Milk', 1, 10, 10, 0, 1, null, 5, [{ id: 2, name: 'Food', color: null }])];
+
+        component.onClickSaveTransfer();
+        expect(save.mock.calls[0][0].tagIds).toEqual([1]);
+        expect(save.mock.calls[0][0].tagIds).not.toContain(2);
     });
 });
