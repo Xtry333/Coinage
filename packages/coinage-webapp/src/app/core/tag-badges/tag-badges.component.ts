@@ -27,8 +27,8 @@ export class TagBadgesComponent {
 
     public title(tag: TagDTO | EffectiveTagDTO): string {
         if (this.isInherited(tag)) {
-            return `${tag.name} (inherited)`;
+            return `${tag.name} (Item Tag)`;
         }
-        return this.receipt ? 'Assigned to a transfer in this receipt.' : 'Directly assigned tag.';
+        return this.receipt ? 'Assigned to a transfer in this receipt' : `${tag.name} (Transfer Tag)`;
     }
 }

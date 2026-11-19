@@ -16,7 +16,7 @@ describe('TagBadgesComponent', () => {
         fixture.detectChanges();
         const badges = fixture.nativeElement.querySelectorAll('[title]');
         expect(badges).toHaveLength(1);
-        expect(badges[0].title).toBe('Holiday (inherited)');
+        expect(badges[0].title).toBe('Holiday (Item Tag)');
         expect(badges[0].textContent.trim()).toBe('Holiday');
     });
 
@@ -24,7 +24,7 @@ describe('TagBadgesComponent', () => {
         fixture.componentInstance.tags = [{ id: 1, name: 'Holiday', color: null, isDirect: true, isInherited: true }];
         fixture.detectChanges();
         const badge = fixture.nativeElement.querySelector('[title]');
-        expect(badge.title).toBe('Holiday (inherited)');
+        expect(badge.title).toBe('Holiday (Item Tag)');
         expect(badge.textContent.trim()).toBe('Holiday');
     });
 
@@ -33,7 +33,7 @@ describe('TagBadgesComponent', () => {
         fixture.componentInstance.tags = [{ id: 1, name: 'Holiday', color: null, isDirect: false, isInherited: true }];
         fixture.detectChanges();
         const badge = fixture.nativeElement.querySelector('[title]');
-        expect(badge.title).toBe('Holiday (inherited)');
+        expect(badge.title).toBe('Holiday (Item Tag)');
         expect(badge.textContent.trim()).toBe('Holiday');
     });
 
@@ -41,7 +41,7 @@ describe('TagBadgesComponent', () => {
         fixture.componentInstance.tags = [{ id: 1, name: 'Holiday', color: null }];
         fixture.detectChanges();
         const badge = fixture.nativeElement.querySelector('[title]');
-        expect(badge.title).toBe('Directly assigned tag.');
+        expect(badge.title).toBe('Holiday (Transfer Tag)');
         expect(badge.textContent.trim()).toBe('Holiday');
     });
 
