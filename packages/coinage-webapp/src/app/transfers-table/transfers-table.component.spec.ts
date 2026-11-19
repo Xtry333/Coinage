@@ -73,14 +73,14 @@ describe('TransferTableComponent', () => {
         fixture.detectChanges();
 
         expect(component.appliedFilters).toEqual([
-            { label: 'Category', value: 'Groceries' },
-            { label: 'Description', value: 'Lunch' },
-            { label: 'Source account', value: 'Cash' },
-            { label: 'Amount', value: '0 – 100' },
-            { label: 'Contractor', value: 'Store' },
-            { label: 'Date', value: 'Nov 1, 2026 – Nov 15, 2026' },
-            { label: 'Show planned transfers' },
-            { label: 'Only flagged transfers' },
+            { key: 'categoryIds', label: 'Category', value: 'Groceries' },
+            { key: 'description', label: 'Description', value: 'Lunch' },
+            { key: 'accountIds', label: 'Source account', value: 'Cash' },
+            { key: 'amount', label: 'Amount', value: '0 – 100' },
+            { key: 'contractorIds', label: 'Contractor', value: 'Store' },
+            { key: 'date', label: 'Date', value: 'Nov 1, 2026 – Nov 15, 2026' },
+            { key: 'showPlanned', label: 'Show planned transfers' },
+            { key: 'showFlagged', label: 'Only flagged transfers' },
         ]);
     });
 
@@ -106,13 +106,13 @@ describe('TransferTableComponent', () => {
             TableFilterComponent.mapToFilterOptions(4, 'Transport', [4]),
         ];
 
-        expect(component.appliedFilters).toEqual([{ label: 'Category', value: 'Groceries' }]);
+        expect(component.appliedFilters).toEqual([{ key: 'categoryIds', label: 'Category', value: 'Groceries' }]);
     });
 
     it('identifies selected options even when their names are unavailable', () => {
         component.filter.categoryIds = [99];
 
-        expect(component.appliedFilters).toEqual([{ label: 'Category', value: '#99' }]);
+        expect(component.appliedFilters).toEqual([{ key: 'categoryIds', label: 'Category', value: '#99' }]);
     });
 
     it('keeps the summary and clear link above the table when no transfers match', () => {
@@ -194,7 +194,7 @@ describe('TransferTableComponent', () => {
         fixture.detectChanges();
 
         expect(component.optionsForCheckboxFilters.tags[0].isSelected).toBe(true);
-        expect(component.appliedFilters).toEqual([{ label: 'Tags (any)', value: 'Holiday' }]);
+        expect(component.appliedFilters).toEqual([{ key: 'tagIds', label: 'Tags (any)', value: 'Holiday' }]);
     });
 
     it('emits distinct tag IDs for server-side filtering', () => {
@@ -205,5 +205,129 @@ describe('TransferTableComponent', () => {
         expect(emitted).toHaveBeenLastCalledWith({ tagIds: [4] });
         expect(storage.setObject).toHaveBeenLastCalledWith('test.filters', { tagIds: [4] });
         expect(component.currentPage).toBe(1);
+    });
+
+    it('restores excluded tags and enables three-state checkboxes only for tags', () => {
+        storage.getObject.mockReturnValue({ excludedTagIds: [4] });
+        fixture.detectChanges();
+
+        expect(component.optionsForCheckboxFilters.tags[0].isExcluded).toBe(true);
+        expect(component.optionsForCheckboxFilters.tags[0].isSelected).toBe(false);
+        expect(component.appliedFilters).toEqual([{ key: 'excludedTagIds', label: 'Tags (none)', value: 'Holiday' }]);
+        expect(component.isAnyFilterApplied).toBe(true);
+        const columnFilters = fixture.debugElement
+            .queryAll(By.directive(TableFilterComponent))
+            .map((element) => element.componentInstance as TableFilterComponent);
+        expect(columnFilters.filter((filter) => filter.allowExclusion).map((filter) => filter.filterName)).toEqual(['Tags']);
+    });
+
+    it('persists distinct included and excluded tag IDs and clears exclusions when removed', () => {
+        fixture.detectChanges();
+        const emitted = jest.spyOn(component.tableFilter, 'emit');
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: 'Tags', selectedIds: [4, 4], excludedIds: [5, 5] });
+
+        expect(emitted).toHaveBeenLastCalledWith({ tagIds: [4], excludedTagIds: [5] });
+        expect(storage.setObject).toHaveBeenLastCalledWith('test.filters', { tagIds: [4], excludedTagIds: [5] });
+        expect(component.appliedFilters).toEqual([
+            { key: 'tagIds', label: 'Tags (any)', value: 'Holiday' },
+            { key: 'excludedTagIds', label: 'Tags (none)', value: '#5' },
+        ]);
+
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: 'Tags', selectedIds: [4], excludedIds: [] });
+        expect(component.filter.excludedTagIds).toBeUndefined();
+        expect(emitted).toHaveBeenLastCalledWith({ tagIds: [4] });
+    });
+
+    it('clears excluded tags from controls, storage and the request when clearing all filters', () => {
+        storage.getObject.mockReturnValue({ excludedTagIds: [4] });
+        fixture.detectChanges();
+        const emitted = jest.spyOn(component.tableFilter, 'emit');
+
+        component.clearAllFilters();
+        expect(component.optionsForCheckboxFilters.tags[0].isExcluded).toBe(false);
+        expect(component.isAnyFilterApplied).toBe(false);
+        expect(emitted).toHaveBeenLastCalledWith({});
+        expect(storage.setObject).toHaveBeenLastCalledWith('test.filters', undefined);
+    });
+
+    it('removes a clicked filter chip while preserving other filters and Clear all', () => {
+        storage.getObject.mockReturnValue({ categoryIds: [1], description: 'Lunch' });
+        fixture.detectChanges();
+        component.currentPage = 4;
+        const emitted = jest.spyOn(component.tableFilter, 'emit');
+
+        fixture.nativeElement.querySelector('button[aria-label="Remove Category filter: Groceries"]').click();
+        fixture.detectChanges();
+
+        expect(component.filter).toEqual({ description: 'Lunch' });
+        expect(component.optionsForCheckboxFilters.categories[0].isSelected).toBe(false);
+        expect(component.currentPage).toBe(1);
+        expect(emitted).toHaveBeenCalledTimes(1);
+        expect(emitted).toHaveBeenLastCalledWith({ description: 'Lunch' });
+        expect(storage.setObject).toHaveBeenLastCalledWith('test.filters', { description: 'Lunch' });
+        expect(fixture.nativeElement.querySelector('button[aria-label="Remove Category filter: Groceries"]')).toBeNull();
+        expect(fixture.nativeElement.querySelector('button[aria-label="Clear all filters"]')).not.toBeNull();
+    });
+
+    it.each([
+        { key: 'categoryIds', filter: { categoryIds: [1], category: 'Groceries' }, column: 'Category' },
+        { key: 'description', filter: { description: 'Lunch' }, column: 'Description' },
+        { key: 'accountIds', filter: { accountIds: [2], account: 'Cash' }, column: 'Account' },
+        { key: 'contractorIds', filter: { contractorIds: [3], contractor: 'Store' }, column: 'Contractor' },
+        { key: 'amount', filter: { amountFrom: 0, amountTo: 100 }, column: 'Amount' },
+        { key: 'date', filter: { dateFrom: new Date('2026-11-01'), dateTo: new Date('2026-11-15') }, column: 'Date' },
+        { key: 'showPlanned', filter: { showPlanned: true }, column: undefined },
+        { key: 'showFlagged', filter: { showFlagged: true }, column: undefined },
+    ])('removes the entire $key filter and resets its control', ({ key, filter, column }) => {
+        storage.getObject.mockReturnValue(filter);
+        fixture.detectChanges();
+        const columnFilter = fixture.debugElement
+            .queryAll(By.directive(TableFilterComponent))
+            .map((element) => element.componentInstance as TableFilterComponent)
+            .find((control) => control.filterName === column);
+        const reset = columnFilter ? jest.spyOn(columnFilter, 'reset') : undefined;
+
+        component.removeFilter(key);
+        fixture.detectChanges();
+
+        expect(component.filter).toEqual({});
+        expect(component.isAnyFilterApplied).toBe(false);
+        expect(storage.setObject).toHaveBeenLastCalledWith('test.filters', undefined);
+        expect(fixture.nativeElement.querySelector('[aria-label="Applied filters"]')).toBeNull();
+        if (reset) {
+            expect(reset).toHaveBeenCalledTimes(1);
+            expect(columnFilter?.isFilterApplied).toBe(false);
+        }
+    });
+
+    it.each(['tagIds', 'excludedTagIds'])('removes $key without changing the other tag state', (key) => {
+        storage.getObject.mockReturnValue({ tagIds: [4], excludedTagIds: [5] });
+        fixture.detectChanges();
+        component.optionsForCheckboxFilters.tags.push(TableFilterComponent.mapToFilterOptions(5, 'Groceries', undefined, [5]));
+        const tagsControl = fixture.debugElement
+            .queryAll(By.directive(TableFilterComponent))
+            .map((element) => element.componentInstance as TableFilterComponent)
+            .find((control) => control.filterName === 'Tags');
+
+        component.removeFilter(key);
+        fixture.detectChanges();
+
+        const expected = key === 'tagIds' ? { excludedTagIds: [5] } : { tagIds: [4] };
+        expect(component.filter).toEqual(expected);
+        expect(component.optionsForCheckboxFilters.tags.map((option) => [option.isSelected, option.isExcluded])).toEqual(
+            key === 'tagIds'
+                ? [
+                      [false, false],
+                      [false, true],
+                  ]
+                : [
+                      [true, false],
+                      [false, false],
+                  ],
+        );
+        expect(tagsControl?.isFilterApplied).toBe(true);
+        tagsControl?.onPerformFilter();
+        expect(component.filter.tagIds).toEqual(expected.tagIds ?? []);
+        expect(component.filter.excludedTagIds).toEqual(expected.excludedTagIds);
     });
 });

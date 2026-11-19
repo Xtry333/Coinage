@@ -21,6 +21,7 @@ export interface ItemTableFilterFields {
     itemName?: string;
     categoryIds?: number[];
     tagIds?: number[];
+    excludedTagIds?: number[];
     containerIds?: number[];
     lastPriceFrom?: number;
     lastPriceTo?: number;
@@ -115,7 +116,9 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
             .getTags()
             .pipe(takeUntil(this.destroy$))
             .subscribe((tags) => {
-                this.optionsForCheckboxFilters.tags = tags.map((tag) => TableFilterComponent.mapToFilterOptions(tag.id, tag.name, this.filter.tagIds));
+                this.optionsForCheckboxFilters.tags = tags.map((tag) =>
+                    TableFilterComponent.mapToFilterOptions(tag.id, tag.name, this.filter.tagIds, this.filter.excludedTagIds),
+                );
             });
     }
 
@@ -148,6 +151,7 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
                 break;
             case ItemTableColumn.Tags:
                 this.filter.tagIds = filterEvent.filterType === FilterType.MultiCheckbox ? [...new Set(filterEvent.selectedIds)] : undefined;
+                this.filter.excludedTagIds = filterEvent.filterType === FilterType.MultiCheckbox ? [...new Set(filterEvent.excludedIds ?? [])] : undefined;
                 break;
             case ItemTableColumn.Container:
                 this.filter.containerIds = filterEvent.filterType === FilterType.MultiCheckbox ? filterEvent.selectedIds : undefined;
@@ -197,6 +201,12 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
             filtered = filtered.filter((item) => (item.tags ?? []).some((tag) => selected.has(tag.id)));
         }
 
+        // Exclude an item if it has any excluded tag, even when an included tag matches.
+        if (this.filter.excludedTagIds?.length) {
+            const excluded = new Set(this.filter.excludedTagIds);
+            filtered = filtered.filter((item) => !(item.tags ?? []).some((tag) => excluded.has(tag.id)));
+        }
+
         // Container filter
         if (this.filter.containerIds?.length) {
             filtered = filtered.filter((item) => {
@@ -238,6 +248,7 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
             !!this.filter.itemName?.trim() ||
             !!this.filter.categoryIds?.length ||
             !!this.filter.tagIds?.length ||
+            !!this.filter.excludedTagIds?.length ||
             !!this.filter.containerIds?.length ||
             this.filter.lastPriceFrom !== undefined ||
             this.filter.lastPriceTo !== undefined ||

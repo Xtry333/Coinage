@@ -1,18 +1,43 @@
 @if (filters.length > 0) {
-    <div class="flex flex-wrap items-center gap-2 text-sm" role="group" aria-label="Applied filters">
-        <span class="font-medium text-gray-700">Applied filters:</span>
-        <ul class="m-0 flex list-none flex-wrap gap-2 p-0">
-            @for (filter of filters; track filter.label) {
-                <li class="rounded-md bg-blue-50 px-2 py-1 text-blue-900">
-                    <span class="font-medium">{{ filter.label }}</span>
-                    @if (filter.value) {
-                        <span>: {{ filter.value }}</span>
-                    }
+    <div
+        class="flex flex-wrap items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/80 px-3 py-2.5 text-sm"
+        role="group"
+        aria-label="Applied filters"
+    >
+        <span class="mr-1 text-xs font-semibold tracking-wide text-slate-500">Applied filters</span>
+        <ul class="m-0 flex min-w-0 list-none flex-wrap gap-2 p-0">
+            @for (filter of filters; track filter.key) {
+                <li class="max-w-full min-w-0">
+                    <button
+                        class="group inline-flex max-w-full cursor-pointer items-center gap-2 rounded-full border border-blue-200 bg-blue-50 py-1.5 pr-2 pl-3 text-left text-xs text-blue-900 transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500 sm:text-sm"
+                        [attr.aria-label]="'Remove ' + filter.label + ' filter' + (filter.value ? ': ' + filter.value : '')"
+                        [title]="'Remove ' + filter.label + ' filter'"
+                        (click)="remove.emit(filter.key)"
+                        type="button"
+                    >
+                        <span class="min-w-0 break-words">
+                            <span class="font-medium">{{ filter.label }}</span>
+                            @if (filter.value) {
+                                <span>: {{ filter.value }}</span>
+                            }
+                        </span>
+                        <svg
+                            class="size-4 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100 [@media(hover:none)]:opacity-100"
+                            viewBox="0 0 20 20"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.75"
+                            stroke-linecap="round"
+                            aria-hidden="true"
+                        >
+                            <path d="m6 6 8 8M14 6l-8 8" />
+                        </svg>
+                    </button>
                 </li>
             }
         </ul>
         <button
-            class="shrink-0 rounded-sm text-blue-600 underline hover:text-blue-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
+            class="shrink-0 cursor-pointer rounded-md px-2 py-1.5 text-xs font-medium text-slate-500 underline decoration-slate-300 underline-offset-4 transition-colors hover:bg-white hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
             (click)="clearAll.emit()"
             type="button"
             aria-label="Clear all filters"

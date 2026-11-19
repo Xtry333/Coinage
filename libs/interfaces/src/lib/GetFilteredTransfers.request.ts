@@ -15,6 +15,11 @@ export class GetFilteredTransfersRequest extends PagedRequest {
     @IsInt({ each: true })
     @Min(1, { each: true })
     public tagIds?: number[];
+    @IsOptional()
+    @IsArray()
+    @IsInt({ each: true })
+    @Min(1, { each: true })
+    public excludedTagIds?: number[];
     public accountIds?: number[];
     public userId?: number;
     public type?: TransferTypeEnum;

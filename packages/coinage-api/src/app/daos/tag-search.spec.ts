@@ -102,6 +102,57 @@ describe('PostgreSQL tag queries and many-to-many metadata', () => {
         expect(options.take).toBe(5);
     });
 
+    it.each([{ tagIds: [] }, { tagIds: [4, 4, 5] }])('excludes direct and inherited tags for pages and counts with inclusions $tagIds', async ({ tagIds }) => {
+        const repository = source.getRepository(Transfer);
+        const find = jest.spyOn(repository, 'find').mockResolvedValue([]);
+        const count = jest.spyOn(repository, 'count').mockResolvedValue(0);
+        const dao = new TransferDao(repository, mapper);
+        const filter = {
+            page: 1,
+            rowsPerPage: 10,
+            tagIds,
+            excludedTagIds: [9, 9],
+            transferIds: [20],
+            accountIds: [7],
+        };
+        await dao.getAllFilteredPaged(filter);
+        await dao.getAllFilteredCount(filter);
+
+        const options = find.mock.calls[0][0] ?? {};
+        const where = options.where as FindOptionsWhere<Transfer>[];
+        expect(where).toHaveLength(2);
+        const [sql, parameters] = repository.createQueryBuilder('transfer').setFindOptions(options).getQueryAndParameters();
+        const whereClause = (statement: string) => statement.slice(statement.indexOf(' WHERE ')).split(' ORDER BY ')[0];
+        const countSql = repository
+            .createQueryBuilder('transfer')
+            .setFindOptions(count.mock.calls[0][0] ?? {})
+            .getSql();
+        expect(whereClause(countSql)).toBe(whereClause(sql));
+        expect(sql).toMatch(/NOT \(\s*EXISTS \([\s\S]*FROM transfer_tag[\s\S]*OR EXISTS \([\s\S]*JOIN item_tag/);
+        // Each account branch checks both direct and inherited tags with one deduplicated excluded ID.
+        expect(parameters.filter((parameter) => parameter === 9)).toHaveLength(4);
+        expect(parameters).toContain(20);
+        expect(parameters).toContain(7);
+        if (tagIds.length) {
+            expect(sql).toMatch(/\)\s*AND NOT \(/);
+            expect(parameters).toContain(4);
+            expect(parameters).toContain(5);
+        }
+        expect(sql).not.toContain('IN ()');
+    });
+
+    it('ignores empty included and excluded tag sets', async () => {
+        const repository = source.getRepository(Transfer);
+        const find = jest.spyOn(repository, 'find').mockResolvedValue([]);
+        await new TransferDao(repository, mapper).getAllFilteredPaged({ page: 1, rowsPerPage: 10, tagIds: [], excludedTagIds: [] });
+        const sql = repository
+            .createQueryBuilder('transfer')
+            .setFindOptions(find.mock.calls[0][0] ?? {})
+            .getSql();
+        expect(sql).not.toContain('search_transfer_tag');
+        expect(sql).not.toContain('IN ()');
+    });
+
     it('returns no transfer search results for users with no accounts', async () => {
         const repository = source.getRepository(Transfer);
         const find = jest.spyOn(repository, 'find');

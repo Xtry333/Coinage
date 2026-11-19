@@ -38,7 +38,7 @@
     @if (showFilters) {
         <div class="flex flex-wrap items-center justify-between gap-3">
             <div class="flex min-w-0 flex-1 flex-wrap items-center gap-4">
-                <app-applied-filters [filters]="appliedFilters" (clearAll)="clearAllFilters()"></app-applied-filters>
+                <app-applied-filters [filters]="appliedFilters" (remove)="removeFilter($event)" (clearAll)="clearAllFilters()"></app-applied-filters>
                 @if (enableBulkActions && isBulkEditMode && selectedTransferIds.size > 0) {
                     <div class="flex items-center space-x-4 rounded-md border border-blue-200 bg-blue-50 px-3 py-1">
                         <span class="text-sm font-medium text-blue-900">
@@ -109,12 +109,13 @@
                     }
                 </th>
                 <th class="text-left">
-                    <span title="Matches any selected direct or inherited tag">Tags</span>
+                    <span title="Matches any included tag and none of the excluded tags, including direct and inherited tags">Tags</span>
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="TableColumn.Tags"
                             [filterType]="FilterType.MultiCheckbox"
                             [filterOptions]="optionsForCheckboxFilters.tags"
+                            [allowExclusion]="true"
                             [popupSide]="PopupSide.ToLeft"
                             (filterEvent)="onPerformFilter($event)"
                         ></app-table-filter>

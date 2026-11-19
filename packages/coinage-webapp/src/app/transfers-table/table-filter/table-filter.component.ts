@@ -40,6 +40,7 @@ export type OnMultiCheckboxFilterEvent = {
     filterType: FilterType.MultiCheckbox;
     name: string;
     selectedIds: number[];
+    excludedIds?: number[];
 };
 
 export type OnNumericRangeFilterEvent = {
@@ -61,6 +62,7 @@ export interface FilterOption {
     uiText: string;
     isDisplayed?: boolean;
     isSelected?: boolean;
+    isExcluded?: boolean;
     searchValues: string[];
 }
 
@@ -101,6 +103,7 @@ export class TableFilterComponent implements OnInit {
     @Input() public cachedFilterPrefix?: string;
     @Input() public cachedFilterValue?: string;
     @Input() public filterOptions?: FilterOption[];
+    @Input() public allowExclusion = false;
 
     @Output() public filterEvent = new EventEmitter<OnFilterEvent>();
     @Output() public openEvent = new EventEmitter<void>();
@@ -148,12 +151,13 @@ export class TableFilterComponent implements OnInit {
         }
     }
 
-    public static mapToFilterOptions(id: number, uiText: string, selectedIds?: number[]): FilterOption {
+    public static mapToFilterOptions(id: number, uiText: string, selectedIds?: number[], excludedIds?: number[]): FilterOption {
         return {
             id,
             uiText,
             isDisplayed: true,
-            isSelected: selectedIds?.includes(id) ?? false,
+            isSelected: (selectedIds?.includes(id) ?? false) && !excludedIds?.includes(id),
+            isExcluded: excludedIds?.includes(id) ?? false,
             searchValues: [uiText.toLowerCase(), id.toString()],
         };
     }
@@ -215,7 +219,10 @@ export class TableFilterComponent implements OnInit {
                 this.filterValue.value = this.filterValue.value?.trim();
                 break;
             case FilterType.MultiCheckbox:
-                this.filterValue.selectedIds = this.filterOptions?.filter((opt) => opt.isSelected).map((opt) => opt.id) ?? [];
+                this.filterValue.selectedIds = this.filterOptions?.filter((opt) => opt.isSelected && !opt.isExcluded).map((opt) => opt.id) ?? [];
+                if (this.allowExclusion) {
+                    this.filterValue.excludedIds = this.filterOptions?.filter((opt) => opt.isExcluded).map((opt) => opt.id) ?? [];
+                }
                 break;
             case FilterType.NumericRange:
                 if ((this.filterValue.range.from ?? 0) >= (this.filterValue.range.to ?? 0)) {
@@ -246,13 +253,41 @@ export class TableFilterComponent implements OnInit {
         this.isPopupDisplayed = false;
         this.touched = { from: false, to: false };
         this.onClearOptionsSearchValue();
-        this.filterOptions?.forEach((option) => (option.isSelected = false));
+        this.filterOptions?.forEach((option) => {
+            option.isSelected = false;
+            option.isExcluded = false;
+        });
+    }
+
+    public onChangeOptionSelection(option: FilterOption, event: Event): void {
+        if (this.allowExclusion && option.isSelected) {
+            option.isSelected = false;
+            option.isExcluded = true;
+        } else if (this.allowExclusion && option.isExcluded) {
+            option.isSelected = false;
+            option.isExcluded = false;
+        } else {
+            option.isSelected = !option.isSelected;
+            option.isExcluded = false;
+        }
+
+        // Native activation toggles checked and clears indeterminate before change.
+        const checkbox = event.target as HTMLInputElement;
+        checkbox.checked = option.isSelected;
+        checkbox.indeterminate = option.isExcluded;
+    }
+
+    public getOptionAriaLabel(option: FilterOption): string {
+        const state = option.isExcluded ? 'excluded' : option.isSelected ? 'included' : 'no filter';
+        const nextAction = option.isExcluded ? 'Clear' : option.isSelected ? 'Exclude' : 'Include';
+        return `${option.uiText}: ${state}. ${nextAction} on next click.`;
     }
 
     public onCheckVisibleOptions(): void {
         this.filterOptions?.forEach((option) => {
             if (option.isDisplayed) {
                 option.isSelected = true;
+                option.isExcluded = false;
             }
         });
     }
@@ -299,7 +334,7 @@ export class TableFilterComponent implements OnInit {
             case FilterType.TextBox:
                 return (this.lastFilterValue?.value?.length ?? 0) > 0;
             case FilterType.MultiCheckbox:
-                return this.filterOptions?.some((o) => o.isSelected) ?? false;
+                return this.filterOptions?.some((o) => o.isSelected || o.isExcluded) ?? false;
             case FilterType.DateRange:
                 return this.lastFilterValue?.range.from !== undefined || this.lastFilterValue?.range.to !== undefined;
             case FilterType.NumericRange:

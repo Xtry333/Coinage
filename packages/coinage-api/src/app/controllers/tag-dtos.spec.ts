@@ -37,4 +37,20 @@ describe('tag request validation', () => {
         const dto = plainToInstance(GetFilteredTransfersRequest, { page: 1, rowsPerPage: 10, tagIds: [-1] });
         expect((await validate(dto)).some((error) => error.property === 'tagIds')).toBe(true);
     });
+
+    it.each([{ excludedTagIds: [-1] }, { excludedTagIds: [0] }, { excludedTagIds: ['1'] }, { excludedTagIds: [1.5] }, { excludedTagIds: '1' }])(
+        'rejects invalid excluded tag IDs $excludedTagIds',
+        async ({ excludedTagIds }) => {
+            const dto = plainToInstance(GetFilteredTransfersRequest, { page: 1, rowsPerPage: 10, excludedTagIds });
+            expect((await validate(dto)).some((error) => error.property === 'excludedTagIds')).toBe(true);
+        },
+    );
+
+    it.each([{ excludedTagIds: undefined }, { excludedTagIds: [] }, { excludedTagIds: [1, 1, 2] }])(
+        'accepts optional and valid excluded tag sets $excludedTagIds',
+        async ({ excludedTagIds }) => {
+            const dto = plainToInstance(GetFilteredTransfersRequest, { page: 1, rowsPerPage: 10, tagIds: [3], excludedTagIds });
+            expect(await validate(dto)).toEqual([]);
+        },
+    );
 });

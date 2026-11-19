@@ -6,7 +6,7 @@
                 @if (filterValue.filterType === FilterType.TextBox) {
                     <div class="textbox-with-buttons" style="display: flex; gap: 6px; align-items: center">
                         <input
-                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             #autofocusedFilterInput
                             [(ngModel)]="filterValue.value"
                             [autocomplete]="filterDataProvided ? 'off' : ''"
@@ -15,13 +15,13 @@
                         />
                         <div class="inline-filter-buttons">
                             <button
-                                class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 type="submit"
                             >
                                 Apply
                             </button>
                             <button
-                                class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                 (click)="onClear()"
                                 type="reset"
                             >
@@ -40,7 +40,7 @@
                 @if (filterValue.filterType === FilterType.NumericRange) {
                     <div class="numeric-range">
                         <input
-                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             #autofocusedFilterInput
                             [(ngModel)]="filterValue.range.from"
                             [max]="filterValue.range.to ?? 0"
@@ -50,7 +50,7 @@
                             autocomplete="off"
                         />
                         <input
-                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             [(ngModel)]="filterValue.range.to"
                             [min]="filterValue.range.from ?? 0"
                             name="filterRangeTo"
@@ -62,7 +62,7 @@
                 @if (filterValue.filterType === FilterType.DateRange) {
                     <div class="date-range-filter-container">
                         <input
-                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             #autofocusedFilterInput
                             [(ngModel)]="filterValue.range.from"
                             (change)="onChangeFilterRangeFrom()"
@@ -71,7 +71,7 @@
                             autocomplete="off"
                         />
                         <input
-                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             [(ngModel)]="filterValue.range.to"
                             (change)="onChangeFilterRangeTo()"
                             name="filterDateTo"
@@ -85,7 +85,7 @@
                         @if (shouldDisplaySearchBox) {
                             <div class="filter-option-search-container">
                                 <input
-                                    class="filter-option-search-value w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    class="filter-option-search-value w-full rounded-md border border-gray-300 px-3 py-2 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                                     #autofocusedFilterInput
                                     [ngModel]="optionSearchValue"
                                     (ngModelChange)="onChangeOptionSearchValue($event)"
@@ -111,6 +111,9 @@
                                 }
                             </div>
                         }
+                        @if (allowExclusion) {
+                            <p class="filter-option-help">Click to cycle: no filter → include (✓) → exclude (−).</p>
+                        }
                         <div class="filter-options">
                             @if (noOptionDisplayed) {
                                 <div>
@@ -118,19 +121,33 @@
                                 </div>
                             }
                             @for (option of filterOptions; track option) {
-                                <div class="filter-option">
-                                    @if (option.isDisplayed) {
-                                        <div>
+                                @if (option.isDisplayed) {
+                                    <div class="filter-option">
+                                        <label
+                                            class="filter-option-row"
+                                            [class.is-included]="option.isSelected"
+                                            [class.is-excluded]="option.isExcluded"
+                                            [for]="'filter-option-checkbox-' + filterName + '-' + option.id"
+                                        >
                                             <input
-                                                [(ngModel)]="option.isSelected"
-                                                [id]="'filter-option-checkbox-' + option.id"
-                                                [name]="'filter-option-checkbox-' + option.id"
+                                                [checked]="option.isSelected"
+                                                [indeterminate]="option.isExcluded ?? false"
+                                                [attr.aria-label]="allowExclusion ? getOptionAriaLabel(option) : null"
+                                                [title]="allowExclusion ? getOptionAriaLabel(option) : ''"
+                                                [id]="'filter-option-checkbox-' + filterName + '-' + option.id"
+                                                [name]="'filter-option-checkbox-' + filterName + '-' + option.id"
+                                                (change)="onChangeOptionSelection(option, $event)"
                                                 type="checkbox"
                                             />
-                                            <label [for]="'filter-option-checkbox-' + option.id">{{ option.uiText }}</label>
-                                        </div>
-                                    }
-                                </div>
+                                            <span class="filter-option-label">
+                                                {{ option.uiText }}
+                                                @if (option.isExcluded) {
+                                                    <span class="filter-option-state">(excluded)</span>
+                                                }
+                                            </span>
+                                        </label>
+                                    </div>
+                                }
                             }
                         </div>
                     </div>
@@ -138,13 +155,13 @@
                 @if (filterValue.filterType !== FilterType.TextBox) {
                     <div class="filter-buttons">
                         <button
-                            class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             type="submit"
                         >
                             Apply
                         </button>
                         <button
-                            class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            class="rounded-md border border-gray-300 bg-white px-3 py-1 text-sm text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                             (click)="onClear()"
                             type="reset"
                         >

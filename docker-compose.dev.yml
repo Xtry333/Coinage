@@ -11,10 +11,19 @@ services:
         ports:
             - '${COINAGE_POSTGRES_PORT:-5432}:5432'
         volumes:
-            - ./data/pg:/var/lib/postgresql
+            - type: volume
+              source: coinage_data
+              target: /var/lib/postgresql
+              volume:
+                  subpath: pg
         healthcheck:
             test: ['CMD-SHELL', 'pg_isready -U ${COINAGE_POSTGRES_USER:-postgres} -d ${COINAGE_POSTGRES_DB:-coinage-db}']
             interval: 5s
             timeout: 5s
             retries: 20
             start_period: 10s
+
+volumes:
+    coinage_data:
+        name: coinage_data
+        external: true

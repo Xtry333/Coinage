@@ -50,4 +50,31 @@ describe('ItemsListTableComponent tag filtering', () => {
         expect(component.filteredItems).toEqual(items);
         expect(component.isAnyFilterApplied).toBe(false);
     });
+
+    it('matches included tags only when none of the excluded tags are present', () => {
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Tags, selectedIds: [1], excludedIds: [2, 2] });
+        expect(component.filteredItems.map((item) => item.id)).toEqual([20]);
+        expect(component.filter.excludedTagIds).toEqual([2]);
+    });
+
+    it('supports exclusions without inclusions, preserving untagged items', () => {
+        component.currentPage = 3;
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Tags, selectedIds: [], excludedIds: [2] });
+        expect(component.filteredItems.map((item) => item.id)).toEqual([20, 40]);
+        expect(component.isAnyFilterApplied).toBe(true);
+        expect(component.currentPage).toBe(1);
+    });
+
+    it('combines excluded tags with category filters', () => {
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Category, selectedIds: [5] });
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Tags, selectedIds: [], excludedIds: [2] });
+        expect(component.filteredItems.map((item) => item.id)).toEqual([40]);
+    });
+
+    it('removes exclusions when the tag filter is cleared', () => {
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Tags, selectedIds: [], excludedIds: [2] });
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Tags, selectedIds: [] });
+        expect(component.filteredItems).toEqual(items);
+        expect(component.isAnyFilterApplied).toBe(false);
+    });
 });

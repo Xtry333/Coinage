@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
 export interface AppliedFilter {
+    key: string;
     label: string;
     value?: string;
 }
@@ -15,4 +16,5 @@ export class AppliedFiltersComponent {
     @Input() public filters: AppliedFilter[] = [];
 
     @Output() public clearAll = new EventEmitter<void>();
+    @Output() public remove = new EventEmitter<string>();
 }

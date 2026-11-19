@@ -54,6 +54,7 @@ export interface TableFilterFields {
     contractorIds?: number[];
     accountIds?: number[];
     tagIds?: number[];
+    excludedTagIds?: number[];
     category?: string;
     description?: string;
     contractor?: string;
@@ -164,7 +165,9 @@ export class TransfersTableComponent implements OnInit, OnChanges {
                 this.optionsForCheckboxFilters.accounts = accounts
                     .map((a) => TableFilterComponent.mapToFilterOptions(a.id, a.name, this.filter.accountIds))
                     .sort((a, b) => a.uiText.localeCompare(b.uiText));
-                this.optionsForCheckboxFilters.tags = tags.map((tag) => TableFilterComponent.mapToFilterOptions(tag.id, tag.name, this.filter.tagIds));
+                this.optionsForCheckboxFilters.tags = tags.map((tag) =>
+                    TableFilterComponent.mapToFilterOptions(tag.id, tag.name, this.filter.tagIds, this.filter.excludedTagIds),
+                );
             });
         }
 
@@ -190,6 +193,11 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             this.filter.accountIds = event.selectedIds;
         } else if (this.checkFilterEventColumnName<OnMultiCheckboxFilterEvent>(event, TableColumn.Tags)) {
             this.filter.tagIds = [...new Set(event.selectedIds)];
+            if (event.excludedIds?.length) {
+                this.filter.excludedTagIds = [...new Set(event.excludedIds)];
+            } else {
+                delete this.filter.excludedTagIds;
+            }
         } else if (this.checkFilterEventColumnName<OnNumericRangeFilterEvent>(event, TableColumn.Amount)) {
             this.filter.amountFrom = event.range.from;
             this.filter.amountTo = event.range.to;
@@ -310,35 +318,74 @@ export class TransfersTableComponent implements OnInit, OnChanges {
 
     public get appliedFilters(): AppliedFilter[] {
         const filters: AppliedFilter[] = [];
-        const addTextFilter = (label: string, value?: string) => {
+        const addTextFilter = (key: string, label: string, value?: string) => {
             if (value?.trim()) {
-                filters.push({ label, value });
+                filters.push({ key, label, value });
             }
         };
         const selectedNames = (ids: number[] | undefined, options: FilterOption[], fallback?: string) =>
             ids?.length ? ids.map((id) => options.find((option) => option.id === id)?.uiText ?? `#${id}`).join(', ') : fallback;
 
-        addTextFilter('Category', selectedNames(this.filter.categoryIds, this.optionsForCheckboxFilters.categories, this.filter.category));
-        addTextFilter('Description', this.filter.description);
-        addTextFilter('Tags (any)', selectedNames(this.filter.tagIds, this.optionsForCheckboxFilters.tags));
-        addTextFilter('Source account', selectedNames(this.filter.accountIds, this.optionsForCheckboxFilters.accounts, this.filter.account));
+        addTextFilter('categoryIds', 'Category', selectedNames(this.filter.categoryIds, this.optionsForCheckboxFilters.categories, this.filter.category));
+        addTextFilter('description', 'Description', this.filter.description);
+        addTextFilter('tagIds', 'Tags (any)', selectedNames(this.filter.tagIds, this.optionsForCheckboxFilters.tags));
+        addTextFilter('excludedTagIds', 'Tags (none)', selectedNames(this.filter.excludedTagIds, this.optionsForCheckboxFilters.tags));
+        addTextFilter('accountIds', 'Source account', selectedNames(this.filter.accountIds, this.optionsForCheckboxFilters.accounts, this.filter.account));
         if (this.filter.amountFrom !== undefined && this.filter.amountTo !== undefined) {
-            filters.push({ label: 'Amount', value: `${this.filter.amountFrom} – ${this.filter.amountTo}` });
+            filters.push({ key: 'amount', label: 'Amount', value: `${this.filter.amountFrom} – ${this.filter.amountTo}` });
         }
-        addTextFilter('Contractor', selectedNames(this.filter.contractorIds, this.optionsForCheckboxFilters.contractors, this.filter.contractor));
+        addTextFilter(
+            'contractorIds',
+            'Contractor',
+            selectedNames(this.filter.contractorIds, this.optionsForCheckboxFilters.contractors, this.filter.contractor),
+        );
         if (this.filter.dateFrom !== undefined && this.filter.dateTo !== undefined) {
             filters.push({
+                key: 'date',
                 label: 'Date',
                 value: `${formatDate(this.filter.dateFrom, 'mediumDate', 'en-US')} – ${formatDate(this.filter.dateTo, 'mediumDate', 'en-US')}`,
             });
         }
         if (this.filter.showPlanned) {
-            filters.push({ label: 'Show planned transfers' });
+            filters.push({ key: 'showPlanned', label: 'Show planned transfers' });
         }
         if (this.filter.showFlagged) {
-            filters.push({ label: 'Only flagged transfers' });
+            filters.push({ key: 'showFlagged', label: 'Only flagged transfers' });
         }
         return filters;
+    }
+
+    public removeFilter(key: string): void {
+        const groups: Record<string, { fields: string[]; column?: TableColumn; options?: FilterOption[] }> = {
+            categoryIds: { fields: ['categoryIds', 'category'], column: TableColumn.Category, options: this.optionsForCheckboxFilters.categories },
+            description: { fields: ['description'], column: TableColumn.Description },
+            tagIds: { fields: ['tagIds'], column: TableColumn.Tags, options: this.optionsForCheckboxFilters.tags },
+            excludedTagIds: { fields: ['excludedTagIds'], column: TableColumn.Tags, options: this.optionsForCheckboxFilters.tags },
+            accountIds: { fields: ['accountIds', 'account'], column: TableColumn.Account, options: this.optionsForCheckboxFilters.accounts },
+            amount: { fields: ['amountFrom', 'amountTo'], column: TableColumn.Amount },
+            contractorIds: { fields: ['contractorIds', 'contractor'], column: TableColumn.Contractor, options: this.optionsForCheckboxFilters.contractors },
+            date: { fields: ['dateFrom', 'dateTo'], column: TableColumn.Date },
+            showPlanned: { fields: ['showPlanned'] },
+            showFlagged: { fields: ['showFlagged'] },
+        };
+        const group = groups[key];
+        if (!group) {
+            return;
+        }
+        group.fields.forEach((field) => delete this.filter[field]);
+        this.columnFilters?.find((columnFilter) => columnFilter.filterName === group.column)?.reset();
+        group.options?.forEach((option) => {
+            // Included and excluded tags share a control but can be removed independently.
+            option.isSelected = group.column === TableColumn.Tags && (this.filter.tagIds?.includes(option.id) ?? false);
+            option.isExcluded = group.column === TableColumn.Tags && (this.filter.excludedTagIds?.includes(option.id) ?? false);
+            option.isDisplayed = true;
+        });
+        if (this.filterCachePath) {
+            this.localStorage.setObject(this.filterCachePath, this.isAnyFilterApplied ? this.filter : undefined);
+        }
+        this.currentPage = 1;
+        this.tableFilter.emit(this.filter);
+        this.doFiltering();
     }
 
     public clearAllFilters(): void {
@@ -346,6 +393,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         Object.values(this.optionsForCheckboxFilters).forEach((options) =>
             options.forEach((option) => {
                 option.isSelected = false;
+                option.isExcluded = false;
                 option.isDisplayed = true;
             }),
         );

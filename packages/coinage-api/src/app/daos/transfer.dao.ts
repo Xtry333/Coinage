@@ -73,12 +73,26 @@ export class TransferDao extends BaseDao {
             this.assignInFilterIfExists(filter, accountKey, params.accountIds);
             this.assignInFilterIfExists(filter, 'categoryId', params.categoryIds);
             this.assignInFilterIfExists(filter, 'id', params.transferIds);
-            if (params.tagIds?.length) {
+            if (params.tagIds?.length || params.excludedTagIds?.length) {
                 filter.id = Raw(
-                    (alias) =>
-                        transferTagExistsCondition(alias, 'search_tag.id IN (:...tagIds)') +
-                        (params.transferIds?.length ? ` AND ${alias} IN (:...transferIds)` : ''),
-                    { tagIds: [...new Set(params.tagIds)], transferIds: params.transferIds },
+                    (alias) => {
+                        const conditions: string[] = [];
+                        if (params.tagIds?.length) {
+                            conditions.push(transferTagExistsCondition(alias, 'search_tag.id IN (:...tagIds)'));
+                        }
+                        if (params.excludedTagIds?.length) {
+                            conditions.push(`NOT ${transferTagExistsCondition(alias, 'search_tag.id IN (:...excludedTagIds)')}`);
+                        }
+                        if (params.transferIds?.length) {
+                            conditions.push(`${alias} IN (:...transferIds)`);
+                        }
+                        return conditions.join(' AND ');
+                    },
+                    {
+                        tagIds: [...new Set(params.tagIds ?? [])],
+                        excludedTagIds: [...new Set(params.excludedTagIds ?? [])],
+                        transferIds: params.transferIds,
+                    },
                 );
             }
             this.assignBetweenFilterIfExists(filter, 'date', params.date);

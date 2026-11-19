@@ -27,9 +27,7 @@ export class TagBadgesComponent {
 
     public title(tag: TagDTO | EffectiveTagDTO): string {
         if (this.isInherited(tag)) {
-            return 'isDirect' in tag && tag.isDirect
-                ? 'Assigned directly to a transfer and also inherited from items. Removing the direct assignment leaves the inherited tag.'
-                : 'Inherited from items, calculated automatically. Edit the item tags to remove this tag.';
+            return `${tag.name} (inherited)`;
         }
         return this.receipt ? 'Assigned to a transfer in this receipt.' : 'Directly assigned tag.';
     }
