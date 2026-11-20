@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 
+import { AuthDataService } from './auth.dataservice';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NotificationService } from '../services/notification.service';
-import { AuthDataService } from './auth.dataservice';
 
 @Injectable({
     providedIn: 'root',

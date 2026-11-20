@@ -2,8 +2,8 @@ import { HttpBackend, HttpClient } from '@angular/common/http';
 import { inject, isDevMode, provideAppInitializer } from '@angular/core';
 import { lastValueFrom, timeout } from 'rxjs';
 
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { AuthService } from './auth.service';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 
 // Replaced with an empty provider list at build time in production.
 export const developmentAuthProviders = [

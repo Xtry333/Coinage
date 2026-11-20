@@ -1,12 +1,12 @@
 import { DataSource, FindOptionsWhere } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
+import { ItemDao } from './item.dao';
+import { TransferDao } from './transfer.dao';
 import entities from '../entities/_index';
 import { Item } from '../entities/Item.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
-import { ItemDao } from './item.dao';
-import { TransferDao } from './transfer.dao';
 
 class MetadataDataSource extends DataSource {
     public prepareMetadata(): Promise<void> {

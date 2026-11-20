@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 
-import { Item } from '../entities/Item.entity';
 import { ItemDao } from './item.dao';
+import { Item } from '../entities/Item.entity';
 
 describe('item picker tag projection', () => {
     it('returns tags with the last-used-price rows, including never-used items', async () => {

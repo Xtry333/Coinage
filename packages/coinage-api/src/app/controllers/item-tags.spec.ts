@@ -2,6 +2,7 @@ import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
 import { CreateEditItemDTO } from '@app/interfaces';
 
+import { ItemsController } from './items.controller';
 import { ItemDao } from '../daos/item.dao';
 import { TagDao } from '../daos/tag.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
@@ -9,7 +10,6 @@ import { Item } from '../entities/Item.entity';
 import { Tag } from '../entities/Tag.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
-import { ItemsController } from './items.controller';
 
 describe('item tag save and listing contracts', () => {
     let controller: ItemsController;

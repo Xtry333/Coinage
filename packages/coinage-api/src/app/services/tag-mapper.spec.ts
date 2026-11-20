@@ -1,10 +1,10 @@
 import { TagDTO, effectiveTags, unionEffectiveTags, uniqueTags } from '@app/interfaces';
 
+import { getReceiptTags, getTransferTags } from './tag-mapper';
 import { Item } from '../entities/Item.entity';
 import { Tag } from '../entities/Tag.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
-import { getReceiptTags, getTransferTags } from './tag-mapper';
 
 const holiday: Tag = Object.assign(new Tag(), { id: 1, name: 'Holiday', color: '#112233' });
 const food: Tag = Object.assign(new Tag(), { id: 2, name: 'Food', color: null });

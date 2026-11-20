@@ -3,13 +3,13 @@ import { ApplicationInitStatus } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/router';
 
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { NotificationService } from '../services/notification.service';
 import { AuthDataService } from './auth.dataservice';
 import { authGuard, loginGuard } from './auth.guard';
 import { AuthModule } from './auth.module';
 import { AuthService } from './auth.service';
 import { developmentAuthProviders as productionAuthProviders } from './development-auth.prod';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
+import { NotificationService } from '../services/notification.service';
 
 describe('Forced development login bootstrap', () => {
     let service: AuthService;

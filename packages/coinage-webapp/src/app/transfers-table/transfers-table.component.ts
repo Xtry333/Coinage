@@ -6,10 +6,6 @@ import * as Rx from 'rxjs';
 import { TransferDTO, TransferType, TransferTypeEnum } from '@app/interfaces';
 
 import { CoinageRoutes } from '../app-routing/app-routes';
-import { AppliedFilter } from '../components/applied-filters/applied-filters.component';
-import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
-import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
-import { CoinageDataService } from '../services/coinage.data-service';
 import {
     FilterOption,
     FilterType,
@@ -21,6 +17,10 @@ import {
     PopupSide,
     TableFilterComponent,
 } from './table-filter/table-filter.component';
+import { AppliedFilter } from '../components/applied-filters/applied-filters.component';
+import { MoneyAmountComponentData } from '../components/money-amount/money-amount.component';
+import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
+import { CoinageDataService } from '../services/coinage.data-service';
 
 export enum TableColumn {
     Category = 'Category',

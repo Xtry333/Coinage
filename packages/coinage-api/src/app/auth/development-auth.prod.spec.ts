@@ -1,10 +1,10 @@
 import { INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
-import { AuthGuard } from '../services/auth.guard';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { developmentAuthControllers } from './development-auth.prod';
+import { AuthGuard } from '../services/auth.guard';
 
 describe('Production auth registration', () => {
     let app: INestApplication;

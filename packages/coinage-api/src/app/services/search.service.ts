@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { GlobalSearchItemResult, GlobalSearchRequest, GlobalSearchResponse, GlobalSearchTransferResult, uniqueTags } from '@app/interfaces';
 
+import { getTransferTags } from './tag-mapper';
 import { ItemDao } from '../daos/item.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
-import { getTransferTags } from './tag-mapper';
 
 @Injectable()
 export class SearchService {

@@ -2,6 +2,7 @@ import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
 import { CreateEditTransferModelDTO, GranularCreateEditTransferModelDTO, GranularTransferItemChanges } from '@app/interfaces';
 
+import { TransferController } from './transfer.controller';
 import { AccountDao } from '../daos/account.dao';
 import { CategoryDao } from '../daos/category.dao';
 import { ContractorDao } from '../daos/contractor.dao';
@@ -17,9 +18,8 @@ import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { ItemsService } from '../services/items.service';
 import { TransferItemsService } from '../services/transfer-items.service';
-import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
-import { TransferController } from './transfer.controller';
+import { TransfersService } from '../services/transfers.service';
 
 describe('direct tags in full and granular transfer saves', () => {
     let controller: TransferController;

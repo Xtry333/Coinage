@@ -2,9 +2,9 @@ import { of } from 'rxjs';
 
 import { ItemWithContainerDTO } from '@app/interfaces';
 
+import { ItemTableColumn, ItemsListTableComponent } from './items-list-table.component';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { FilterType } from '../transfers-table/table-filter/table-filter.component';
-import { ItemTableColumn, ItemsListTableComponent } from './items-list-table.component';
 
 describe('ItemsListTableComponent tag filtering', () => {
     const holiday = { id: 1, name: 'Holiday', color: null };

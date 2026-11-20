@@ -1,7 +1,7 @@
 import { of, throwError } from 'rxjs';
 
-import { CoinageDataService } from '../../services/coinage.data-service';
 import { TagSelectorComponent } from './tag-selector.component';
+import { CoinageDataService } from '../../services/coinage.data-service';
 
 describe('TagSelectorComponent', () => {
     const tag = { id: 1, name: 'Holiday', color: null };

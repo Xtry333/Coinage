@@ -1,8 +1,8 @@
 import { IsArray, IsInt, IsOptional, Min } from 'class-validator';
 
+import { Range } from './interfaces';
 import { TransferTypeEnum } from '../model/TransferDetails.dto.response';
 import { PagedRequest } from '../partial/Paged.request';
-import { Range } from './interfaces';
 
 export class GetFilteredTransfersRequest extends PagedRequest {
     public transferIds?: number[];

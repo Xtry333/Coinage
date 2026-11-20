@@ -2,9 +2,9 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { TransferDao } from './transfer.dao';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
-import { TransferDao } from './transfer.dao';
 
 describe('TransferDao', () => {
     let dao: TransferDao;

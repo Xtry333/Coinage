@@ -3,11 +3,11 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { of } from 'rxjs';
 
+import { FilterType, TableFilterComponent } from './table-filter/table-filter.component';
+import { TransfersTableComponent } from './transfers-table.component';
 import { AppliedFiltersComponent } from '../components/applied-filters/applied-filters.component';
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { CoinageDataService } from '../services/coinage.data-service';
-import { FilterType, TableFilterComponent } from './table-filter/table-filter.component';
-import { TransfersTableComponent } from './transfers-table.component';
 
 describe('TransferTableComponent', () => {
     let component: TransfersTableComponent;

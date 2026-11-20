@@ -1,12 +1,12 @@
 import { ExecutionContext, INestApplication } from '@nestjs/common';
 import { Test } from '@nestjs/testing';
 
+import controllers from './_index';
 import { CategoryDao } from '../daos/category.dao';
 import { ItemDao } from '../daos/item.dao';
 import { ReceiptDao } from '../daos/receipt.dao';
 import { AccountsService } from '../services/accounts/accounts.service';
 import { AuthGuard } from '../services/auth.guard';
-import controllers from './_index';
 
 describe('Express 5 route compatibility', () => {
     let app: INestApplication;

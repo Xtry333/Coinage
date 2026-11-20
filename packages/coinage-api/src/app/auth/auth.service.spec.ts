@@ -1,9 +1,9 @@
 import { JwtService } from '@nestjs/jwt';
 
-import { UserDao } from '../daos/user.dao';
-import { User } from '../entities/User.entity';
 import { AuthService } from './auth.service';
 import { hashPassword } from './password-hash.util';
+import { UserDao } from '../daos/user.dao';
+import { User } from '../entities/User.entity';
 
 describe('AuthService', () => {
     let service: AuthService;

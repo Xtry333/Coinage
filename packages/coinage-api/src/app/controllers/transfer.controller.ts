@@ -30,8 +30,8 @@ import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { ItemsService } from '../services/items.service';
 import { getReceiptTags, getTransferTags } from '../services/tag-mapper';
 import { TransferItemsService } from '../services/transfer-items.service';
-import { TransfersService } from '../services/transfers.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
+import { TransfersService } from '../services/transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfer')

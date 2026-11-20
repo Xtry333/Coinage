@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 
+import { verifyPassword } from './password-hash.util';
 import { UserDao } from '../daos/user.dao';
 import { User } from '../entities/User.entity';
-import { verifyPassword } from './password-hash.util';
 
 interface JwtPayload {
     username: string;

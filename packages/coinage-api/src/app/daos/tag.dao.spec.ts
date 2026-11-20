@@ -1,8 +1,8 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { In, Repository } from 'typeorm';
 
-import { Tag } from '../entities/Tag.entity';
 import { TagDao } from './tag.dao';
+import { Tag } from '../entities/Tag.entity';
 
 describe('TagDao assignment validation', () => {
     const findBy = jest.fn();

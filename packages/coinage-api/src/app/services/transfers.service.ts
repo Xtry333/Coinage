@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 
 import { GetFilteredTransfersRequest, TransferDTO, TransferType } from '@app/interfaces';
 
+import { getTransferTags } from './tag-mapper';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Transfer } from '../entities/Transfer.entity';
-import { getTransferTags } from './tag-mapper';
 
 @Injectable()
 export class TransfersService {

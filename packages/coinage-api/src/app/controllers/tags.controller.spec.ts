@@ -1,6 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
+import { TagsController } from './tags.controller';
 import { ItemDao } from '../daos/item.dao';
 import { TagDao } from '../daos/tag.dao';
 import { TransferDao } from '../daos/transfer.dao';
@@ -9,7 +10,6 @@ import { Tag } from '../entities/Tag.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { getTransferTags } from '../services/tag-mapper';
-import { TagsController } from './tags.controller';
 
 describe('TagsController', () => {
     let controller: TagsController;

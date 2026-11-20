@@ -1,7 +1,7 @@
 import { makeCategory } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
 
-import { TransferTypeEnum } from '../../entities/Category.entity';
 import { OllamaService } from './ollama.service';
+import { TransferTypeEnum } from '../../entities/Category.entity';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

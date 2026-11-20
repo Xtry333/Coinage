@@ -2,10 +2,10 @@ import { NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
+import { DevelopmentAuthController } from './development-auth.controller';
 import { environment } from '../../environments/environment';
 import { UserDao } from '../daos/user.dao';
 import { User } from '../entities/User.entity';
-import { DevelopmentAuthController } from './development-auth.controller';
 
 describe('DevelopmentAuthController', () => {
     let controller: DevelopmentAuthController;

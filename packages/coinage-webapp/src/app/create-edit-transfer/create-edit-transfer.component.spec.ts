@@ -6,8 +6,8 @@ import { of } from 'rxjs';
 
 import { ShoppingListItem } from '@app/interfaces';
 
-import { CoinageDataService } from '../services/coinage.data-service';
 import { CreateEditTransferComponent } from './create-edit-transfer.component';
+import { CoinageDataService } from '../services/coinage.data-service';
 
 describe('CreateEditTransferComponent', () => {
     let component: CreateEditTransferComponent;
