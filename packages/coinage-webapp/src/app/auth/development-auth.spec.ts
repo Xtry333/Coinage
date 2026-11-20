@@ -5,9 +5,11 @@ import { ActivatedRouteSnapshot, Router, RouterStateSnapshot } from '@angular/ro
 
 import { CoinageStorageService } from '../core/services/storage-service/coinage-storage.service';
 import { NotificationService } from '../services/notification.service';
+import { AuthDataService } from './auth.dataservice';
 import { authGuard, loginGuard } from './auth.guard';
 import { AuthModule } from './auth.module';
 import { AuthService } from './auth.service';
+import { developmentAuthProviders as productionAuthProviders } from './development-auth.prod';
 
 describe('Forced development login bootstrap', () => {
     let service: AuthService;
@@ -136,6 +138,23 @@ describe('Forced development login bootstrap', () => {
         const status = initialize();
         await status.donePromise;
 
+        http.expectNone('/api/auth/forced-login');
+        expect(service.isAuthenticated()).toBe(false);
+    });
+
+    it('omits the initializer with the production provider replacement, even in a development runtime', async () => {
+        TestBed.overrideModule(AuthModule, {
+            set: {
+                imports: [],
+                declarations: [],
+                providers: [AuthDataService, AuthService, ...productionAuthProviders],
+            },
+        });
+
+        const status = initialize();
+        await status.donePromise;
+
+        expect(productionAuthProviders).toEqual([]);
         http.expectNone('/api/auth/forced-login');
         expect(service.isAuthenticated()).toBe(false);
     });

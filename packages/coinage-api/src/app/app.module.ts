@@ -5,6 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
+import { developmentAuthControllers } from './auth/development-auth';
 import controllers from './controllers/_index';
 import daos from './daos/_index';
 import entities from './entities/_index';
@@ -38,7 +39,7 @@ import { opts } from './typeorm.config';
         }),
         ReceiptProcessingModule,
     ],
-    controllers: [...controllers],
+    controllers: [...controllers, ...developmentAuthControllers],
     providers: [...services, ...daos, EventsGateway],
 })
 export class AppModule {}

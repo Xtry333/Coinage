@@ -177,16 +177,17 @@ corepack yarn dev:webapp # Starts the web application
 
 ### Automatic development login
 
-To sign in automatically and skip the login screen, set both variables in the root `.env` to an existing user's credentials, then restart the API:
+To sign in automatically and skip the login screen, set `COINAGE_FORCED_LOGIN` in the root `.env` to an existing user's username, then restart the API:
 
 ```dotenv
 COINAGE_FORCED_LOGIN="your-development-username"
-COINAGE_FORCED_PASSWORD="your-development-password"
 ```
 
-The development webapp signs in before initial navigation, including when opening a protected page directly, and replaces any previously saved session with the configured user's session. Missing or empty variables disable automatic login; invalid credentials or an unavailable API leave the normal login flow available. This does not create users or reset passwords.
+The development webapp signs in before initial navigation, including when opening a protected page directly, and replaces any previously saved session with the configured user's session. A missing or empty username disables automatic login; a nonexistent user or an unavailable API leaves the normal login flow available. This does not create users or reset passwords.
 
-Credentials stay on the API server and are never included in browser builds. Production API builds and production-mode webapps disable this feature. **Do not expose a development API with forced login enabled to untrusted networks:** anyone who can reach it can obtain the configured user's session.
+This is development-only impersonation: no password is required or checked. Normal login still requires a valid password. Configuration is read by the API, not embedded in browser builds. Production builds replace the development-only registrations with empty ones: the API controller and webapp initializer are not bundled, and `/api/auth/forced-login` does not exist (returns `404`). Runtime guards remain as an additional safeguard for development builds. **Do not expose a development API with forced login enabled to untrusted networks:** anyone who can reach it can obtain the configured user's session.
+
+Run `yarn nx run coinage-tools:verify-production-auth` to build both applications in production mode and check their output, including emitted source maps, for development authentication code, route names, and environment-variable markers.
 
 ## Database migrations
 

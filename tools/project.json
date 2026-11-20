@@ -19,10 +19,11 @@
                 "{workspaceRoot}/nginx.conf.template",
                 "{workspaceRoot}/packages/coinage-webapp/proxy.conf.cjs",
                 "{workspaceRoot}/packages/coinage-webapp/project.json",
+                "{workspaceRoot}/packages/coinage-api/webpack.config.js",
                 "{workspaceRoot}/.dockerignore"
             ],
             "options": {
-                "command": "node --test tools/db-dump.test.cjs tools/docker-images.test.cjs tools/pi-bundle.test.cjs tools/start-pi.test.cjs tools/ports.test.cjs"
+                "command": "node --test tools/db-dump.test.cjs tools/docker-images.test.cjs tools/pi-bundle.test.cjs tools/start-pi.test.cjs tools/ports.test.cjs tools/verify-production-auth.test.cjs"
             }
         },
         "test-compose": {
@@ -31,6 +32,14 @@
             "options": {
                 "command": "node --test tools/docker-compose.test.cjs tools/pi-compose.test.cjs"
             }
+        },
+        "verify-production-auth": {
+            "executor": "nx:run-commands",
+            "cache": false,
+            "dependsOn": [{ "projects": ["coinage-api", "coinage-webapp"], "target": "build" }],
+            "defaultConfiguration": "production",
+            "configurations": { "production": {} },
+            "options": { "command": "node tools/verify-production-auth.cjs" }
         },
         "docker-bundle-pi": {
             "executor": "nx:run-commands",

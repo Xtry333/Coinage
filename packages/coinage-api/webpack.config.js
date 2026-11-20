@@ -32,6 +32,10 @@ module.exports = () => {
                               replace: join(__dirname, 'src/environments/environment.ts'),
                               with: join(__dirname, 'src/environments/environment.prod.ts'),
                           },
+                          {
+                              replace: join(__dirname, 'src/app/auth/development-auth.ts'),
+                              with: join(__dirname, 'src/app/auth/development-auth.prod.ts'),
+                          },
                       ]
                     : [],
             }),

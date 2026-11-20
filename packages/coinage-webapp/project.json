@@ -34,6 +34,12 @@
             },
             "configurations": {
                 "production": {
+                    "fileReplacements": [
+                        {
+                            "replace": "packages/coinage-webapp/src/app/auth/development-auth.ts",
+                            "with": "packages/coinage-webapp/src/app/auth/development-auth.prod.ts"
+                        }
+                    ],
                     "budgets": [
                         {
                             "type": "initial",

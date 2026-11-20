@@ -1,19 +1,18 @@
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 
-describe('AuthController forced development login', () => {
-    it.each(['signed-token', null])('returns only the session token (%s)', async (token) => {
-        const forcedLogin = jest.fn().mockResolvedValue(token);
-        const controller = new AuthController({ forcedLogin } as unknown as AuthService);
+describe('AuthController', () => {
+    it('validates the supplied credentials through normal login', async () => {
+        const loginUser = jest.fn().mockResolvedValue('signed-token');
+        const controller = new AuthController({ loginUser } as unknown as AuthService);
 
-        await expect(controller.forcedLogin()).resolves.toEqual({ token });
-        expect(forcedLogin).toHaveBeenCalledWith();
+        await expect(controller.login({ username: 'developer', password: 'password' })).resolves.toEqual({ token: 'signed-token' });
+        expect(loginUser).toHaveBeenCalledWith('developer', 'password');
     });
 
-    it('does not allow caching session responses', () => {
-        expect(Reflect.getMetadata('__headers__', AuthController.prototype.forcedLogin)).toContainEqual({
-            name: 'Cache-Control',
-            value: 'no-store',
-        });
+    it('acknowledges logout', async () => {
+        const controller = new AuthController({} as AuthService);
+
+        await expect(controller.logout()).resolves.toEqual({ message: 'Logged out successfully.' });
     });
 });
