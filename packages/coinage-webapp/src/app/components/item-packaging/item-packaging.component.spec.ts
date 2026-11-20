@@ -6,9 +6,9 @@ import { of } from 'rxjs';
 
 import { ItemPackagingDTO } from '@app/interfaces';
 
+import { ItemPackagingComponent } from './item-packaging.component';
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
-import { ItemPackagingComponent } from './item-packaging.component';
 
 const variant: ItemPackagingDTO = {
     id: 3,

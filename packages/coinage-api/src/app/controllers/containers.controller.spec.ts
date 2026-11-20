@@ -1,7 +1,7 @@
+import { ContainersController } from './containers.controller';
 import { ContainerDao } from '../daos/container.dao';
 import { ItemsWithContainersDao } from '../daos/itemsWithContainers.dao';
 import { SharedContainersService } from '../services/shared-containers.service';
-import { ContainersController } from './containers.controller';
 
 describe('ContainersController legacy compatibility', () => {
     it('does not substitute packaging names or composite totals for shared container definitions', async () => {

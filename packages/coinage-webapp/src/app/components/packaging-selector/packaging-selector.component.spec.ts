@@ -1,7 +1,7 @@
 import { ItemPackagingDTO } from '@app/interfaces';
 
-import { CoinageDataService } from '../../services/coinage.data-service';
 import { PackagingSelectorComponent } from './packaging-selector.component';
+import { CoinageDataService } from '../../services/coinage.data-service';
 
 const variant: ItemPackagingDTO = {
     id: 3,

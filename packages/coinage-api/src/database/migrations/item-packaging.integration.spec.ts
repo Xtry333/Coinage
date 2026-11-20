@@ -3,6 +3,9 @@ import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 
 import { ItemPackagingInput } from '@app/interfaces';
 
+import { NormalizeMeasurementUnits1795175999000 } from './1795175999000-NormalizeMeasurementUnits';
+import { AddItemPackaging1795176000000 } from './1795176000000-AddItemPackaging';
+import { AddPackagingComposition1795176001000 } from './1795176001000-AddPackagingComposition';
 import { TransferItemDao } from '../../app/daos/transferItem.dao';
 import entities from '../../app/entities/_index';
 import { Container } from '../../app/entities/Container.entity';
@@ -11,9 +14,6 @@ import { getPostgresConnectionOptions } from '../../app/postgres-connection-opti
 import { ItemPackagingService, toPackagingDTO } from '../../app/services/item-packaging.service';
 import { SharedContainersService } from '../../app/services/shared-containers.service';
 import { TransferItemsService } from '../../app/services/transfer-items.service';
-import { NormalizeMeasurementUnits1795175999000 } from './1795175999000-NormalizeMeasurementUnits';
-import { AddItemPackaging1795176000000 } from './1795176000000-AddItemPackaging';
-import { AddPackagingComposition1795176001000 } from './1795176001000-AddPackagingComposition';
 
 // Opt in with COINAGE_PACKAGING_DB_TEST=1. All DDL and fixture data are isolated in
 // a disposable schema inside a transaction which is always rolled back.

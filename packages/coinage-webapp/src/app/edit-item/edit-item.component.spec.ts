@@ -8,10 +8,10 @@ import { BehaviorSubject, of, throwError } from 'rxjs';
 import { Unit } from '@app/common-units';
 import { BaseResponseDTO, CreateEditItemDTO, ItemDetailsDTO } from '@app/interfaces';
 
+import { EditItemComponent } from './edit-item.component';
 import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NotificationService } from '../services/notification.service';
-import { EditItemComponent } from './edit-item.component';
 
 describe('EditItemComponent', () => {
     let component: EditItemComponent;

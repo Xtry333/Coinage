@@ -2,11 +2,11 @@ import { DataSource } from 'typeorm';
 
 import { calculatePackagingContents, ItemPackagingInput, packagingLabel } from '@app/interfaces';
 
+import { ItemPackagingService, validatePackaging } from './item-packaging.service';
 import { Container } from '../entities/Container.entity';
 import { Item } from '../entities/Item.entity';
 import { ItemPackaging } from '../entities/ItemPackaging.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
-import { ItemPackagingService, validatePackaging } from './item-packaging.service';
 
 const input: ItemPackagingInput = {
     containerId: 7,

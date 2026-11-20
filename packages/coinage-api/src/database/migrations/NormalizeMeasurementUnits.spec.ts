@@ -1,7 +1,7 @@
 import { DataSource, QueryRunner } from 'typeorm';
 
-import { getPostgresConnectionOptions } from '../../app/postgres-connection-options';
 import { NormalizeMeasurementUnits1795175999000 } from './1795175999000-NormalizeMeasurementUnits';
+import { getPostgresConnectionOptions } from '../../app/postgres-connection-options';
 
 describe('NormalizeMeasurementUnits migration', () => {
     let query: jest.Mock;

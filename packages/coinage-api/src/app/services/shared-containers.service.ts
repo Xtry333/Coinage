@@ -3,9 +3,9 @@ import { DataSource } from 'typeorm';
 
 import { BaseResponseDTO, UpdateSharedContainerDTO } from '@app/interfaces';
 
+import { validatePackaging } from './item-packaging.service';
 import { Container } from '../entities/Container.entity';
 import { ItemPackaging } from '../entities/ItemPackaging.entity';
-import { validatePackaging } from './item-packaging.service';
 
 @Injectable()
 export class SharedContainersService {

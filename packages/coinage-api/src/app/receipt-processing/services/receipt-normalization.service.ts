@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
+import { OllamaExtractedData, OllamaService } from './ollama.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
@@ -11,7 +12,6 @@ import { Container } from '../../entities/Container.entity';
 import { Contractor } from '../../entities/Contractor.entity';
 import { Item } from '../../entities/Item.entity';
 import { ItemsWithContainers } from '../../entities/views/ItemsWithContainers.view';
-import { OllamaExtractedData, OllamaService } from './ollama.service';
 
 /** Top N fuzzy candidates to send to AI on first attempt. */
 const FIRST_PASS_CANDIDATES = 10;

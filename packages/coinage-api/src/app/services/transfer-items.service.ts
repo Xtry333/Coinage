@@ -1,8 +1,8 @@
 import { Injectable, Logger } from '@nestjs/common';
 
+import { ItemPackagingService } from './item-packaging.service';
 import { TransferItemDao } from '../daos/transferItem.dao';
 import { TransferItem } from '../entities/TransferItem.entity';
-import { ItemPackagingService } from './item-packaging.service';
 
 @Injectable()
 export class TransferItemsService {

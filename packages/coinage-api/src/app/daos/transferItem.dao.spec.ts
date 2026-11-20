@@ -1,9 +1,9 @@
 import { Equal, IsNull, Repository } from 'typeorm';
 
+import { TransferItemDao } from './transferItem.dao';
 import { Container } from '../entities/Container.entity';
 import { Item } from '../entities/Item.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
-import { TransferItemDao } from './transferItem.dao';
 
 describe('TransferItemDao', () => {
     let dao: TransferItemDao;

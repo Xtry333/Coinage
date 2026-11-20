@@ -4,10 +4,10 @@ import { ActivatedRoute, convertToParamMap } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
+import { TransferItemDetailsComponent } from './transfer-item-details.component';
 import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NotificationService } from '../services/notification.service';
-import { TransferItemDetailsComponent } from './transfer-item-details.component';
 
 describe('TransferItemDetailsComponent', () => {
     let component: TransferItemDetailsComponent;

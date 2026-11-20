@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
 
+import { SharedContainersService } from './shared-containers.service';
 import { Container } from '../entities/Container.entity';
 import { ItemPackaging } from '../entities/ItemPackaging.entity';
-import { SharedContainersService } from './shared-containers.service';
 
 describe('SharedContainersService', () => {
     let service: SharedContainersService;

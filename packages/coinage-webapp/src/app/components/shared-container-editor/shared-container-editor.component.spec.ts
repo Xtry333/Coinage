@@ -3,9 +3,9 @@ import { FormsModule } from '@angular/forms';
 
 import { ContainerDTO } from '@app/interfaces';
 
+import { SharedContainerEditorComponent } from './shared-container-editor.component';
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
-import { SharedContainerEditorComponent } from './shared-container-editor.component';
 
 describe('SharedContainerEditorComponent', () => {
     let fixture: ComponentFixture<SharedContainerEditorComponent>;

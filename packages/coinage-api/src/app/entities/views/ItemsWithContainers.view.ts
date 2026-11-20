@@ -3,8 +3,8 @@ import { ManyToOne, ViewColumn, ViewEntity } from 'typeorm';
 import { Container } from '../Container.entity';
 import { Item } from '../Item.entity';
 import { ItemPackaging } from '../ItemPackaging.entity';
-import { DecimalToNumberTransformer } from '../transformers/decimal-to-number.transformer';
 import { ItemPackagingContents } from './ItemPackagingContents.view';
+import { DecimalToNumberTransformer } from '../transformers/decimal-to-number.transformer';
 
 @ViewEntity({
     expression: `

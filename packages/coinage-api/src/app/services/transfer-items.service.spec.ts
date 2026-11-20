@@ -1,10 +1,10 @@
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
+import { ItemPackagingService } from './item-packaging.service';
+import { TransferItemsService } from './transfer-items.service';
 import { TransferItemDao } from '../daos/transferItem.dao';
 import { ItemPackaging } from '../entities/ItemPackaging.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
-import { ItemPackagingService } from './item-packaging.service';
-import { TransferItemsService } from './transfer-items.service';
 
 function makeMockTransferItem(overrides: Partial<TransferItem> = {}): TransferItem {
     const item = new TransferItem();
