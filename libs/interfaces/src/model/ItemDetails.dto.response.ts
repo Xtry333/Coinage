@@ -23,6 +23,8 @@ export class ItemDetailsDTO {
 }
 
 export class TransferWithItemDetailsDTO {
+    public transferItemId?: number;
+    public packagingId?: number | null;
     public transferId!: number;
     public transferName!: string;
     public tags!: EffectiveTagDTO[];

@@ -1,0 +1,123 @@
+@if (draft) {
+    <div class="space-y-4 rounded-lg border border-amber-300 bg-white p-4" #containerForm="ngForm" (keydown.enter)="onEnter($event)" ngForm>
+        <div class="space-y-2 rounded-md bg-amber-50 p-3 text-sm text-amber-900" role="alert">
+            <p class="font-semibold">Shared container changes affect historical items</p>
+            <p>
+                This edits the original shared container. Legacy records that display its name or read its measurements use the updated values. Named packaging
+                variants keep their own names.
+            </p>
+            <p>Saved product-packaging sizes stay unchanged unless you explicitly choose to correct matching historical sizes below.</p>
+        </div>
+        <fieldset class="grid grid-cols-1 gap-4 sm:grid-cols-2" [disabled]="saving">
+            <div class="space-y-1 sm:col-span-2">
+                <label class="block text-sm font-medium text-gray-700" [for]="formId + '-name'">Shared container name</label>
+                <input
+                    class="w-full rounded-md border border-gray-300 px-3 py-2"
+                    [(ngModel)]="draft.name"
+                    [id]="formId + '-name'"
+                    name="name"
+                    type="text"
+                    maxlength="64"
+                />
+            </div>
+            <div class="space-y-1">
+                <label class="block text-sm font-medium text-gray-700" [for]="formId + '-weight'">Legacy weight</label>
+                <input
+                    class="w-full rounded-md border border-gray-300 px-3 py-2"
+                    [(ngModel)]="draft.weight"
+                    [id]="formId + '-weight'"
+                    name="weight"
+                    type="number"
+                    min="0.000001"
+                    step="any"
+                />
+                <select
+                    class="w-full rounded-md border border-gray-300 px-3 py-2"
+                    [(ngModel)]="draft.weightUnit"
+                    name="weightUnit"
+                    aria-label="Legacy weight unit"
+                >
+                    <option [ngValue]="null">No weight unit</option>
+                    <option value="g">g</option>
+                    <option value="kg">kg</option>
+                </select>
+            </div>
+            <div class="space-y-1">
+                <label class="block text-sm font-medium text-gray-700" [for]="formId + '-volume'">Legacy volume</label>
+                <input
+                    class="w-full rounded-md border border-gray-300 px-3 py-2"
+                    [(ngModel)]="draft.volume"
+                    [id]="formId + '-volume'"
+                    name="volume"
+                    type="number"
+                    min="0.000001"
+                    step="any"
+                />
+                <select
+                    class="w-full rounded-md border border-gray-300 px-3 py-2"
+                    [(ngModel)]="draft.volumeUnit"
+                    name="volumeUnit"
+                    aria-label="Legacy volume unit"
+                >
+                    <option [ngValue]="null">No volume unit</option>
+                    <option value="ml">ml</option>
+                    <option value="cl">cl</option>
+                    <option value="l">l</option>
+                </select>
+            </div>
+            <div class="space-y-1">
+                <label class="block text-sm font-medium text-gray-700" [for]="formId + '-count'">Legacy items per package</label>
+                <input
+                    class="w-full rounded-md border border-gray-300 px-3 py-2"
+                    [(ngModel)]="draft.itemCount"
+                    [id]="formId + '-count'"
+                    name="itemCount"
+                    type="number"
+                    min="1"
+                    max="2147483647"
+                    step="1"
+                />
+            </div>
+            <div class="space-y-2 sm:col-span-2">
+                <label class="flex items-start gap-2 text-sm font-medium text-amber-900">
+                    <input
+                        class="mt-1"
+                        [(ngModel)]="correctHistoricalSizes"
+                        (ngModelChange)="acknowledged = false"
+                        name="correctHistoricalSizes"
+                        type="checkbox"
+                    />
+                    Also correct matching historical sizes
+                </label>
+                <p class="text-xs text-gray-600">
+                    Opting in updates linked leaf packaging variants whose weight, volume, units, and pack count exactly match this container's current legacy
+                    definition, including archived variants across all products. Outer packages containing those versions recalculate their totals. Other leaf
+                    sizes are left alone. Historical price-per-kg/liter displays can change; purchase prices and quantities do not.
+                </p>
+                <label class="flex items-start gap-2 text-sm font-medium text-amber-900">
+                    <input class="mt-1" [(ngModel)]="acknowledged" name="acknowledged" type="checkbox" required />
+                    I understand that shared changes affect historical items across products.
+                </label>
+            </div>
+        </fieldset>
+        @if (!valid) {
+            <p class="text-sm text-gray-600">Sizes must be positive with matching units; items per package must be a positive integer.</p>
+        }
+        @if (error) {
+            <p class="text-sm text-red-600" role="alert">{{ error }}</p>
+        }
+        <div class="flex gap-3">
+            <button
+                class="rounded-md bg-amber-700 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                [disabled]="saving || !acknowledged || !valid || containerForm.invalid"
+                (click)="save()"
+                type="button"
+            >
+                {{ saving ? 'Saving…' : 'Save shared container' }}
+            </button>
+            <button class="rounded-md border border-gray-300 px-3 py-2 text-sm disabled:opacity-50" [disabled]="saving" (click)="cancel()" type="button">
+                Cancel container edit
+            </button>
+        </div>
+    </div>
+}

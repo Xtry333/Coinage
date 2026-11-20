@@ -1,0 +1,296 @@
+<div class="space-y-4">
+    <p class="text-sm text-gray-600">
+        Give each package its own name. A box can contain multiple units of another package from this product, such as 24 × Can.
+    </p>
+    @if (loading) {
+        <p class="text-sm text-gray-500">Loading packaging…</p>
+    } @else if (error) {
+        <p class="text-sm text-red-600" role="alert">{{ error }}</p>
+        <button class="text-sm text-blue-600 underline" (click)="load()" type="button">Retry</button>
+    } @else {
+        <ul class="divide-y divide-gray-200">
+            @for (variant of variants; track variant.id) {
+                @if (!variant.isArchived || showArchived) {
+                    <li class="flex flex-wrap items-center justify-between gap-3 py-3">
+                        <div>
+                            <span class="text-sm font-medium text-gray-900">{{ label(variant) }}</span>
+                            @if (variant.isPreferred) {
+                                <span class="ml-2 text-xs text-blue-700">Preferred</span>
+                            }
+                            @if (variant.isArchived) {
+                                <span class="ml-2 text-xs text-gray-500">Archived · kept for past purchases</span>
+                            }
+                            @if (variant.barcode) {
+                                <p class="text-xs text-gray-500">Barcode: {{ variant.barcode }}</p>
+                            }
+                            @if (perItemLabel(variant); as each) {
+                                <p class="text-xs text-gray-500">Per item: {{ each }}</p>
+                            }
+                        </div>
+                        @if (!readonly && !variant.isArchived) {
+                            <div class="flex flex-wrap gap-3 text-sm">
+                                <button class="text-blue-600 disabled:opacity-50" [disabled]="saving" (click)="start(variant, true)" type="button">
+                                    Edit size
+                                </button>
+                                <button class="text-blue-600 disabled:opacity-50" [disabled]="saving" (click)="start(variant)" type="button">Duplicate</button>
+                                @if (!variant.isPreferred) {
+                                    <button class="text-blue-600 disabled:opacity-50" [disabled]="saving" (click)="setState(variant, 'prefer')" type="button">
+                                        Set preferred
+                                    </button>
+                                }
+                                <button class="text-gray-600 disabled:opacity-50" [disabled]="saving" (click)="setState(variant, 'archive')" type="button">
+                                    Archive
+                                </button>
+                                @if (variant.containerId; as containerId) {
+                                    <button
+                                        class="text-amber-800 disabled:opacity-50"
+                                        [disabled]="saving"
+                                        (click)="editSharedContainer(containerId)"
+                                        type="button"
+                                    >
+                                        Edit shared container
+                                    </button>
+                                }
+                            </div>
+                        }
+                    </li>
+                }
+            } @empty {
+                <li class="py-3 text-sm text-gray-500">No packaging variants yet. Purchases can also be recorded without packaging.</li>
+            }
+        </ul>
+        <label class="flex items-center gap-2 text-sm text-gray-600">
+            <input [(ngModel)]="showArchived" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+            Show archived sizes
+        </label>
+        @if (!readonly && !draft) {
+            <button
+                class="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                [disabled]="saving"
+                (click)="start()"
+                type="button"
+            >
+                Add packaging variant
+            </button>
+        }
+    }
+    @if (draft && !readonly) {
+        <div class="space-y-4 rounded-lg border border-gray-200 bg-white p-4" #packagingForm="ngForm" (keydown.enter)="onEnter($event)" ngForm>
+            <p class="text-sm text-gray-600">
+                {{
+                    replacedId
+                        ? 'Saving creates a replacement variant and archives this size. Past purchases will not change.'
+                        : 'Add a named package for this product. Create the inner package first if this package contains others.'
+                }}
+            </p>
+            <fieldset class="grid grid-cols-1 gap-4 sm:grid-cols-2" [disabled]="saving">
+                <div class="space-y-1 sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700" [for]="formId + '-name'">Packaging name</label>
+                    <input
+                        class="w-full rounded-md border border-gray-300 px-3 py-2"
+                        [(ngModel)]="draft.name"
+                        [id]="formId + '-name'"
+                        name="packagingName"
+                        maxlength="64"
+                        required
+                        placeholder="For example: Can, Box, Pallet"
+                    />
+                </div>
+                <div class="space-y-1 sm:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700" [for]="formId + '-contained'">Contained packaging (optional)</label>
+                    <ng-select
+                        [(ngModel)]="draft.containedPackagingId"
+                        [items]="containedOptions"
+                        [disabled]="saving || loading"
+                        [labelForId]="formId + '-contained'"
+                        (ngModelChange)="onContainedPackagingChanged($event)"
+                        name="containedPackaging"
+                        bindValue="id"
+                        bindLabel="displayName"
+                        placeholder="None · individual or flat package"
+                    ></ng-select>
+                </div>
+                @if (draft.containedPackagingId) {
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-gray-700" [for]="formId + '-contained-count'">Number of contained packages</label>
+                        <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2"
+                            [(ngModel)]="draft.containedCount"
+                            [id]="formId + '-contained-count'"
+                            name="containedCount"
+                            type="number"
+                            min="1"
+                            max="2147483647"
+                            step="1"
+                            required
+                        />
+                    </div>
+                    <div class="space-y-1 rounded-md bg-blue-50 p-3 text-sm text-blue-900">
+                        <span class="font-medium">Calculated contents</span>
+                        <p>{{ draftSummary || 'Choose a contained package and a positive integer count.' }}</p>
+                        @if (calculatedContents; as contents) {
+                            <p>{{ contents.itemCount }} individual items in total</p>
+                        }
+                    </div>
+                }
+                <details class="space-y-1 sm:col-span-2">
+                    <summary class="cursor-pointer text-sm text-gray-600">Legacy container reference (optional)</summary>
+                    <label class="block text-sm font-medium text-gray-700" [for]="formId + '-container'">Legacy shared container</label>
+                    <ng-select
+                        [(ngModel)]="draft.containerId"
+                        [items]="containers"
+                        [addTag]="addContainer.bind(this)"
+                        [disabled]="saving || loading"
+                        [labelForId]="formId + '-container'"
+                        name="container"
+                        bindValue="id"
+                        bindLabel="name"
+                        placeholder="Optional · select or create a format"
+                        addTagText="Create container format"
+                    ></ng-select>
+                    <p class="text-xs text-gray-500">Kept for compatibility. The packaging name above is independent of this shared container.</p>
+                </details>
+                @if (!draft.containedPackagingId) {
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-gray-700" [for]="formId + '-weight'">Total net weight</label>
+                        <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2"
+                            [(ngModel)]="draft.weight"
+                            [id]="formId + '-weight'"
+                            name="weight"
+                            type="number"
+                            min="0.000001"
+                            step="any"
+                        />
+                        <select
+                            class="w-full rounded-md border border-gray-300 px-3 py-2"
+                            [(ngModel)]="draft.weightUnit"
+                            name="weightUnit"
+                            aria-label="Weight unit"
+                        >
+                            <option [ngValue]="null">No weight unit</option>
+                            <option value="g">g</option>
+                            <option value="kg">kg</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-gray-700" [for]="formId + '-volume'">Total net volume</label>
+                        <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2"
+                            [(ngModel)]="draft.volume"
+                            [id]="formId + '-volume'"
+                            name="volume"
+                            type="number"
+                            min="0.000001"
+                            step="any"
+                        />
+                        <select
+                            class="w-full rounded-md border border-gray-300 px-3 py-2"
+                            [(ngModel)]="draft.volumeUnit"
+                            name="volumeUnit"
+                            aria-label="Volume unit"
+                        >
+                            <option [ngValue]="null">No volume unit</option>
+                            <option value="ml">ml</option>
+                            <option value="cl">cl</option>
+                            <option value="l">l</option>
+                        </select>
+                    </div>
+                    <div class="space-y-1">
+                        <label class="block text-sm font-medium text-gray-700" [for]="formId + '-count'">Items per package</label>
+                        <input
+                            class="w-full rounded-md border border-gray-300 px-3 py-2"
+                            [(ngModel)]="draft.itemCount"
+                            [id]="formId + '-count'"
+                            name="itemCount"
+                            type="number"
+                            min="1"
+                            max="2147483647"
+                            step="1"
+                        />
+                    </div>
+                }
+                <div class="space-y-1">
+                    <label class="block text-sm font-medium text-gray-700" [for]="formId + '-barcode'">Barcode (optional)</label>
+                    <input
+                        class="w-full rounded-md border border-gray-300 px-3 py-2"
+                        [(ngModel)]="draft.barcode"
+                        [id]="formId + '-barcode'"
+                        name="barcode"
+                        maxlength="64"
+                        type="text"
+                    />
+                </div>
+                <label class="flex items-center gap-2 text-sm text-gray-700">
+                    <input [(ngModel)]="draft.isPreferred" name="preferred" type="checkbox" />Preferred for new purchases
+                </label>
+            </fieldset>
+            <p class="text-xs text-gray-500">
+                For boxes and multipacks, select the contained package and its count; totals are calculated automatically. Flat legacy packages keep their
+                total-size fields. Packaging changes are saved separately from item and transfer changes.
+            </p>
+            @if (draftPerItem; as each) {
+                <p class="text-xs text-gray-500">Per item: {{ each }}</p>
+            }
+            @if (!valid) {
+                <p class="text-sm text-gray-600">Enter a packaging name and valid sizes, or choose a contained package with a positive integer count.</p>
+            }
+            <div class="flex gap-3">
+                <button
+                    class="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+                    [disabled]="saving || loading || !!error || packagingForm.invalid || !valid"
+                    (click)="save()"
+                    type="button"
+                >
+                    {{ saving ? 'Saving…' : 'Save packaging' }}
+                </button>
+                <button
+                    class="rounded-md border border-gray-300 px-3 py-2 text-sm disabled:opacity-50"
+                    [disabled]="saving"
+                    (click)="draft = undefined"
+                    type="button"
+                >
+                    Cancel packaging edit
+                </button>
+            </div>
+        </div>
+    }
+    @if (!readonly && !draft && !loading && !error) {
+        <div class="space-y-3 border-t border-gray-200 pt-4">
+            <button
+                class="text-sm text-amber-800 underline disabled:opacity-50"
+                [disabled]="saving"
+                (click)="showContainerManager = !showContainerManager"
+                type="button"
+            >
+                {{ showContainerManager ? 'Hide shared containers' : 'Manage shared / legacy containers' }}
+            </button>
+            @if (showContainerManager) {
+                <p class="text-sm text-gray-600">
+                    All shared containers are listed here, including old and unused definitions. Editing them can affect historical items across products.
+                </p>
+                <label class="block text-sm font-medium text-gray-700" [for]="formId + '-shared'">Choose a shared container to edit</label>
+                <select
+                    class="w-full rounded-md border border-gray-300 px-3 py-2"
+                    [(ngModel)]="editingContainerId"
+                    [id]="formId + '-shared'"
+                    [ngModelOptions]="{ standalone: true }"
+                    [disabled]="saving"
+                >
+                    <option [ngValue]="null">Choose a container</option>
+                    @for (container of containers; track container.id) {
+                        <option [ngValue]="container.id">{{ containerLabel(container) }}</option>
+                    }
+                </select>
+                @if (editingContainer; as container) {
+                    <app-shared-container-editor
+                        [container]="container"
+                        (busyChange)="saving = $event"
+                        (saved)="onSharedContainerSaved()"
+                        (cancelled)="editingContainerId = null"
+                    ></app-shared-container-editor>
+                }
+            }
+        </div>
+    }
+</div>

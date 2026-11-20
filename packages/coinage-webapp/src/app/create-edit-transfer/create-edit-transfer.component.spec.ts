@@ -6,8 +6,8 @@ import { of } from 'rxjs';
 
 import { ShoppingListItem } from '@app/interfaces';
 
-import { CreateEditTransferComponent } from './create-edit-transfer.component';
 import { CoinageDataService } from '../services/coinage.data-service';
+import { CreateEditTransferComponent } from './create-edit-transfer.component';
 
 describe('CreateEditTransferComponent', () => {
     let component: CreateEditTransferComponent;
@@ -67,5 +67,18 @@ describe('CreateEditTransferComponent', () => {
         component.onClickSaveTransfer();
         expect(save.mock.calls[0][0].tagIds).toEqual([1]);
         expect(save.mock.calls[0][0].tagIds).not.toContain(2);
+    });
+
+    it('detects a packaging-only edit even when both sizes use the same container', () => {
+        const data = TestBed.inject(CoinageDataService);
+        const save = jest.spyOn(data, 'postGranularSaveTransfer').mockReturnValue(of({}));
+        component.editMode = true;
+        component.transferId = 3;
+        component.redirectAfterSave = false;
+        component.selectedTransferInputs = { amount: 10, date: '2026-11-01', description: 'Test' };
+        component.originalItemsInTransfer = [new ShoppingListItem(10, 'Cola', 1, 10, 10, 0, 1, 7, 5, [], 41)];
+        component.itemsInTransfer = [new ShoppingListItem(10, 'Cola', 1, 10, 10, 0, 1, 7, 5, [], 42)];
+        component.onClickSaveTransfer();
+        expect(save.mock.calls[0][0].itemChanges.editedItems).toEqual([expect.objectContaining({ packagingId: 42, containerId: 7 })]);
     });
 });

@@ -21,8 +21,7 @@ export class TransferItemDetailsComponent implements OnInit, OnDestroy {
     public showPage = false;
 
     public item!: ItemDetailsDTO;
-    public selectedTagIds: number[] = [];
-    public savingTags = false;
+    public CoinageRoutes = CoinageRoutes;
 
     public routeSubscription!: Rx.Subscription;
 
@@ -65,27 +64,11 @@ export class TransferItemDetailsComponent implements OnInit, OnDestroy {
         return `${perItem.toFixed(3)} ${weightUnit ?? ''}`.trim();
     }
 
-    public async saveTags(): Promise<void> {
-        if (this.savingTags) return;
-        this.savingTags = true;
-        try {
-            const response = await this.coinageData.setItemTags(this.item.id, this.selectedTagIds);
-            if (response.error) throw new Error(response.error);
-            await this.loadItemDetails(this.item.id);
-            this.notificationService.push({ title: 'Tags saved', message: 'Transfers now inherit the updated item tags.' });
-        } catch {
-            this.notificationService.error('Could not save item tags.');
-        } finally {
-            this.savingTags = false;
-        }
-    }
-
     private loadItemDetails(id: number): Promise<void> {
         return this.coinageData
             .getItemDetails(id)
             .then((item) => {
                 this.item = item;
-                this.selectedTagIds = [...new Set((item.tags ?? []).map((tag) => tag.id))];
                 console.log(this.item);
             })
             .catch(() => {

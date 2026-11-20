@@ -13,7 +13,8 @@ export interface NormalizedReceiptItemDTO {
 }
 
 export interface NormalizedContainerDTO {
-    containerId: number;
+    packagingId?: number;
+    containerId: number | null;
     containerName: string;
     volume: number | null;
     volumeUnit: string | null;
@@ -47,6 +48,7 @@ export interface ReceiptAiResultDTO {
 }
 
 export interface ConfirmReceiptItemDTO {
+    packagingId?: number | null;
     itemId: number | null;
     name: string;
     price: number;

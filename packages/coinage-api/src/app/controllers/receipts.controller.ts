@@ -46,6 +46,7 @@ import { TransferItem } from '../entities/TransferItem.entity';
 import { User } from '../entities/User.entity';
 import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.event';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
+import { ItemPackagingService } from '../services/item-packaging.service';
 import { getReceiptTags, getTransferTags } from '../services/tag-mapper';
 import { TransfersService } from '../services/transfers.service';
 
@@ -89,6 +90,7 @@ export class ReceiptsController {
         private readonly contractorDao: ContractorDao,
         private readonly itemDao: ItemDao,
         private readonly transfersService: TransfersService,
+        private readonly packagingService: ItemPackagingService,
     ) {}
 
     @Post()
@@ -235,7 +237,14 @@ export class ReceiptsController {
         }
 
         // Resolve item IDs: create new items if needed
-        const resolvedItems: Array<{ itemId: number; price: number; quantity: number; categoryId: number }> = [];
+        const resolvedItems: Array<{
+            itemId: number;
+            price: number;
+            quantity: number;
+            categoryId: number;
+            packagingId: number | null;
+            containerId: number | null;
+        }> = [];
         for (const item of includedItems) {
             let itemId = item.itemId;
             let categoryId: number | null = null;
@@ -254,7 +263,15 @@ export class ReceiptsController {
             const dbItem = await this.itemDao.getById(itemId);
             categoryId = dbItem.categoryId ?? (await this.categoryDao.getAll())[0]?.id ?? 1;
 
-            resolvedItems.push({ itemId, price: item.price, quantity: item.quantity, categoryId });
+            const packaging = await this.packagingService.resolve(itemId, item.packagingId, null);
+            resolvedItems.push({
+                itemId,
+                price: item.price,
+                quantity: item.quantity,
+                categoryId,
+                packagingId: packaging?.id ?? null,
+                containerId: packaging?.containerId ?? null,
+            });
         }
 
         // Group by category and create transfers
@@ -292,6 +309,8 @@ export class ReceiptsController {
                 ti.unitPrice = item.price;
                 ti.totalSetPrice = item.price * item.quantity;
                 ti.totalSetDiscount = 0;
+                ti.packagingId = item.packagingId;
+                ti.containerId = item.containerId;
                 return ti;
             });
 

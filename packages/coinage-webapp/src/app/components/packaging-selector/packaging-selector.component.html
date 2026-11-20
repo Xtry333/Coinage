@@ -1,0 +1,29 @@
+<div class="space-y-2">
+    <ng-select
+        [ngModel]="packagingId"
+        [ngModelOptions]="{ standalone: true }"
+        [items]="variants"
+        [loading]="loading"
+        [disabled]="!itemId || loading || !!error"
+        [clearable]="true"
+        (ngModelChange)="select($event)"
+        bindValue="id"
+        bindLabel="displayName"
+        placeholder="No packaging / loose item"
+        aria-label="Product packaging"
+    ></ng-select>
+    @if (error) {
+        <p class="text-xs text-red-600" role="alert">{{ error }} <button class="underline" (click)="load()" type="button">Retry</button></p>
+    }
+    @if (itemId && !loading && !error) {
+        @if (packagingId === undefined && legacyContainerId) {
+            <p class="text-xs text-gray-500">Legacy container is retained until you choose a packaging variant.</p>
+        }
+        <button class="text-xs text-blue-600 underline" (click)="adding = !adding" type="button">
+            {{ adding ? 'Close packaging editor' : 'Add another size' }}
+        </button>
+        @if (adding) {
+            <app-item-packaging [itemId]="itemId" [startAdding]="true" (saved)="onCreated($event)"></app-item-packaging>
+        }
+    }
+</div>

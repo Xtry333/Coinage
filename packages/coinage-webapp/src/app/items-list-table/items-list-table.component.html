@@ -51,7 +51,7 @@
                     }
                 </th>
                 <th class="text-right">
-                    <span>Container</span>
+                    <span>Packaging</span>
                     @if (showFilters) {
                         <app-table-filter
                             [filterName]="ItemTableColumn.Container"
@@ -127,14 +127,8 @@
                     </td>
                     <td class="text-center">
                         <div class="flex items-center justify-center gap-1">
-                            <a [routerLink]="CoinageRoutes.TransferItemDetailsPage.getUrl({ id: item.id })">
-                                <app-button-icon
-                                    [icon]="editIcon"
-                                    size="sm"
-                                    variant="ghost"
-                                    ariaLabel="Edit item tags"
-                                    title="Edit item tags"
-                                ></app-button-icon>
+                            <a [routerLink]="CoinageRoutes.EditItemPage.getUrl({ id: item.id })">
+                                <app-button-icon [icon]="editIcon" size="sm" variant="ghost" ariaLabel="Edit item" title="Edit item"></app-button-icon>
                             </a>
                         </div>
                     </td>

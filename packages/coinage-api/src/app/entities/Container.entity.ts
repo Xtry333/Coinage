@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Container {
@@ -8,6 +8,7 @@ export class Container {
     @Column({ type: 'varchar', length: 64, nullable: true })
     public name!: string | null;
 
+    /** Legacy net-content fields retained for older clients; new sizes belong to ItemPackaging. */
     @Column({ type: 'float', nullable: true })
     public weight!: number | null;
 
@@ -19,7 +20,7 @@ export class Container {
 
     @Column({ type: 'varchar', length: 8, nullable: true })
     public volumeUnit!: string | null;
- 
+
     @Column({ type: 'int', nullable: true })
     public itemCount!: number | null;
 }

@@ -1,9 +1,9 @@
 import { Equal, IsNull, Repository } from 'typeorm';
 
-import { TransferItemDao } from './transferItem.dao';
 import { Container } from '../entities/Container.entity';
 import { Item } from '../entities/Item.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
+import { TransferItemDao } from './transferItem.dao';
 
 describe('TransferItemDao', () => {
     let dao: TransferItemDao;
@@ -25,6 +25,7 @@ describe('TransferItemDao', () => {
                 transferId: 3793,
                 itemId: 380,
                 containerId,
+                packagingId: null,
                 quantity: 3,
                 unitPrice: 23.1,
                 totalSetPrice: 69.3,
@@ -40,6 +41,7 @@ describe('TransferItemDao', () => {
                 transferId: 3793,
                 itemId: 380,
                 containerId,
+                packagingId: null,
                 quantity: 3,
                 unitPrice: 23.1,
                 totalSetPrice: 69.3,
@@ -51,6 +53,10 @@ describe('TransferItemDao', () => {
     });
 
     describe('findUnique', () => {
+        it('distinguishes two sizes using the same shared container', async () => {
+            await dao.findUnique(3793, 380, 23.1, 1, 9);
+            expect(findOneBy).toHaveBeenCalledWith(expect.objectContaining({ containerId: Equal(1), packagingId: Equal(9) }));
+        });
         it('distinguishes containers for the same item and price', async () => {
             await dao.findUnique(3793, 380, 23.1, 1);
 
@@ -59,6 +65,7 @@ describe('TransferItemDao', () => {
                 itemId: Equal(380),
                 unitPrice: Equal(23.1),
                 containerId: Equal(1),
+                packagingId: IsNull(),
             });
         });
 
@@ -70,6 +77,7 @@ describe('TransferItemDao', () => {
                 itemId: Equal(380),
                 unitPrice: Equal(23.1),
                 containerId: IsNull(),
+                packagingId: IsNull(),
             });
         });
     });

@@ -346,6 +346,7 @@ export class CreateEditTransferComponent implements OnInit {
                 item.containerId,
                 item.transferItemId,
                 item.tags,
+                item.packagingId,
             );
         });
     }
@@ -405,6 +406,7 @@ export class CreateEditTransferComponent implements OnInit {
             original.amount !== current.amount ||
             original.price !== current.price ||
             original.containerId !== current.containerId ||
+            original.packagingId !== current.packagingId ||
             original.name !== current.name ||
             original.id !== current.id
         );

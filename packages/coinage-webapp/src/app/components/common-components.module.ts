@@ -8,9 +8,12 @@ import { AppliedFiltersComponent } from './applied-filters/applied-filters.compo
 import { AutoPaginationComponent } from './auto-pagination/auto-pagination.component';
 import { BulkEditTransfersModalComponent } from './bulk-edit-transfers-modal/bulk-edit-transfers-modal.component';
 import { ChartComponent } from './chart/chart.component';
+import { ItemPackagingComponent } from './item-packaging/item-packaging.component';
 import { ModalComponent } from './modal/modal.component';
 import { MoneyAmountComponent } from './money-amount/money-amount.component';
+import { PackagingSelectorComponent } from './packaging-selector/packaging-selector.component';
 import { SectionComponent } from './section/section.component';
+import { SharedContainerEditorComponent } from './shared-container-editor/shared-container-editor.component';
 import { TagSelectorComponent } from './tag-selector/tag-selector.component';
 
 @NgModule({
@@ -24,6 +27,9 @@ import { TagSelectorComponent } from './tag-selector/tag-selector.component';
         BulkEditTransfersModalComponent,
         AppliedFiltersComponent,
         TagSelectorComponent,
+        ItemPackagingComponent,
+        PackagingSelectorComponent,
+        SharedContainerEditorComponent,
     ],
     exports: [
         SectionComponent,
@@ -34,6 +40,9 @@ import { TagSelectorComponent } from './tag-selector/tag-selector.component';
         BulkEditTransfersModalComponent,
         AppliedFiltersComponent,
         TagSelectorComponent,
+        ItemPackagingComponent,
+        PackagingSelectorComponent,
+        SharedContainerEditorComponent,
     ],
 })
 export class CommonComponentsModule {}

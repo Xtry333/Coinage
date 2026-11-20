@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 
 import { parseUnit } from '@app/common-units';
 import {
@@ -52,10 +52,11 @@ export class ItemsController {
             const item = await transferItem.item;
             const category = item ? await item.category : null;
             const container = transferItem.containerId ? await transferItem.container : null;
+            const contents = transferItem.packaging?.contents ?? transferItem.packaging ?? container;
             const transfer = await transferItem.transfer;
 
             // Create unique key for item + container combination
-            const key = `${item?.id || 0}-${transferItem.containerId || 'no-container'}`;
+            const key = `${item?.id || 0}-${transferItem.packagingId ? 'packaging-' + transferItem.packagingId : transferItem.containerId || 'no-container'}`;
 
             const existing = itemContainerMap.get(key);
             const itemData: ItemWithContainerDTO = existing || {
@@ -70,11 +71,12 @@ export class ItemsController {
                 containerSizeUnit: item?.containerSizeUnit || null,
                 // Container entity information
                 containerId: container?.id || null,
-                containerName: container?.name || null,
-                containerWeight: container?.weight || null,
-                containerWeightUnit: parseUnit(container?.weightUnit || null) || null,
-                containerVolume: container?.volume || null,
-                containerVolumeUnit: parseUnit(container?.volumeUnit || null) || null,
+                packagingId: transferItem.packagingId ?? null,
+                containerName: transferItem.packaging?.name ?? container?.name ?? null,
+                containerWeight: contents?.weight ?? null,
+                containerWeightUnit: parseUnit(contents?.weightUnit ?? null) ?? null,
+                containerVolume: contents?.volume ?? null,
+                containerVolumeUnit: parseUnit(contents?.volumeUnit ?? null) ?? null,
                 // Initialize with this transfer item's data
                 lastUsedDate: transfer.createdDate,
                 lastUnitPrice: transferItem.unitPrice,
@@ -126,7 +128,7 @@ export class ItemsController {
     }
 
     @Get('/:itemId')
-    public async getItemById(@Param('itemId') itemId: number): Promise<ItemDetailsDTO> {
+    public async getItemById(@Param('itemId', ParseIntPipe) itemId: number): Promise<ItemDetailsDTO> {
         const item = await this.itemDao.getById(itemId),
             category = await item.category,
             container = item.containerSizeUnit ? new ItemContainer() : null;
@@ -139,29 +141,33 @@ export class ItemsController {
         const transferItems = await this.transferItemDao.findByItemId(itemId);
         const transfersWithItems = await Promise.all(transferItems.map(async (transferItem) => this.toTransfersWithItemsDTO(transferItem)));
         // filter only the unique containers
-        const uniqueContainers = new Set(transferItems.map((transferItem) => transferItem.containerId));
         // collect transfer-level containers (unique by id)
         const containers = await Promise.all(
             transferItems
-                .filter((transferItem) => transferItem.itemId === itemId && transferItem.containerId !== null)
-                .map(async (transferItem) => ({ id: transferItem.containerId, container: await transferItem.container })),
+                .filter((transferItem) => transferItem.itemId === itemId && (transferItem.containerId != null || transferItem.packagingId != null))
+                .map(async (transferItem) => ({
+                    id: transferItem.packagingId ?? transferItem.containerId,
+                    container: await transferItem.container,
+                    name: transferItem.packaging?.name,
+                    contents: transferItem.packaging?.contents ?? transferItem.packaging ?? (await transferItem.container),
+                })),
         );
 
         const seen = new Set<number>();
         const itemContainers: AdvancedItemContainer[] = [];
         for (const entry of containers) {
-            if (!entry || entry.id === null) continue;
+            if (!entry || entry.id == null) continue;
             if (seen.has(entry.id)) continue;
             seen.add(entry.id);
             const container = entry.container;
             const advancedContainer = new AdvancedItemContainer();
             advancedContainer.id = entry.id;
-            advancedContainer.name = container?.name ?? null;
-            advancedContainer.weight = container?.weight ?? undefined;
-            advancedContainer.weightUnit = parseUnit(container?.weightUnit ?? null) ?? undefined;
-            advancedContainer.volume = container?.volume ?? undefined;
-            advancedContainer.volumeUnit = parseUnit(container?.volumeUnit ?? null) ?? undefined;
-            advancedContainer.itemCount = container?.itemCount ?? null;
+            advancedContainer.name = entry.name ?? container?.name ?? null;
+            advancedContainer.weight = entry.contents?.weight ?? undefined;
+            advancedContainer.weightUnit = parseUnit(entry.contents?.weightUnit ?? null) ?? undefined;
+            advancedContainer.volume = entry.contents?.volume ?? undefined;
+            advancedContainer.volumeUnit = parseUnit(entry.contents?.volumeUnit ?? null) ?? undefined;
+            advancedContainer.itemCount = entry.contents?.itemCount ?? null;
             itemContainers.push(advancedContainer);
         }
 
@@ -207,19 +213,22 @@ export class ItemsController {
         let containerVolumeUnit: any | null = null;
         let containerItemCount: number | null = null;
 
-        if (transferItem.containerId !== null) {
+        if (transferItem.containerId != null || transferItem.packagingId != null) {
             const container = await transferItem.container;
-            if (container) {
-                containerName = container.name ?? null;
-                containerWeight = container.weight ?? null;
-                containerWeightUnit = parseUnit(container.weightUnit ?? null) ?? null;
-                containerVolume = container.volume ?? null;
-                containerVolumeUnit = parseUnit(container.volumeUnit ?? null) ?? null;
-                containerItemCount = container.itemCount ?? null;
+            const contents = transferItem.packaging?.contents ?? transferItem.packaging ?? container;
+            if (contents) {
+                containerName = transferItem.packaging?.name ?? container?.name ?? null;
+                containerWeight = contents.weight ?? null;
+                containerWeightUnit = parseUnit(contents.weightUnit ?? null) ?? null;
+                containerVolume = contents.volume ?? null;
+                containerVolumeUnit = parseUnit(contents.volumeUnit ?? null) ?? null;
+                containerItemCount = contents.itemCount ?? null;
             }
         }
         return {
             transferId: transfer.id,
+            transferItemId: transferItem.id,
+            packagingId: transferItem.packagingId ?? null,
             transferName: transfer.description,
             tags: getTransferTags(transfer),
             transferContractorId: transfer.contractor?.id ?? null,

@@ -22,7 +22,7 @@
             <div class="item-input-price">
                 <label class="block text-sm font-medium text-gray-700" for="itemPrice">Price</label>
                 <input
-                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                     id="itemPrice"
                     [(ngModel)]="selectedItem.price"
                     name="itemPrice"
@@ -35,7 +35,7 @@
             <div class="item-input-amount">
                 <label class="block text-sm font-medium text-gray-700" for="itemAmount">Amount</label>
                 <input
-                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                     id="itemAmount"
                     [(ngModel)]="selectedItem.amount"
                     name="itemAmount"
@@ -46,24 +46,17 @@
                 />
             </div>
             <div class="item-input-container">
-                <label class="block text-sm font-medium text-gray-700" for="containerId">Container</label>
-                <ng-select
-                    #containerSelect
-                    [(ngModel)]="selectedItem.containerId"
-                    [clearable]="true"
-                    [required]="false"
-                    [items]="containersWithDisplayNames"
-                    name="containerId"
-                    labelForId="containerId"
-                    bindValue="id"
-                    bindLabel="displayName"
-                    placeholder="Select container (optional)"
-                >
-                </ng-select>
+                <span class="block text-sm font-medium text-gray-700">Packaging</span>
+                <app-packaging-selector
+                    [itemId]="selectedItem.id"
+                    [packagingId]="selectedItem.packagingId"
+                    [autoSelectPreferred]="true"
+                    (packagingChange)="onPackagingChanged(selectedItem, $event)"
+                ></app-packaging-selector>
             </div>
         </div>
         <button
-            class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-400"
+            class="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:cursor-not-allowed disabled:bg-gray-400"
             (click)="onClickAddNewItemToList()"
         >
             <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -103,19 +96,12 @@
                                 <span class="total-price">{{ item.amount * item.price | plnCurrency }}</span>
                             </div>
                             <div class="container-selection">
-                                <label class="sr-only">Container</label>
-                                <ng-select
-                                    class="container-select"
-                                    [(ngModel)]="item.containerId"
-                                    [clearable]="true"
-                                    [searchable]="false"
-                                    [items]="containersWithDisplayNames"
-                                    (ngModelChange)="onItemContainerChanged(item)"
-                                    bindValue="id"
-                                    bindLabel="displayName"
-                                    placeholder="Container (optional)"
-                                >
-                                </ng-select>
+                                <app-packaging-selector
+                                    [itemId]="item.id"
+                                    [packagingId]="item.packagingId"
+                                    [legacyContainerId]="item.containerId"
+                                    (packagingChange)="onPackagingChanged(item, $event)"
+                                ></app-packaging-selector>
                             </div>
                         </div>
                         <span (click)="onRemoveItemFromList(item)"><fa-icon class="remove-icon" [icon]="removeIcon" [fixedWidth]="true"></fa-icon></span>

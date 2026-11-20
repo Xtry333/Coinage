@@ -24,6 +24,7 @@ import { CreateEditTransferComponent } from './create-edit-transfer/create-edit-
 import { ItemShoppingListComponent } from './create-edit-transfer/item-shopping-list/item-shopping-list.component';
 import { ItemizedTransfersModule } from './create-multiple-transfers/itemized-transfer.module';
 import { ChatComponent } from './demo/chat/chat.component';
+import { EditItemComponent } from './edit-item/edit-item.component';
 import { ItemsListTableComponent } from './items-list-table/items-list-table.component';
 import { NetworkInterceptor } from './loaderGadget/network.interceptor';
 import { SpinnerComponent } from './loaderGadget/spinner/spinner.component';
@@ -88,6 +89,7 @@ Chart.register(zoomPlugin);
         SpinnerComponent,
         CategoryManagerComponent,
         CreateEditTransferComponent,
+        EditItemComponent,
         CategoryListItemComponent,
         TransfersTableComponent,
         TransfersListComponent,

@@ -95,7 +95,7 @@
             <div>
                 <label class="mb-1 block text-sm text-gray-600" for="reviewDateInput">Date</label>
                 <input
-                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    class="w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                     id="reviewDateInput"
                     [(ngModel)]="overrideDate"
                     type="date"
@@ -116,7 +116,7 @@
 
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-left text-xs text-gray-500 uppercase">
                     <tr>
                         <th class="w-10 px-3 py-2"></th>
                         <th class="w-20 px-3 py-2">Status</th>
@@ -153,7 +153,7 @@
                             <!-- Editable name -->
                             <td class="px-3 py-2">
                                 <input
-                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-sm text-gray-900 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-sm text-gray-900 focus:border-blue-300 focus:bg-white focus:ring-1 focus:ring-blue-300 focus:outline-none"
                                     [(ngModel)]="item.name"
                                     [title]="item.brand ? 'Brand: ' + item.brand : ''"
                                     (ngModelChange)="onNameChange(item)"
@@ -162,12 +162,19 @@
                                 @if (item.suggestedContainer) {
                                     <div class="mt-0.5 text-xs text-gray-400">{{ item.suggestedContainer.containerName }}</div>
                                 }
+                                @if (item.itemId && !item.isNew) {
+                                    <app-packaging-selector
+                                        [itemId]="item.itemId"
+                                        [packagingId]="item.packagingId"
+                                        (packagingChange)="onPackagingChanged(item, $event)"
+                                    ></app-packaging-selector>
+                                }
                             </td>
 
                             <!-- Editable qty -->
                             <td class="px-3 py-2">
                                 <input
-                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:ring-1 focus:ring-blue-300 focus:outline-none"
                                     [(ngModel)]="item.quantity"
                                     (ngModelChange)="onQtyChange(item)"
                                     type="number"
@@ -179,7 +186,7 @@
                             <!-- Editable unit price -->
                             <td class="px-3 py-2">
                                 <input
-                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm text-gray-700 focus:border-blue-300 focus:bg-white focus:ring-1 focus:ring-blue-300 focus:outline-none"
                                     [(ngModel)]="item.price"
                                     (ngModelChange)="onPriceChange(item)"
                                     type="number"
@@ -191,7 +198,7 @@
                             <!-- Editable total (magic calculator) -->
                             <td class="px-3 py-2">
                                 <input
-                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm font-medium text-gray-900 focus:border-blue-300 focus:bg-white focus:outline-none focus:ring-1 focus:ring-blue-300"
+                                    class="w-full rounded border border-transparent bg-transparent px-1 py-0.5 text-right font-mono text-sm font-medium text-gray-900 focus:border-blue-300 focus:bg-white focus:ring-1 focus:ring-blue-300 focus:outline-none"
                                     [(ngModel)]="item._total"
                                     (ngModelChange)="onTotalChange(item)"
                                     type="number"
@@ -221,7 +228,7 @@
                 {{ showRawData ? 'Hide' : 'Show' }} Raw AI Data
             </button>
             <button
-                class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-300 disabled:cursor-not-allowed disabled:opacity-50"
+                class="inline-flex items-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-50 focus:ring-2 focus:ring-gray-300 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
                 [disabled]="isSubmitting"
                 (click)="onRetry()"
                 title="Discard the current AI result and re-run receipt parsing"
@@ -240,7 +247,7 @@
         </div>
 
         <button
-            class="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+            class="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
             [disabled]="isSubmitting || !selectedAccountId || includedItems.length === 0"
             (click)="onConfirm()"
             type="button"
@@ -260,7 +267,7 @@
             @if (rawLlmResponse) {
                 <div>
                     <h4 class="mb-1 text-sm font-semibold text-gray-700">Raw LLM Response</h4>
-                    <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{
+                    <pre class="max-h-64 overflow-auto rounded border border-gray-200 bg-white p-3 text-xs whitespace-pre-wrap text-gray-600">{{
                         rawLlmResponse
                     }}</pre>
                 </div>
@@ -269,7 +276,7 @@
             <!-- Parsed JSON extraction -->
             <div>
                 <h4 class="mb-1 text-sm font-semibold text-gray-700">Parsed Extraction (JSON)</h4>
-                <pre class="max-h-64 overflow-auto whitespace-pre-wrap rounded border border-gray-200 bg-white p-3 text-xs text-gray-600">{{
+                <pre class="max-h-64 overflow-auto rounded border border-gray-200 bg-white p-3 text-xs whitespace-pre-wrap text-gray-600">{{
                     aiData.raw | json
                 }}</pre>
             </div>

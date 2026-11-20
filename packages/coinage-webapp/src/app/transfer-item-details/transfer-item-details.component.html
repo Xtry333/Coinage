@@ -31,23 +31,12 @@
                         <dt class="w-1/3 text-sm font-medium text-gray-500">Tags</dt>
                         <dd class="w-2/3 space-y-2 text-sm text-gray-900">
                             <app-tag-badges [tags]="item.tags"></app-tag-badges>
-                            <label class="block text-sm font-medium text-gray-700" for="itemTags">Edit item tags</label>
-                            <app-tag-selector [(tagIds)]="selectedTagIds" [disabled]="savingTags" inputId="itemTags"></app-tag-selector>
-                            <p class="text-xs text-gray-500">All transfers containing this item inherit these tags automatically.</p>
-                            <button
-                                class="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-                                [disabled]="savingTags"
-                                (click)="saveTags()"
-                                type="button"
-                            >
-                                {{ savingTags ? 'Saving…' : 'Save tags' }}
-                            </button>
                         </dd>
                     </div>
 
                     @if (item.itemContainers && item.itemContainers.length > 0) {
                         <div class="flex items-start justify-between">
-                            <dt class="w-1/3 text-sm font-medium text-gray-500">Containers used</dt>
+                            <dt class="w-1/3 text-sm font-medium text-gray-500">Packaging used</dt>
                             <dd class="w-2/3 text-sm text-gray-900">
                                 <div class="space-y-2">
                                     @for (c of item.itemContainers; track c.id) {
@@ -94,6 +83,19 @@
                         </div>
                     }
                 </dl>
+            </app-section>
+
+            <app-section header="Available packaging">
+                <app-item-packaging [itemId]="item.id" [readonly]="true"></app-item-packaging>
+            </app-section>
+
+            <app-section>
+                <a
+                    class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                    [routerLink]="CoinageRoutes.EditItemPage.getUrl({ id: item.id })"
+                >
+                    Edit
+                </a>
             </app-section>
 
             <!-- Transfers with Item Table -->

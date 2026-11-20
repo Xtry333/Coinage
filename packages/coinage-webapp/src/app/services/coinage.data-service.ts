@@ -24,6 +24,8 @@ import {
     GetFilteredTransfersRequest,
     GranularCreateEditTransferModelDTO,
     ItemDetailsDTO,
+    ItemPackagingDTO,
+    ItemPackagingInput,
     ItemWithContainerDTO,
     ItemWithLastUsedPriceDTO,
     NewMonthlyUserStatsDTO,
@@ -38,6 +40,7 @@ import {
     TotalInMonthByCategory,
     TransferDTO,
     TransferDetailsDTO,
+    UpdateSharedContainerDTO,
 } from '@app/interfaces';
 
 @Injectable({
@@ -214,6 +217,32 @@ export class CoinageDataService {
 
     public postCreateItem(request: CreateEditItemDTO) {
         return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}item/save`, request));
+    }
+
+    public getItemPackaging(itemId: number): Promise<ItemPackagingDTO[]> {
+        return lastValueFrom(this.http.get<ItemPackagingDTO[]>(`${CoinageDataService.API_URL}items/${itemId}/packaging`));
+    }
+
+    public saveItemPackaging(itemId: number, input: ItemPackagingInput, replacedId?: number): Promise<ItemPackagingDTO> {
+        const url = `${CoinageDataService.API_URL}items/${itemId}/packaging`;
+        return lastValueFrom(replacedId ? this.http.put<ItemPackagingDTO>(`${url}/${replacedId}`, input) : this.http.post<ItemPackagingDTO>(url, input));
+    }
+
+    public setItemPackagingState(itemId: number, id: number, action: 'prefer' | 'archive'): Promise<BaseResponseDTO> {
+        return lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}items/${itemId}/packaging/${id}/${action}`, {}));
+    }
+
+    public async createContainerFormat(name: string): Promise<ContainerDTO> {
+        const trimmed = name.trim();
+        const response = await lastValueFrom(this.http.post<BaseResponseDTO>(`${CoinageDataService.API_URL}containers`, { name: trimmed }));
+        if (!response.insertedId || response.error) throw new Error('Container not created');
+        return { id: response.insertedId, name: trimmed, weight: null, weightUnit: null, volume: null, volumeUnit: null, itemCount: null };
+    }
+
+    public updateSharedContainer(container: ContainerDTO, correctMatchingPackaging: boolean, acknowledgeHistoricalImpact: boolean): Promise<BaseResponseDTO> {
+        const { id, ...fields } = container;
+        const request: UpdateSharedContainerDTO = { ...fields, correctMatchingPackaging, acknowledgeHistoricalImpact };
+        return lastValueFrom(this.http.put<BaseResponseDTO>(`${CoinageDataService.API_URL}containers/${id}`, request));
     }
 
     public deleteTransfer(transferId: number): Observable<boolean> {

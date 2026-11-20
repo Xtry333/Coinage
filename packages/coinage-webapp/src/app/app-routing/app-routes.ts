@@ -1,12 +1,12 @@
 import { Routes } from '@angular/router';
 
-import { CoinageRoute } from './CoinageRoute.class';
 import { authGuard, loginGuard } from '../auth/auth.guard';
 import { LoginComponent } from '../auth/login/login.component.page';
 import { CategoryManagerComponent } from '../category-manager/category-manager.component';
 import { CreateEditTransferComponent } from '../create-edit-transfer/create-edit-transfer.component';
 import { CreateMultipleTransfersComponent } from '../create-multiple-transfers/create-multiple-transfers.component';
 import { ChatComponent } from '../demo/chat/chat.component';
+import { EditItemComponent } from '../edit-item/edit-item.component';
 import { MonthSummaryComponent } from '../month-summary/month-summary.component';
 import { AccountDetailsPage } from '../pages/account-details-page/account-details-page.component';
 import { AccountSettingsPageComponent } from '../pages/account-settings-page/account-settings-page.component';
@@ -17,6 +17,7 @@ import { ReceiptUploadPageComponent } from '../receipt-upload/receipt-upload.com
 import { TransferDetailsComponent } from '../transfer-details/transfer-details.component';
 import { TransferItemDetailsComponent } from '../transfer-item-details/transfer-item-details.component';
 import { TransfersListComponent } from '../transfers-list/transfers-list.component';
+import { CoinageRoute } from './CoinageRoute.class';
 
 const guarded = { canActivate: [authGuard] };
 
@@ -27,6 +28,7 @@ export const CoinageRoutes = {
     AccountDetailsPage: new CoinageRoute('account/:id', AccountDetailsPage, guarded, { id: 'number' }),
     TransferDetailsPage: new CoinageRoute('transfer/details/:id', TransferDetailsComponent, guarded, { id: 'number' }),
     TransferItemDetailsPage: new CoinageRoute('item/details/:id', TransferItemDetailsComponent, guarded, { id: 'number' }),
+    EditItemPage: new CoinageRoute('item/edit/:id', EditItemComponent, guarded, { id: 'number' }),
     ReceiptDetailsPage: new CoinageRoute('receipt/details/:id', ReceiptDetailsComponent, guarded, { id: 'number' }),
     ReceiptUploadPage: new CoinageRoute('receipt/upload', ReceiptUploadPageComponent, guarded),
     TransfersListPage: new CoinageRoute('transfers', TransfersListComponent, guarded),

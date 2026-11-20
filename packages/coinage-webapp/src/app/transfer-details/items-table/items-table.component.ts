@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 
-import { ContainerDTO, TransferItemDTO } from '@app/interfaces';
+import { ContainerDTO, TransferItemDTO, packagingLabel } from '@app/interfaces';
 
 import { CoinageRoutes } from '../../app-routing/app-routes';
 
@@ -16,6 +16,9 @@ export class UiTransferItemDTO extends TransferItemDTO {
         this.totalPrice = transferItem.totalPrice;
         this.setDiscount = transferItem.setDiscount;
         this.containerId = transferItem.containerId;
+        this.packagingId = transferItem.packagingId;
+        this.packaging = transferItem.packaging;
+        this.transferItemId = transferItem.transferItemId;
         this.tags = transferItem.tags ?? [];
     }
 }
@@ -43,8 +46,8 @@ export class ItemsTableComponent implements OnChanges {
         this.totalAmount = this.items.reduce((sum, item) => sum + item.amount, 0);
     }
 
-    public idTracker(_index: number, item: TransferItemDTO): string {
-        return item.id.toString();
+    public idTracker(index: number, item: TransferItemDTO): string {
+        return item.transferItemId?.toString() ?? `${item.id}:${item.packagingId ?? item.containerId ?? 'loose'}:${index}`;
     }
 
     public getItemLink(item: TransferItemDTO) {
@@ -76,5 +79,9 @@ export class ItemsTableComponent implements OnChanges {
         }
 
         return parts.length > 0 ? ` [${parts.join(', ')}]` : '';
+    }
+
+    public getPackagingDetails(item: TransferItemDTO): string {
+        return item.packaging ? packagingLabel(item.packaging) : this.getContainerDetails(item.containerId);
     }
 }

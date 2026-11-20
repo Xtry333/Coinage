@@ -18,6 +18,7 @@ export class ItemWithContainerDTO {
 
     // Container entity information
     public containerId?: number | null;
+    public packagingId?: number | null;
     public containerName?: string | null;
     public containerWeight?: number | null;
     public containerWeightUnit?: Unit | null;

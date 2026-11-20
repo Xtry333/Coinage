@@ -1,0 +1,82 @@
+@if (selectedItemInputs) {
+    <div class="bg-gray-50 p-4 sm:ml-auto md:px-4">
+        <app-section header="Item Form">
+            <form class="space-y-6" #itemForm="ngForm" (ngSubmit)="onClickSaveItem()">
+                <fieldset class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3" [disabled]="saving">
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="itemName">Name</label>
+                        <input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
+                            id="itemName"
+                            [(ngModel)]="selectedItemInputs.name"
+                            name="itemName"
+                            type="text"
+                            maxlength="50"
+                            required
+                            placeholder="Enter item name"
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="itemBrand">Brand</label>
+                        <input
+                            class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
+                            id="itemBrand"
+                            [(ngModel)]="selectedItemInputs.brand"
+                            name="itemBrand"
+                            type="text"
+                            maxlength="50"
+                            placeholder="Optional brand"
+                        />
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="itemCategory">Category</label>
+                        <ng-select
+                            [(ngModel)]="selectedItemInputs.categoryId"
+                            [items]="categories"
+                            [clearable]="true"
+                            [editableSearchTerm]="true"
+                            [disabled]="saving"
+                            name="itemCategory"
+                            labelForId="itemCategory"
+                            bindValue="id"
+                            bindLabel="name"
+                            placeholder="Uncategorized"
+                        ></ng-select>
+                    </div>
+                </fieldset>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-medium text-gray-700" for="itemTags">Tags</label>
+                    <app-tag-selector [(tagIds)]="selectedItemInputs.tagIds" [disabled]="saving" inputId="itemTags"></app-tag-selector>
+                    <p class="text-xs text-gray-500">All transfers containing this item inherit these tags automatically.</p>
+                </div>
+                <p class="text-sm text-gray-500">
+                    Changes apply to this catalog item everywhere it is used. Quantities and prices are edited on individual transfers.
+                </p>
+
+                <div class="flex flex-wrap gap-3 border-t border-gray-200 pt-6">
+                    <button
+                        class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
+                        [disabled]="saving || itemForm.invalid || !isValid"
+                        type="submit"
+                    >
+                        {{ saving ? 'Saving…' : 'Save Changes' }}
+                    </button>
+                    <button
+                        class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
+                        [disabled]="saving"
+                        (click)="onClickCancelEdit()"
+                        type="button"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </app-section>
+        @if (selectedItemInputs.id; as itemId) {
+            <app-section class="mt-6" header="Packaging variants">
+                <app-item-packaging [itemId]="itemId"></app-item-packaging>
+            </app-section>
+        }
+    </div>
+}

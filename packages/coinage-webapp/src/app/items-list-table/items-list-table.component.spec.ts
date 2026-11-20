@@ -1,10 +1,13 @@
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
 import { ItemWithContainerDTO } from '@app/interfaces';
 
-import { ItemTableColumn, ItemsListTableComponent } from './items-list-table.component';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { FilterType } from '../transfers-table/table-filter/table-filter.component';
+import { ItemTableColumn, ItemsListTableComponent } from './items-list-table.component';
 
 describe('ItemsListTableComponent tag filtering', () => {
     const holiday = { id: 1, name: 'Holiday', color: null };
@@ -76,5 +79,55 @@ describe('ItemsListTableComponent tag filtering', () => {
         component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Tags, selectedIds: [] });
         expect(component.filteredItems).toEqual(items);
         expect(component.isAnyFilterApplied).toBe(false);
+    });
+
+    it('does not label explicitly loose purchases with a deprecated item size', () => {
+        expect(component.formatContainer({ ...items[0], packagingId: null, containerSize: 500, containerSizeUnit: 'ml' })).toBe('No container');
+    });
+});
+
+describe('ItemsListTableComponent edit links', () => {
+    it('keeps item names linked to details and sends the edit action to the item form', async () => {
+        await TestBed.configureTestingModule({
+            imports: [RouterTestingModule],
+            declarations: [ItemsListTableComponent],
+            providers: [
+                {
+                    provide: CoinageDataService,
+                    useValue: {
+                        getItemsWithContainers: () => of([{ id: 12, name: 'Milk', categoryId: 5, tags: [] }]),
+                        getCategoryList: () => of([]),
+                        getTags: () => of([]),
+                    },
+                },
+            ],
+            schemas: [NO_ERRORS_SCHEMA],
+        }).compileComponents();
+        const fixture = TestBed.createComponent(ItemsListTableComponent);
+        fixture.detectChanges();
+        const links: HTMLAnchorElement[] = Array.from(fixture.nativeElement.querySelectorAll('tbody a'));
+        expect(links.map((link) => link.getAttribute('href'))).toEqual(['/item/details/12', '/item/edit/12']);
+        expect(fixture.nativeElement.querySelector('app-button-icon').getAttribute('ariaLabel')).toBe('Edit item');
+    });
+});
+
+describe('ItemsListTableComponent packaging filtering', () => {
+    it('distinguishes named variants independently of legacy container references', () => {
+        const items: ItemWithContainerDTO[] = [
+            { id: 10, name: 'Red Bull', categoryId: 5, tags: [], packagingId: 21, containerId: 7, containerName: 'Can' },
+            { id: 10, name: 'Red Bull', categoryId: 5, tags: [], packagingId: 22, containerId: 7, containerName: 'Box' },
+            { id: 10, name: 'Red Bull', categoryId: 5, tags: [], packagingId: 23, containerId: null, containerName: 'Pallet' },
+        ];
+        const component = new ItemsListTableComponent({
+            getItemsWithContainers: () => of(items),
+            getCategoryList: () => of([]),
+            getTags: () => of([]),
+        } as unknown as CoinageDataService);
+        component.ngOnInit();
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Container, selectedIds: [22] });
+        expect(component.filteredItems).toEqual([items[1]]);
+        component.onPerformFilter({ filterType: FilterType.MultiCheckbox, name: ItemTableColumn.Container, selectedIds: [23] });
+        expect(component.filteredItems).toEqual([items[2]]);
+        component.ngOnDestroy();
     });
 });

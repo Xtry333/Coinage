@@ -1,8 +1,10 @@
 import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
-import { TransferItemsService } from './transfer-items.service';
 import { TransferItemDao } from '../daos/transferItem.dao';
+import { ItemPackaging } from '../entities/ItemPackaging.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
+import { ItemPackagingService } from './item-packaging.service';
+import { TransferItemsService } from './transfer-items.service';
 
 function makeMockTransferItem(overrides: Partial<TransferItem> = {}): TransferItem {
     const item = new TransferItem();
@@ -19,13 +21,39 @@ function makeMockTransferItem(overrides: Partial<TransferItem> = {}): TransferIt
 describe('TransferItemsService', () => {
     let service: TransferItemsService;
     let transferItemDao: Spy<TransferItemDao>;
+    let packaging: Spy<ItemPackagingService>;
 
     beforeEach(() => {
         transferItemDao = createSpyFromClass(TransferItemDao);
-        service = new TransferItemsService(transferItemDao);
+        packaging = createSpyFromClass(ItemPackagingService);
+        packaging.resolve.mockResolvedValue(null);
+        service = new TransferItemsService(transferItemDao, packaging);
     });
 
     describe('save', () => {
+        it('uses the selected product variant when saving lines', async () => {
+            const input = makeMockTransferItem({ packagingId: 42, containerId: 99 });
+            packaging.resolve.mockResolvedValue(Object.assign(new ItemPackaging(), { id: 42, itemId: 10, containerId: 7 }));
+            transferItemDao.findUnique.mockResolvedValue(null);
+            transferItemDao.save.mockImplementation(async (entity) => entity as TransferItem);
+            const result = await service.save(input);
+            expect(result).toMatchObject({ packagingId: 42, containerId: 7 });
+            expect(transferItemDao.findUnique).not.toHaveBeenCalled();
+        });
+
+        it('clears legacy containers when packaging is explicitly removed', async () => {
+            const input = makeMockTransferItem({ packagingId: null, containerId: 99 });
+            transferItemDao.findUnique.mockResolvedValue(null);
+            transferItemDao.save.mockImplementation(async (entity) => entity as TransferItem);
+            const result = await service.save(input);
+            expect(result).toMatchObject({ packagingId: null, containerId: null });
+        });
+
+        it('never saves a line when its packaging cannot be assigned', async () => {
+            packaging.resolve.mockRejectedValue(new Error('Wrong product'));
+            await expect(service.save(makeMockTransferItem({ packagingId: 9 }))).rejects.toThrow('Wrong product');
+            expect(transferItemDao.save).not.toHaveBeenCalled();
+        });
         it('calls getById when item.id is defined', async () => {
             const input = makeMockTransferItem({ id: 42 });
             const entity = makeMockTransferItem({ id: 42 });
@@ -38,31 +66,33 @@ describe('TransferItemsService', () => {
             expect(transferItemDao.findUnique).not.toHaveBeenCalled();
         });
 
-        it('calls findUnique when item.id is undefined', async () => {
+        it('creates a separate line even when the same item, packaging and price already exist', async () => {
             const input = makeMockTransferItem();
             const found = makeMockTransferItem({ id: 7 });
             transferItemDao.findUnique.mockResolvedValue(found);
-            transferItemDao.save.mockResolvedValue(found);
+            transferItemDao.save.mockImplementation(async (entity) => entity as TransferItem);
 
-            await service.save(input);
+            const saved = await service.save(input);
 
-            expect(transferItemDao.findUnique).toHaveBeenCalledWith(input.transferId, input.itemId, input.unitPrice, null);
+            expect(saved.id).toBeUndefined();
+            expect(saved).not.toBe(found);
+            expect(transferItemDao.findUnique).not.toHaveBeenCalled();
             expect(transferItemDao.getById).not.toHaveBeenCalled();
         });
 
-        it('includes the selected container when looking for an existing transfer item', async () => {
+        it('includes the selected container when saving a transfer item', async () => {
             const input = makeMockTransferItem({ containerId: 5 });
             transferItemDao.findUnique.mockResolvedValue(null);
             transferItemDao.save.mockImplementation(async (entity) => entity as TransferItem);
 
             const result = await service.save(input);
 
-            expect(transferItemDao.findUnique).toHaveBeenCalledWith(input.transferId, input.itemId, input.unitPrice, 5);
+            expect(transferItemDao.findUnique).not.toHaveBeenCalled();
             expect(result.id).toBeUndefined();
             expect(result.containerId).toBe(5);
         });
 
-        it('creates a new TransferItem when findUnique returns null', async () => {
+        it('creates a new TransferItem without an existing line ID', async () => {
             const input = makeMockTransferItem();
             const saved = makeMockTransferItem({ id: 99 });
             transferItemDao.findUnique.mockResolvedValue(null);
@@ -83,9 +113,10 @@ describe('TransferItemsService', () => {
                 totalSetPrice: 29.97,
                 totalSetDiscount: 1.0,
                 containerId: 5,
+                id: 50,
             });
             const existing = makeMockTransferItem({ id: 50 });
-            transferItemDao.findUnique.mockResolvedValue(existing);
+            transferItemDao.getById.mockResolvedValue(existing);
             transferItemDao.save.mockImplementation(async (e) => e as TransferItem);
 
             await service.save(input);

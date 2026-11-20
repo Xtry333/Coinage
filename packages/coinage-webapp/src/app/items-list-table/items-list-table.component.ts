@@ -123,11 +123,12 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
     }
 
     private setupContainerFilterOptions(): void {
-        // Get unique containers from loaded items
+        // Packaging names/sizes are independent even when a legacy container is shared.
         const uniqueContainers = new Map<number, string>();
         this.items.forEach((item) => {
-            if (item.containerId && item.containerName) {
-                uniqueContainers.set(item.containerId, item.containerName);
+            const id = this.packagingFilterId(item);
+            if (id) {
+                uniqueContainers.set(id, this.formatContainer(item));
             }
         });
 
@@ -135,10 +136,13 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
             TableFilterComponent.mapToFilterOptions(id, name, this.filter.containerIds),
         );
 
-        // Add "No Container" option for items without containers
-        if (this.items.some((item) => !item.containerId)) {
-            this.optionsForCheckboxFilters.containers.unshift(TableFilterComponent.mapToFilterOptions(0, 'No Container', this.filter.containerIds));
+        if (this.items.some((item) => this.packagingFilterId(item) === 0)) {
+            this.optionsForCheckboxFilters.containers.unshift(TableFilterComponent.mapToFilterOptions(0, 'No packaging', this.filter.containerIds));
         }
+    }
+
+    private packagingFilterId(item: ItemWithContainerDTO): number {
+        return item.packagingId ?? (item.containerId ? -item.containerId : 0);
     }
 
     public onPerformFilter(filterEvent: OnFilterEvent): void {
@@ -210,7 +214,7 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
         // Container filter
         if (this.filter.containerIds?.length) {
             filtered = filtered.filter((item) => {
-                const itemContainerId = item.containerId || 0; // 0 represents "No Container"
+                const itemContainerId = this.packagingFilterId(item);
                 return this.filter.containerIds!.includes(itemContainerId);
             });
         }
@@ -288,8 +292,8 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
     }
 
     public formatContainer(item: ItemWithContainerDTO): string {
-        if (item.containerName) {
-            let result = item.containerName;
+        if (item.containerName || item.packagingId) {
+            let result = item.containerName || 'Package';
 
             // Add container details if available
             const details: string[] = [];
@@ -308,7 +312,7 @@ export class ItemsListTableComponent implements OnInit, OnDestroy {
         }
 
         // Fallback to deprecated container size if no container entity
-        if (item.containerSize && item.containerSizeUnit) {
+        if (item.packagingId === undefined && item.containerSize && item.containerSizeUnit) {
             return `${item.containerSize}${item.containerSizeUnit} (deprecated)`;
         }
 

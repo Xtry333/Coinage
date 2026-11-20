@@ -1,3 +1,4 @@
+import { ItemPackagingContents } from './ItemPackagingContents.view';
 import { ItemsWithContainers } from './ItemsWithContainers.view';
 
-export default [ItemsWithContainers];
+export default [ItemPackagingContents, ItemsWithContainers];

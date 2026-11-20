@@ -3,13 +3,13 @@ import { DataSource } from 'typeorm';
 
 import { makeCategory, makeContainer, makeContractor, makeItem, makeItemContainerPair } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
 
-import { OllamaService } from './ollama.service';
-import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
 import { ItemsWithContainersDao } from '../../daos/itemsWithContainers.dao';
 import { TransferTypeEnum } from '../../entities/Category.entity';
+import { OllamaService } from './ollama.service';
+import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -25,12 +25,12 @@ function makeDataSource(priceRows: Array<{ containerId: number; lastUnitPrice: n
 describe('parseContainerDimensions', () => {
     describe('volume extraction', () => {
         it.each([
-            ['Mleko UHT 1L', { volume: 1, volumeUnit: 'L' }],
-            ['Woda mineralna 500ml', { volume: 500, volumeUnit: 'ML' }],
-            ['Sok jabłkowy 0,5l', { volume: 0.5, volumeUnit: 'L' }],
-            ['Piwo jasne 330ml', { volume: 330, volumeUnit: 'ML' }],
-            ['Napój 1.5l', { volume: 1.5, volumeUnit: 'L' }],
-            ['Syrop 250cl', { volume: 250, volumeUnit: 'CL' }],
+            ['Mleko UHT 1L', { volume: 1, volumeUnit: 'l' }],
+            ['Woda mineralna 500ml', { volume: 500, volumeUnit: 'ml' }],
+            ['Sok jabłkowy 0,5l', { volume: 0.5, volumeUnit: 'l' }],
+            ['Piwo jasne 330ml', { volume: 330, volumeUnit: 'ml' }],
+            ['Napój 1.5l', { volume: 1.5, volumeUnit: 'l' }],
+            ['Syrop 250cl', { volume: 250, volumeUnit: 'cl' }],
         ])('"%s" → volume %o', (input, expected) => {
             expect(parseContainerDimensions(input)).toMatchObject(expected);
         });
@@ -62,9 +62,13 @@ describe('parseContainerDimensions', () => {
     });
 
     describe('combined', () => {
-        it('extracts both volume and item count from "6x330ml"', () => {
-            const result = parseContainerDimensions('Piwo 6x330ml');
-            expect(result).toMatchObject({ volume: 330, volumeUnit: 'ML', itemCount: 6 });
+        it.each([
+            ['Piwo 6x330ml', { volume: 1980, volumeUnit: 'ml', itemCount: 6 }],
+            ['Cola 24 × 0,25 L', { volume: 6, volumeUnit: 'l', itemCount: 24 }],
+            ['Jogurt 4 x 125g', { weight: 500, weightUnit: 'g', itemCount: 4 }],
+            ['Jogurt 500g 4-pack', { weight: 500, weightUnit: 'g', itemCount: 4 }],
+        ])('extracts total contents from "%s"', (name, expected) => {
+            expect(parseContainerDimensions(name)).toMatchObject(expected);
         });
     });
 
@@ -106,6 +110,26 @@ describe('matchesDimensions', () => {
     it('does not match when container has no dimensions', () => {
         const c = { volume: null, volumeUnit: null, weight: null, weightUnit: null, itemCount: null };
         expect(matchesDimensions(c, { volume: 1, volumeUnit: 'L' })).toBe(false);
+    });
+
+    it('matches equivalent units and multipack totals while rejecting individual packages', () => {
+        const parsed = parseContainerDimensions('Cola 24x250ml');
+        if (!parsed) throw new Error('Expected multipack dimensions');
+        expect(matchesDimensions({ volume: 6, volumeUnit: 'l', itemCount: 24 }, parsed)).toBe(true);
+        expect(matchesDimensions({ volume: 250, volumeUnit: 'ml', itemCount: 1 }, parsed)).toBe(false);
+        expect(matchesDimensions({ volume: 6, volumeUnit: 'l', itemCount: 12 }, parsed)).toBe(false);
+        const yogurt = parseContainerDimensions('Jogurt 4x125g');
+        if (!yogurt) throw new Error('Expected multipack dimensions');
+        expect(matchesDimensions({ weight: 0.5, weightUnit: 'kg', itemCount: 4 }, yogurt)).toBe(true);
+    });
+
+    it('matches count-only packs and requires every explicit measurement to agree', () => {
+        expect(matchesDimensions({ itemCount: 10 }, { itemCount: 10 })).toBe(true);
+        expect(matchesDimensions({ itemCount: 6 }, { itemCount: 10 })).toBe(false);
+        expect(
+            matchesDimensions({ volume: 1, volumeUnit: 'l', weight: 500, weightUnit: 'g' }, { volume: 1, volumeUnit: 'l', weight: 1, weightUnit: 'kg' }),
+        ).toBe(false);
+        expect(matchesDimensions({ volume: 0.005, volumeUnit: 'l' }, { volume: 0.01, volumeUnit: 'l' })).toBe(false);
     });
 });
 
@@ -336,6 +360,27 @@ describe('ReceiptNormalizationService', () => {
                 expect(item.containerConfidence).toBe('price-match');
                 expect(item.needsContainerConfirmation).toBe(true);
                 expect(item.historicalContainers).toHaveLength(2);
+            });
+
+            it('uses the explicit receipt size even when a different package has a closer price', async () => {
+                const small = { ...makeItemContainerPair(42, 7, 'Small', { volume: 0.5, volumeUnit: 'l' }), packagingId: 10 };
+                const large = { ...makeItemContainerPair(42, 7, 'Large', { volume: 1, volumeUnit: 'l' }), packagingId: 11 };
+                itemsWithContainersDao.getContainersUsedWithItem.mockResolvedValue([small, large]);
+                dataSource.query = jest.fn().mockResolvedValue([
+                    { containerId: 7, packagingId: 10, lastUnitPrice: 2.49 },
+                    { containerId: 7, packagingId: 11, lastUnitPrice: 5 },
+                ]);
+                const result = await service.normalize({ items: [{ name: 'Mleko UHT 3,2% 1L', price: 2.49 }] });
+                expect(result.items[0].suggestedContainer?.packagingId).toBe(11);
+                expect(result.items[0].containerConfidence).toBe('dimension-match');
+            });
+
+            it('does not auto-assign the only variant when the receipt specifies a different size', async () => {
+                itemsWithContainersDao.getContainersUsedWithItem.mockResolvedValue([makeItemContainerPair(42, 7, 'Small', { volume: 0.5, volumeUnit: 'l' })]);
+                dataSource.query = jest.fn().mockResolvedValue([{ containerId: 7, lastUnitPrice: 2.49 }]);
+                const result = await service.normalize({ items: [{ name: 'Mleko UHT 3,2% 1L', price: 2.49 }] });
+                expect(result.items[0].suggestedContainer).toBeNull();
+                expect(result.items[0].needsContainerConfirmation).toBe(true);
             });
 
             it('falls back to dimension matching from OCR name when prices are ambiguous', async () => {

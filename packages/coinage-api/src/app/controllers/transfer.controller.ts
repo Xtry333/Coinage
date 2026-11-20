@@ -27,11 +27,12 @@ import { User } from '../entities/User.entity';
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
+import { toPackagingDTO } from '../services/item-packaging.service';
 import { ItemsService } from '../services/items.service';
 import { getReceiptTags, getTransferTags } from '../services/tag-mapper';
 import { TransferItemsService } from '../services/transfer-items.service';
-import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 import { TransfersService } from '../services/transfers.service';
+import { SaveTransfersService } from '../services/transfers/save-transfers.service';
 
 @UseGuards(AuthGuard)
 @Controller('transfer')
@@ -139,6 +140,8 @@ export class TransferController {
                     totalPrice: item.totalSetPrice,
                     setDiscount: item.totalSetDiscount,
                     containerId: item.containerId,
+                    packagingId: item.packagingId ?? null,
+                    packaging: item.packaging ? toPackagingDTO(item.packaging) : null,
                     transferItemId: item.id,
                     tags: uniqueTags(item.item.tags),
                 };
@@ -340,6 +343,7 @@ export class TransferController {
                     existingItem.quantity = item.amount;
                     existingItem.unitPrice = item.price;
                     existingItem.containerId = item.containerId ?? null;
+                    existingItem.packagingId = item.packagingId;
                     existingItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
                     existingItem.totalSetDiscount = item.setDiscount ?? 0;
 
@@ -353,6 +357,7 @@ export class TransferController {
                     transferItem.transferId = inserted.id;
                     transferItem.unitPrice = item.price;
                     transferItem.containerId = item.containerId ?? null;
+                    transferItem.packagingId = item.packagingId;
                     transferItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
                     transferItem.totalSetDiscount = item.setDiscount ?? 0;
 
@@ -439,6 +444,7 @@ export class TransferController {
                     existingItem.quantity = item.amount;
                     existingItem.unitPrice = item.price;
                     existingItem.containerId = item.containerId ?? null;
+                    existingItem.packagingId = item.packagingId;
                     existingItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
                     existingItem.totalSetDiscount = item.setDiscount ?? 0;
 
@@ -456,6 +462,7 @@ export class TransferController {
                 transferItem.transferId = inserted.id;
                 transferItem.unitPrice = item.price;
                 transferItem.containerId = item.containerId ?? null;
+                transferItem.packagingId = item.packagingId;
                 transferItem.totalSetPrice = item.totalPrice ?? item.amount * item.price;
                 transferItem.totalSetDiscount = item.setDiscount ?? 0;
 

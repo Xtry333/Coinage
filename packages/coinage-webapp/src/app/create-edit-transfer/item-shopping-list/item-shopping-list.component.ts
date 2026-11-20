@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnI
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
 
-import { ContainerDTO, CreateEditItemDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
+import { ContainerDTO, CreateEditItemDTO, ItemPackagingDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
@@ -19,9 +19,6 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     public allItems: ItemWithLastUsedPriceDTO[] = [];
     public searchableItems: ItemWithLastUsedPriceDTO[] = this.allItems;
     public itemsLoading = true;
-    public prioritizedContainers: ContainerDTO[] = [];
-    public otherContainers: ContainerDTO[] = [];
-    public containersWithDisplayNames: (ContainerDTO & { displayName: string })[] = [];
 
     @ViewChildren('itemSelect') private itemSelect?: QueryList<NgSelectComponent>;
 
@@ -48,8 +45,6 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     public ngOnChanges(): void {
         this.itemList = this.preselectedItems ?? [];
         this.filterItems();
-        this.organizeContainers();
-        this.loadContainersForPreselectedItems();
     }
 
     public loadItems(): void {
@@ -156,6 +151,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             this.selectedItem.containerId,
             null,
             item?.tags ?? [],
+            this.selectedItem.packagingId,
         );
         this.itemList.push(shoppingItem);
         if (this.shouldOverrideTotalCostOnChange) {
@@ -167,6 +163,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         this.selectedItem.price = 0;
         this.selectedItem.amount = 1;
         this.selectedItem.containerId = null;
+        this.selectedItem.packagingId = undefined;
     }
 
     public onRemoveItemFromList(item: ShoppingListItem): void {
@@ -197,17 +194,21 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         this.itemListChanged.emit(this.itemList);
     }
 
-    public onItemSelected(selected: ShoppingListItem): void {
-        if (selected === undefined) {
+    public onPackagingChanged(item: ShoppingListItem, packaging: ItemPackagingDTO | null): void {
+        item.packagingId = packaging?.id ?? null;
+        item.containerId = packaging?.containerId ?? null;
+        if (this.itemList.includes(item)) this.itemListChanged.emit(this.itemList);
+    }
+
+    public onItemSelected(selected?: { id: number }): void {
+        this.selectedItem.packagingId = undefined;
+        this.selectedItem.containerId = null;
+        if (!selected) {
             return;
         }
         const item = this.allItems.find((item) => item.id === selected.id);
         if (item && item.lastUnitPrice !== null) {
             this.selectedItem.price = item.lastUnitPrice;
-        }
-
-        if (selected.id) {
-            this.loadContainersForItem(selected.id);
         }
     }
 
@@ -215,67 +216,5 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         const totalCost = Number(this.itemList.reduce((acc, curr) => acc + curr.price * curr.amount, 0).toFixed(2));
         this.totalCostChanged.emit(totalCost);
         this.itemListChanged.emit(this.itemList);
-    }
-
-    private organizeContainers(): void {
-        this.prioritizedContainers = [];
-        this.otherContainers = this.containers;
-        this.updateContainersWithDisplayNames();
-    }
-
-    private updateContainersWithDisplayNames(): void {
-        const prioritized = this.prioritizedContainers.map((container) => ({
-            ...container,
-            displayName: this.getContainerDisplayName(container),
-        }));
-
-        const others = this.otherContainers.map((container) => ({
-            ...container,
-            displayName: this.getContainerDisplayName(container),
-        }));
-
-        this.containersWithDisplayNames = [...prioritized, ...others];
-    }
-
-    private async loadContainersForItem(itemId: number): Promise<void> {
-        try {
-            const usedContainers = await this.coinageDataService.getContainersUsedWithItem(itemId);
-            const usedContainerIds = new Set(usedContainers.map((c) => c.id));
-
-            this.prioritizedContainers = usedContainers;
-            this.otherContainers = this.containers.filter((c) => !usedContainerIds.has(c.id));
-            this.updateContainersWithDisplayNames();
-
-            // Only set default container if the item has been used with containers before
-            if (!this.selectedItem.containerId && usedContainers.length > 0) {
-                this.selectedItem.containerId = usedContainers[0].id;
-            }
-        } catch (error) {
-            console.error('Failed to load containers for item:', error);
-            this.organizeContainers();
-        }
-    }
-
-    private async loadContainersForPreselectedItems(): Promise<void> {
-        if (!this.itemList.length) {
-            return;
-        }
-
-        const allUsedContainerIds = new Set<number>();
-
-        for (const item of this.itemList) {
-            if (item.id) {
-                try {
-                    const usedContainers = await this.coinageDataService.getContainersUsedWithItem(item.id);
-                    usedContainers.forEach((container) => allUsedContainerIds.add(container.id));
-                } catch (error) {
-                    console.error(`Failed to load containers for item ${item.id}:`, error);
-                }
-            }
-        }
-
-        this.prioritizedContainers = this.containers.filter((c) => allUsedContainerIds.has(c.id));
-        this.otherContainers = this.containers.filter((c) => !allUsedContainerIds.has(c.id));
-        this.updateContainersWithDisplayNames();
     }
 }

@@ -55,8 +55,9 @@ export class TransferItemsTableComponent {
         private readonly localStorage: CoinageStorageService,
     ) {}
 
-    public transferWithItemIdTracker(_index: number, item: TransferWithItemDetailsDTO): string {
-        const parts = [item.transferId?.toString() ?? '', item.unitPrice?.toString() ?? ''];
+    public transferWithItemIdTracker(index: number, item: TransferWithItemDetailsDTO): string {
+        if (item.transferItemId) return item.transferItemId.toString();
+        const parts = [item.transferId?.toString() ?? '', item.unitPrice?.toString() ?? '', index.toString()];
         if (item.containerName) parts.push(item.containerName ?? '');
         return parts.join('|');
     }
@@ -105,8 +106,9 @@ export class TransferItemsTableComponent {
         let weightSize = details.containerWeight ?? null;
         let weightUnit: Unit | null = details.containerWeightUnit ?? null;
 
-        // fallback to deprecated item-level container
-        if (!volumeSize && !weightSize && this.item?.container) {
+        // Only older responses without packaging information may use the legacy size.
+        // Explicitly loose purchases and variants with unknown contents must stay unknown.
+        if (details.packagingId === undefined && !volumeSize && !weightSize && this.item?.container) {
             const u = this.item.container.unit ?? null;
             const s = this.item.container.size ?? null;
             if (s && u) {
@@ -133,6 +135,7 @@ export class TransferItemsTableComponent {
         }
 
         if (parts.length > 0) return parts.join(' · ');
+        if (details.packagingId !== undefined) return '—';
 
         // fallback to raw container unit if nothing else
         const fallbackUnit = this.item?.container?.unit ?? details.containerVolumeUnit ?? details.containerWeightUnit ?? null;

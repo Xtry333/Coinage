@@ -2,14 +2,17 @@ import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
 import { CreateEditItemDTO } from '@app/interfaces';
 
-import { ItemsController } from './items.controller';
 import { ItemDao } from '../daos/item.dao';
 import { TagDao } from '../daos/tag.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
+import { Container } from '../entities/Container.entity';
 import { Item } from '../entities/Item.entity';
+import { ItemPackaging } from '../entities/ItemPackaging.entity';
 import { Tag } from '../entities/Tag.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
+import { ItemPackagingContents } from '../entities/views/ItemPackagingContents.view';
+import { ItemsController } from './items.controller';
 
 describe('item tag save and listing contracts', () => {
     let controller: ItemsController;
@@ -43,6 +46,19 @@ describe('item tag save and listing contracts', () => {
         expect(tags.getByIds).toHaveBeenCalledWith([]);
     });
 
+    it('edits the existing catalog item and supports clearing its brand and category', async () => {
+        item.brand = 'Old brand';
+        item.categoryId = 5;
+        tags.getByIds.mockResolvedValue([]);
+        const result = await controller.saveItem(new CreateEditItemDTO(2, null, 'Oat milk', null, 500, 'ml', []));
+
+        expect(items.getById).toHaveBeenCalledWith(2);
+        expect(items.save).toHaveBeenCalledWith(item);
+        expect(item).toMatchObject({ id: 2, brand: null, name: 'Oat milk', categoryId: null, containerSize: 500, containerSizeUnit: 'ml', tags: [] });
+        expect(result).toEqual({ insertedId: 2 });
+        expect(transferItems.save).not.toHaveBeenCalled();
+    });
+
     it('rejects unknown tag IDs before writing an item', async () => {
         tags.getByIds.mockRejectedValue(new Error('Unknown tag'));
         await expect(controller.saveItem(new CreateEditItemDTO(2, null, 'Milk', 5, null, null, [99]))).rejects.toThrow('Unknown tag');
@@ -72,5 +88,62 @@ describe('item tag save and listing contracts', () => {
         expect(result.map((row) => row.id)).toEqual([2, 3]);
         expect(result.every((row) => row.tags.length === 1 && row.tags[0].id === 1)).toBe(true);
         expect(result[1].lastUsedDate).toBeNull();
+    });
+
+    it('lists distinct packaging sizes and uses their historical contents, not the shared container size', async () => {
+        const container = Object.assign(new Container(), { id: 7, name: 'Can', volume: 900, volumeUnit: 'ml' });
+        const transfer = Object.assign(new Transfer(), { createdDate: new Date('2026-11-01'), currency: { symbol: 'PLN' } });
+        const lines = [330, 500].map((volume, index) =>
+            Object.assign(new TransferItem(), {
+                id: index + 1,
+                item,
+                containerId: 7,
+                container: Promise.resolve(container),
+                transfer: Promise.resolve(transfer),
+                unitPrice: 3,
+                packagingId: index + 10,
+                packaging: Object.assign(new ItemPackaging(), { id: index + 10, itemId: 2, containerId: 7, volume, volumeUnit: 'ml' }),
+            }),
+        );
+        transferItems.findAllWithItemAndContainer.mockResolvedValue(lines);
+        items.getAll.mockResolvedValue([item]);
+        const result = await controller.getAllItemsWithContainers();
+        expect(result).toHaveLength(2);
+        expect(result.map((row) => row.containerVolume)).toEqual([330, 500]);
+        expect(result.map((row) => row.packagingId)).toEqual([10, 11]);
+    });
+
+    it('uses a composite package’s own name and derived totals in purchase-price listings', async () => {
+        const transfer = Object.assign(new Transfer(), { createdDate: new Date('2026-11-01'), currency: { symbol: 'PLN' } });
+        const line = Object.assign(new TransferItem(), {
+            id: 99,
+            item,
+            containerId: null,
+            container: Promise.resolve(null),
+            transfer: Promise.resolve(transfer),
+            unitPrice: 48,
+            packagingId: 25,
+            packaging: Object.assign(new ItemPackaging(), {
+                id: 25,
+                itemId: 2,
+                name: 'Box',
+                volume: null,
+                volumeUnit: null,
+                containedPackagingId: 24,
+                containedCount: 24,
+                contents: Object.assign(new ItemPackagingContents(), { volume: 6, volumeUnit: 'l', itemCount: 24 }),
+            }),
+        });
+        transferItems.findAllWithItemAndContainer.mockResolvedValue([line]);
+        items.getAll.mockResolvedValue([item]);
+        expect(await controller.getAllItemsWithContainers()).toEqual([
+            expect.objectContaining({
+                packagingId: 25,
+                containerName: 'Box',
+                containerVolume: 6,
+                containerVolumeUnit: 'l',
+                lastUnitPrice: 48,
+            }),
+        ]);
     });
 });

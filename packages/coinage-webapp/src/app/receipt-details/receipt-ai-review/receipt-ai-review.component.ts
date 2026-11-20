@@ -2,12 +2,13 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
-import { AccountDTO, ConfirmReceiptDTO, ConfirmReceiptItemDTO, NormalizedReceiptItemDTO, ReceiptAiResultDTO } from '@app/interfaces';
+import { AccountDTO, ConfirmReceiptDTO, ConfirmReceiptItemDTO, ItemPackagingDTO, NormalizedReceiptItemDTO, ReceiptAiResultDTO } from '@app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
 
 export interface ReviewItem extends NormalizedReceiptItemDTO {
+    packagingId?: number | null;
     included: boolean;
     /** Tracks which of qty/price was last edited — the other adjusts when total is changed. */
     _lastEdited: 'qty' | 'price';
@@ -60,6 +61,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
         this.items = normalized.items.map((item) => ({
             ...item,
             included: true,
+            packagingId: item.needsContainerConfirmation ? undefined : item.suggestedContainer?.packagingId,
             _lastEdited: 'price' as const,
             _total: +(item.price * item.quantity).toFixed(2),
         }));
@@ -151,6 +153,10 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
         // name is bound directly; nothing extra to compute
     }
 
+    public onPackagingChanged(item: ReviewItem, packaging: ItemPackagingDTO | null): void {
+        item.packagingId = packaging?.id ?? null;
+    }
+
     // ── Confirm ──────────────────────────────────────────────────────────────
 
     public async onRetry(): Promise<void> {
@@ -186,6 +192,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
                 quantity: item.quantity,
                 isNew: item.isNew,
                 included: item.included,
+                packagingId: item.packagingId,
             })),
         };
 

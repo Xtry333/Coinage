@@ -2,6 +2,7 @@ import { Type } from 'class-transformer';
 
 import { TransferDTO } from '../lib/FilteredTransferDTO.response';
 import { AccountDTO, CategoryPathDTO, ReceiptDTO } from '../lib/interfaces';
+import { ItemPackagingDTO } from '../lib/ItemPackagingDTO';
 import { EffectiveTagDTO, TagDTO } from '../lib/TagDTO.response';
 
 export class TransferItemDTO {
@@ -13,6 +14,8 @@ export class TransferItemDTO {
     public totalPrice!: number;
     public setDiscount!: number;
     public containerId?: number | null;
+    public packagingId?: number | null;
+    public packaging?: ItemPackagingDTO | null;
     public transferItemId!: number;
     public tags!: TagDTO[];
 }

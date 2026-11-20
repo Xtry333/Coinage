@@ -2,7 +2,9 @@ import { ManyToOne, ViewColumn, ViewEntity } from 'typeorm';
 
 import { Container } from '../Container.entity';
 import { Item } from '../Item.entity';
-import { TransferItem } from '../TransferItem.entity';
+import { ItemPackaging } from '../ItemPackaging.entity';
+import { DecimalToNumberTransformer } from '../transformers/decimal-to-number.transformer';
+import { ItemPackagingContents } from './ItemPackagingContents.view';
 
 @ViewEntity({
     expression: `
@@ -16,19 +18,23 @@ SELECT
     item.created_date AS item_created_date,
     item.edited_date AS item_updated_date,
     container.id AS container_id,
-    container.name AS container_name,
-    container.weight AS container_weight,
-    container.weight_unit AS container_weight_unit,
-    container.volume AS container_volume,
-    container.volume_unit AS container_volume_unit,
-    container.item_count AS container_item_count
-FROM item 
-JOIN transfer_item ON item.id = transfer_item.item_id
-JOIN container ON container.id = transfer_item.container_id
-GROUP BY item.id, container.id`,
-    dependsOn: [Item, Container, TransferItem],
+    packaging.name AS container_name,
+    contents.weight AS container_weight,
+    contents.weight_unit AS container_weight_unit,
+    contents.volume AS container_volume,
+    contents.volume_unit AS container_volume_unit,
+    contents.item_count AS container_item_count,
+    packaging.id AS packaging_id
+FROM item_packaging packaging
+JOIN item ON item.id = packaging.item_id
+JOIN item_packaging_contents contents ON contents.id = packaging.id
+LEFT JOIN container ON container.id = packaging.container_id
+WHERE NOT packaging.is_archived`,
+    dependsOn: [Item, Container, ItemPackaging, ItemPackagingContents],
 })
 export class ItemsWithContainers {
+    @ViewColumn()
+    public packagingId!: number;
     @ViewColumn()
     public itemId!: number;
 
@@ -54,7 +60,7 @@ export class ItemsWithContainers {
     public itemUpdatedDate!: Date;
 
     @ViewColumn()
-    public containerId!: number;
+    public containerId!: number | null;
 
     @ViewColumn()
     public containerName!: string | null;
@@ -71,13 +77,13 @@ export class ItemsWithContainers {
     @ViewColumn()
     public containerVolumeUnit!: string | null;
 
-    @ViewColumn()
+    @ViewColumn({ transformer: new DecimalToNumberTransformer() })
     public containerItemCount!: number | null;
 
     // Keep these for backward compatibility if needed
     @ManyToOne(() => Item, { eager: true, nullable: false })
     public item!: Item | null;
 
-    @ManyToOne(() => Container, { eager: true, nullable: false })
+    @ManyToOne(() => Container, { eager: true, nullable: true })
     public container!: Container | null;
 }

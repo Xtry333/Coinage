@@ -1,31 +1,12 @@
-import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, Post, Put, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, NotFoundException, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 
-import { BaseResponseDTO } from '@app/interfaces';
+import { BaseResponseDTO, ContainerDTO, CreateEditContainerDTO, UpdateSharedContainerDTO } from '@app/interfaces';
 
 import { ContainerDao } from '../daos/container.dao';
 import { ItemsWithContainersDao } from '../daos/itemsWithContainers.dao';
 import { Container } from '../entities/Container.entity';
 import { AuthGuard } from '../services/auth.guard';
-
-export interface ContainerDTO {
-    id: number;
-    name: string | null;
-    weight: number | null;
-    weightUnit: string | null;
-    volume: number | null;
-    volumeUnit: string | null;
-    itemCount: number | null;
-}
-
-export interface CreateEditContainerDTO {
-    id?: number;
-    name?: string | null;
-    weight?: number | null;
-    weightUnit?: string | null;
-    volume?: number | null;
-    volumeUnit?: string | null;
-    itemCount?: number | null;
-}
+import { SharedContainersService } from '../services/shared-containers.service';
 
 @UseGuards(AuthGuard)
 @Controller('containers')
@@ -35,6 +16,7 @@ export class ContainersController {
     public constructor(
         private readonly containerDao: ContainerDao,
         private readonly itemsWithContainersDao: ItemsWithContainersDao,
+        private readonly sharedContainers: SharedContainersService,
     ) {}
 
     @Get()
@@ -51,24 +33,9 @@ export class ContainersController {
 
         const itemContainerPairs = await this.itemsWithContainersDao.getContainersUsedWithItem(itemId);
 
-        // Convert the view data to container DTOs, removing duplicates
-        const containersMap = new Map<number, ContainerDTO>();
-
-        itemContainerPairs.forEach((pair) => {
-            if (!containersMap.has(pair.containerId)) {
-                containersMap.set(pair.containerId, {
-                    id: pair.containerId,
-                    name: pair.containerName,
-                    weight: pair.containerWeight,
-                    weightUnit: pair.containerWeightUnit,
-                    volume: pair.containerVolume,
-                    volumeUnit: pair.containerVolumeUnit,
-                    itemCount: pair.containerItemCount,
-                });
-            }
-        });
-
-        return Array.from(containersMap.values());
+        // This legacy endpoint still returns physical container definitions, not named variant totals.
+        const ids = [...new Set(itemContainerPairs.map((pair) => pair.containerId).filter((id): id is number => id != null))];
+        return Promise.all(ids.map(async (id) => this.toContainerDTO(await this.containerDao.getById(id))));
     }
 
     @Get(':containerId')
@@ -95,20 +62,15 @@ export class ContainersController {
     }
 
     @Put(':containerId')
-    public async updateContainer(@Param('containerId') containerId: number, @Body() containerData: CreateEditContainerDTO): Promise<BaseResponseDTO> {
+    public async updateContainer(
+        @Param('containerId', ParseIntPipe) containerId: number,
+        @Body() containerData: UpdateSharedContainerDTO,
+    ): Promise<BaseResponseDTO> {
         if (!containerId || containerId < 1) {
             throw new BadRequestException(ContainersController.INVALID_ID_MESSAGE);
         }
 
-        const container = await this.containerDao.getById(containerId);
-        if (!container) {
-            throw new NotFoundException('Container not found.');
-        }
-
-        this.mapToEntity(container, containerData);
-
-        const saved = await this.containerDao.save(container);
-        return { insertedId: saved.id };
+        return this.sharedContainers.update(containerId, containerData);
     }
 
     @Delete(':containerId')

@@ -15,6 +15,7 @@ export class ShoppingListItem {
         public containerId?: number | null,
         public transferItemId?: number | null,
         public tags: TagDTO[] = [],
+        public packagingId?: number | null,
     ) {}
 }
 

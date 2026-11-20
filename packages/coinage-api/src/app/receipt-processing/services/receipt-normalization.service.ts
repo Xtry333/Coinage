@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-import { OllamaExtractedData, OllamaService } from './ollama.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
@@ -12,6 +11,7 @@ import { Container } from '../../entities/Container.entity';
 import { Contractor } from '../../entities/Contractor.entity';
 import { Item } from '../../entities/Item.entity';
 import { ItemsWithContainers } from '../../entities/views/ItemsWithContainers.view';
+import { OllamaExtractedData, OllamaService } from './ollama.service';
 
 /** Top N fuzzy candidates to send to AI on first attempt. */
 const FIRST_PASS_CANDIDATES = 10;
@@ -33,7 +33,8 @@ const PRICE_MATCH_TOLERANCE = 0.2;
 // ─── Public interfaces ────────────────────────────────────────────────────────
 
 export interface SuggestedContainer {
-    id: number;
+    id: number | null;
+    packagingId?: number;
     name: string | null;
     volume: number | null;
     volumeUnit: string | null;
@@ -101,7 +102,8 @@ interface ParsedDimensions {
 }
 
 interface ContainerWithPrice {
-    containerId: number;
+    containerId: number | null;
+    packagingId?: number | null;
     lastUnitPrice: number;
 }
 
@@ -241,23 +243,26 @@ export class ReceiptNormalizationService {
                 return this.resolveContainerFromName(extractedName);
             }
 
-            if (historicalPairs.length === 1) {
-                // Exactly one container ever used → accept automatically
-                const suggested = this.pairToSuggested(historicalPairs[0], null);
-                this.logger.debug(`Item "${resolvedItem.name}" has single historical container "${suggested.name}" — auto-accepted`);
+            const parsed = parseContainerDimensions(extractedName);
+            const matchingPairs = parsed ? historicalPairs.filter((pair) => matchesDimensions(this.pairToSuggested(pair, null), parsed)) : historicalPairs;
+            if (matchingPairs.length === 1) {
+                const suggested = this.pairToSuggested(matchingPairs[0], null);
                 return {
                     suggestedContainer: suggested,
-                    historicalContainers: [suggested],
-                    containerConfidence: 'auto-single',
-                    needsContainerConfirmation: false,
+                    historicalContainers: historicalPairs.map((pair) => this.pairToSuggested(pair, null)),
+                    containerConfidence: parsed ? 'dimension-match' : 'auto-single',
+                    needsContainerConfirmation: parsed != null,
                 };
             }
 
             // Multiple containers — try to narrow down
             const historical = await this.enrichWithLastPrices(resolvedItem.id, historicalPairs);
 
-            // 1. Try price proximity
-            const priceMatch = this.findByPriceProximity(extractedPrice, historical);
+            // Explicit receipt contents take precedence over price and single-variant guesses.
+            const priceMatch = this.findByPriceProximity(
+                extractedPrice,
+                parsed ? historical.filter((entry) => matchesDimensions(entry.suggested, parsed)) : historical,
+            );
             if (priceMatch) {
                 this.logger.debug(
                     `Item "${resolvedItem.name}" container resolved by price proximity → "${priceMatch.suggested.name}" (lastPrice=${priceMatch.suggested.lastUnitPrice})`,
@@ -268,21 +273,6 @@ export class ReceiptNormalizationService {
                     containerConfidence: 'price-match',
                     needsContainerConfirmation: true, // still show picker — price match is a guess
                 };
-            }
-
-            // 2. Try dimension extraction from OCR name
-            const parsed = parseContainerDimensions(extractedName);
-            if (parsed) {
-                const dimensionMatch = historical.find((h) => matchesDimensions(h.suggested, parsed));
-                if (dimensionMatch) {
-                    this.logger.debug(`Item "${resolvedItem.name}" container resolved by dimensions from name → "${dimensionMatch.suggested.name}"`);
-                    return {
-                        suggestedContainer: dimensionMatch.suggested,
-                        historicalContainers: historical.map((h) => h.suggested),
-                        containerConfidence: 'dimension-match',
-                        needsContainerConfirmation: true,
-                    };
-                }
             }
 
             // Could not narrow down — return all options for user
@@ -351,26 +341,28 @@ export class ReceiptNormalizationService {
         pairs: ItemsWithContainers[],
     ): Promise<Array<{ suggested: SuggestedContainer; lastUnitPrice: number | null }>> {
         const priceRows: ContainerWithPrice[] = await this.dataSource.query(
-            `SELECT ti.container_id AS containerId, ti.unit_price AS lastUnitPrice
+            `SELECT ti.container_id AS "containerId", ti.packaging_id AS "packagingId", ti.unit_price AS "lastUnitPrice"
              FROM transfer_item ti
              JOIN transfer t ON t.id = ti.transfer_id
-             WHERE ti.item_id = $1 AND ti.container_id IS NOT NULL
+             WHERE ti.item_id = $1 AND (ti.container_id IS NOT NULL OR ti.packaging_id IS NOT NULL)
              ORDER BY t.date DESC`,
             [itemId],
         );
 
         // Keep only the first (most recent) row per container
-        const latestPriceByContainer = new Map<number, number>();
+        const latestPriceByContainer = new Map<string, number>();
         for (const row of priceRows) {
-            if (!latestPriceByContainer.has(row.containerId)) {
-                latestPriceByContainer.set(row.containerId, row.lastUnitPrice);
+            const key = row.packagingId ? `p-${row.packagingId}` : `c-${row.containerId}`;
+            if (!latestPriceByContainer.has(key)) {
+                latestPriceByContainer.set(key, row.lastUnitPrice);
             }
         }
 
-        return pairs.map((pair) => ({
-            suggested: this.pairToSuggested(pair, latestPriceByContainer.get(pair.containerId) ?? null),
-            lastUnitPrice: latestPriceByContainer.get(pair.containerId) ?? null,
-        }));
+        return pairs.map((pair) => {
+            const key = pair.packagingId ? `p-${pair.packagingId}` : `c-${pair.containerId}`;
+            const lastUnitPrice = latestPriceByContainer.get(key) ?? null;
+            return { suggested: this.pairToSuggested(pair, lastUnitPrice), lastUnitPrice };
+        });
     }
 
     private findByPriceProximity(
@@ -403,6 +395,7 @@ export class ReceiptNormalizationService {
     private pairToSuggested(pair: ItemsWithContainers, lastUnitPrice: number | null): SuggestedContainer {
         return {
             id: pair.containerId,
+            ...(pair.packagingId ? { packagingId: pair.packagingId } : {}),
             name: pair.containerName,
             volume: pair.containerVolume,
             volumeUnit: pair.containerVolumeUnit,
@@ -473,18 +466,18 @@ export function parseContainerDimensions(name: string): ParsedDimensions | null 
     let found = false;
 
     // Volume: "1L", "500ml", "0,5l", "1.5l", "33cl"
-    const volumeMatch = n.match(/(\d+(?:[.,]\d+)?)\s*(ml|cl|dl|l)\b/);
+    const volumeMatch = n.match(/(?:(\d+)\s*[x×]\s*)?(\d+(?:[.,]\d+)?)\s*(ml|cl|dl|l)\b/);
     if (volumeMatch) {
-        result.volume = parseFloat(volumeMatch[1].replace(',', '.'));
-        result.volumeUnit = volumeMatch[2] === 'l' ? 'L' : volumeMatch[2].toUpperCase();
+        result.volume = Number(volumeMatch[1] ?? 1) * parseFloat(volumeMatch[2].replace(',', '.'));
+        result.volumeUnit = volumeMatch[3];
         found = true;
     }
 
     // Weight: "250g", "1kg", "500 g"
-    const weightMatch = n.match(/(\d+(?:[.,]\d+)?)\s*(mg|g|kg)\b/);
+    const weightMatch = n.match(/(?:(\d+)\s*[x×]\s*)?(\d+(?:[.,]\d+)?)\s*(mg|g|kg)\b/);
     if (weightMatch) {
-        result.weight = parseFloat(weightMatch[1].replace(',', '.'));
-        result.weightUnit = weightMatch[2];
+        result.weight = Number(weightMatch[1] ?? 1) * parseFloat(weightMatch[2].replace(',', '.'));
+        result.weightUnit = weightMatch[3];
         found = true;
     }
 
@@ -499,28 +492,36 @@ export function parseContainerDimensions(name: string): ParsedDimensions | null 
 }
 
 /**
- * Check whether a container's physical dimensions match parsed receipt dimensions.
- * Matches on volume OR weight. Exported for unit testing.
+ * Compare total package contents in compatible units. Every explicit receipt
+ * measurement/count must match, so a multipack cannot be mistaken for one can.
  */
 export function matchesDimensions(
     container: { volume?: number | null; volumeUnit?: string | null; weight?: number | null; weightUnit?: string | null; itemCount?: number | null },
     parsed: ParsedDimensions,
 ): boolean {
-    const volumeMatch =
-        parsed.volume !== undefined &&
-        container.volume !== null &&
-        container.volume !== undefined &&
-        Math.abs(container.volume - parsed.volume) < 0.01 &&
-        (!parsed.volumeUnit || container.volumeUnit?.toLowerCase() === parsed.volumeUnit.toLowerCase());
-
-    const weightMatch =
-        parsed.weight !== undefined &&
-        container.weight !== null &&
-        container.weight !== undefined &&
-        Math.abs(container.weight - parsed.weight) < 0.01 &&
-        (!parsed.weightUnit || container.weightUnit?.toLowerCase() === parsed.weightUnit.toLowerCase());
-
-    return volumeMatch || weightMatch;
+    const matchesSize = (
+        value: number | null | undefined,
+        unit: string | null | undefined,
+        expected: number,
+        expectedUnit: string | undefined,
+        scales: Record<string, number>,
+    ) => {
+        if (value == null || !Number.isFinite(value) || value <= 0 || !Number.isFinite(expected) || expected <= 0) return false;
+        const scale = scales[unit?.trim().toLowerCase() ?? ''];
+        const expectedScale = scales[expectedUnit?.trim().toLowerCase() ?? ''];
+        if (scale == null || expectedScale == null) return false;
+        const actual = value * scale;
+        const target = expected * expectedScale;
+        return Number.isFinite(actual) && Number.isFinite(target) && Math.abs(actual - target) <= Math.max(actual, target) * 1e-6;
+    };
+    const checks: boolean[] = [];
+    if (parsed.volume !== undefined)
+        checks.push(matchesSize(container.volume, container.volumeUnit, parsed.volume, parsed.volumeUnit, { ml: 1, cl: 10, dl: 100, l: 1000 }));
+    if (parsed.weight !== undefined)
+        checks.push(matchesSize(container.weight, container.weightUnit, parsed.weight, parsed.weightUnit, { mg: 0.001, g: 1, kg: 1000 }));
+    if (parsed.itemCount !== undefined)
+        checks.push(Number.isSafeInteger(parsed.itemCount) && parsed.itemCount > 0 && (container.itemCount ?? 1) === parsed.itemCount);
+    return checks.length > 0 && checks.every(Boolean);
 }
 
 // ─── Jaro-Winkler similarity ──────────────────────────────────────────────────
