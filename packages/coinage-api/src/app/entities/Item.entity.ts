@@ -35,4 +35,7 @@ export class Item extends WithDateEntity {
 
     @Column({ type: 'varchar', length: 16, nullable: true })
     public containerSizeUnit!: string | null;
+
+    @Column({ default: false })
+    public isArchived!: boolean;
 }
