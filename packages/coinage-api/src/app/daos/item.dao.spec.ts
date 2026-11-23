@@ -1,7 +1,7 @@
 import { Repository } from 'typeorm';
 
-import { ItemDao } from './item.dao';
 import { Item } from '../entities/Item.entity';
+import { ItemDao } from './item.dao';
 
 describe('item picker tag projection', () => {
     it('returns tags with the last-used-price rows, including never-used items', async () => {
@@ -25,5 +25,6 @@ describe('item picker tag projection', () => {
         expect(item.lastUsedDate).toBeNull();
         expect(query.mock.calls[0][0]).toContain("'[]'::jsonb");
         expect(query.mock.calls[0][0]).toContain('FROM item_tag it JOIN tag t');
+        expect(query.mock.calls[0][0]).toContain('WHERE NOT i.is_archived');
     });
 });

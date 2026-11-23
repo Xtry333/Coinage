@@ -1,4 +1,4 @@
-import { IsArray, IsInt, IsOptional, Min } from 'class-validator';
+import { IsArray, IsBoolean, IsInt, IsOptional, Min } from 'class-validator';
 
 export class CreateEditItemDTO {
     public constructor(
@@ -9,9 +9,11 @@ export class CreateEditItemDTO {
         containerSize: number | null,
         public containerSizeUnit: string | null,
         tagIds?: number[],
+        isArchived?: boolean,
     ) {
         this.containerSize = containerSize;
         this.tagIds = tagIds;
+        this.isArchived = isArchived;
     }
 
     @Min(0)
@@ -23,4 +25,8 @@ export class CreateEditItemDTO {
     @IsInt({ each: true })
     @Min(1, { each: true })
     public tagIds?: number[];
+
+    @IsOptional()
+    @IsBoolean()
+    public isArchived?: boolean;
 }

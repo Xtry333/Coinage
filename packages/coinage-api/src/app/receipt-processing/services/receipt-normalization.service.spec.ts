@@ -3,13 +3,13 @@ import { DataSource } from 'typeorm';
 
 import { makeCategory, makeContainer, makeContractor, makeItem, makeItemContainerPair } from '@coinage-app/test/mock-generators/receipt-normalization.mock';
 
-import { OllamaService } from './ollama.service';
-import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
 import { ItemsWithContainersDao } from '../../daos/itemsWithContainers.dao';
 import { TransferTypeEnum } from '../../entities/Category.entity';
+import { OllamaService } from './ollama.service';
+import { matchesDimensions, parseContainerDimensions, ReceiptNormalizationService } from './receipt-normalization.service';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -234,6 +234,17 @@ describe('ReceiptNormalizationService', () => {
             expect(result.items[0].itemId).toBe(42);
             expect(result.items[0].isNew).toBe(false);
             expect(result.items[0].name).toBe('Mleko UHT 3,2%');
+            expect(ollamaService.resolveEntityMatch).not.toHaveBeenCalled();
+        });
+
+        it('does not match archived items when normalizing a new transfer', async () => {
+            const archived = makeItem(42, 'Mleko UHT 3,2%');
+            archived.isArchived = true;
+            itemDao.getAll.mockResolvedValue([archived]);
+
+            const result = await service.normalize({ items: [{ name: 'Mleko UHT 3,2%', price: 2.49 }] });
+
+            expect(result.items[0]).toMatchObject({ itemId: null, isNew: true });
             expect(ollamaService.resolveEntityMatch).not.toHaveBeenCalled();
         });
 

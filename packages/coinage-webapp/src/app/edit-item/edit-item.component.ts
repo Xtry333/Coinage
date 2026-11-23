@@ -61,6 +61,7 @@ export class EditItemComponent implements OnInit, OnDestroy {
                     item.container?.size ?? null,
                     item.container?.unit ?? null,
                     [...new Set((item.tags ?? []).map((tag) => tag.id))],
+                    item.isArchived ?? false,
                 );
             });
     }
@@ -86,6 +87,7 @@ export class EditItemComponent implements OnInit, OnDestroy {
             inputs.containerSize,
             inputs.containerSizeUnit,
             [...new Set(inputs.tagIds ?? [])],
+            inputs.isArchived,
         );
         this.saving = true;
         try {

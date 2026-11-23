@@ -2,7 +2,6 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 
-import { OllamaExtractedData, OllamaService } from './ollama.service';
 import { CategoryDao } from '../../daos/category.dao';
 import { ContractorDao } from '../../daos/contractor.dao';
 import { ItemDao } from '../../daos/item.dao';
@@ -12,6 +11,7 @@ import { Container } from '../../entities/Container.entity';
 import { Contractor } from '../../entities/Contractor.entity';
 import { Item } from '../../entities/Item.entity';
 import { ItemsWithContainers } from '../../entities/views/ItemsWithContainers.view';
+import { OllamaExtractedData, OllamaService } from './ollama.service';
 
 /** Top N fuzzy candidates to send to AI on first attempt. */
 const FIRST_PASS_CANDIDATES = 10;
@@ -123,7 +123,8 @@ export class ReceiptNormalizationService {
     ) {}
 
     public async normalize(rawData: OllamaExtractedData): Promise<NormalizedReceiptData> {
-        const [categories, contractors, items] = await Promise.all([this.categoryDao.getAll(), this.contractorDao.getActive(), this.itemDao.getAll()]);
+        const [categories, contractors, allItems] = await Promise.all([this.categoryDao.getAll(), this.contractorDao.getActive(), this.itemDao.getAll()]);
+        const items = allItems.filter((item) => !item.isArchived);
 
         // Only use OUTCOME categories for receipt items (purchases)
         const outcomeCategories = categories.filter((c) => c.type === TransferTypeEnum.OUTCOME);

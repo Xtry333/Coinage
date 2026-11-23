@@ -8,10 +8,10 @@ import { BehaviorSubject, of, throwError } from 'rxjs';
 import { Unit } from '@app/common-units';
 import { BaseResponseDTO, CreateEditItemDTO, ItemDetailsDTO } from '@app/interfaces';
 
-import { EditItemComponent } from './edit-item.component';
 import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { NotificationService } from '../services/notification.service';
+import { EditItemComponent } from './edit-item.component';
 
 describe('EditItemComponent', () => {
     let component: EditItemComponent;
@@ -35,6 +35,7 @@ describe('EditItemComponent', () => {
             categoryId: 5,
             categoryName: 'Groceries',
             tags: [{ id: 2, name: 'Food', color: null }],
+            isArchived: false,
             container: { size: 500, unit: Unit.ML },
             itemContainers: [{ id: 3, name: 'Bottle', volume: 500, volumeUnit: Unit.ML }],
             transfersWithItems: [],
@@ -79,7 +80,7 @@ describe('EditItemComponent', () => {
     it('loads the existing item into an independent editable form', async () => {
         await load();
         expect(data.getItemDetails).toHaveBeenCalledWith(12);
-        expect(component.selectedItemInputs).toEqual(new CreateEditItemDTO(12, 'Brand', 'Milk', 5, 500, Unit.ML, [2]));
+        expect(component.selectedItemInputs).toEqual(new CreateEditItemDTO(12, 'Brand', 'Milk', 5, 500, Unit.ML, [2], false));
         expect(component.categories).toEqual([{ id: 5, name: 'Groceries' }]);
         expect(fixture.nativeElement.querySelector('#itemName').value).toBe('Milk');
         expect(fixture.nativeElement.querySelector('#itemBrand').value).toBe('Brand');
@@ -97,7 +98,7 @@ describe('EditItemComponent', () => {
         fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         await fixture.whenStable();
 
-        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, 'New brand', 'Oat milk', 7, 500, Unit.ML, [4, 2]));
+        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, 'New brand', 'Oat milk', 7, 500, Unit.ML, [4, 2], false));
         expect(data.postCreateItem.mock.calls[0][0]).not.toHaveProperty('itemContainers');
         expect(notifications.push).toHaveBeenCalledWith({ title: 'Item Saved', message: 'Oat milk', linkTo: '/item/details/12' });
         expect(navigator.goTo).toHaveBeenCalledWith('/item/details/12');
@@ -112,7 +113,29 @@ describe('EditItemComponent', () => {
         inputs().brand = ' ';
         inputs().tagIds = [];
         await component.onClickSaveItem();
-        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, null, 'Milk', null, null, null, []));
+        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, null, 'Milk', null, null, null, [], false));
+    });
+
+    it('allows changing the archived status and saves it with the item', async () => {
+        await load();
+        const checkbox: HTMLInputElement = fixture.nativeElement.querySelector('#itemArchived');
+        expect(checkbox.checked).toBe(false);
+        checkbox.checked = true;
+        checkbox.dispatchEvent(new Event('change'));
+        await fixture.whenStable();
+
+        await component.onClickSaveItem();
+
+        expect(inputs().isArchived).toBe(true);
+        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, 'Brand', 'Milk', 5, 500, Unit.ML, [2], true));
+    });
+
+    it('loads the archived status into the edit control', async () => {
+        item.isArchived = true;
+        await load();
+
+        const checkbox: HTMLInputElement = fixture.nativeElement.querySelector('#itemArchived');
+        expect(checkbox.checked).toBe(true);
     });
 
     it('cancels without saving or mutating the loaded item', async () => {

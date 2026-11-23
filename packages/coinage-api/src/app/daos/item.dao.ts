@@ -4,8 +4,8 @@ import { Equal, ILike, In, Raw, Repository } from 'typeorm';
 
 import { ItemWithLastUsedPriceDTO, TagDTO } from '@app/interfaces';
 
-import { BaseDao } from './base.dao';
 import { Item } from '../entities/Item.entity';
+import { BaseDao } from './base.dao';
 
 interface ItemWithLastUsedPriceDBObject {
     id: number;
@@ -56,6 +56,7 @@ export class ItemDao extends BaseDao {
                 ), '[]'::jsonb) AS tags
             FROM item i
             LEFT JOIN latest_transfer_item lti ON i.id = lti.item_id AND rn = 1
+            WHERE NOT i.is_archived
             ORDER BY i.name;
           `);
         return result.map(

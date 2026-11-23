@@ -45,6 +45,21 @@
                     </div>
                 </fieldset>
 
+                <div class="flex items-start gap-3">
+                    <input
+                        class="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        id="itemArchived"
+                        [(ngModel)]="selectedItemInputs.isArchived"
+                        [disabled]="saving"
+                        name="itemArchived"
+                        type="checkbox"
+                    />
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700" for="itemArchived">Archived</label>
+                        <p class="text-xs text-gray-500">Archived items are hidden when adding new transfers but remain in existing history.</p>
+                    </div>
+                </div>
+
                 <div class="space-y-2">
                     <label class="block text-sm font-medium text-gray-700" for="itemTags">Tags</label>
                     <app-tag-selector [(tagIds)]="selectedItemInputs.tagIds" [disabled]="saving" inputId="itemTags"></app-tag-selector>

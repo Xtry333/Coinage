@@ -2,7 +2,6 @@ import { createSpyFromClass, Spy } from 'jest-auto-spies';
 
 import { CreateEditItemDTO } from '@app/interfaces';
 
-import { ItemsController } from './items.controller';
 import { ItemDao } from '../daos/item.dao';
 import { TagDao } from '../daos/tag.dao';
 import { TransferItemDao } from '../daos/transferItem.dao';
@@ -13,6 +12,7 @@ import { Tag } from '../entities/Tag.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TransferItem } from '../entities/TransferItem.entity';
 import { ItemPackagingContents } from '../entities/views/ItemPackagingContents.view';
+import { ItemsController } from './items.controller';
 
 describe('item tag save and listing contracts', () => {
     let controller: ItemsController;
@@ -27,15 +27,25 @@ describe('item tag save and listing contracts', () => {
         tags = createSpyFromClass(TagDao);
         transferItems = createSpyFromClass(TransferItemDao);
         controller = new ItemsController(items, transferItems, tags);
-        item = Object.assign(new Item(), { id: 2, name: 'Milk', tags: [tag], category: Promise.resolve(null) });
+        item = Object.assign(new Item(), { id: 2, name: 'Milk', tags: [tag], category: Promise.resolve(null), isArchived: false });
         items.getById.mockResolvedValue(item);
         items.save.mockImplementation(async (entity) => entity);
     });
 
     it('preserves existing tags when an older item client omits tagIds', async () => {
+        item.isArchived = true;
         await controller.saveItem(new CreateEditItemDTO(2, null, 'Milk', 5, null, null));
         expect(item.tags).toEqual([tag]);
+        expect(item.isArchived).toBe(true);
         expect(tags.getByIds).not.toHaveBeenCalled();
+        expect(items.save).toHaveBeenCalledWith(item);
+    });
+
+    it.each([false, true])('saves an explicit archive status of %s', async (isArchived) => {
+        item.isArchived = !isArchived;
+        await controller.saveItem(new CreateEditItemDTO(2, null, 'Milk', 5, null, null, undefined, isArchived));
+
+        expect(item.isArchived).toBe(isArchived);
         expect(items.save).toHaveBeenCalledWith(item);
     });
 
@@ -57,6 +67,15 @@ describe('item tag save and listing contracts', () => {
         expect(item).toMatchObject({ id: 2, brand: null, name: 'Oat milk', categoryId: null, containerSize: 500, containerSizeUnit: 'ml', tags: [] });
         expect(result).toEqual({ insertedId: 2 });
         expect(transferItems.save).not.toHaveBeenCalled();
+    });
+
+    it('includes archive status in item details', async () => {
+        item.isArchived = true;
+        transferItems.findByItemId.mockResolvedValue([]);
+
+        const result = await controller.getItemById(2);
+
+        expect(result.isArchived).toBe(true);
     });
 
     it('rejects unknown tag IDs before writing an item', async () => {

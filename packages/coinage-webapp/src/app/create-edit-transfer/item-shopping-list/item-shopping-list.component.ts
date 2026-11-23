@@ -61,7 +61,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     }
 
     public get itemsLoaded(): boolean {
-        return this.allItems.length > 0;
+        return !this.itemsLoading;
     }
 
     public getContainerDetails(containerId: number | null | undefined): string {

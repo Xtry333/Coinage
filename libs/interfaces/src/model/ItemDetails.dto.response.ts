@@ -11,6 +11,7 @@ export class ItemDetailsDTO {
     public categoryId!: number | null;
     public categoryName!: string | null;
     public tags!: TagDTO[];
+    public isArchived!: boolean;
     /**
      * @deprecated Prefer transfer-level container fields on TransferWithItemDetailsDTO.
      * Kept for backward compatibility.

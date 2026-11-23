@@ -178,6 +178,7 @@ export class ItemsController {
             categoryId: category?.id ?? null,
             categoryName: category?.name ?? null,
             tags: uniqueTags(item.tags),
+            isArchived: item.isArchived,
             container: container,
             createdDate: item.createdDate,
             editedDate: item.editedDate,
@@ -195,6 +196,9 @@ export class ItemsController {
         entity.categoryId = item.categoryId;
         entity.containerSize = item.containerSize;
         entity.containerSizeUnit = item.containerSizeUnit;
+        if (typeof item.isArchived === 'boolean') {
+            entity.isArchived = item.isArchived;
+        }
         if (item.tagIds !== undefined) {
             entity.tags = await this.tagDao.getByIds(item.tagIds);
         }
