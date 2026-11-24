@@ -20,7 +20,7 @@
                 </ng-select>
             </div>
             <div class="item-input-price">
-                <label class="block text-sm font-medium text-gray-700" for="itemPrice">Price</label>
+                <label class="block text-sm font-medium text-gray-700" for="itemPrice">Unit price</label>
                 <input
                     class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                     id="itemPrice"
@@ -43,6 +43,20 @@
                     min="0"
                     step="0.01"
                     placeholder="1"
+                />
+            </div>
+            <div class="item-input-discount">
+                <label class="block text-sm font-medium text-gray-700" for="itemSetDiscount">Total set discount (PLN)</label>
+                <input
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
+                    id="itemSetDiscount"
+                    [(ngModel)]="selectedItem.setDiscount"
+                    name="itemSetDiscount"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    placeholder="0.00"
+                    title="Discount for the whole line, not per unit"
                 />
             </div>
             <div class="item-input-container">
@@ -82,7 +96,7 @@
                                     placeholder="Qty"
                                 />
                                 <span class="multiply-symbol">×</span>
-                                <label class="sr-only">Price</label>
+                                <label class="sr-only">Unit price</label>
                                 <input
                                     class="price-input"
                                     [(ngModel)]="item.price"
@@ -92,8 +106,20 @@
                                     step="0.01"
                                     placeholder="Price"
                                 />
+                                <span class="minus-symbol">−</span>
+                                <input
+                                    class="discount-input"
+                                    [(ngModel)]="item.setDiscount"
+                                    (ngModelChange)="onItemDiscountChanged(item)"
+                                    type="number"
+                                    min="0"
+                                    step="0.01"
+                                    placeholder="0.00"
+                                    aria-label="Total set discount (PLN)"
+                                    title="Discount for the whole line, not per unit"
+                                />
                                 <span class="equals-symbol">=</span>
-                                <span class="total-price">{{ item.amount * item.price | plnCurrency }}</span>
+                                <span class="total-price">{{ item.totalPrice - (item.setDiscount ?? 0) | plnCurrency }}</span>
                             </div>
                             <div class="container-selection">
                                 <app-packaging-selector

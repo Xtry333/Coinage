@@ -13,6 +13,7 @@
 
 .add-items-to-transfer-form {
     display: flex;
+    flex-wrap: wrap;
     gap: 12px;
     align-items: end;
     width: 100%;
@@ -36,6 +37,7 @@
 
     .item-input-price,
     .item-input-amount,
+    .item-input-discount,
     .item-input-container {
         min-width: 80px;
         flex: 0 0 auto;
@@ -156,7 +158,8 @@
                 }
 
                 .quantity-input,
-                .price-input {
+                .price-input,
+                .discount-input {
                     width: 85px;
                     padding: 6px 10px;
                     border: 1px solid #d1d5db;
@@ -190,6 +193,7 @@
                 }
 
                 .multiply-symbol,
+                .minus-symbol,
                 .equals-symbol {
                     color: #6b7280;
                     font-weight: 600;

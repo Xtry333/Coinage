@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { of } from 'rxjs';
 
-import { ShoppingListItem } from '@app/interfaces';
+import { ShoppingListItem, TransferDetailsDTO } from '@app/interfaces';
 
 import { CreateEditTransferComponent } from './create-edit-transfer.component';
 import { CoinageDataService } from '../services/coinage.data-service';
@@ -80,5 +80,72 @@ describe('CreateEditTransferComponent', () => {
         component.itemsInTransfer = [new ShoppingListItem(10, 'Cola', 1, 10, 10, 0, 1, 7, 5, [], 42)];
         component.onClickSaveTransfer();
         expect(save.mock.calls[0][0].itemChanges.editedItems).toEqual([expect.objectContaining({ packagingId: 42, containerId: 7 })]);
+    });
+
+    it('sends gross prices and total set discounts when creating a transfer', () => {
+        const data = TestBed.inject(CoinageDataService);
+        const save = jest.spyOn(data, 'postCreateSaveTransfer').mockReturnValue(of({}));
+        component.redirectAfterSave = false;
+        component.selectedTransferInputs = { amount: 13, date: '2026-11-01', description: 'Milk' };
+        component.itemsInTransfer = [new ShoppingListItem(10, 'Milk', 3, 5, 15, 2, 1)];
+
+        component.onClickSaveTransfer();
+
+        expect(save.mock.calls[0][0]).toMatchObject({
+            amount: 13,
+            items: [expect.objectContaining({ amount: 3, price: 5, totalPrice: 15, setDiscount: 2 })],
+        });
+    });
+
+    it.each([3, 0])('detects a discount-only edit to %s when saving an existing transfer', (setDiscount) => {
+        const data = TestBed.inject(CoinageDataService);
+        const save = jest.spyOn(data, 'postGranularSaveTransfer').mockReturnValue(of({}));
+        component.editMode = true;
+        component.transferId = 3;
+        component.redirectAfterSave = false;
+        component.selectedTransferInputs = { amount: 10 - setDiscount, date: '2026-11-01', description: 'Milk' };
+        component.originalItemsInTransfer = [new ShoppingListItem(10, 'Milk', 2, 5, 10, 2, 1, null, 5)];
+        component.itemsInTransfer = [new ShoppingListItem(10, 'Milk', 2, 5, 10, setDiscount, 1, null, 5)];
+
+        component.onClickSaveTransfer();
+
+        expect(save.mock.calls[0][0].itemChanges).toMatchObject({
+            addedItems: [],
+            editedItems: [expect.objectContaining({ transferItemId: 5, totalPrice: 10, setDiscount })],
+            removedItemIds: [],
+        });
+    });
+
+    it('preserves the stored gross line price when loading and editing a discounted transfer', async () => {
+        const data = TestBed.inject(CoinageDataService);
+        const route = TestBed.inject(ActivatedRoute);
+        route.params = of({ id: '3' });
+        jest.spyOn(component, 'todayInputFormat', 'get').mockReturnValue('2026-11-01');
+        jest.spyOn(data, 'getCategoryList').mockResolvedValue([]);
+        jest.spyOn(data, 'getContractorList').mockResolvedValue([]);
+        jest.spyOn(data, 'getContainerList').mockResolvedValue([]);
+        jest.spyOn(data, 'getAllAvailableAccounts').mockResolvedValue([]);
+        jest.spyOn(data, 'getTransferDetails').mockResolvedValue(
+            Object.assign(new TransferDetailsDTO(), {
+                id: 3,
+                amount: 9,
+                date: new Date('2026-11-01'),
+                description: 'Milk',
+                categoryId: 1,
+                account: { id: 1, name: 'Cash' },
+                targetAccount: { id: 2, name: 'Shop' },
+                items: [{ id: 10, itemName: 'Milk', amount: 3, unitPrice: 3.33, totalPrice: 10, setDiscount: 1, transferItemId: 5 }],
+            }),
+        );
+        const save = jest.spyOn(data, 'postGranularSaveTransfer').mockReturnValue(of({}));
+        component.redirectAfterSave = false;
+
+        component.ngOnInit();
+        await fixture.whenStable();
+        expect(component.itemsInTransfer[0]).toMatchObject({ price: 3.33, totalPrice: 10, setDiscount: 1 });
+
+        component.itemsInTransfer[0].setDiscount = 2;
+        component.onClickSaveTransfer();
+        expect(save.mock.calls[0][0].itemChanges.editedItems).toEqual([expect.objectContaining({ totalPrice: 10, setDiscount: 2 })]);
     });
 });

@@ -146,7 +146,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             this.selectedItem.amount,
             this.selectedItem.price,
             this.selectedItem.price * this.selectedItem.amount,
-            undefined,
+            this.selectedItem.setDiscount ?? 0,
             item?.categoryId ?? 0,
             this.selectedItem.containerId,
             null,
@@ -154,39 +154,33 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             this.selectedItem.packagingId,
         );
         this.itemList.push(shoppingItem);
-        if (this.shouldOverrideTotalCostOnChange) {
-            this.recalculateAndEmitTotalCost();
-        } else {
-            this.itemListChanged.emit(this.itemList);
-        }
+        this.emitItemListChanges();
         this.itemSelect?.first.handleClearClick();
         this.selectedItem.price = 0;
         this.selectedItem.amount = 1;
+        this.selectedItem.setDiscount = 0;
         this.selectedItem.containerId = null;
         this.selectedItem.packagingId = undefined;
     }
 
     public onRemoveItemFromList(item: ShoppingListItem): void {
         this.itemList = this.itemList.filter((listItem) => listItem !== item);
-        if (this.shouldOverrideTotalCostOnChange) {
-            this.recalculateAndEmitTotalCost();
-        } else {
-            this.itemListChanged.emit(this.itemList);
-        }
+        this.emitItemListChanges();
     }
 
     public onItemQuantityChanged(item: ShoppingListItem): void {
         item.totalPrice = item.amount * item.price;
-        if (this.shouldOverrideTotalCostOnChange) {
-            this.recalculateAndEmitTotalCost();
-        }
+        this.emitItemListChanges();
     }
 
     public onItemPriceChanged(item: ShoppingListItem): void {
         item.totalPrice = item.amount * item.price;
-        if (this.shouldOverrideTotalCostOnChange) {
-            this.recalculateAndEmitTotalCost();
-        }
+        this.emitItemListChanges();
+    }
+
+    public onItemDiscountChanged(item: ShoppingListItem): void {
+        item.setDiscount = item.setDiscount ?? 0;
+        this.emitItemListChanges();
     }
 
     public onItemContainerChanged(item: ShoppingListItem): void {
@@ -212,9 +206,11 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
         }
     }
 
-    private recalculateAndEmitTotalCost(): void {
-        const totalCost = Number(this.itemList.reduce((acc, curr) => acc + curr.price * curr.amount, 0).toFixed(2));
-        this.totalCostChanged.emit(totalCost);
+    private emitItemListChanges(): void {
+        if (this.shouldOverrideTotalCostOnChange) {
+            const totalCost = Number(this.itemList.reduce((acc, curr) => acc + curr.totalPrice - (curr.setDiscount ?? 0), 0).toFixed(2));
+            this.totalCostChanged.emit(totalCost);
+        }
         this.itemListChanged.emit(this.itemList);
     }
 }

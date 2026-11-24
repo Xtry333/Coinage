@@ -340,7 +340,7 @@ export class CreateEditTransferComponent implements OnInit {
                 item.itemName,
                 item.amount,
                 item.unitPrice,
-                item.unitPrice * item.amount,
+                item.totalPrice,
                 item.setDiscount,
                 0,
                 item.containerId,
@@ -405,6 +405,8 @@ export class CreateEditTransferComponent implements OnInit {
         return (
             original.amount !== current.amount ||
             original.price !== current.price ||
+            original.totalPrice !== current.totalPrice ||
+            (original.setDiscount ?? 0) !== (current.setDiscount ?? 0) ||
             original.containerId !== current.containerId ||
             original.packagingId !== current.packagingId ||
             original.name !== current.name ||
