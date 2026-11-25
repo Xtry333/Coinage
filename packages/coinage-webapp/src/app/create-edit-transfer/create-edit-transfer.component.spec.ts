@@ -2,6 +2,7 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { ActivatedRoute } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { of } from 'rxjs';
 
 import { ShoppingListItem, TransferDetailsDTO } from '@app/interfaces';
@@ -15,7 +16,7 @@ describe('CreateEditTransferComponent', () => {
 
     beforeEach(async () => {
         await TestBed.configureTestingModule({
-            imports: [RouterTestingModule, HttpClientTestingModule],
+            imports: [RouterTestingModule, HttpClientTestingModule, NgSelectModule],
             declarations: [CreateEditTransferComponent],
             providers: [
                 {
@@ -39,6 +40,28 @@ describe('CreateEditTransferComponent', () => {
 
     it('should create', () => {
         expect(component).toBeTruthy();
+    });
+
+    it('places direct tags after Date in a single form grid column', async () => {
+        const data = TestBed.inject(CoinageDataService);
+        TestBed.inject(ActivatedRoute).params = of({});
+        jest.spyOn(component, 'todayInputFormat', 'get').mockReturnValue('2026-11-01');
+        jest.spyOn(data, 'getCategoryList').mockResolvedValue([]);
+        jest.spyOn(data, 'getContractorList').mockResolvedValue([]);
+        jest.spyOn(data, 'getContainerList').mockResolvedValue([]);
+        jest.spyOn(data, 'getAllAvailableAccounts').mockResolvedValue([]);
+
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        const dateField: HTMLElement = fixture.nativeElement.querySelector('#date').parentElement;
+        const tagsField: HTMLElement = fixture.nativeElement.querySelector('app-tag-selector').parentElement;
+        expect(tagsField).toBe(dateField.nextElementSibling);
+        expect(tagsField.parentElement).toBe(dateField.parentElement);
+        expect(tagsField.parentElement?.classList.contains('lg:grid-cols-3')).toBe(true);
+        expect(tagsField.classList.contains('col-span-1')).toBe(true);
+        expect(tagsField.querySelector('app-tag-badges')).not.toBeNull();
     });
 
     it('shows one effective tag when direct and inherited assignments overlap', () => {

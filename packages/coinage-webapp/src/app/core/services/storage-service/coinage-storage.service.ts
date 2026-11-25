@@ -36,7 +36,7 @@ export class CoinageStorageService {
     public getBoolean(key: string, scope: StorageScope = StorageScope.Persistent): boolean | undefined {
         const n = this.getScopedStorage(scope).getItem(CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key));
         if (n !== null) {
-            return Boolean(n);
+            return n === 'true';
         }
         return undefined;
     }

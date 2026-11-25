@@ -331,3 +331,50 @@ describe('TransferTableComponent', () => {
         expect(component.filter.excludedTagIds).toEqual(expected.excludedTagIds);
     });
 });
+
+describe('TransfersTableComponent bulk edit mode persistence', () => {
+    const key = 'transfers.table.bulkEditMode';
+    const storedKey = CoinageStorageService.KEY_BOOLEAN_TEMPLATE(key);
+
+    function createTable(): TransfersTableComponent {
+        const table = new TransfersTableComponent({} as CoinageDataService, new CoinageStorageService());
+        table.transfers = [];
+        table.showTodayMarker = false;
+        table.enableBulkActions = true;
+        table.ngOnInit();
+        return table;
+    }
+
+    beforeEach(() => {
+        window.localStorage.removeItem(storedKey);
+    });
+
+    afterEach(() => {
+        window.localStorage.removeItem(storedKey);
+    });
+
+    it('defaults to disabled when there is no saved preference', () => {
+        expect(createTable().isBulkEditMode).toBe(false);
+    });
+
+    it.each([true, false])('restores an existing %s preference', (value) => {
+        window.localStorage.setItem(storedKey, String(value));
+
+        expect(createTable().isBulkEditMode).toBe(value);
+    });
+
+    it('stays disabled after enabling, disabling and recreating the table', () => {
+        const table = createTable();
+        table.isBulkEditMode = true;
+        table.onBulkEditModeChanged();
+        expect(createTable().isBulkEditMode).toBe(true);
+
+        table.selectedTransferIds.add(1);
+        table.isBulkEditMode = false;
+        table.onBulkEditModeChanged();
+
+        expect(table.selectedTransferIds.size).toBe(0);
+        expect(window.localStorage.getItem(storedKey)).toBe('false');
+        expect(createTable().isBulkEditMode).toBe(false);
+    });
+});

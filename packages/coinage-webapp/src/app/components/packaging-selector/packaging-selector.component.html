@@ -1,17 +1,33 @@
 <div class="space-y-2">
-    <ng-select
-        [ngModel]="packagingId"
-        [ngModelOptions]="{ standalone: true }"
-        [items]="variants"
-        [loading]="loading"
-        [disabled]="!itemId || loading || !!error"
-        [clearable]="true"
-        (ngModelChange)="select($event)"
-        bindValue="id"
-        bindLabel="displayName"
-        placeholder="No packaging / loose item"
-        aria-label="Product packaging"
-    ></ng-select>
+    <div class="flex flex-wrap items-start gap-2">
+        <ng-select
+            class="min-w-0 flex-[1_1_14rem]"
+            [ngModel]="packagingId"
+            [ngModelOptions]="{ standalone: true }"
+            [items]="variants"
+            [loading]="loading"
+            [disabled]="!itemId || loading || !!error"
+            [clearable]="true"
+            (ngModelChange)="select($event)"
+            bindValue="id"
+            bindLabel="displayName"
+            placeholder="No packaging / loose item"
+            aria-label="Product packaging"
+        ></ng-select>
+        @if (itemId && !loading && !error) {
+            <button
+                class="inline-flex h-9 shrink-0 items-center justify-center gap-1.5 rounded-md border border-gray-300 bg-white px-3 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 focus-visible:outline-none"
+                [attr.aria-expanded]="adding"
+                (click)="adding = !adding"
+                type="button"
+            >
+                <svg class="h-3.5 w-3.5" [class.rotate-45]="adding" aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v12m6-6H6"></path>
+                </svg>
+                {{ adding ? 'Close packaging editor' : 'Add another size' }}
+            </button>
+        }
+    </div>
     @if (error) {
         <p class="text-xs text-red-600" role="alert">{{ error }} <button class="underline" (click)="load()" type="button">Retry</button></p>
     }
@@ -19,11 +35,10 @@
         @if (packagingId === undefined && legacyContainerId) {
             <p class="text-xs text-gray-500">Legacy container is retained until you choose a packaging variant.</p>
         }
-        <button class="text-xs text-blue-600 underline" (click)="adding = !adding" type="button">
-            {{ adding ? 'Close packaging editor' : 'Add another size' }}
-        </button>
         @if (adding) {
-            <app-item-packaging [itemId]="itemId" [startAdding]="true" (saved)="onCreated($event)"></app-item-packaging>
+            <div class="border-t border-gray-200 pt-3" role="region" aria-label="Packaging editor">
+                <app-item-packaging [itemId]="itemId" [startAdding]="true" (saved)="onCreated($event)"></app-item-packaging>
+            </div>
         }
     }
 </div>

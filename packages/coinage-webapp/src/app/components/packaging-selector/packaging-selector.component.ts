@@ -7,6 +7,7 @@ import { CoinageDataService } from '../../services/coinage.data-service';
 @Component({
     selector: 'app-packaging-selector',
     templateUrl: './packaging-selector.component.html',
+    host: { class: 'block min-w-0' },
     changeDetection: ChangeDetectionStrategy.Eager,
     standalone: false,
 })

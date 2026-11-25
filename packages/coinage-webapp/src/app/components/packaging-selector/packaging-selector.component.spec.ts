@@ -1,3 +1,6 @@
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { NgSelectModule } from '@ng-select/ng-select';
+
 import { ItemPackagingDTO } from '@app/interfaces';
 
 import { PackagingSelectorComponent } from './packaging-selector.component';
@@ -111,5 +114,69 @@ describe('PackagingSelectorComponent', () => {
         expect(component.error).toBeTruthy();
         expect(component.packagingId).toBe(3);
         expect(emit).not.toHaveBeenCalled();
+    });
+});
+
+describe('PackagingSelectorComponent template', () => {
+    let fixture: ComponentFixture<PackagingSelectorComponent>;
+    let component: PackagingSelectorComponent;
+
+    beforeEach(async () => {
+        await TestBed.configureTestingModule({
+            imports: [NgSelectModule],
+            declarations: [PackagingSelectorComponent],
+            providers: [{ provide: CoinageDataService, useValue: { getItemPackaging: jest.fn().mockResolvedValue([variant]) } }],
+        }).compileComponents();
+        fixture = TestBed.createComponent(PackagingSelectorComponent);
+        component = fixture.componentInstance;
+        fixture.componentRef.setInput('itemId', 10);
+        fixture.componentRef.setInput('packagingId', variant.id);
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+    });
+
+    it('keeps the add-size action beside the dropdown and toggles a separate editor without changing the selection', () => {
+        const emit = jest.spyOn(component.packagingChange, 'emit');
+        const button: HTMLButtonElement = fixture.nativeElement.querySelector('button');
+        const select: HTMLElement = fixture.nativeElement.querySelector('ng-select');
+        expect(button.parentElement).toBe(select.parentElement);
+        expect(button.textContent).toContain('Add another size');
+        expect(button.type).toBe('button');
+        expect(button.getAttribute('aria-expanded')).toBe('false');
+        expect(fixture.nativeElement.querySelector('[role="region"]')).toBeNull();
+
+        button.click();
+        fixture.detectChanges();
+
+        const editor: HTMLElement = fixture.nativeElement.querySelector('[aria-label="Packaging editor"]');
+        expect(button.getAttribute('aria-expanded')).toBe('true');
+        expect(button.textContent).toContain('Close packaging editor');
+        expect(editor.querySelector('app-item-packaging')).not.toBeNull();
+        expect(editor.parentElement).toBe(select.parentElement?.parentElement);
+
+        button.click();
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('[role="region"]')).toBeNull();
+        expect(component.packagingId).toBe(variant.id);
+        expect(emit).not.toHaveBeenCalled();
+    });
+
+    it('closes the editor and selects a newly saved size', async () => {
+        fixture.nativeElement.querySelector('button').click();
+        fixture.detectChanges();
+
+        const created = { ...variant, id: 9 };
+        const emit = jest.spyOn(component.packagingChange, 'emit');
+        component.onCreated(created);
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(component.packagingId).toBe(created.id);
+        expect(emit).toHaveBeenCalledWith(created);
+        expect(fixture.nativeElement.querySelector('[role="region"]')).toBeNull();
+        expect(fixture.nativeElement.querySelector('button').getAttribute('aria-expanded')).toBe('false');
     });
 });

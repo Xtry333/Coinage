@@ -118,21 +118,20 @@
                             required
                         />
                     </div>
-                </div>
-
-                <div class="space-y-2">
-                    <label class="block text-sm font-medium text-gray-700" for="transferTags">Direct tags</label>
-                    <app-tag-selector
-                        [(tagIds)]="selectedTransferInputs.tagIds"
-                        (tagsLoaded)="availableTags = $event"
-                        inputId="transferTags"
-                    ></app-tag-selector>
-                    <p class="text-xs text-gray-500">
-                        Only direct assignments are edited here. Item tags are inherited automatically, even after a matching direct tag is removed.
-                    </p>
-                    <div class="space-y-1">
-                        <span class="block text-sm font-medium text-gray-700">All effective tags</span>
-                        <app-tag-badges [tags]="effectiveTags"></app-tag-badges>
+                    <div class="col-span-1 min-w-0 space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="transferTags">Direct tags</label>
+                        <app-tag-selector
+                            [(tagIds)]="selectedTransferInputs.tagIds"
+                            (tagsLoaded)="availableTags = $event"
+                            inputId="transferTags"
+                        ></app-tag-selector>
+                        <p class="text-xs text-gray-500">
+                            Only direct assignments are edited here. Item tags are inherited automatically, even after a matching direct tag is removed.
+                        </p>
+                        <div class="space-y-1">
+                            <span class="block text-sm font-medium text-gray-700">All effective tags</span>
+                            <app-tag-badges [tags]="effectiveTags"></app-tag-badges>
+                        </div>
                     </div>
                 </div>
 
