@@ -31,7 +31,14 @@
                             }
                         </div>
                     </td>
-                    <td class="px-4 py-3 text-right font-mono text-sm text-gray-900">{{ item.unitPrice | plnCurrency }}</td>
+                    <td class="px-4 py-3 text-right font-mono text-sm whitespace-nowrap text-gray-900">
+                        @if (item.discountedUnitPrice !== null) {
+                            <s class="mr-2 text-gray-500" title="Original unit price">{{ item.unitPrice | plnCurrency: false }}</s>
+                            {{ item.discountedUnitPrice | plnCurrency }}
+                        } @else {
+                            {{ item.unitPrice | plnCurrency }}
+                        }
+                    </td>
                     <td class="px-4 py-3 text-right text-sm text-gray-900">{{ item.amount }}</td>
                     <td class="px-4 py-3 text-right font-mono text-sm text-gray-900">{{ item.totalPrice - item.setDiscount | plnCurrency }}</td>
                 </tr>

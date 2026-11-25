@@ -21,6 +21,10 @@ export class UiTransferItemDTO extends TransferItemDTO {
         this.transferItemId = transferItem.transferItemId;
         this.tags = transferItem.tags ?? [];
     }
+
+    public get discountedUnitPrice(): number | null {
+        return this.setDiscount > 0 && this.amount > 0 ? (this.totalPrice - this.setDiscount) / this.amount : null;
+    }
 }
 
 @Component({

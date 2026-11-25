@@ -35,4 +35,11 @@ describe('PlnCurrencyPipe', () => {
     it('formats zero correctly', () => {
         expect(pipe.transform(0)).toEqual('0,00 ' + pipe.CURRENCY_SYMBOL);
     });
+
+    it('can omit the currency symbol while keeping the usual number formatting', () => {
+        expect(pipe.transform(11.5, false)).toBe('11,50');
+        expect(pipe.transform(0, false)).toBe('0,00');
+        expect(pipe.transform(null, false)).toBe('-');
+        expect(pipe.transform(undefined, false)).toBe('-');
+    });
 });
