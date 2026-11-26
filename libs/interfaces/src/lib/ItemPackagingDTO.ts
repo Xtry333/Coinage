@@ -12,6 +12,11 @@ export interface ItemPackagingInput {
     isPreferred?: boolean;
 }
 
+export interface ItemPackagingSaveInput extends ItemPackagingInput {
+    correctExistingPackaging?: boolean;
+    acknowledgeHistoricalImpact?: boolean;
+}
+
 export interface ItemPackagingDTO extends ItemPackagingInput {
     id: number;
     itemId: number;

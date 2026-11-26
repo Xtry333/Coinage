@@ -1,6 +1,6 @@
 import { Body, Controller, Get, Param, ParseIntPipe, Post, Put, UseGuards } from '@nestjs/common';
 
-import { ItemPackagingInput } from '@app/interfaces';
+import { ItemPackagingSaveInput } from '@app/interfaces';
 
 import { AuthGuard } from '../services/auth.guard';
 import { ItemPackagingService } from '../services/item-packaging.service';
@@ -16,12 +16,12 @@ export class ItemPackagingController {
     }
 
     @Post()
-    public create(@Param('itemId', ParseIntPipe) itemId: number, @Body() input: ItemPackagingInput) {
+    public create(@Param('itemId', ParseIntPipe) itemId: number, @Body() input: ItemPackagingSaveInput) {
         return this.packaging.save(itemId, input);
     }
 
     @Put(':id')
-    public replace(@Param('itemId', ParseIntPipe) itemId: number, @Param('id', ParseIntPipe) id: number, @Body() input: ItemPackagingInput) {
+    public replace(@Param('itemId', ParseIntPipe) itemId: number, @Param('id', ParseIntPipe) id: number, @Body() input: ItemPackagingSaveInput) {
         return this.packaging.save(itemId, input, id);
     }
 

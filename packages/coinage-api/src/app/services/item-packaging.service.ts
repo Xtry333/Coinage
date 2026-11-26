@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource, EntityManager } from 'typeorm';
 
-import { calculatePackagingContents, ItemPackagingDTO, ItemPackagingInput } from '@app/interfaces';
+import { calculatePackagingContents, ItemPackagingDTO, ItemPackagingInput, ItemPackagingSaveInput } from '@app/interfaces';
 
 import { Container } from '../entities/Container.entity';
 import { Item } from '../entities/Item.entity';
@@ -97,23 +97,35 @@ export class ItemPackagingService {
         if (!item) throw new NotFoundException('Item not found.');
     }
 
-    public async save(itemId: number, data: ItemPackagingInput, replacedId?: number): Promise<ItemPackagingDTO> {
+    public async save(itemId: number, data: ItemPackagingSaveInput, replacedId?: number): Promise<ItemPackagingDTO> {
         validatePackaging(data);
+        if (
+            (data.correctExistingPackaging !== undefined && typeof data.correctExistingPackaging !== 'boolean') ||
+            (data.acknowledgeHistoricalImpact !== undefined && typeof data.acknowledgeHistoricalImpact !== 'boolean')
+        ) {
+            throw new BadRequestException('Invalid historical correction option.');
+        }
+        if (data.correctExistingPackaging && data.acknowledgeHistoricalImpact !== true) {
+            throw new BadRequestException('Acknowledge the historical impact before correcting existing packaging.');
+        }
+        if (data.correctExistingPackaging && !replacedId) throw new BadRequestException('Select an existing package to correct.');
         return this.dataSource.transaction(async (manager) => {
             await this.lockItem(manager, itemId);
             const repository = manager.getRepository(ItemPackaging);
             const previous = replacedId ? await repository.findOneBy({ id: replacedId, itemId }) : null;
-            if (replacedId && (!previous || previous.isArchived)) throw new NotFoundException('Active packaging variant not found.');
+            if (replacedId && (!previous || (previous.isArchived && !data.correctExistingPackaging))) {
+                throw new NotFoundException('Packaging variant not found or archived.');
+            }
+            const variants = data.containedPackagingId != null || data.correctExistingPackaging ? await repository.find({ where: { itemId } }) : [];
+            const byId = new Map<number, ItemPackagingInput & { id: number }>(variants.map((p) => [p.id, p]));
             let derived: ReturnType<typeof calculatePackagingContents> | undefined;
             let containedName: string | null = null;
             let nestingDepth = 1;
             if (data.containedPackagingId != null) {
-                const variants = await repository.find({ where: { itemId } });
-                const byId = new Map(variants.map((p) => [p.id, p]));
                 const child = byId.get(data.containedPackagingId);
                 if (!child) throw new BadRequestException('Contained packaging must belong to the same product.');
                 const path = new Set<number>();
-                let current: ItemPackaging | undefined = child;
+                let current: (ItemPackagingInput & { id: number }) | undefined = child;
                 while (current) {
                     if (current.id === replacedId || path.has(current.id)) throw new BadRequestException('Packaging cannot contain itself or form a cycle.');
                     path.add(current.id);
@@ -126,16 +138,26 @@ export class ItemPackagingService {
                 } catch (error) {
                     throw new BadRequestException(error instanceof Error ? error.message : 'Invalid contained packaging.');
                 }
-                containedName = child.name;
+                containedName = child.name ?? null;
+            }
+            if (data.correctExistingPackaging && previous) {
+                byId.set(previous.id, { ...data, id: previous.id });
+                try {
+                    // A correction also changes every outer package using this version.
+                    for (const variant of byId.values()) calculatePackagingContents(variant, byId);
+                } catch (error) {
+                    throw new BadRequestException(error instanceof Error ? error.message : 'Invalid contained packaging.');
+                }
             }
             const container = data.containerId != null ? await manager.getRepository(Container).findOneBy({ id: data.containerId }) : null;
             if (data.containerId != null && !container) throw new NotFoundException('Container not found.');
-            const preferred = data.isPreferred ?? previous?.isPreferred ?? false;
-            // Never rewrite measurements referenced by historical purchases, even for unused variants.
-            if (previous) await repository.update(previous.id, { isArchived: true, isPreferred: false });
+            const preferred = previous?.isArchived ? false : (data.isPreferred ?? previous?.isPreferred ?? false);
+            // Preserve historical versions unless a correction has been explicitly acknowledged.
+            if (previous && !data.correctExistingPackaging) await repository.update(previous.id, { isArchived: true, isPreferred: false });
             if (preferred) await repository.update({ itemId, isPreferred: true }, { isPreferred: false });
             const saved = await repository.save(
                 repository.create({
+                    ...(data.correctExistingPackaging && previous ? { id: previous.id } : {}),
                     itemId,
                     name: data.name?.trim() || previous?.name || container?.name?.trim() || 'Package',
                     containedPackagingId: data.containedPackagingId ?? null,
@@ -149,7 +171,7 @@ export class ItemPackagingService {
                     itemCount: data.itemCount ?? null,
                     barcode: data.barcode?.trim() || null,
                     isPreferred: preferred,
-                    isArchived: false,
+                    isArchived: data.correctExistingPackaging ? (previous?.isArchived ?? false) : false,
                 }),
             );
             const dto = toPackagingDTO(saved);

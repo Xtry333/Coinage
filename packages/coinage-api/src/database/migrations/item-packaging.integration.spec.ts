@@ -399,6 +399,40 @@ integration('item packaging migration on PostgreSQL', () => {
         expect(historical).toMatchObject({ quantity: 1, unitPrice: 48 });
     });
 
+    it.each([false, true])(
+        'corrects a purchased package in place (archived: %s) and updates containing packages without changing purchase lines',
+        async (archived) => {
+            const packaging = new ItemPackagingService(isolatedSource());
+            const can = await packaging.save(2, { ...canInput, isPreferred: true });
+            const box = await packaging.save(2, { ...outerInput, containedPackagingId: can.id, containedCount: 24 });
+            const pallet = await packaging.save(2, { ...outerInput, name: 'Pallet', containedPackagingId: box.id, containedCount: 10 });
+            const dao = new TransferItemDao(runner.manager.getRepository(TransferItem));
+            const transfers = new TransferItemsService(dao, packaging);
+            const line = { transferId: 2, itemId: 2, containerId: null, quantity: 2, unitPrice: 48, totalSetPrice: 96, totalSetDiscount: 0 };
+            const direct = await transfers.save(Object.assign(new TransferItem(), line, { packagingId: can.id }));
+            const outer = await transfers.save(Object.assign(new TransferItem(), line, { packagingId: box.id }));
+            if (archived) await packaging.setState(2, can.id, 'archive');
+            const before = await packaging.list(2);
+            const corrected = await packaging.save(
+                2,
+                { ...canInput, name: 'Corrected can', volume: 0.3, correctExistingPackaging: true, acknowledgeHistoricalImpact: true },
+                can.id,
+            );
+            expect(corrected).toMatchObject({ id: can.id, name: 'Corrected can', volume: 0.3, isArchived: archived, isPreferred: !archived });
+            const after = await packaging.list(2);
+            expect(after).toHaveLength(before.length);
+            expect(after.find((p) => p.id === box.id)).toMatchObject({ containedPackagingId: can.id, containedPackagingName: 'Corrected can', itemCount: 24 });
+            expect(after.find((p) => p.id === pallet.id)?.volume).toBeCloseTo(72);
+            const directPurchase = await dao.getById(direct.id);
+            const outerPurchase = await dao.getById(outer.id);
+            expect(directPurchase).toMatchObject({ ...line, packagingId: can.id });
+            expect(outerPurchase).toMatchObject({ ...line, packagingId: box.id });
+            if (!directPurchase.packaging || !outerPurchase.packaging) throw new Error('Missing purchased packaging');
+            expect(toPackagingDTO(directPurchase.packaging)).toMatchObject({ name: 'Corrected can', volume: 0.3, isArchived: archived });
+            expect(toPackagingDTO(outerPurchase.packaging).volume).toBeCloseTo(7.2);
+        },
+    );
+
     it('enforces same-product composition, integer counts, no direct/indirect cycles, and deletion restrictions in PostgreSQL', async () => {
         const packaging = new ItemPackagingService(isolatedSource());
         const a = await packaging.save(1, { ...canInput, name: 'A' });

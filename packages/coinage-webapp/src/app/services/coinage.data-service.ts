@@ -25,7 +25,7 @@ import {
     GranularCreateEditTransferModelDTO,
     ItemDetailsDTO,
     ItemPackagingDTO,
-    ItemPackagingInput,
+    ItemPackagingSaveInput,
     ItemWithContainerDTO,
     ItemWithLastUsedPriceDTO,
     NewMonthlyUserStatsDTO,
@@ -223,7 +223,7 @@ export class CoinageDataService {
         return lastValueFrom(this.http.get<ItemPackagingDTO[]>(`${CoinageDataService.API_URL}items/${itemId}/packaging`));
     }
 
-    public saveItemPackaging(itemId: number, input: ItemPackagingInput, replacedId?: number): Promise<ItemPackagingDTO> {
+    public saveItemPackaging(itemId: number, input: ItemPackagingSaveInput, replacedId?: number): Promise<ItemPackagingDTO> {
         const url = `${CoinageDataService.API_URL}items/${itemId}/packaging`;
         return lastValueFrom(replacedId ? this.http.put<ItemPackagingDTO>(`${url}/${replacedId}`, input) : this.http.post<ItemPackagingDTO>(url, input));
     }

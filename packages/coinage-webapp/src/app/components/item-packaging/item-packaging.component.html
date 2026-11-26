@@ -27,29 +27,38 @@
                                 <p class="text-xs text-gray-500">Per item: {{ each }}</p>
                             }
                         </div>
-                        @if (!readonly && !variant.isArchived) {
+                        @if (!readonly) {
                             <div class="flex flex-wrap gap-3 text-sm">
                                 <button class="text-blue-600 disabled:opacity-50" [disabled]="saving" (click)="start(variant, true)" type="button">
-                                    Edit size
+                                    {{ variant.isArchived ? 'Correct archived package' : 'Edit package' }}
                                 </button>
-                                <button class="text-blue-600 disabled:opacity-50" [disabled]="saving" (click)="start(variant)" type="button">Duplicate</button>
-                                @if (!variant.isPreferred) {
-                                    <button class="text-blue-600 disabled:opacity-50" [disabled]="saving" (click)="setState(variant, 'prefer')" type="button">
-                                        Set preferred
+                                @if (!variant.isArchived) {
+                                    <button class="text-blue-600 disabled:opacity-50" [disabled]="saving" (click)="start(variant)" type="button">
+                                        Duplicate
                                     </button>
-                                }
-                                <button class="text-gray-600 disabled:opacity-50" [disabled]="saving" (click)="setState(variant, 'archive')" type="button">
-                                    Archive
-                                </button>
-                                @if (variant.containerId; as containerId) {
-                                    <button
-                                        class="text-amber-800 disabled:opacity-50"
-                                        [disabled]="saving"
-                                        (click)="editSharedContainer(containerId)"
-                                        type="button"
-                                    >
-                                        Edit shared container
+                                    @if (!variant.isPreferred) {
+                                        <button
+                                            class="text-blue-600 disabled:opacity-50"
+                                            [disabled]="saving"
+                                            (click)="setState(variant, 'prefer')"
+                                            type="button"
+                                        >
+                                            Set preferred
+                                        </button>
+                                    }
+                                    <button class="text-gray-600 disabled:opacity-50" [disabled]="saving" (click)="setState(variant, 'archive')" type="button">
+                                        Archive
                                     </button>
+                                    @if (variant.containerId; as containerId) {
+                                        <button
+                                            class="text-amber-800 disabled:opacity-50"
+                                            [disabled]="saving"
+                                            (click)="editSharedContainer(containerId)"
+                                            type="button"
+                                        >
+                                            Edit shared container
+                                        </button>
+                                    }
                                 }
                             </div>
                         }
@@ -79,11 +88,36 @@
             <p class="text-sm text-gray-600">
                 {{
                     replacedId
-                        ? 'Saving creates a replacement variant and archives this size. Past purchases will not change.'
+                        ? correctExistingPackaging
+                            ? 'Correct this package in place. Past purchases and any packages containing it will reflect the corrected name and size.'
+                            : 'Saving creates a replacement variant and archives this size. Past purchases will not change.'
                         : 'Add a named package for this product. Create the inner package first if this package contains others.'
                 }}
             </p>
             <fieldset class="grid grid-cols-1 gap-4 sm:grid-cols-2" [disabled]="saving">
+                @if (replacedId) {
+                    <div class="space-y-2 sm:col-span-2">
+                        @if (editingArchived) {
+                            <p class="text-sm text-gray-600">This package will remain archived after correction.</p>
+                        } @else {
+                            <label class="flex items-center gap-2 text-sm text-gray-700">
+                                <input
+                                    [(ngModel)]="correctExistingPackaging"
+                                    (ngModelChange)="correctionAcknowledged = false"
+                                    name="correctExistingPackaging"
+                                    type="checkbox"
+                                />
+                                Correct existing package instead of archiving and replacing it
+                            </label>
+                        }
+                        @if (correctExistingPackaging) {
+                            <label class="flex items-center gap-2 rounded-md bg-amber-50 p-3 text-sm text-amber-900">
+                                <input [(ngModel)]="correctionAcknowledged" name="correctionAcknowledged" type="checkbox" />
+                                I understand this changes past purchases and any packages containing this package.
+                            </label>
+                        }
+                    </div>
+                }
                 <div class="space-y-1 sm:col-span-2">
                     <label class="block text-sm font-medium text-gray-700" [for]="formId + '-name'">Packaging name</label>
                     <input
@@ -221,9 +255,11 @@
                         type="text"
                     />
                 </div>
-                <label class="flex items-center gap-2 text-sm text-gray-700">
-                    <input [(ngModel)]="draft.isPreferred" name="preferred" type="checkbox" />Preferred for new purchases
-                </label>
+                @if (!editingArchived) {
+                    <label class="flex items-center gap-2 text-sm text-gray-700">
+                        <input [(ngModel)]="draft.isPreferred" name="preferred" type="checkbox" />Preferred for new purchases
+                    </label>
+                }
             </fieldset>
             <p class="text-xs text-gray-500">
                 For boxes and multipacks, select the contained package and its count; totals are calculated automatically. Flat legacy packages keep their
@@ -238,11 +274,11 @@
             <div class="flex gap-3">
                 <button
                     class="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
-                    [disabled]="saving || loading || !!error || packagingForm.invalid || !valid"
+                    [disabled]="saving || loading || !!error || packagingForm.invalid || !valid || (correctExistingPackaging && !correctionAcknowledged)"
                     (click)="save()"
                     type="button"
                 >
-                    {{ saving ? 'Saving…' : 'Save packaging' }}
+                    {{ saving ? 'Saving…' : correctExistingPackaging ? 'Save correction' : 'Save packaging' }}
                 </button>
                 <button
                     class="rounded-md border border-gray-300 px-3 py-2 text-sm disabled:opacity-50"

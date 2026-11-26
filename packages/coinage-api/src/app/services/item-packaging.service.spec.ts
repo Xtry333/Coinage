@@ -1,6 +1,6 @@
 import { DataSource } from 'typeorm';
 
-import { calculatePackagingContents, ItemPackagingInput, packagingLabel } from '@app/interfaces';
+import { calculatePackagingContents, ItemPackagingInput, ItemPackagingSaveInput, packagingLabel } from '@app/interfaces';
 
 import { ItemPackagingService, validatePackaging } from './item-packaging.service';
 import { Container } from '../entities/Container.entity';
@@ -122,6 +122,8 @@ describe('ItemPackagingService', () => {
             ),
             create: jest.fn((data) => Object.assign(new ItemPackaging(), data)),
             save: jest.fn(async (data) => {
+                const existing = variants.find((p) => p.id === data.id);
+                if (existing) return Object.assign(existing, data);
                 const saved = Object.assign(new ItemPackaging(), data, { id: variants.length + 1 });
                 variants.push(saved);
                 return saved;
@@ -166,6 +168,57 @@ describe('ItemPackagingService', () => {
             expect(patch).not.toHaveProperty('weight');
             expect(patch).not.toHaveProperty('containerId');
         }
+    });
+
+    it('corrects a current package in place only with explicit consent, without changing other products or shared containers', async () => {
+        const original = await service.save(10, { ...input, isPreferred: true });
+        const other = await service.save(20, input);
+        const corrected = await service.save(
+            10,
+            { ...input, name: '  Corrected can  ', volume: 350, correctExistingPackaging: true, acknowledgeHistoricalImpact: true },
+            original.id,
+        );
+        expect(corrected).toMatchObject({ id: original.id, name: 'Corrected can', volume: 350, isPreferred: true, isArchived: false });
+        expect(variants).toHaveLength(2);
+        expect(variants.find((p) => p.id === other.id)).toMatchObject({ name: 'Can', volume: 330 });
+        expect(container).toMatchObject({ name: 'Can', volume: 330 });
+    });
+
+    it('corrects archived packages without reactivating them or taking preference from the current package', async () => {
+        const original = await service.save(10, { ...input, isPreferred: true });
+        const current = await service.save(10, { ...input, volume: 500 }, original.id);
+        await expect(service.save(10, input, original.id)).rejects.toThrow('archived');
+        const corrected = await service.save(
+            10,
+            { ...input, name: 'Old can', volume: 350, isPreferred: true, correctExistingPackaging: true, acknowledgeHistoricalImpact: true },
+            original.id,
+        );
+        expect(corrected).toMatchObject({ id: original.id, name: 'Old can', volume: 350, isArchived: true, isPreferred: false });
+        expect(variants.find((p) => p.id === current.id)).toMatchObject({ volume: 500, isPreferred: true, isArchived: false });
+        expect(variants).toHaveLength(2);
+    });
+
+    it.each([
+        { correctExistingPackaging: true },
+        { correctExistingPackaging: true, acknowledgeHistoricalImpact: false },
+        { correctExistingPackaging: true, acknowledgeHistoricalImpact: 'true' },
+        { correctExistingPackaging: 'true', acknowledgeHistoricalImpact: true },
+        { correctExistingPackaging: null, acknowledgeHistoricalImpact: true },
+    ])('rejects missing consent or invalid correction options before changing anything: %p', async (options) => {
+        const original = await service.save(10, input);
+        transaction.mockClear();
+        await expect(service.save(10, { ...input, ...options } as ItemPackagingSaveInput, original.id)).rejects.toThrow();
+        expect(transaction).not.toHaveBeenCalled();
+        expect(variants[0]).toMatchObject({ volume: 330, isArchived: false });
+    });
+
+    it('requires an existing package from the same product for corrections', async () => {
+        const original = await service.save(20, input);
+        const correction = { ...input, correctExistingPackaging: true, acknowledgeHistoricalImpact: true };
+        await expect(service.save(10, correction)).rejects.toThrow('existing package');
+        await expect(service.save(10, correction, original.id)).rejects.toThrow('not found');
+        await expect(service.save(20, correction, 999)).rejects.toThrow('not found');
+        expect(variants).toHaveLength(1);
     });
 
     it('limits preference changes to one product and retains archived variants', async () => {
@@ -264,5 +317,44 @@ describe('ItemPackagingService', () => {
         await expect(service.save(10, outer, can.id)).rejects.toThrow('itself');
         const box = await service.save(10, outer);
         await expect(service.save(10, { ...outer, containedPackagingId: box.id }, can.id)).rejects.toThrow('cycle');
+    });
+
+    it('corrects a composite package count in place and returns its recalculated contents', async () => {
+        const can = await service.save(10, input);
+        const outer = { ...input, name: 'Box', volume: null, volumeUnit: null, itemCount: null, containedPackagingId: can.id, containedCount: 24 };
+        const box = await service.save(10, outer);
+        const corrected = await service.save(
+            10,
+            { ...outer, containedCount: 30, correctExistingPackaging: true, acknowledgeHistoricalImpact: true },
+            box.id,
+        );
+        expect(corrected).toMatchObject({ id: box.id, containedPackagingId: can.id, containedCount: 30, volume: 9900, itemCount: 30, nestingDepth: 2 });
+        expect(variants).toHaveLength(2);
+        expect(variants[1]).toMatchObject({ volume: null, itemCount: null, containedCount: 30 });
+    });
+
+    it('rejects corrections that introduce cycles or overflow an existing outer package', async () => {
+        const can = await service.save(10, input);
+        const outer = { ...input, volume: null, volumeUnit: null, itemCount: null, containedPackagingId: can.id, containedCount: 100000 };
+        let current = await service.save(10, outer);
+        current = await service.save(10, { ...outer, containedPackagingId: current.id });
+        const correction = { correctExistingPackaging: true, acknowledgeHistoricalImpact: true };
+        await expect(service.save(10, { ...outer, ...correction, containedPackagingId: current.id }, can.id)).rejects.toThrow('cycle');
+        await expect(service.save(10, { ...input, ...correction, itemCount: 2147483647 }, can.id)).rejects.toThrow('too large');
+        expect(variants[0]).toMatchObject({ itemCount: 1, containedPackagingId: null });
+    });
+
+    it('rejects corrections that would push an existing ancestor beyond 32 nesting levels', async () => {
+        const can = await service.save(10, input);
+        const outer = { ...input, volume: null, volumeUnit: null, itemCount: null, containedPackagingId: can.id, containedCount: 1 };
+        let current = can;
+        for (let depth = 2; depth <= 32; depth++) {
+            current = await service.save(10, { ...outer, containedPackagingId: current.id });
+        }
+        const another = await service.save(10, input);
+        await expect(
+            service.save(10, { ...outer, containedPackagingId: another.id, correctExistingPackaging: true, acknowledgeHistoricalImpact: true }, can.id),
+        ).rejects.toThrow('32 levels');
+        expect(variants[0].containedPackagingId).toBeNull();
     });
 });

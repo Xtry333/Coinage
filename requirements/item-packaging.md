@@ -4,7 +4,7 @@
 
 ## Usage
 
-- Open an item's **Edit** page and use **Packaging variants** to add, duplicate, replace, prefer, or archive a size.
+- Open an item's **Edit** page and use **Packaging variants** to add, duplicate, replace, correct, prefer, or archive a size.
 - New purchases can default to the preferred variant. Selecting no packaging records a loose/unspecified item.
 - Transfer and receipt editors offer only that product's variants, with **Add another size** available inline.
 - Packaging changes are saved separately from the surrounding item/transfer form. Cancelling that form does not undo packaging changes.
@@ -26,9 +26,18 @@ Containment uses a same-product self-FK. API validation and database constraints
 
 Parents remain pinned to the chosen inner version. Replacing Can with a new 0.3 l version does not change an existing Box's 6 l total. Edit/replace Box explicitly to choose the new Can; historical purchases keep the old Box → Can chain.
 
+### Correcting an existing package
+
+- **Edit package** still archives the old variant and creates a replacement by default.
+- To rename a package or fix an incorrect size without creating a new version, select **Correct existing package instead of archiving and replacing it**, then acknowledge the historical impact and **Save correction**.
+- For old versions, enable **Show archived sizes** and choose **Correct archived package**. These corrections also require acknowledgment and leave the package archived and non-preferred.
+- Corrections keep the same package ID. Past purchases and all packages containing that version reflect the corrected name and contents; purchase prices and quantities, other products, and shared container definitions are unchanged.
+- The API requires both `correctExistingPackaging: true` and `acknowledgeHistoricalImpact: true` on `PUT /items/:itemId/packaging/:id`. Without correction mode, replacement behavior is unchanged. Corrections also validate affected outer packages for cycles, nesting limits, and unsafe totals.
+- No additional database migration is needed.
+
 ### Editing shared / legacy containers
 
-Use **Edit shared container** beside a packaging variant, or **Manage shared / legacy containers** beneath the packaging list to select any original definition, including unused containers. This is deliberately separate from history-safe **Edit size**.
+Use **Edit shared container** beside a packaging variant, or **Manage shared / legacy containers** beneath the packaging list to select any original definition, including unused containers. This is deliberately separate from product-specific **Edit package**.
 
 - Shared names change only on records displaying the legacy container name. Named packaging variants keep their own names. Legacy purchases without packaging snapshots also read the updated container measurements.
 - Saving requires acknowledging the historical impact. By default, saved product-packaging sizes remain unchanged.

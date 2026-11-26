@@ -83,6 +83,77 @@ describe('ItemPackagingComponent', () => {
         expect(variant.volume).toBe(330);
         expect(component.draft).toBeUndefined();
         expect(emitted).toHaveBeenCalledWith(expect.objectContaining({ id: 4 }));
+        expect(notifications.push).toHaveBeenCalledWith(expect.objectContaining({ message: 'Existing purchases retain their original sizes.' }));
+    });
+
+    it('defaults to archiving and replacing a current package, with an opt-in correction requiring consent', async () => {
+        component.start(variant, true);
+        expect(component.correctExistingPackaging).toBe(false);
+        component.correctExistingPackaging = true;
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(fixture.nativeElement.textContent).toContain('Past purchases and any packages containing it');
+        const save = Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>).find(
+            (button) => button.textContent?.trim() === 'Save correction',
+        );
+        expect(save?.disabled).toBe(true);
+        await component.save();
+        expect(data.saveItemPackaging).not.toHaveBeenCalled();
+        component.correctionAcknowledged = true;
+        if (component.draft) Object.assign(component.draft, { name: 'Corrected can', volume: 350 });
+        fixture.detectChanges();
+        expect(save?.disabled).toBe(false);
+        await component.save();
+        expect(data.saveItemPackaging).toHaveBeenCalledWith(
+            10,
+            expect.objectContaining({ name: 'Corrected can', volume: 350, correctExistingPackaging: true, acknowledgeHistoricalImpact: true }),
+            3,
+        );
+        expect(notifications.push).toHaveBeenCalledWith(
+            expect.objectContaining({ message: 'Existing purchases and containing packages now use the corrected packaging.' }),
+        );
+    });
+
+    it('offers corrections for archived packages without making them preferred or silently accepting historical impact', async () => {
+        const archived = { ...variant, isPreferred: false, isArchived: true };
+        component.variants = [archived];
+        component.showArchived = true;
+        fixture.detectChanges();
+        const edit = Array.from(fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>).find(
+            (button) => button.textContent?.trim() === 'Correct archived package',
+        );
+        expect(edit).toBeDefined();
+        edit?.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        expect(component.correctExistingPackaging).toBe(true);
+        expect(component.correctionAcknowledged).toBe(false);
+        expect(fixture.nativeElement.textContent).toContain('remain archived');
+        expect(fixture.nativeElement.querySelector('input[name="preferred"]')).toBeNull();
+        await component.save();
+        expect(data.saveItemPackaging).not.toHaveBeenCalled();
+        component.correctionAcknowledged = true;
+        await component.save();
+        expect(data.saveItemPackaging).toHaveBeenCalledWith(
+            10,
+            expect.objectContaining({ correctExistingPackaging: true, acknowledgeHistoricalImpact: true, isPreferred: false }),
+            3,
+        );
+    });
+
+    it('resets correction mode and consent when starting another edit or changing products', () => {
+        component.start(variant, true);
+        component.correctExistingPackaging = true;
+        component.correctionAcknowledged = true;
+        component.start(variant, true);
+        expect(component.correctExistingPackaging).toBe(false);
+        expect(component.correctionAcknowledged).toBe(false);
+        component.correctExistingPackaging = true;
+        component.correctionAcknowledged = true;
+        component.itemId = 20;
+        component.ngOnChanges();
+        expect(component.correctExistingPackaging).toBe(false);
+        expect(component.correctionAcknowledged).toBe(false);
     });
 
     it('duplicates without replacing the original or copying its preferred flag/barcode', async () => {
@@ -172,7 +243,8 @@ describe('ItemPackagingComponent', () => {
     it('shows read-only packaging without edit actions', () => {
         component.readonly = true;
         fixture.detectChanges();
-        expect(fixture.nativeElement.textContent).not.toContain('Edit size');
+        expect(fixture.nativeElement.textContent).not.toContain('Edit package');
+        expect(fixture.nativeElement.textContent).not.toContain('Correct archived package');
         expect(fixture.nativeElement.textContent).not.toContain('Add packaging variant');
         expect(fixture.nativeElement.textContent).not.toContain('Manage shared / legacy containers');
     });

@@ -36,6 +36,8 @@ export class ItemPackagingComponent implements OnChanges, OnDestroy {
     public showArchived = false;
     public draft?: ItemPackagingInput;
     public replacedId?: number;
+    public correctExistingPackaging = false;
+    public correctionAcknowledged = false;
     public showContainerManager = false;
     public editingContainerId: number | null = null;
     public readonly formId = `packaging-form-${nextFormId++}`;
@@ -53,6 +55,8 @@ export class ItemPackagingComponent implements OnChanges, OnDestroy {
         this.context++;
         this.draft = undefined;
         this.replacedId = undefined;
+        this.correctExistingPackaging = false;
+        this.correctionAcknowledged = false;
         this.showContainerManager = false;
         this.editingContainerId = null;
         this.variants = [];
@@ -86,6 +90,8 @@ export class ItemPackagingComponent implements OnChanges, OnDestroy {
         this.showContainerManager = false;
         this.editingContainerId = null;
         this.replacedId = replace ? variant?.id : undefined;
+        this.correctExistingPackaging = replace && variant?.isArchived === true;
+        this.correctionAcknowledged = false;
         this.draft = {
             name: variant?.name || variant?.containerName || '',
             containedPackagingId: variant?.containedPackagingId ?? null,
@@ -99,6 +105,10 @@ export class ItemPackagingComponent implements OnChanges, OnDestroy {
             barcode: replace ? (variant?.barcode ?? null) : null,
             isPreferred: replace ? (variant?.isPreferred ?? false) : false,
         };
+    }
+
+    public get editingArchived(): boolean {
+        return this.variants.some((variant) => variant.id === this.replacedId && variant.isArchived);
     }
 
     public get containedOptions(): (ItemPackagingDTO & { displayName: string })[] {
@@ -210,16 +220,29 @@ export class ItemPackagingComponent implements OnChanges, OnDestroy {
 
     public async save(): Promise<void> {
         if (this.saving || this.loading || this.error || !this.valid || !this.draft) return;
+        if (this.correctExistingPackaging && (!this.replacedId || !this.correctionAcknowledged)) return;
         const context = this.context;
+        const correcting = this.correctExistingPackaging;
         this.saving = true;
         try {
-            const saved = await this.data.saveItemPackaging(this.itemId, { ...this.draft }, this.replacedId);
+            const saved = await this.data.saveItemPackaging(
+                this.itemId,
+                { ...this.draft, ...(correcting ? { correctExistingPackaging: true, acknowledgeHistoricalImpact: true } : {}) },
+                this.replacedId,
+            );
             if (context !== this.context) return;
             this.draft = undefined;
             this.replacedId = undefined;
+            this.correctExistingPackaging = false;
+            this.correctionAcknowledged = false;
             await this.load();
             if (context !== this.context) return;
-            this.notifications.push({ title: 'Packaging Saved', message: 'Existing purchases retain their original sizes.' });
+            this.notifications.push({
+                title: 'Packaging Saved',
+                message: correcting
+                    ? 'Existing purchases and containing packages now use the corrected packaging.'
+                    : 'Existing purchases retain their original sizes.',
+            });
             this.saved.emit(saved);
         } catch {
             if (context === this.context) this.notifications.error('Could not save packaging. Please try again.');
