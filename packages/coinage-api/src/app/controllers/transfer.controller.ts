@@ -7,6 +7,7 @@ import {
     GranularCreateEditTransferModelDTO,
     ReceiptDTO,
     RefundTransferDTO,
+    roundMoney,
     SplitTransferDTO,
     TransferDetailsDTO,
     TransferDTO,
@@ -32,6 +33,7 @@ import { ItemsService } from '../services/items.service';
 import { getReceiptTags, getTransferTags } from '../services/tag-mapper';
 import { TransferItemsService } from '../services/transfer-items.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
+import { assertNonnegativeTransferAmount } from '../services/transfers/transfer-amount';
 import { TransfersService } from '../services/transfers.service';
 
 @UseGuards(AuthGuard)
@@ -108,6 +110,9 @@ export class TransferController {
         if (transfer.targetAccountId == 17 && transfer.targetAccount && transfer.contractor) {
             transfer.targetAccount.name = `${transfer.contractor.name} [Contractor]`;
         }
+        if (transfer.originAccountId == 17 && transfer.originAccount && transfer.contractor) {
+            transfer.originAccount.name = `${transfer.contractor.name} [Contractor]`;
+        }
 
         const transferType = transfer.originAccount.userId === transfer.targetAccount?.userId ? TransferType.INTERNAL.value : transfer.type;
         return {
@@ -123,7 +128,7 @@ export class TransferController {
             contractorId: transfer.contractor?.id,
             categoryId: transfer.category.id,
             tags: getTransferTags(transfer),
-            account: { id: transfer.originAccount?.id ?? 0, name: transfer.originAccount?.name ?? '' },
+            originAccount: { id: transfer.originAccount?.id ?? 0, name: transfer.originAccount?.name ?? '' },
             targetAccount: { id: transfer.targetAccount?.id ?? 0, name: transfer.targetAccount?.name ?? '' },
             otherTransfers: otherTransfers,
             receipt: receiptDto,
@@ -167,8 +172,8 @@ export class TransferController {
             categoryName: transfer.category?.name,
             contractorId: transfer.contractor?.id ?? null,
             contractorName: transfer.contractor?.name ?? null,
-            accountId: transfer.originAccountId,
-            accountName: transfer.originAccount.name,
+            originAccountId: transfer.originAccountId,
+            originAccountName: transfer.originAccount.name,
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
@@ -208,29 +213,29 @@ export class TransferController {
 
     @Post('createAdvanced')
     public async createTransfersFromAdvancedObject(@RequestingUser() user: User, @Body() requestBody: CreateMultipleTransfersDTO): Promise<BaseResponseDTO> {
+        assertNonnegativeTransferAmount(requestBody.amount);
         const directTags = requestBody.tagIds !== undefined ? await this.tagDao.getByIds(requestBody.tagIds) : [];
         const transferEntities: Transfer[] = [];
         const items = await this.itemsService.getByIds(requestBody.items.map((item) => item.itemId));
         const contractor = requestBody.contractorId !== null ? await this.contractorDao.getById(requestBody.contractorId) : null;
-        const account = await this.accountDao.getById(requestBody.accountId);
+        const account = await this.accountDao.getById(requestBody.originAccountId);
 
         // Create transfers from items
         const itemCategoriesIds = [...new Set(items.filter((v) => v !== null).map((i) => i.categoryId) as number[])];
-        for (const categoryId of itemCategoriesIds) {
+        const groups = itemCategoriesIds.map((categoryId) => {
             const itemsForCategory = items.filter((item) => item.categoryId === categoryId);
+            const categoryItemIds = new Set(itemsForCategory.map((item) => item.id));
+            const requestedItemsForCategory = requestBody.items.filter((item) => categoryItemIds.has(item.itemId));
+            const amount = roundMoney(requestedItemsForCategory.reduce((sum, item) => sum + item.calculatedPrice, 0));
+            assertNonnegativeTransferAmount(amount);
+            return { categoryId, requestedItemsForCategory, amount };
+        });
 
-            const requestedItemsForCategory = itemsForCategory.map((item) => {
-                const mappedItem = requestBody.items.find((requestedItem) => requestedItem.itemId === item.id);
-                if (mappedItem === undefined) {
-                    throw new NotFoundException();
-                }
-                return mappedItem;
-            });
-
+        for (const { categoryId, requestedItemsForCategory, amount } of groups) {
             const category = await this.categoryDao.getById(categoryId);
 
             const entity = new Transfer();
-            entity.amount = requestedItemsForCategory.map((i) => i.calculatedPrice).reduce((a, b) => a + b, 0); //requestBody.amount;
+            entity.amount = amount;
             entity.currency = account.currency;
             entity.date = requestBody.date;
             entity.categoryId = category.id;
@@ -274,10 +279,11 @@ export class TransferController {
 
     @Post('save')
     public async saveTransferObject(@RequestingUser() user: User, @Body() transfer: CreateEditTransferModelDTO): Promise<BaseResponseDTO> {
+        assertNonnegativeTransferAmount(transfer.amount);
         const directTags = transfer.tagIds !== undefined ? await this.tagDao.getByIds(transfer.tagIds) : undefined;
         let entity: Transfer;
         const category = await this.categoryDao.getById(transfer.categoryId);
-        const account = await this.accountDao.getById(transfer.accountId);
+        const account = await this.accountDao.getById(transfer.originAccountId);
         const targetAccount = await this.accountDao.getById(transfer.targetAccountId ?? 17);
         const contractor = transfer.contractorId !== null ? await this.contractorDao.getById(transfer.contractorId) : null;
         const receipt = transfer.receiptId !== null ? await this.receiptDao.getById(transfer.receiptId) : null;
@@ -316,7 +322,11 @@ export class TransferController {
 
         if (entity.category.name === 'Paliwo') {
             try {
-                entity.metadata = { unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')), location: entity.description.split(' ')[3] };
+                entity.metadata = {
+                    ...entity.metadata,
+                    unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')),
+                    location: entity.description.split(' ')[3],
+                };
             } catch (e) {
                 console.error('Could not set metadata for transfer on', entity.date);
                 console.error(e);
@@ -381,11 +391,12 @@ export class TransferController {
         if (!transfer.id) {
             throw new BadRequestException('Transfer ID is required for granular save');
         }
+        assertNonnegativeTransferAmount(transfer.amount);
         const directTags = transfer.tagIds !== undefined ? await this.tagDao.getByIds(transfer.tagIds) : undefined;
 
         let entity: Transfer;
         const category = await this.categoryDao.getById(transfer.categoryId);
-        const account = await this.accountDao.getById(transfer.accountId);
+        const account = await this.accountDao.getById(transfer.originAccountId);
         const targetAccount = await this.accountDao.getById(transfer.targetAccountId ?? 17);
         const contractor = transfer.contractorId !== null ? await this.contractorDao.getById(transfer.contractorId) : null;
         const receipt = transfer.receiptId !== null ? await this.receiptDao.getById(transfer.receiptId) : null;
@@ -415,7 +426,11 @@ export class TransferController {
 
         if (entity.category.name === 'Paliwo') {
             try {
-                entity.metadata = { unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')), location: entity.description.split(' ')[3] };
+                entity.metadata = {
+                    ...entity.metadata,
+                    unitPrice: parseFloat(entity.description.split(' ')[1].replace(',', '.')),
+                    location: entity.description.split(' ')[3],
+                };
             } catch (e) {
                 console.error('Could not set metadata for transfer on', entity.date);
                 console.error(e);
@@ -499,6 +514,9 @@ export class TransferController {
         entity.date = target.date;
         entity.accountingDate = target.accountingDate;
         entity.originAccountId = target.originAccountId;
+        entity.targetAccountId = target.targetAccountId;
+        entity.currency = target.currency;
+        entity.ownerUserId = target.ownerUserId;
 
         entity.contractor = target.contractor;
         entity.receiptId = target.receiptId;
@@ -515,28 +533,37 @@ export class TransferController {
 
         const refundTargetId = Math.floor(Number(refundDTO.refundTargetId));
         const refundDate = new Date(refundDTO.refundDate);
+        if (refundTargetId !== Number(transferId) || Number.isNaN(refundDate.getTime())) {
+            throw new BadRequestException('Invalid refund target or date.');
+        }
 
         const transfer = await this.transferDao.getById(transferId);
 
         const refundCategory = await this.categoryDao.getBySystemTag('system-refund');
+        if (!transfer.targetAccountId || !transfer.targetAccount) {
+            throw new BadRequestException('Both accounts are required for a refund.');
+        }
 
         if (transfer.metadata.refundedBy || transfer.metadata.refundTargetId) {
-            throw new Error('Cannot refund a refund or a refund target.');
+            throw new BadRequestException('Cannot refund a refund or a refund target.');
         }
 
         const refundTransferEntity = new Transfer();
         refundTransferEntity.description = `Refund: ${transfer.description}`;
         refundTransferEntity.amount = transfer.amount;
+        refundTransferEntity.currency = transfer.currency;
         refundTransferEntity.type = refundCategory.type;
         refundTransferEntity.categoryId = refundCategory.id;
         refundTransferEntity.date = refundDate;
         refundTransferEntity.accountingDate = refundDate;
         refundTransferEntity.originAccountId = transfer.targetAccountId ?? 0;
         refundTransferEntity.targetAccountId = transfer.originAccountId;
+        refundTransferEntity.originAccount = transfer.targetAccount;
+        refundTransferEntity.targetAccount = transfer.originAccount;
         refundTransferEntity.metadata.refundTargetId = refundTargetId;
         refundTransferEntity.contractor = transfer.contractor;
-        refundTransferEntity.receipt = transfer.receipt;
-        refundTransferEntity.ownerUser = transfer.ownerUser;
+        refundTransferEntity.receiptId = transfer.receiptId;
+        refundTransferEntity.ownerUserId = transfer.ownerUserId;
 
         const inserted = await this.transferDao.save(refundTransferEntity);
 

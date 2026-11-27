@@ -20,8 +20,8 @@ export class TransferDTO {
     @IsString() public categoryName!: string;
     @IsNumber() @IsOptional() public contractorId!: number | null;
     @IsString() @IsOptional() public contractorName!: string | null;
-    @IsNumber() public accountId!: number;
-    @IsString() public accountName!: string;
+    @IsNumber() public originAccountId!: number;
+    @IsString() public originAccountName!: string;
     @IsNumber() public receiptId!: number | null;
     @IsBoolean() public isFlagged!: boolean;
     public tags!: EffectiveTagDTO[];

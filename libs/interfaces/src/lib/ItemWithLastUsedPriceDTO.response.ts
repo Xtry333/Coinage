@@ -1,3 +1,4 @@
+import { DEFAULT_ITEM_KIND } from './ItemKindDTO';
 import { TagDTO } from './TagDTO.response';
 
 export class ItemWithLastUsedPriceDTO {
@@ -10,5 +11,6 @@ export class ItemWithLastUsedPriceDTO {
         public lastUnitPrice: number | null,
         public categoryId: number,
         public tags: TagDTO[] = [],
+        public kindCode: string = DEFAULT_ITEM_KIND,
     ) {}
 }

@@ -4,7 +4,6 @@ import { Subscription } from 'rxjs';
 
 import { ReceiptAiResultDTO, ReceiptDetailsDTO, ReceiptProcessingStatus, ReceiptUploadResponseDTO, TransferType } from '@app/interfaces';
 
-
 import { NavigatorService } from '../app-routing/navigator.service';
 import { CoinageDataService } from '../services/coinage.data-service';
 import { SocketService } from '../services/socket.service';
@@ -140,7 +139,11 @@ export class ReceiptDetailsComponent implements OnInit, OnDestroy {
     }
 
     public get receiptDirectionDisplaySymbol(): string {
-        return TransferType.OUTCOME.symbol;
+        return (this.receiptDetails?.amount ?? 0) < 0 ? TransferType.INCOME.symbol : TransferType.OUTCOME.symbol;
+    }
+
+    public get receiptDisplayAmount(): number {
+        return Math.abs(this.receiptDetails?.amount ?? 0);
     }
 
     public get remainingAmount(): number {

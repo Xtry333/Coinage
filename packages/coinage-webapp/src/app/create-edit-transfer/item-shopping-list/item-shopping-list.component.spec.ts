@@ -43,6 +43,22 @@ describe('ItemShoppingListComponent', () => {
         expect(component).toBeTruthy();
     });
 
+    it('edits a negative price on an ordinary product and emits its signed total', async () => {
+        const item = new ShoppingListItem(12, 'Milk', 6, 0.5, 3, 0, 5);
+        component.preselectedItems = [item];
+        component.ngOnChanges();
+        const totals = jest.spyOn(component.totalCostChanged, 'emit');
+        await load();
+        const price: HTMLInputElement = fixture.nativeElement.querySelector('.price-input');
+        expect(price.hasAttribute('min')).toBe(false);
+        expect(fixture.nativeElement.querySelector('#itemPrice').hasAttribute('min')).toBe(false);
+        price.value = '-0.50';
+        price.dispatchEvent(new Event('input'));
+        await fixture.whenStable();
+        expect(item).toMatchObject({ amount: 6, price: -0.5, totalPrice: -3 });
+        expect(totals).toHaveBeenLastCalledWith(-3);
+    });
+
     it('waits for the picker request before showing the controls', async () => {
         let resolveItems!: (items: ItemWithLastUsedPriceDTO[]) => void;
         data.getAllItems.mockReturnValue(new Promise<ItemWithLastUsedPriceDTO[]>((resolve) => (resolveItems = resolve)));

@@ -81,9 +81,9 @@
         <h4 class="mb-3 text-sm font-semibold text-gray-700">Transfer Details</h4>
         <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div>
-                <label class="mb-1 block text-sm text-gray-600" for="reviewAccountSelect">Account</label>
+                <label class="mb-1 block text-sm text-gray-600" for="reviewAccountSelect">Origin account</label>
                 <ng-select
-                    [(ngModel)]="selectedAccountId"
+                    [(ngModel)]="selectedOriginAccountId"
                     [items]="accounts"
                     [clearable]="false"
                     bindValue="id"
@@ -127,7 +127,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @for (item of items; track item.name; let i = $index) {
+                    @for (item of items; track item; let i = $index) {
                         <tr class="border-t border-gray-100 transition-colors" [class.opacity-50]="!item.included" [class.bg-gray-50]="!item.included">
                             <!-- Checkbox -->
                             <td class="px-3 py-2">
@@ -190,7 +190,6 @@
                                     [(ngModel)]="item.price"
                                     (ngModelChange)="onPriceChange(item)"
                                     type="number"
-                                    min="0"
                                     step="0.01"
                                 />
                             </td>
@@ -202,7 +201,6 @@
                                     [(ngModel)]="item._total"
                                     (ngModelChange)="onTotalChange(item)"
                                     type="number"
-                                    min="0"
                                     step="0.01"
                                 />
                             </td>
@@ -246,9 +244,12 @@
             </button>
         </div>
 
+        @if (totalAmount < 0) {
+            <p class="text-sm text-red-700" role="alert">Receipt transfers cannot have negative totals. Use an explicit refund for returns.</p>
+        }
         <button
             class="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
-            [disabled]="isSubmitting || !selectedAccountId || includedItems.length === 0"
+            [disabled]="isSubmitting || !selectedOriginAccountId || includedItems.length === 0 || totalAmount < 0"
             (click)="onConfirm()"
             type="button"
         >

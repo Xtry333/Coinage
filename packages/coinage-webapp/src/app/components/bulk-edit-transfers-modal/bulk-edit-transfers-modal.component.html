@@ -1,6 +1,6 @@
 <div class="min-w-[600px] space-y-6">
     <div class="border-b border-gray-200 pb-4">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">Bulk Edit Transfers</h3>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">Bulk Edit Transfers</h3>
         <p class="mt-1 text-sm text-gray-500">
             Edit {{ selectedTransferIds.length }} selected transfer{{ selectedTransferIds.length === 1 ? '' : 's' }}. Only fields you fill in will be updated.
         </p>
@@ -12,7 +12,7 @@
             <div class="space-y-2">
                 <label class="block text-sm font-medium text-gray-700" for="bulkDescription"> Description </label>
                 <input
-                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                     id="bulkDescription"
                     [(ngModel)]="bulkEditData.description"
                     name="description"
@@ -61,13 +61,13 @@
 
             <!-- Account -->
             <div class="space-y-2">
-                <label class="block text-sm font-medium text-gray-700" for="bulkAccount"> Account </label>
+                <label class="block text-sm font-medium text-gray-700" for="bulkAccount"> Origin account </label>
                 <ng-select
-                    [(ngModel)]="bulkEditData.accountId"
+                    [(ngModel)]="bulkEditData.originAccountId"
                     [clearable]="true"
                     [editableSearchTerm]="true"
                     [items]="accounts"
-                    name="account"
+                    name="originAccount"
                     labelForId="bulkAccount"
                     bindValue="id"
                     bindLabel="name"
@@ -121,7 +121,7 @@
             <div class="space-y-2">
                 <label class="block text-sm font-medium text-gray-700" for="bulkDate"> Date </label>
                 <input
-                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+                    class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                     id="bulkDate"
                     [(ngModel)]="bulkEditData.date"
                     name="date"
@@ -134,14 +134,14 @@
         <!-- Action Buttons -->
         <div class="flex justify-end space-x-3 border-t border-gray-200 pt-6">
             <button
-                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
                 (click)="onClose()"
                 type="button"
             >
                 Cancel
             </button>
             <button
-                class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none disabled:opacity-50"
                 [disabled]="!hasChanges() || isLoading"
                 type="submit"
             >

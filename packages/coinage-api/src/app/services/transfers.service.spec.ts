@@ -221,7 +221,7 @@ describe('TransfersService', () => {
 
             const [dto] = await service.getAllFilteredPagedDTO({} as any);
 
-            expect(dto.accountName).toBe('Main Account [PLN]');
+            expect(dto.originAccountName).toBe('Main Account [PLN]');
         });
 
         it('should set receiptId to null when transfer has no receipt', async () => {

@@ -11,7 +11,7 @@
                         <th class="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">Standard Price</th>
                         <th class="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">Quantity</th>
                         <th class="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">Total</th>
-                        <th class="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">Account</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">Origin account</th>
                         <th class="px-4 py-3 text-right text-xs font-medium tracking-wider text-gray-500 uppercase">Date</th>
                     </tr>
                 </thead>
@@ -47,15 +47,15 @@
                             <td class="px-4 py-3 text-right text-sm text-gray-900">{{ getStandardPrice(details) }}</td>
                             <td class="px-4 py-3 text-right text-sm text-gray-900">{{ details.quantity }}</td>
                             <td class="px-4 py-3 text-right font-mono text-sm font-medium text-gray-900">
-                                {{ details.unitPrice * details.quantity | plnCurrency }}
+                                {{ (details.totalPrice ?? details.unitPrice * details.quantity) - (details.setDiscount ?? 0) | plnCurrency }}
                             </td>
-                            <td class="px-4 py-3 text-right text-sm text-gray-900">{{ details.accountName }}</td>
+                            <td class="px-4 py-3 text-right text-sm text-gray-900">{{ details.originAccountName }}</td>
                             <td class="px-4 py-3 text-right text-sm whitespace-nowrap text-gray-900">
                                 {{ details.date | date }}
                             </td>
                         </tr>
                     }
-                    @if (showSummary && hasAnyRows && totalPrice > 0) {
+                    @if (showSummary && hasAnyRows) {
                         <tr class="border-t-2 border-gray-300 bg-gray-50 font-semibold">
                             <td class="px-4 py-3 text-sm text-gray-900">Total</td>
                             <td class="px-4 py-3 text-sm text-gray-900"></td>

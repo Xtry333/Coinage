@@ -21,6 +21,7 @@ describe('EditItemComponent', () => {
     let data: {
         getItemDetails: jest.Mock;
         getCategoryList: jest.Mock;
+        getItemKinds: jest.Mock;
         postCreateItem: jest.Mock;
     };
     let navigator: { goTo: jest.Mock; goToNotFoundPage: jest.Mock };
@@ -45,6 +46,12 @@ describe('EditItemComponent', () => {
         data = {
             getItemDetails: jest.fn().mockResolvedValue(item),
             getCategoryList: jest.fn().mockReturnValue(of([{ id: 5, name: 'Groceries' }])),
+            getItemKinds: jest.fn().mockReturnValue(
+                of([
+                    { code: 'PRODUCT', name: 'Product' },
+                    { code: 'DEPOSIT', name: 'Deposit' },
+                ]),
+            ),
             postCreateItem: jest.fn().mockResolvedValue({ insertedId: 12 }),
         };
         navigator = { goTo: jest.fn(), goToNotFoundPage: jest.fn() };
@@ -80,7 +87,7 @@ describe('EditItemComponent', () => {
     it('loads the existing item into an independent editable form', async () => {
         await load();
         expect(data.getItemDetails).toHaveBeenCalledWith(12);
-        expect(component.selectedItemInputs).toEqual(new CreateEditItemDTO(12, 'Brand', 'Milk', 5, 500, Unit.ML, [2], false));
+        expect(component.selectedItemInputs).toEqual(new CreateEditItemDTO(12, 'Brand', 'Milk', 5, 500, Unit.ML, [2], false, 'PRODUCT'));
         expect(component.categories).toEqual([{ id: 5, name: 'Groceries' }]);
         expect(fixture.nativeElement.querySelector('#itemName').value).toBe('Milk');
         expect(fixture.nativeElement.querySelector('#itemBrand').value).toBe('Brand');
@@ -98,7 +105,7 @@ describe('EditItemComponent', () => {
         fixture.nativeElement.querySelector('form').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
         await fixture.whenStable();
 
-        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, 'New brand', 'Oat milk', 7, 500, Unit.ML, [4, 2], false));
+        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, 'New brand', 'Oat milk', 7, 500, Unit.ML, [4, 2], false, 'PRODUCT'));
         expect(data.postCreateItem.mock.calls[0][0]).not.toHaveProperty('itemContainers');
         expect(notifications.push).toHaveBeenCalledWith({ title: 'Item Saved', message: 'Oat milk', linkTo: '/item/details/12' });
         expect(navigator.goTo).toHaveBeenCalledWith('/item/details/12');
@@ -113,7 +120,7 @@ describe('EditItemComponent', () => {
         inputs().brand = ' ';
         inputs().tagIds = [];
         await component.onClickSaveItem();
-        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, null, 'Milk', null, null, null, [], false));
+        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, null, 'Milk', null, null, null, [], false, 'PRODUCT'));
     });
 
     it('allows changing the archived status and saves it with the item', async () => {
@@ -127,7 +134,7 @@ describe('EditItemComponent', () => {
         await component.onClickSaveItem();
 
         expect(inputs().isArchived).toBe(true);
-        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, 'Brand', 'Milk', 5, 500, Unit.ML, [2], true));
+        expect(data.postCreateItem).toHaveBeenCalledWith(new CreateEditItemDTO(12, 'Brand', 'Milk', 5, 500, Unit.ML, [2], true, 'PRODUCT'));
     });
 
     it('loads the archived status into the edit control', async () => {
@@ -136,6 +143,25 @@ describe('EditItemComponent', () => {
 
         const checkbox: HTMLInputElement = fixture.nativeElement.querySelector('#itemArchived');
         expect(checkbox.checked).toBe(true);
+    });
+
+    it('loads reference kinds, defaults to PRODUCT and allows selecting DEPOSIT', async () => {
+        await load();
+        expect(data.getItemKinds).toHaveBeenCalled();
+        expect(inputs().kindCode).toBe('PRODUCT');
+        expect(fixture.nativeElement.querySelector('#itemKind')).not.toBeNull();
+        inputs().kindCode = 'DEPOSIT';
+        await component.onClickSaveItem();
+        expect(data.postCreateItem).toHaveBeenCalledWith(expect.objectContaining({ id: 12, kindCode: 'DEPOSIT' }));
+    });
+
+    it('preserves an existing nonproduct kind when editing unrelated fields', async () => {
+        item.kindCode = 'DEPOSIT';
+        await load();
+        expect(inputs().kindCode).toBe('DEPOSIT');
+        inputs().name = 'Kaucja';
+        await component.onClickSaveItem();
+        expect(data.postCreateItem).toHaveBeenCalledWith(expect.objectContaining({ kindCode: 'DEPOSIT', name: 'Kaucja' }));
     });
 
     it('cancels without saving or mutating the loaded item', async () => {

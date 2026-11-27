@@ -41,7 +41,7 @@ export class AccountDao extends BaseDao {
             .createQueryBuilder()
             .select('COUNT(t.id)', 'count')
             .from(Transfer, 't')
-            .where({ accountId: Equal(id) })
+            .where({ originAccountId: Equal(id) })
             .orWhere({ targetAccountId: Equal(id) })
             .getRawOne<{ count: string | number }>();
         return Number(result?.count ?? 0);
@@ -81,10 +81,10 @@ export class AccountDao extends BaseDao {
                     to_char(t.date, 'YYYY-MM-DD') AS date,
                     t.currency_symbol AS "currencySymbol",
                     COUNT(t.id)::int AS "transferCount",
-                    COALESCE(SUM(CASE WHEN t.account_id = :accountId THEN t.amount ELSE 0 END), 0)::float8 AS outcomes,
+                    COALESCE(SUM(CASE WHEN t.origin_account_id = :accountId THEN t.amount ELSE 0 END), 0)::float8 AS outcomes,
                     COALESCE(SUM(CASE WHEN t.target_account_id = :accountId THEN t.amount ELSE 0 END), 0)::float8 AS incomes
                 FROM account AS a
-                LEFT JOIN transfer AS t ON t.account_id = a.id OR t.target_account_id = a.id
+                LEFT JOIN transfer AS t ON t.origin_account_id = a.id OR t.target_account_id = a.id
                 WHERE a.id = :accountId
                 GROUP BY t.date, t.currency_symbol
             ) AS daily
@@ -100,14 +100,15 @@ export class AccountDao extends BaseDao {
     public async getAccountBalanceForAccountAsOfDate(accountIds: number[], asOfDate: Date): Promise<BalanceDTO[]> {
         const result = await this.dataSource.query(
             `SELECT
-                    t.account_id AS "accountId",
+                    a.id AS "accountId",
                     a.name,
-                    SUM(CASE WHEN t.type = $3 THEN t.amount WHEN t.type = $4 THEN -t.amount ELSE 0 END) AS balance
-                FROM transfer t
-                JOIN account a ON t.account_id = a.id
-                WHERE t.date <= $1::date AND a.id = ANY($2::int[])
-                GROUP BY t.account_id, a.id, a.name`,
-            [this.dateParser.formatMySql(asOfDate), accountIds, TransferType.Income, TransferType.Outcome],
+                    COALESCE(SUM(CASE WHEN t.target_account_id = a.id THEN t.amount ELSE 0 END), 0)
+                        - COALESCE(SUM(CASE WHEN t.origin_account_id = a.id THEN t.amount ELSE 0 END), 0) AS balance
+                FROM account a
+                LEFT JOIN transfer t ON (t.origin_account_id = a.id OR t.target_account_id = a.id) AND t.date <= $1::date
+                WHERE a.id = ANY($2::int[])
+                GROUP BY a.id, a.name`,
+            [this.dateParser.formatMySql(asOfDate), accountIds],
         );
         return result.map((r: { accountId: number; name: string; balance: string }) => {
             return {
@@ -121,14 +122,16 @@ export class AccountDao extends BaseDao {
     public async getSpendingsAsOfDate(accountIds: number[], asOfDate: Date, userId: number): Promise<BalanceDTO[]> {
         const result = await this.dataSource.query(
             `SELECT a.id, a.name,
-                SUM(CASE WHEN t.type = $4 THEN t.amount WHEN t.type = $5 THEN -t.amount ELSE 0 END) AS balance,
+                COALESCE(SUM(CASE WHEN c.type = $5 AND t.target_account_id = a.id THEN t.amount ELSE 0 END), 0)
+                    - COALESCE(SUM(CASE WHEN c.type = $5 AND t.origin_account_id = a.id THEN t.amount ELSE 0 END), 0) AS balance,
                 COUNT(t.id) AS transfer_count
                 FROM account a
                 LEFT JOIN transfer t
-                ON t.account_id = a.id AND t.date = $1::date
-                WHERE a.id = ANY($2::int[]) AND a.user_id = $3 AND t.type = $5 AND a.currency_symbol = $6
+                ON (t.origin_account_id = a.id OR t.target_account_id = a.id) AND t.date = $1::date
+                LEFT JOIN category c ON c.id = t.category_id
+                WHERE a.id = ANY($2::int[]) AND a.user_id = $3 AND a.currency_symbol = $4
                 GROUP BY a.id, a.name`,
-            [this.dateParser.formatMySql(asOfDate), accountIds, userId, TransferType.Income, TransferType.Outcome, 'PLN'],
+            [this.dateParser.formatMySql(asOfDate), accountIds, userId, 'PLN', TransferType.Outcome],
         );
         return result.map((r: { id: number; name: string; balance: string }) => {
             return {
@@ -149,15 +152,16 @@ export class AccountDao extends BaseDao {
             `SELECT
                     EXTRACT(YEAR FROM t.date)::int AS "year",
                     EXTRACT(MONTH FROM t.date)::int AS "month",
-                    SUM(CASE WHEN t.type = $3 THEN t.amount ELSE 0 END) AS income,
-                    SUM(CASE WHEN t.type = $4 THEN t.amount ELSE 0 END) AS outcome,
-                    COUNT(t.id)::text AS count
+                    SUM(CASE WHEN t.target_account_id = a.id THEN t.amount ELSE 0 END) AS income,
+                    SUM(CASE WHEN t.origin_account_id = a.id THEN t.amount ELSE 0 END) AS outcome,
+                    COUNT(DISTINCT t.id)::text AS count
                 FROM transfer AS t
-                WHERE t.account_id = ANY($1::int[]) AND t.date <= $2::date
+                JOIN account a ON (t.origin_account_id = a.id OR t.target_account_id = a.id)
+                WHERE a.id = ANY($1::int[]) AND t.date <= $2::date
                 GROUP BY EXTRACT(YEAR FROM t.date), EXTRACT(MONTH FROM t.date)
                 ORDER BY "year" DESC, "month" DESC
                 LIMIT 12`,
-            [accountIds, this.dateParser.getToday(), TransferType.Income, TransferType.Outcome],
+            [accountIds, this.dateParser.getToday()],
         );
     }
 
@@ -173,7 +177,7 @@ SELECT
     COALESCE(oa.user_id = ta.user_id, false) AS "isInternal",
     COUNT(t.id)::int AS "transferCount"
 FROM transfer AS t
-LEFT JOIN account AS oa ON oa.id = t.account_id
+LEFT JOIN account AS oa ON oa.id = t.origin_account_id
 LEFT JOIN account AS ta ON ta.id = t.target_account_id
 WHERE (oa.user_id = :userId OR ta.user_id = :userId)
     AND t.date <= CURRENT_DATE
@@ -187,7 +191,10 @@ ORDER BY "changeYear" DESC, "changeMonth" DESC
     }
 
     public async getLastTransferDate(accountId: number): Promise<string> {
-        const result = await this.dataSource.query(`SELECT t.date FROM transfer t WHERE t.account_id = $1 ORDER BY t.date DESC LIMIT 1`, [accountId]);
+        const result = await this.dataSource.query(
+            `SELECT t.date FROM transfer t WHERE t.origin_account_id = $1 OR t.target_account_id = $1 ORDER BY t.date DESC LIMIT 1`,
+            [accountId],
+        );
         return result[0]?.date;
     }
 
@@ -217,7 +224,7 @@ ORDER BY "changeYear" DESC, "changeMonth" DESC
                 ta.user_id AS "toUserId",
                 COALESCE(oa.user_id = ta.user_id, false) AS "isInternalTransfer"
             FROM transfer AS t
-            LEFT JOIN account oa ON t.account_id = oa.id
+            LEFT JOIN account oa ON t.origin_account_id = oa.id
             LEFT JOIN account ta ON t.target_account_id = ta.id
             WHERE t.date <= $1::date
                 ${filters.map((filterSql) => `AND ${filterSql}`).join('\n                ')}
@@ -271,7 +278,7 @@ ORDER BY "changeYear" DESC, "changeMonth" DESC
                 oa.user_id AS "userId"
             FROM account AS oa
             LEFT JOIN currency AS c ON oa.currency_symbol = c.symbol
-            LEFT JOIN transfer AS t ON t.account_id = oa.id AND t.date <= $1::date
+            LEFT JOIN transfer AS t ON t.origin_account_id = oa.id AND t.date <= $1::date
             ${filters.length > 0 ? `WHERE ${filters.join(' AND ')}` : ''}
             GROUP BY oa.id, oa.name, c.symbol, oa.currency_symbol, oa.user_id
         `,

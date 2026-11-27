@@ -13,6 +13,7 @@ import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
 import { EtherealTransferService } from '../services/ethereal-transfer.service';
 import { SaveTransfersService } from '../services/transfers/save-transfers.service';
+import { transferExpenseAmount } from '../services/transfers/transfer-amount';
 import { TransfersService } from '../services/transfers.service';
 
 @UseGuards(AuthGuard)
@@ -85,13 +86,13 @@ export class TransfersController {
     }
 
     @Get('/weekly/:id')
-    public async getWeeklySpendings(@Param('id') id: string): Promise<any> {
+    public async getWeeklySpendings(@Param('id') id: string, @RequestingUser('id') userId?: number): Promise<any> {
         const idNum = parseInt(id);
         if (!idNum) {
             return {};
         }
 
-        const transfers = await (await this.transferDao.getAll()).filter((t) => t.type === 'OUTCOME' && t.categoryId === idNum); //getByCategory(idNum);
+        const transfers = (await this.transferDao.getAll()).filter((t) => t.category.type === 'OUTCOME' && t.categoryId === idNum);
 
         const weeks: { week: number; indetifier: string; outcomes: number }[] = [];
         transfers.forEach((transfer) => {
@@ -100,12 +101,12 @@ export class TransfersController {
             //const indetifier = `${date.getFullYear()}.${(date.getMonth() + 1).toString().padStart(2, '0')}`;
             const week = weeks.find((w) => w.indetifier === indetifier);
             if (week) {
-                week.outcomes += transfer.amount;
+                week.outcomes += transferExpenseAmount(transfer, userId);
             } else {
                 weeks.push({
                     indetifier,
                     week: this.getWeek(date),
-                    outcomes: transfer.amount,
+                    outcomes: transferExpenseAmount(transfer, userId),
                 });
             }
         });
@@ -127,7 +128,7 @@ export class TransfersController {
 
             // Filter transfers that belong to the user
             const userAccountIds = (await (await this.userDao.getById(userId)).accounts).map((a) => a.id);
-            const userTransfers = transfers.filter((t) => userAccountIds.includes(t.originAccountId));
+            const userTransfers = transfers.filter((t) => userAccountIds.includes(t.originAccountId) || userAccountIds.includes(t.targetAccountId ?? 0));
 
             if (userTransfers.length !== request.transferIds.length) {
                 return { error: 'Some transfers not found or not owned by user' };
@@ -156,7 +157,7 @@ export class TransfersController {
             if (request.description !== undefined) updateData.description = request.description;
             if (request.categoryId !== undefined) updateData.categoryId = request.categoryId;
             if (request.contractorId !== undefined) updateData.contractorId = request.contractorId;
-            if (request.accountId !== undefined) updateData.accountId = request.accountId;
+            if (request.originAccountId !== undefined) updateData.originAccountId = request.originAccountId;
             if (request.date !== undefined) updateData.date = request.date;
             if (request.scheduleId !== undefined) updateData.scheduleId = request.scheduleId;
             if (request.receiptId !== undefined) updateData.receiptId = request.receiptId;
@@ -178,7 +179,7 @@ export class TransfersController {
 
             // Filter transfers that belong to the user
             const userAccountIds = (await (await this.userDao.getById(userId)).accounts).map((a) => a.id);
-            const userTransfers = transfers.filter((t) => userAccountIds.includes(t.originAccountId));
+            const userTransfers = transfers.filter((t) => userAccountIds.includes(t.originAccountId) || userAccountIds.includes(t.targetAccountId ?? 0));
 
             if (userTransfers.length !== request.transferIds.length) {
                 return { error: 'Some transfers not found or not owned by user' };

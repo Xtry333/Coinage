@@ -44,13 +44,18 @@ export class CategoryDao extends BaseDao {
             .select('category.name', 'categoryName')
             .addSelect('category.id', 'categoryId')
             .addSelect('category.parentId', 'categoryParentId')
-            .addSelect('SUM(transfer.amount)', 'amount')
+            .addSelect(
+                `SUM(CASE WHEN originAccount.userId = :userId THEN transfer.amount ELSE 0 END)
+                 - SUM(CASE WHEN targetAccount.userId = :userId THEN transfer.amount ELSE 0 END)`,
+                'amount',
+            )
             .addSelect('COUNT(transfer.id)', 'numberOfTransfers')
             .leftJoin(Transfer, 'transfer', 'category.id = transfer.category_id')
-            .leftJoin(Account, 'account', 'account.id = transfer.account_id')
+            .leftJoin(Account, 'originAccount', 'originAccount.id = transfer.origin_account_id')
+            .leftJoin(Account, 'targetAccount', 'targetAccount.id = transfer.target_account_id')
             .where('category.type = :type', { type: TransferTypeEnum.OUTCOME })
             .andWhere('EXTRACT(YEAR FROM transfer.date) = :year', { year })
-            .andWhere('account.userId = :userId', { userId });
+            .andWhere('(originAccount.userId = :userId OR targetAccount.userId = :userId)', { userId });
 
         if (month !== undefined) query.andWhere('EXTRACT(MONTH FROM transfer.date) = :month', { month });
         if (day !== undefined) query.andWhere('EXTRACT(DAY FROM transfer.date) = :day', { day });

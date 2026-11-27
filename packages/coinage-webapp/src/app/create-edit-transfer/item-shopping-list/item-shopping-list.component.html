@@ -27,7 +27,6 @@
                     [(ngModel)]="selectedItem.price"
                     name="itemPrice"
                     type="number"
-                    min="0"
                     step="0.01"
                     placeholder="0.00"
                 />
@@ -102,7 +101,6 @@
                                     [(ngModel)]="item.price"
                                     (ngModelChange)="onItemPriceChanged(item)"
                                     type="number"
-                                    min="0"
                                     step="0.01"
                                     placeholder="Price"
                                 />

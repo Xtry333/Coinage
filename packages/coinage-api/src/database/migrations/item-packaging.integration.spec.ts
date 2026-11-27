@@ -42,6 +42,7 @@ integration('item packaging migration on PostgreSQL', () => {
         await runner.query(`
             CREATE TABLE item (
                 id SERIAL PRIMARY KEY, brand VARCHAR(50), name VARCHAR(50), category_id INT,
+                kind_code VARCHAR(32) DEFAULT 'PRODUCT', is_archived BOOLEAN NOT NULL DEFAULT FALSE,
                 container_size DOUBLE PRECISION, container_size_unit VARCHAR(16),
                 created_date TIMESTAMP DEFAULT NOW(), edited_date TIMESTAMP DEFAULT NOW()
             );

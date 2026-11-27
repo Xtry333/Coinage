@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsDate, IsInt, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsDate, IsInt, IsNotIn, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 
 export class ExistingItem {
     @IsNumber()
@@ -14,12 +14,10 @@ export class ExistingItem {
 
     @IsNumber()
     @IsNotIn([NaN])
-    @Min(0)
     public unitPrice: number;
 
     @IsNumber()
     @IsNotIn([NaN])
-    @Min(0)
     public totalSetPrice: number;
 
     @IsNumber()
@@ -105,7 +103,7 @@ export class CreateMultipleTransfersDTO {
     @IsNumber()
     @Min(1)
     @IsNotIn([NaN])
-    public accountId: number;
+    public originAccountId: number;
 
     @IsOptional()
     @IsNumber()
@@ -118,6 +116,8 @@ export class CreateMultipleTransfersDTO {
     public date: Date;
 
     @Type(() => ExistingItem)
+    @IsArray()
+    @ValidateNested({ each: true })
     public items: ExistingItem[];
 
     public constructor(
@@ -125,7 +125,7 @@ export class CreateMultipleTransfersDTO {
         amount: number,
         categoryId: number,
         contractorId: number | null,
-        accountId: number,
+        originAccountId: number,
         date: Date,
         receiptId: number | null,
         items: ExistingItem[] | undefined,
@@ -134,7 +134,7 @@ export class CreateMultipleTransfersDTO {
         this.amount = amount;
         this.mainCategoryId = categoryId;
         this.contractorId = contractorId;
-        this.accountId = accountId;
+        this.originAccountId = originAccountId;
         this.date = date;
         this.receiptId = receiptId;
         this.items = items ?? [];

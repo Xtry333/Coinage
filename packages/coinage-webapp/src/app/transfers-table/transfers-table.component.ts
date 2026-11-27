@@ -224,7 +224,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         return (
             (this.filter.category === undefined || this.caseInsensitiveIncludes(row.categoryName, this.filter.category)) &&
             (this.filter.description === undefined || this.caseInsensitiveIncludes(row.description, this.filter.description)) &&
-            (this.filter.account === undefined || this.caseInsensitiveIncludes(row.accountName, this.filter.account)) &&
+            (this.filter.account === undefined || this.caseInsensitiveIncludes(row.originAccountName, this.filter.account)) &&
             (this.filter.contractor === undefined ||
                 this.caseInsensitiveIncludes(row.contractorName ?? TransfersTableComponent.EMPTY_CONTRACTOR, this.filter.contractor)) &&
             (this.filter.showPlanned || new Date(row.date) < new Date())
@@ -330,7 +330,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
         addTextFilter('description', 'Description', this.filter.description);
         addTextFilter('tagIds', 'Tags (any)', selectedNames(this.filter.tagIds, this.optionsForCheckboxFilters.tags));
         addTextFilter('excludedTagIds', 'Tags (none)', selectedNames(this.filter.excludedTagIds, this.optionsForCheckboxFilters.tags));
-        addTextFilter('accountIds', 'Source account', selectedNames(this.filter.accountIds, this.optionsForCheckboxFilters.accounts, this.filter.account));
+        addTextFilter('accountIds', 'Origin account', selectedNames(this.filter.accountIds, this.optionsForCheckboxFilters.accounts, this.filter.account));
         if (this.filter.amountFrom !== undefined && this.filter.amountTo !== undefined) {
             filters.push({ key: 'amount', label: 'Amount', value: `${this.filter.amountFrom} – ${this.filter.amountTo}` });
         }
@@ -424,7 +424,7 @@ export class TransfersTableComponent implements OnInit, OnChanges {
     public getTransferAccountDetails(transfer: UiTransfer): MoneyAmountComponentData.TransferAccountsData {
         return {
             originAccount: {
-                name: transfer.accountName,
+                name: transfer.originAccountName,
                 balance: 0,
             },
             transferType: transfer.type,
@@ -440,8 +440,8 @@ export class TransfersTableComponent implements OnInit, OnChanges {
             id: -1,
             date: new Date(),
             type: TransferTypeEnum.OUTCOME,
-            accountId: 0,
-            accountName: '',
+            originAccountId: 0,
+            originAccountName: '',
             categoryId: 0,
             contractorName: null,
             contractorId: null,

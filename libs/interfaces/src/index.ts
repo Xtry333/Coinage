@@ -12,6 +12,7 @@ export * from './lib/GlobalSearch.request';
 export * from './lib/GlobalSearch.response';
 export * from './lib/interfaces';
 export * from './lib/ItemDTO.response';
+export * from './lib/ItemKindDTO';
 export * from './lib/ItemPackagingDTO';
 export * from './lib/ItemWithContainerDTO.response';
 export * from './lib/ItemWithLastUsedPriceDTO.response';
@@ -34,6 +35,7 @@ export * from './model/TransferDetails.dto.response';
 export * from './model/PartialDate';
 
 export * from './utils/Expand';
+export * from './utils/money';
 export * from './utils/tag-sets';
 
 export * from './lib/ReceiptAiReviewDTO';

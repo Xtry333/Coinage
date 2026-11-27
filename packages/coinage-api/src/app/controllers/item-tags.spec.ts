@@ -78,6 +78,27 @@ describe('item tag save and listing contracts', () => {
         expect(result.isArchived).toBe(true);
     });
 
+    it('defaults new catalog items to PRODUCT without restricting signed line prices', async () => {
+        await controller.saveItem(new CreateEditItemDTO(null, null, 'Kaucja', 5, null, null));
+        expect(items.save).toHaveBeenCalledWith(expect.objectContaining({ kindCode: 'PRODUCT' }));
+    });
+
+    it('saves a known item kind and includes it in details', async () => {
+        items.kindExists.mockResolvedValue(true);
+        transferItems.findByItemId.mockResolvedValue([]);
+        await controller.saveItem(new CreateEditItemDTO(2, null, 'Kaucja', 5, null, null, undefined, undefined, 'DEPOSIT'));
+        expect(items.kindExists).toHaveBeenCalledWith('DEPOSIT');
+        expect((await controller.getItemById(2)).kindCode).toBe('DEPOSIT');
+    });
+
+    it('rejects an unknown kind before writing an item', async () => {
+        items.kindExists.mockResolvedValue(false);
+        await expect(controller.saveItem(new CreateEditItemDTO(2, null, 'Milk', 5, null, null, undefined, undefined, 'UNKNOWN'))).rejects.toThrow(
+            'Unknown item kind',
+        );
+        expect(items.save).not.toHaveBeenCalled();
+    });
+
     it('rejects unknown tag IDs before writing an item', async () => {
         tags.getByIds.mockRejectedValue(new Error('Unknown tag'));
         await expect(controller.saveItem(new CreateEditItemDTO(2, null, 'Milk', 5, null, null, [99]))).rejects.toThrow('Unknown tag');

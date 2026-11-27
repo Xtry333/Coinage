@@ -5,11 +5,11 @@
                 <th>Description</th>
                 <td>{{ receiptDetails.description }}</td>
             </tr>
-            @if (receiptDetails.amount) {
+            @if (receiptDetails.amount !== null && receiptDetails.amount !== undefined) {
                 <tr>
                     <th>Amount</th>
                     <td>
-                        <span>{{ receiptDirectionDisplaySymbol }} {{ receiptDetails.amount | plnCurrency }}</span>
+                        <span>{{ receiptDirectionDisplaySymbol }} {{ receiptDisplayAmount | plnCurrency }}</span>
                     </td>
                 </tr>
             }

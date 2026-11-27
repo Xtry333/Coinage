@@ -25,7 +25,7 @@ export class TransferDetailsDTO {
     public description!: string;
     public amount!: number;
     public type!: TransferTypeEnum;
-    public account!: AccountDTO;
+    public originAccount!: AccountDTO;
     public targetAccount!: AccountDTO;
     public categoryPath!: CategoryPathDTO[];
     public categoryId!: number;

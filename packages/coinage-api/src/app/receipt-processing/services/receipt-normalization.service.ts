@@ -370,20 +370,21 @@ export class ReceiptNormalizationService {
         receiptPrice: number,
         enriched: Array<{ suggested: SuggestedContainer; lastUnitPrice: number | null }>,
     ): { suggested: SuggestedContainer } | null {
-        if (receiptPrice <= 0) return null;
+        const priceMagnitude = Math.abs(receiptPrice);
+        if (!Number.isFinite(priceMagnitude) || priceMagnitude === 0) return null;
 
         const withPrice = enriched.filter(
-            (e): e is { suggested: SuggestedContainer; lastUnitPrice: number } => e.lastUnitPrice !== null && e.lastUnitPrice > 0,
+            (e): e is { suggested: SuggestedContainer; lastUnitPrice: number } => e.lastUnitPrice !== null && Math.abs(e.lastUnitPrice) > 0,
         );
         if (withPrice.length === 0) return null;
 
         const closest = withPrice.reduce((best, current) => {
-            const currentDiff = Math.abs((current.lastUnitPrice - receiptPrice) / receiptPrice);
-            const bestDiff = Math.abs((best.lastUnitPrice - receiptPrice) / receiptPrice);
+            const currentDiff = Math.abs((Math.abs(current.lastUnitPrice) - priceMagnitude) / priceMagnitude);
+            const bestDiff = Math.abs((Math.abs(best.lastUnitPrice) - priceMagnitude) / priceMagnitude);
             return currentDiff < bestDiff ? current : best;
         });
 
-        const relativeDiff = Math.abs((closest.lastUnitPrice - receiptPrice) / receiptPrice);
+        const relativeDiff = Math.abs((Math.abs(closest.lastUnitPrice) - priceMagnitude) / priceMagnitude);
         if (relativeDiff <= PRICE_MATCH_TOLERANCE) {
             return { suggested: closest.suggested };
         }

@@ -170,10 +170,14 @@ export class AddItemsToTransferComponent implements OnInit {
     }
 
     private autoAdjustAmount(): void {
-        this.selectedItemDetails.amount = Number((this.selectedItemDetails.totalPrice / this.selectedItemDetails.unitPrice).toFixed(3));
+        if (this.selectedItemDetails.unitPrice === 0) return;
+        const amount = this.selectedItemDetails.totalPrice / this.selectedItemDetails.unitPrice;
+        if (amount >= 0) this.selectedItemDetails.amount = Number(amount.toFixed(3));
+        else this.autoAdjustUnitPrice();
     }
 
     private autoAdjustUnitPrice(): void {
+        if (this.selectedItemDetails.amount <= 0) return;
         this.selectedItemDetails.unitPrice = Number((this.selectedItemDetails.totalPrice / this.selectedItemDetails.amount).toFixed(2));
     }
 

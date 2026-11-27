@@ -75,7 +75,7 @@ describe('TransferTableComponent', () => {
         expect(component.appliedFilters).toEqual([
             { key: 'categoryIds', label: 'Category', value: 'Groceries' },
             { key: 'description', label: 'Description', value: 'Lunch' },
-            { key: 'accountIds', label: 'Source account', value: 'Cash' },
+            { key: 'accountIds', label: 'Origin account', value: 'Cash' },
             { key: 'amount', label: 'Amount', value: '0 – 100' },
             { key: 'contractorIds', label: 'Contractor', value: 'Store' },
             { key: 'date', label: 'Date', value: 'Nov 1, 2026 – Nov 15, 2026' },

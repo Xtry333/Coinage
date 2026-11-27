@@ -1,30 +1,69 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsDate, IsInt, IsNotIn, IsNumber, IsOptional, IsString, Min } from 'class-validator';
+import { IsArray, IsDate, IsInt, IsNotIn, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
 
 import { TagDTO } from '../lib/TagDTO.response';
 
 export class ShoppingListItem {
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    public id: number | undefined;
+
+    @IsNumber()
+    @Min(0)
+    public amount: number;
+
+    @IsNumber()
+    public price: number;
+
+    @IsNumber()
+    public totalPrice: number;
+
+    @IsOptional()
+    @IsNumber()
+    @Min(0)
+    public setDiscount: number | undefined;
+
     public constructor(
-        public id: number | undefined,
+        id: number | undefined,
         public name: string,
-        public amount: number,
-        public price: number,
-        public totalPrice: number,
-        public setDiscount: number | undefined,
+        amount: number,
+        price: number,
+        totalPrice: number,
+        setDiscount: number | undefined,
         public categoryId: number | null,
         public containerId?: number | null,
         public transferItemId?: number | null,
         public tags: TagDTO[] = [],
         public packagingId?: number | null,
-    ) {}
+    ) {
+        this.id = id;
+        this.amount = amount;
+        this.price = price;
+        this.totalPrice = totalPrice;
+        this.setDiscount = setDiscount;
+    }
 }
 
 export class GranularTransferItemChanges {
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ShoppingListItem)
+    public addedItems: ShoppingListItem[];
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ShoppingListItem)
+    public editedItems: ShoppingListItem[];
+
     public constructor(
-        public addedItems: ShoppingListItem[],
-        public editedItems: ShoppingListItem[],
+        addedItems: ShoppingListItem[],
+        editedItems: ShoppingListItem[],
         public removedItemIds: number[],
-    ) {}
+    ) {
+        this.addedItems = addedItems;
+        this.editedItems = editedItems;
+    }
 }
 
 export class GranularCreateEditTransferModelDTO {
@@ -34,7 +73,7 @@ export class GranularCreateEditTransferModelDTO {
         amount: number,
         categoryId: number,
         contractorId: number | null,
-        accountId: number,
+        originAccountId: number,
         date: Date,
         receiptId: number | null,
         itemChanges: GranularTransferItemChanges,
@@ -46,7 +85,7 @@ export class GranularCreateEditTransferModelDTO {
         this.amount = amount;
         this.categoryId = categoryId;
         this.contractorId = contractorId;
-        this.accountId = accountId;
+        this.originAccountId = originAccountId;
         this.date = date;
         this.receiptId = receiptId;
         this.itemChanges = itemChanges;
@@ -83,7 +122,7 @@ export class GranularCreateEditTransferModelDTO {
     @IsNumber()
     @Min(1)
     @IsNotIn([NaN])
-    public accountId: number;
+    public originAccountId: number;
 
     @IsOptional()
     @IsNumber()
@@ -102,6 +141,7 @@ export class GranularCreateEditTransferModelDTO {
     public date: Date;
 
     @Type(() => GranularTransferItemChanges)
+    @ValidateNested()
     public itemChanges: GranularTransferItemChanges;
 
     @IsOptional()
@@ -118,7 +158,7 @@ export class CreateEditTransferModelDTO {
         amount: number,
         categoryId: number,
         contractorId: number | null,
-        accountId: number,
+        originAccountId: number,
         date: Date,
         receiptId: number | null,
         items: ShoppingListItem[] | undefined,
@@ -130,7 +170,7 @@ export class CreateEditTransferModelDTO {
         this.amount = amount;
         this.categoryId = categoryId;
         this.contractorId = contractorId;
-        this.accountId = accountId;
+        this.originAccountId = originAccountId;
         this.date = date;
         this.receiptId = receiptId;
         this.items = items ?? [];
@@ -167,7 +207,7 @@ export class CreateEditTransferModelDTO {
     @IsNumber()
     @Min(1)
     @IsNotIn([NaN])
-    public accountId: number;
+    public originAccountId: number;
 
     @IsOptional()
     @IsNumber()
@@ -186,6 +226,8 @@ export class CreateEditTransferModelDTO {
     public date: Date;
 
     @Type(() => ShoppingListItem)
+    @IsArray()
+    @ValidateNested({ each: true })
     public items: ShoppingListItem[];
 
     @IsOptional()

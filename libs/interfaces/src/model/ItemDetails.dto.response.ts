@@ -8,6 +8,7 @@ export class ItemDetailsDTO {
     public id!: number;
     public brand!: string | null;
     public itemName!: string;
+    public kindCode?: string;
     public categoryId!: number | null;
     public categoryName!: string | null;
     public tags!: TagDTO[];
@@ -31,8 +32,10 @@ export class TransferWithItemDetailsDTO {
     public tags!: EffectiveTagDTO[];
     public transferContractorId!: number | null;
     public transferContractorName!: string | null;
-    public accountId!: number;
-    public accountName!: string;
+    public originAccountId!: number;
+    public originAccountName!: string;
+    public totalPrice?: number;
+    public setDiscount?: number;
     public receiptId!: number | null;
     public quantity!: number;
     public unitPrice!: number;

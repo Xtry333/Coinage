@@ -162,6 +162,9 @@ export class TransferItemsTableComponent {
     }
 
     public get totalPrice(): number {
-        return this.transfersWithItem.reduce((acc, transferItem) => (acc += transferItem.quantity * transferItem.unitPrice), 0);
+        return this.transfersWithItem.reduce(
+            (acc, transferItem) => acc + (transferItem.totalPrice ?? transferItem.quantity * transferItem.unitPrice) - (transferItem.setDiscount ?? 0),
+            0,
+        );
     }
 }

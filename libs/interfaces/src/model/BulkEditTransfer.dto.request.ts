@@ -24,7 +24,7 @@ export class BulkEditTransferDTO {
     @IsOptional()
     @IsNumber()
     @Min(1)
-    public accountId?: number;
+    public originAccountId?: number;
 
     @IsOptional()
     @IsDate()

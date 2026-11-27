@@ -386,6 +386,21 @@ describe('ReceiptNormalizationService', () => {
                 expect(result.items[0].containerConfidence).toBe('dimension-match');
             });
 
+            it.each([-2.49, 2.49])('matches packaging by magnitude without changing a signed price of %s', async (price) => {
+                itemsWithContainersDao.getContainersUsedWithItem.mockResolvedValue([
+                    makeItemContainerPair(42, 7, 'Small', { volume: 1, volumeUnit: 'l' }),
+                    makeItemContainerPair(42, 8, 'Large', { volume: 2, volumeUnit: 'l' }),
+                ]);
+                dataSource.query = jest.fn().mockResolvedValue([
+                    { containerId: 7, lastUnitPrice: -2.39 },
+                    { containerId: 8, lastUnitPrice: 4.99 },
+                ]);
+                const result = await service.normalize({ items: [{ name: 'Mleko UHT 3,2%', price }] });
+                expect(result.items[0].price).toBe(price);
+                expect(result.items[0].suggestedContainer?.id).toBe(7);
+                expect(result.items[0].containerConfidence).toBe('price-match');
+            });
+
             it('does not auto-assign the only variant when the receipt specifies a different size', async () => {
                 itemsWithContainersDao.getContainersUsedWithItem.mockResolvedValue([makeItemContainerPair(42, 7, 'Small', { volume: 0.5, volumeUnit: 'l' })]);
                 dataSource.query = jest.fn().mockResolvedValue([{ containerId: 7, lastUnitPrice: 2.49 }]);

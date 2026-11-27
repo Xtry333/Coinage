@@ -1,12 +1,14 @@
-import { Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Get, Param, ParseIntPipe, Post, UseGuards } from '@nestjs/common';
 
 import { parseUnit } from '@app/common-units';
 import {
     AdvancedItemContainer,
     BaseResponseDTO,
     CreateEditItemDTO,
+    DEFAULT_ITEM_KIND,
     ItemContainer,
     ItemDetailsDTO,
+    ItemKindDTO,
     ItemWithContainerDTO,
     ItemWithLastUsedPriceDTO,
     TransferWithItemDetailsDTO,
@@ -33,6 +35,11 @@ export class ItemsController {
     @Get('/all')
     public async getAllItems(): Promise<ItemWithLastUsedPriceDTO[]> {
         return this.itemDao.getAllWithLastUsedPrice();
+    }
+
+    @Get('/kinds')
+    public getItemKinds(): Promise<ItemKindDTO[]> {
+        return this.itemDao.getKinds();
     }
 
     @Get('/all/detailed')
@@ -62,6 +69,7 @@ export class ItemsController {
             const itemData: ItemWithContainerDTO = existing || {
                 id: item?.id || 0,
                 name: item?.name || '',
+                kindCode: item?.kindCode ?? DEFAULT_ITEM_KIND,
                 brand: item?.brand || null,
                 categoryId: category?.id || 0,
                 categoryName: category?.name || null,
@@ -103,6 +111,7 @@ export class ItemsController {
             itemContainerMap.set(`${item.id}-no-container`, {
                 id: item.id,
                 name: item.name,
+                kindCode: item.kindCode ?? DEFAULT_ITEM_KIND,
                 brand: item.brand,
                 categoryId: item.categoryId ?? 0,
                 categoryName: category?.name ?? null,
@@ -175,6 +184,7 @@ export class ItemsController {
             id: item.id,
             brand: item.brand,
             itemName: item.name,
+            kindCode: item.kindCode ?? DEFAULT_ITEM_KIND,
             categoryId: category?.id ?? null,
             categoryName: category?.name ?? null,
             tags: uniqueTags(item.tags),
@@ -193,6 +203,11 @@ export class ItemsController {
 
         entity.brand = item.brand;
         entity.name = item.name;
+        const kindCode = item.kindCode ?? entity.kindCode ?? DEFAULT_ITEM_KIND;
+        if (item.kindCode !== undefined && !(await this.itemDao.kindExists(kindCode))) {
+            throw new BadRequestException('Unknown item kind.');
+        }
+        entity.kindCode = kindCode;
         entity.categoryId = item.categoryId;
         entity.containerSize = item.containerSize;
         entity.containerSizeUnit = item.containerSizeUnit;
@@ -237,12 +252,14 @@ export class ItemsController {
             tags: getTransferTags(transfer),
             transferContractorId: transfer.contractor?.id ?? null,
             transferContractorName: transfer.contractor?.name ?? null,
-            accountId: transfer.originAccountId,
-            accountName: transfer.originAccount.name,
+            originAccountId: transfer.originAccountId,
+            originAccountName: transfer.originAccount.name,
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
             quantity: transferItem.quantity,
             unitPrice: transferItem.unitPrice,
+            totalPrice: transferItem.totalSetPrice,
+            setDiscount: transferItem.totalSetDiscount,
             containerName: containerName,
             containerWeight: containerWeight,
             containerWeightUnit: containerWeightUnit,

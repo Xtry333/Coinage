@@ -1,3 +1,6 @@
+import { Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsDateString, IsInt, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
+
 export interface NormalizedReceiptItemDTO {
     itemId: number | null;
     isNew: boolean;
@@ -47,19 +50,49 @@ export interface ReceiptAiResultDTO {
     normalized: NormalizedReceiptDTO;
 }
 
-export interface ConfirmReceiptItemDTO {
+export class ConfirmReceiptItemDTO {
+    @IsOptional()
+    @IsInt()
+    @Min(1)
     packagingId?: number | null;
-    itemId: number | null;
-    name: string;
-    price: number;
-    quantity: number;
-    isNew: boolean;
-    included: boolean;
+
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    itemId!: number | null;
+
+    @IsString()
+    name!: string;
+
+    @IsNumber()
+    price!: number;
+
+    @IsNumber()
+    @Min(0)
+    quantity!: number;
+
+    @IsBoolean()
+    isNew!: boolean;
+
+    @IsBoolean()
+    included!: boolean;
 }
 
-export interface ConfirmReceiptDTO {
-    accountId: number;
-    date: string;
-    contractorId: number | null;
-    items: ConfirmReceiptItemDTO[];
+export class ConfirmReceiptDTO {
+    @IsInt()
+    @Min(1)
+    originAccountId!: number;
+
+    @IsDateString()
+    date!: string;
+
+    @IsOptional()
+    @IsInt()
+    @Min(1)
+    contractorId!: number | null;
+
+    @IsArray()
+    @ValidateNested({ each: true })
+    @Type(() => ConfirmReceiptItemDTO)
+    items!: ConfirmReceiptItemDTO[];
 }

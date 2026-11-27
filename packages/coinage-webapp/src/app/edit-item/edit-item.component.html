@@ -43,6 +43,21 @@
                             placeholder="Uncategorized"
                         ></ng-select>
                     </div>
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700" for="itemKind">Kind</label>
+                        <ng-select
+                            [(ngModel)]="selectedItemInputs.kindCode"
+                            [items]="itemKinds"
+                            [clearable]="false"
+                            [disabled]="saving"
+                            name="itemKind"
+                            labelForId="itemKind"
+                            bindValue="code"
+                            bindLabel="name"
+                            required
+                        ></ng-select>
+                        <p class="text-xs text-gray-500">Classification only. Every kind supports positive and negative item prices.</p>
+                    </div>
                 </fieldset>
 
                 <div class="flex items-start gap-3">

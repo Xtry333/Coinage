@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnChanges, OnI
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { NgSelectComponent } from '@ng-select/ng-select';
 
-import { ContainerDTO, CreateEditItemDTO, ItemPackagingDTO, ItemWithLastUsedPriceDTO, ShoppingListItem } from '@app/interfaces';
+import { ContainerDTO, CreateEditItemDTO, ItemPackagingDTO, ItemWithLastUsedPriceDTO, ShoppingListItem, roundMoney } from '@app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
@@ -128,6 +128,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             name,
             categoryId: 0,
             lastUnitPrice: 0,
+            kindCode: 'PRODUCT',
             lastUsedDate: null,
             containerSize: null,
             containerSizeUnit: null,
@@ -145,7 +146,7 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
             item?.name ?? this.selectedItem.name,
             this.selectedItem.amount,
             this.selectedItem.price,
-            this.selectedItem.price * this.selectedItem.amount,
+            roundMoney(this.selectedItem.price * this.selectedItem.amount),
             this.selectedItem.setDiscount ?? 0,
             item?.categoryId ?? 0,
             this.selectedItem.containerId,
@@ -169,12 +170,12 @@ export class ItemShoppingListComponent implements OnInit, OnChanges {
     }
 
     public onItemQuantityChanged(item: ShoppingListItem): void {
-        item.totalPrice = item.amount * item.price;
+        item.totalPrice = roundMoney(item.amount * item.price);
         this.emitItemListChanges();
     }
 
     public onItemPriceChanged(item: ShoppingListItem): void {
-        item.totalPrice = item.amount * item.price;
+        item.totalPrice = roundMoney(item.amount * item.price);
         this.emitItemListChanges();
     }
 

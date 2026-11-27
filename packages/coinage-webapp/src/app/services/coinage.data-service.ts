@@ -24,6 +24,7 @@ import {
     GetFilteredTransfersRequest,
     GranularCreateEditTransferModelDTO,
     ItemDetailsDTO,
+    ItemKindDTO,
     ItemPackagingDTO,
     ItemPackagingSaveInput,
     ItemWithContainerDTO,
@@ -271,6 +272,10 @@ export class CoinageDataService {
 
     public getItemDetails(id: number): Promise<ItemDetailsDTO> {
         return lastValueFrom(this.http.get<ItemDetailsDTO>(`${CoinageDataService.API_URL}item/${id}`).pipe(map((i) => plainToInstance(ItemDetailsDTO, i))));
+    }
+
+    public getItemKinds(): Observable<ItemKindDTO[]> {
+        return this.http.get<ItemKindDTO[]>(`${CoinageDataService.API_URL}items/kinds`);
     }
 
     public postCreateAdvancedTransfers(request: CreateMultipleTransfersDTO): Promise<BaseResponseDTO> {

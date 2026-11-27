@@ -27,7 +27,7 @@ export interface NewTransferObject {
     transferDate: string;
     categoryId?: number;
     contractorId?: number | null;
-    accountId?: number;
+    originAccountId?: number;
 }
 
 @Component({
@@ -125,7 +125,7 @@ export class CreateMultipleTransfersComponent implements OnInit {
 
     public async onClickCreateTransfer(): Promise<void> {
         console.log(this.itemsInTransfers);
-        if (!this.selectedDetails?.accountId) {
+        if (!this.selectedDetails?.originAccountId) {
             this.newTransferDetailsComponent?.first.highlightAccountSelect();
             throw new Error('Select account!');
         }
@@ -133,7 +133,7 @@ export class CreateMultipleTransfersComponent implements OnInit {
             amount: 0,
             mainCategoryId: 1,
             contractorId: this.selectedDetails?.contractorId ?? null,
-            accountId: this.selectedDetails?.accountId,
+            originAccountId: this.selectedDetails?.originAccountId,
             receiptId: null,
             date: new Date(`${this.selectedDetails.transferDate} 12:00`),
             items: this.itemsInTransfers.map((i) => new ExistingItem(i.id ?? 0, i.amount, i.unitPrice, i.totalPrice, i.setDiscount ?? 0)),

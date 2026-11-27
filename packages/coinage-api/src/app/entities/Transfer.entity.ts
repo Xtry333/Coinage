@@ -1,4 +1,4 @@
-import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Check, Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Account } from './Account.entity';
 import { Category } from './Category.entity';
@@ -20,6 +20,7 @@ export enum TransferTypeEnum {
 }
 
 @Entity()
+@Check('ck_transfer_amount_nonnegative', '"amount" >= 0')
 export class Transfer extends WithDateEntity {
     public constructor() {
         super();
@@ -93,11 +94,11 @@ export class Transfer extends WithDateEntity {
     @JoinColumn({ name: 'schedule_id' })
     public schedule!: Promise<Schedule | null>;
 
-    @Column({ name: 'account_id', nullable: false })
+    @Column({ name: 'origin_account_id', nullable: false })
     public originAccountId!: number;
 
     @ManyToOne(() => Account, { eager: true, onUpdate: 'CASCADE', onDelete: 'RESTRICT' })
-    @JoinColumn({ name: 'account_id' })
+    @JoinColumn({ name: 'origin_account_id' })
     public originAccount!: Account;
 
     @Column({ name: 'target_account_id', nullable: false })

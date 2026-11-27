@@ -9,6 +9,7 @@ import { transferTagExistsCondition } from './tag-search';
 import { Tag } from '../entities/Tag.entity';
 import { Transfer } from '../entities/Transfer.entity';
 import { TemplateNameMapperService } from '../services/template-name-mapper.service';
+import { prepareTransferForSave } from '../services/transfers/transfer-amount';
 import { Writeable } from '../types/Writeable.type';
 
 type KeysOfType<O, T> = {
@@ -36,6 +37,7 @@ export class TransferDao extends BaseDao {
 
     public async getAll() {
         const transfers = await this.transferRepository.find({ order: { date: 'DESC', id: 'DESC' } });
+        transfers.forEach((transfer) => (transfer.type = this.getTransferType(transfer).value));
         this.templateNameMapperService.mapTransfersTemplateNames(transfers);
         return transfers;
     }
@@ -50,6 +52,7 @@ export class TransferDao extends BaseDao {
             skip: params.rowsPerPage * (params.page - 1),
         });
 
+        transfers.forEach((transfer) => (transfer.type = this.getTransferType(transfer).value));
         this.templateNameMapperService.mapTransfersTemplateNames(transfers);
         return transfers;
     }
@@ -153,6 +156,7 @@ export class TransferDao extends BaseDao {
             .take(count)
             .getMany();
 
+        transfers.forEach((transfer) => (transfer.type = this.getTransferType(transfer).value));
         this.templateNameMapperService.mapTransfersTemplateNames(transfers);
         return transfers;
     }
@@ -165,6 +169,7 @@ export class TransferDao extends BaseDao {
         //     whereOptions.contractorId = IsNull();
         // }
         const transfers = await this.transferRepository.find({ where: whereOptions, order: { createdDate: 'DESC', description: 'ASC' } });
+        transfers.forEach((transfer) => (transfer.type = this.getTransferType(transfer).value));
         this.templateNameMapperService.mapTransfersTemplateNames(transfers);
         return transfers;
     }
@@ -179,10 +184,11 @@ export class TransferDao extends BaseDao {
     }
 
     public async insert(transfer: Transfer): Promise<InsertResult> {
-        return await this.transferRepository.insert(transfer);
+        return await this.transferRepository.insert(prepareTransferForSave(transfer));
     }
 
     public async save(transfer: Writeable<Transfer>): Promise<Transfer> {
+        prepareTransferForSave(transfer);
         transfer.editedDate = new Date();
         return await this.transferRepository.save(transfer);
     }

@@ -1,14 +1,14 @@
 <div class="grid grid-cols-1 gap-3 md:grid-cols-3">
     <div class="flex flex-col">
-        <label for="selectedAccountInput">Virtual Account</label>
+        <label for="selectedAccountInput">Origin account</label>
         <ng-select
             #accountSelect
-            [(ngModel)]="selected.accountId"
+            [(ngModel)]="selected.originAccountId"
             [clearable]="false"
             [editableSearchTerm]="true"
             [items]="accounts"
             (change)="onAccountChanged($event)"
-            name="accountId"
+            name="originAccountId"
             labelForId="selectedAccountInput"
             placeholder="Search"
             required="true"

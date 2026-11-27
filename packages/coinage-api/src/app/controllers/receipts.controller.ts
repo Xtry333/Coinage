@@ -32,6 +32,7 @@ import {
     ReceiptUploadResponseDTO,
     TransferDTO,
     TransferType,
+    roundMoney,
 } from '@app/interfaces';
 
 import { AccountDao } from '../daos/account.dao';
@@ -48,6 +49,7 @@ import { ReceiptQueuedEvent } from '../receipt-processing/events/receipt-queued.
 import { AuthGuard, RequestingUser } from '../services/auth.guard';
 import { ItemPackagingService } from '../services/item-packaging.service';
 import { getReceiptTags, getTransferTags } from '../services/tag-mapper';
+import { assertNonnegativeTransferAmount, transferExpenseAmount } from '../services/transfers/transfer-amount';
 import { TransfersService } from '../services/transfers.service';
 
 const UPLOAD_DIR = join(process.cwd(), 'uploads', 'receipts');
@@ -227,7 +229,7 @@ export class ReceiptsController {
         @Body() body: ConfirmReceiptDTO,
     ): Promise<BaseResponseDTO> {
         const receipt = await this.receiptDao.getById(id);
-        const account = await this.accountDao.getById(body.accountId);
+        const account = await this.accountDao.getById(body.originAccountId);
         const contractor = body.contractorId ? await this.contractorDao.getById(body.contractorId) : null;
         const date = new Date(body.date);
 
@@ -282,12 +284,18 @@ export class ReceiptsController {
             categoryMap.set(item.categoryId, group);
         }
 
+        const groups = [...categoryMap].map(([categoryId, items]) => {
+            const amount = roundMoney(items.reduce((sum, item) => sum + roundMoney(item.price * item.quantity), 0));
+            assertNonnegativeTransferAmount(amount);
+            return { categoryId, items, amount };
+        });
+
         const transferIds: number[] = [];
-        for (const [categoryId, items] of categoryMap) {
+        for (const { categoryId, items, amount } of groups) {
             const category = await this.categoryDao.getById(categoryId);
 
             const transfer = new Transfer();
-            transfer.amount = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+            transfer.amount = amount;
             transfer.currency = account.currency;
             transfer.date = date;
             transfer.categoryId = category.id;
@@ -307,7 +315,7 @@ export class ReceiptsController {
                 ti.itemId = item.itemId;
                 ti.quantity = item.quantity;
                 ti.unitPrice = item.price;
-                ti.totalSetPrice = item.price * item.quantity;
+                ti.totalSetPrice = roundMoney(item.price * item.quantity);
                 ti.totalSetDiscount = 0;
                 ti.packagingId = item.packagingId;
                 ti.containerId = item.containerId;
@@ -319,7 +327,7 @@ export class ReceiptsController {
         }
 
         // Update receipt with confirmed data
-        receipt.amount = resolvedItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
+        receipt.amount = roundMoney(resolvedItems.reduce((sum, i) => sum + roundMoney(i.price * i.quantity), 0));
         receipt.date = date;
         receipt.contractorId = contractor?.id ?? null;
         await this.receiptDao.save(receipt);
@@ -329,7 +337,7 @@ export class ReceiptsController {
     }
 
     @Get(':id/details')
-    public async getReceiptDetails(@Param('id', ParseIntPipe) id: number): Promise<ReceiptDetailsDTO> {
+    public async getReceiptDetails(@Param('id', ParseIntPipe) id: number, @RequestingUser('id') userId?: number): Promise<ReceiptDetailsDTO> {
         const receipt = await this.receiptDao.getById(id);
 
         return {
@@ -338,8 +346,8 @@ export class ReceiptsController {
             nextTransferDate: this.getNextTransferDate(receipt.transfers),
             description: receipt.description,
             amount: Number(receipt.amount),
-            totalAmount: this.calculateTotalAmount(receipt.transfers, true),
-            totalTransferred: this.calculateTotalAmount(receipt.transfers, false),
+            totalAmount: this.calculateTotalAmount(receipt.transfers, true, userId),
+            totalTransferred: this.calculateTotalAmount(receipt.transfers, false, userId),
             contractorId: receipt.contractor?.id ?? null,
             contractorName: receipt.contractor?.name ?? null,
             allTransfers: receipt.transfers.map((t) => this.toTransferDTO(t)),
@@ -347,11 +355,12 @@ export class ReceiptsController {
         };
     }
 
-    private calculateTotalAmount(transfers: Transfer[], withPlanned: boolean): number {
-        return Math.abs(
+    private calculateTotalAmount(transfers: Transfer[], withPlanned: boolean, userId?: number): number {
+        return Number(
             transfers
-                ?.filter((t) => withPlanned || new Date(t.date) <= new Date())
-                .reduce((amount, t) => amount + Number(t.amount) * TransferType[t.category.type].mathSymbol, 0),
+                .filter((t) => withPlanned || new Date(t.date) <= new Date())
+                .reduce((amount, t) => amount + transferExpenseAmount(t, userId), 0)
+                .toFixed(2),
         );
     }
 
@@ -362,13 +371,18 @@ export class ReceiptsController {
             description: transfer.description,
             amount: Number(transfer.amount),
             currency: transfer.currency.symbol,
-            type: transfer.type,
+            type:
+                transfer.originAccount.userId === transfer.targetAccount?.userId
+                    ? TransferType.INTERNAL.value
+                    : transfer.originAccount.userId === transfer.ownerUserId
+                      ? TransferType.OUTCOME.value
+                      : TransferType.INCOME.value,
             categoryId: transfer.category.id,
             categoryName: transfer.category.name,
             contractorId: transfer.contractorId ?? null,
             contractorName: transfer.contractor?.name ?? null,
-            accountId: transfer.originAccount.id,
-            accountName: transfer.originAccount.name,
+            originAccountId: transfer.originAccount.id,
+            originAccountName: transfer.originAccount.name,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,
             tags: getTransferTags(transfer),

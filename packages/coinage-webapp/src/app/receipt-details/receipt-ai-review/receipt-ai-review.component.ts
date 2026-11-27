@@ -1,8 +1,16 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
-import { AccountDTO, ConfirmReceiptDTO, ConfirmReceiptItemDTO, ItemPackagingDTO, NormalizedReceiptItemDTO, ReceiptAiResultDTO } from '@app/interfaces';
+import {
+    AccountDTO,
+    ConfirmReceiptDTO,
+    ConfirmReceiptItemDTO,
+    ItemPackagingDTO,
+    NormalizedReceiptItemDTO,
+    ReceiptAiResultDTO,
+    roundMoney,
+} from '@app/interfaces';
 
 import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
@@ -33,7 +41,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
     @Output() public retryRequested = new EventEmitter<void>();
 
     public accounts: AccountDTO[] = [];
-    public selectedAccountId?: number;
+    public selectedOriginAccountId?: number;
     public overrideDate = '';
     public items: ReviewItem[] = [];
     public isSubmitting = false;
@@ -63,7 +71,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
             included: true,
             packagingId: item.needsContainerConfirmation ? undefined : item.suggestedContainer?.packagingId,
             _lastEdited: 'price' as const,
-            _total: +(item.price * item.quantity).toFixed(2),
+            _total: roundMoney(item.price * item.quantity),
         }));
     }
 
@@ -133,19 +141,19 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
 
     public onQtyChange(item: ReviewItem): void {
         item._lastEdited = 'qty';
-        item._total = +(item.price * item.quantity).toFixed(2);
+        item._total = roundMoney(item.price * item.quantity);
     }
 
     public onPriceChange(item: ReviewItem): void {
         item._lastEdited = 'price';
-        item._total = +(item.price * item.quantity).toFixed(2);
+        item._total = roundMoney(item.price * item.quantity);
     }
 
     public onTotalChange(item: ReviewItem): void {
-        if (item._lastEdited === 'qty' && item.price > 0) {
+        if (item._lastEdited === 'qty' && item.price !== 0 && item._total / item.price >= 0) {
             item.quantity = +(item._total / item.price).toFixed(3);
         } else if (item.quantity > 0) {
-            item.price = +(item._total / item.quantity).toFixed(2);
+            item.price = roundMoney(item._total / item.quantity);
         }
     }
 
@@ -169,7 +177,7 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
     }
 
     public async onConfirm(): Promise<void> {
-        if (!this.selectedAccountId) {
+        if (!this.selectedOriginAccountId) {
             this.notificationService.push({ title: 'Error', message: 'Please select an account' });
             return;
         }
@@ -179,10 +187,15 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
             return;
         }
 
+        if (this.totalAmount < 0) {
+            this.notificationService.push({ title: 'Error', message: 'Receipt transfers cannot have negative totals. Use an explicit refund for returns.' });
+            return;
+        }
+
         this.isSubmitting = true;
 
         const dto: ConfirmReceiptDTO = {
-            accountId: this.selectedAccountId,
+            originAccountId: this.selectedOriginAccountId,
             date: this.overrideDate,
             contractorId: this.aiData.normalized.contractorId,
             items: this.items.map((item): ConfirmReceiptItemDTO => ({
@@ -203,8 +216,9 @@ export class ReceiptAiReviewComponent implements OnInit, OnDestroy {
                 message: `${this.includedItems.length} item(s) confirmed for receipt #${this.receiptId}`,
             });
             this.transfersCreated.emit();
-        } catch {
-            this.notificationService.push({ title: 'Error', message: 'Failed to create transfers' });
+        } catch (error) {
+            const message = error instanceof HttpErrorResponse && typeof error.error?.message === 'string' ? error.error.message : 'Failed to create transfers';
+            this.notificationService.push({ title: 'Error', message });
         } finally {
             this.isSubmitting = false;
         }

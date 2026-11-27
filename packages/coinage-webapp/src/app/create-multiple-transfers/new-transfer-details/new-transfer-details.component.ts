@@ -10,7 +10,7 @@ import { CoinageDataService } from '../../services/coinage.data-service';
 import { NotificationService } from '../../services/notification.service';
 
 export interface SelectedDetails {
-    accountId: number | undefined;
+    originAccountId: number | undefined;
     contractorId: number | undefined;
     transferDate: string;
     tagIds?: number[];
@@ -46,7 +46,7 @@ export class NewTransferDetailsComponent implements OnInit {
         private readonly notificationService: NotificationService,
     ) {
         this.selected = {
-            accountId: 0,
+            originAccountId: 0,
             contractorId: 0,
             transferDate: '',
             tagIds: [],
@@ -64,7 +64,7 @@ export class NewTransferDetailsComponent implements OnInit {
                 this.contractors = contractors;
                 this.accounts = accounts;
 
-                this.selected.accountId = this.storage.getNumber(NewTransferDetailsComponent.LAST_USED_ACCOUNT, StorageScope.Persistent);
+                this.selected.originAccountId = this.storage.getNumber(NewTransferDetailsComponent.LAST_USED_ACCOUNT, StorageScope.Persistent);
                 this.selected.contractorId = this.storage.getNumber(NewTransferDetailsComponent.LAST_USED_CONTRACTOR, StorageScope.Persistent);
                 this.selected.transferDate = this.todayInputFormat;
                 this.detailsChanged.emit(this.selected);

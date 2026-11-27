@@ -71,7 +71,7 @@ describe('PostgreSQL tag queries and many-to-many metadata', () => {
         expect(sql).toContain('FROM transfer_item search_transfer_item');
         expect(sql).toContain('JOIN item_tag search_item_tag');
         expect(sql).toContain('search_tag.id IN (');
-        expect(sql).toContain('"transfer"."account_id"');
+        expect(sql).toContain('"transfer"."origin_account_id"');
         expect(sql).toContain('"transfer"."target_account_id"');
         expect(sql).toContain('"transfer"."category_id"');
         expect(sql).toContain('"transfer"."contractor_id"');

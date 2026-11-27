@@ -15,7 +15,10 @@ CONSTRAINTS & FORMATTING RULES:
    - 'price' is ALWAYS the unit price (price per single unit or per kg/l), NOT the line total.
    - If only the line total is visible on the receipt, compute: price = (lineTotal - lineDiscount) / quantity.
    - For weighted items (e.g. "0.456 kg"), set quantity to the weight/volume value (e.g. 0.456) and price to the per-unit rate (e.g. price per kg).
-   - Discount lines (e.g. 'RABAT', 'Opust', 'Promocja') are NOT separate items. Subtract the discount from the affected line total before computing the unit price for that item. Do not emit discount lines as items.
+   - Product-specific discount lines (e.g. 'RABAT', 'Opust', 'Promocja') are NOT separate items. Subtract the discount from the affected line total before computing the unit price for that item.
+   - Preserve signed amounts: a returned product, returned bottle deposit ('ZWROT KAUCJI'), or standalone basket coupon can have a NEGATIVE unit price. Keep quantity nonnegative and place the sign on price.
+   - Bottle deposits charged ('KAUCJA') and returned are separate item lines, not part of a drink's price. Preserve separate charge and return lines, even when their names match.
+   - Only merge a discount into a product when it clearly belongs to that product. Keep an unallocated basket discount as a separate negative coupon item. Do not count payment vouchers/gift cards as discounts.
 8. CONFIDENCE: Float between 0.0 and 1.0 reflecting overall extraction quality:
    - 0.95–1.0: Clear text, all fields readable, items sum matches total.
    - 0.75–0.94: Minor OCR noise or 1–2 ambiguous fields, overall data reliable.

@@ -6,6 +6,7 @@ import { getTransferTags } from './tag-mapper';
 import { CategoryDao } from '../daos/category.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { Transfer } from '../entities/Transfer.entity';
+import { prepareTransferForSave } from './transfers/transfer-amount';
 
 @Injectable()
 export class TransfersService {
@@ -27,6 +28,7 @@ export class TransfersService {
     }
 
     public async saveTransfer(transfer: Transfer): Promise<Transfer> {
+        prepareTransferForSave(transfer);
         const category = await this.categoryDao.getById(transfer.categoryId ?? transfer.category.id);
         if (category === null) {
             throw new Error('Category not found');
@@ -50,8 +52,8 @@ export class TransfersService {
             categoryName: transfer.category?.name,
             contractorId: transfer.contractor?.id ?? null,
             contractorName: transfer.contractor?.name ?? null,
-            accountId: transfer.originAccountId,
-            accountName: `${transfer.originAccount.name} [${transfer.currency.symbol}]`,
+            originAccountId: transfer.originAccountId,
+            originAccountName: `${transfer.originAccount.name} [${transfer.currency.symbol}]`,
             date: transfer.date,
             receiptId: transfer.receiptId ?? null,
             isFlagged: transfer.isFlagged,

@@ -17,7 +17,7 @@
                         />
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700" for="amount">Price</label>
+                        <label class="block text-sm font-medium text-gray-700" for="amount">Transfer amount</label>
                         <input
                             class="block w-full rounded-md border border-gray-300 px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-blue-500 focus:outline-none sm:text-sm"
                             id="amount"
@@ -30,7 +30,13 @@
                             autocomplete="off"
                             placeholder="0.00"
                         />
+                        @if (!isTransferAmountValid) {
+                            <p class="text-sm text-red-700" role="alert">
+                                Transfer amount must be zero or positive. Use an explicit refund for returns. Accounts will not be changed automatically.
+                            </p>
+                        }
                         @if (shouldDisplayShoppingList) {
+                            <p class="text-sm text-gray-600">Signed item subtotal: {{ signedItemsTotal | plnCurrency }}</p>
                             <div class="flex items-center">
                                 <input
                                     class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
@@ -80,14 +86,14 @@
                         </ng-select>
                     </div>
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700" for="account">Virtual Account</label>
+                        <label class="block text-sm font-medium text-gray-700" for="originAccount">Origin account</label>
                         <ng-select
-                            [(ngModel)]="selectedTransferInputs.accountId"
+                            [(ngModel)]="selectedTransferInputs.originAccountId"
                             [clearable]="false"
                             [editableSearchTerm]="true"
                             [items]="accounts"
-                            name="account"
-                            labelForId="account"
+                            name="originAccount"
+                            labelForId="originAccount"
                             bindValue="id"
                             bindLabel="name"
                         >
@@ -139,6 +145,7 @@
                 <div class="flex flex-wrap gap-3 border-t border-gray-200 pt-6">
                     <button
                         class="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none"
+                        [disabled]="!isTransferAmountValid"
                         type="submit"
                     >
                         @if (editMode) {

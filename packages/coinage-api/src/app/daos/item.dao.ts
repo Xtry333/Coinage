@@ -10,6 +10,7 @@ import { Item } from '../entities/Item.entity';
 interface ItemWithLastUsedPriceDBObject {
     id: number;
     brand: string;
+    kind_code: string;
     name: string;
     last_unit_price: number | null;
     last_used_date: Date | null;
@@ -70,6 +71,7 @@ export class ItemDao extends BaseDao {
                     item.last_unit_price ?? 0,
                     item.category_id,
                     item.tags,
+                    item.kind_code,
                 ),
         );
     }
@@ -80,6 +82,15 @@ export class ItemDao extends BaseDao {
 
     public save(entity: Item): Promise<Item> {
         return this.itemRepository.save(entity);
+    }
+
+    public async getKinds(): Promise<Array<{ code: string; name: string }>> {
+        return this.itemRepository.query(`SELECT code, name FROM item_kind ORDER BY CASE WHEN code = 'PRODUCT' THEN 0 ELSE 1 END, name`);
+    }
+
+    public async kindExists(code: string): Promise<boolean> {
+        const rows = await this.itemRepository.query(`SELECT code FROM item_kind WHERE code = $1`, [code]);
+        return rows.length > 0;
     }
 
     public async searchByNameOrBrand(query: string, limit: number): Promise<Item[]> {

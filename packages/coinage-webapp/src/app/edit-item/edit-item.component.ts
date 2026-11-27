@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/
 import { ActivatedRoute } from '@angular/router';
 import { EMPTY, Subscription, catchError, forkJoin, from, switchMap } from 'rxjs';
 
-import { CategoryDTO, CreateEditItemDTO } from '@app/interfaces';
+import { CategoryDTO, CreateEditItemDTO, DEFAULT_ITEM_KIND, ItemKindDTO } from '@app/interfaces';
 
 import { CoinageRoutes } from '../app-routing/app-routes';
 import { NavigatorService } from '../app-routing/navigator.service';
@@ -18,6 +18,7 @@ import { NotificationService } from '../services/notification.service';
 export class EditItemComponent implements OnInit, OnDestroy {
     public selectedItemInputs?: CreateEditItemDTO;
     public categories: CategoryDTO[] = [];
+    public itemKinds: ItemKindDTO[] = [];
     public saving = false;
 
     private routeSubscription?: Subscription;
@@ -42,6 +43,7 @@ export class EditItemComponent implements OnInit, OnDestroy {
                     return forkJoin({
                         item: from(this.coinageData.getItemDetails(id)),
                         categories: this.coinageData.getCategoryList(),
+                        kinds: this.coinageData.getItemKinds(),
                     }).pipe(
                         catchError(() => {
                             this.notificationService.error('Could not load item for editing.');
@@ -51,8 +53,9 @@ export class EditItemComponent implements OnInit, OnDestroy {
                     );
                 }),
             )
-            .subscribe(({ item, categories }) => {
+            .subscribe(({ item, categories, kinds }) => {
                 this.categories = categories;
+                this.itemKinds = kinds;
                 this.selectedItemInputs = new CreateEditItemDTO(
                     item.id,
                     item.brand,
@@ -62,6 +65,7 @@ export class EditItemComponent implements OnInit, OnDestroy {
                     item.container?.unit ?? null,
                     [...new Set((item.tags ?? []).map((tag) => tag.id))],
                     item.isArchived ?? false,
+                    item.kindCode ?? DEFAULT_ITEM_KIND,
                 );
             });
     }
@@ -88,6 +92,7 @@ export class EditItemComponent implements OnInit, OnDestroy {
             inputs.containerSizeUnit,
             [...new Set(inputs.tagIds ?? [])],
             inputs.isArchived,
+            inputs.kindCode ?? DEFAULT_ITEM_KIND,
         );
         this.saving = true;
         try {

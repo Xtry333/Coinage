@@ -9,6 +9,9 @@ import { ReceiptDao } from '../daos/receipt.dao';
 import { ScheduleDao } from '../daos/schedule.dao';
 import { TransferDao } from '../daos/transfer.dao';
 import { UserDao } from '../daos/user.dao';
+import { Account } from '../entities/Account.entity';
+import { Category } from '../entities/Category.entity';
+import { Transfer } from '../entities/Transfer.entity';
 import { AccountBalanceService } from '../services/account-balance.service';
 import { AuthGuard } from '../services/auth.guard';
 import { DateParserService } from '../services/date-parser.service';
@@ -90,6 +93,26 @@ describe('TransfersController', () => {
 
     it('should be defined', () => {
         expect(controller).toBeDefined();
+    });
+
+    it('nets incoming deposit reversals against charges in weekly spending', async () => {
+        const originAccount = Object.assign(new Account(), { id: 1, userId: 7 });
+        const targetAccount = Object.assign(new Account(), { id: 17, userId: null });
+        const category = Object.assign(new Category(), { id: 2, type: 'OUTCOME' });
+        const charge = Object.assign(new Transfer(), {
+            amount: 2,
+            ownerUserId: 7,
+            categoryId: 2,
+            category,
+            originAccount,
+            targetAccount,
+            date: new Date('2026-11-27'),
+        });
+        const reversal = Object.assign(new Transfer(), { ...charge, amount: 3, originAccount: targetAccount, targetAccount: originAccount });
+        (transferDao.getAll as jest.Mock).mockResolvedValue([charge, reversal]);
+        const weeks = await controller.getWeeklySpendings('2');
+        expect(weeks).toHaveLength(1);
+        expect(weeks[0].outcomes).toBe(-1);
     });
 
     describe('.getAllFilteredTransfers', () => {

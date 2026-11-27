@@ -9,6 +9,7 @@ import { ShoppingListItem, TransferDetailsDTO } from '@app/interfaces';
 
 import { CreateEditTransferComponent } from './create-edit-transfer.component';
 import { CoinageDataService } from '../services/coinage.data-service';
+import { NotificationService } from '../services/notification.service';
 
 describe('CreateEditTransferComponent', () => {
     let component: CreateEditTransferComponent;
@@ -62,6 +63,15 @@ describe('CreateEditTransferComponent', () => {
         expect(tagsField.parentElement?.classList.contains('lg:grid-cols-3')).toBe(true);
         expect(tagsField.classList.contains('col-span-1')).toBe(true);
         expect(tagsField.querySelector('app-tag-badges')).not.toBeNull();
+
+        component.selectedTransferInputs.amount = -1;
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('[role="alert"]').textContent).toContain('Transfer amount must be zero or positive');
+        expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBe(true);
+        component.selectedTransferInputs.amount = 0;
+        fixture.detectChanges();
+        expect(fixture.nativeElement.querySelector('[role="alert"]')).toBeNull();
+        expect(fixture.nativeElement.querySelector('button[type="submit"]').disabled).toBe(false);
     });
 
     it('shows one effective tag when direct and inherited assignments overlap', () => {
@@ -120,6 +130,76 @@ describe('CreateEditTransferComponent', () => {
         });
     });
 
+    it.each([false, true])('blocks a negative calculated amount without changing accounts (edit: %s)', (editMode) => {
+        const data = TestBed.inject(CoinageDataService);
+        const create = jest.spyOn(data, 'postCreateSaveTransfer').mockReturnValue(of({}));
+        const edit = jest.spyOn(data, 'postGranularSaveTransfer').mockReturnValue(of({}));
+        const error = jest.spyOn(TestBed.inject(NotificationService), 'error').mockReturnValue(0);
+        component.editMode = editMode;
+        component.transferId = editMode ? 3 : 0;
+        component.redirectAfterSave = false;
+        component.selectedTransferInputs = { amount: 0, originAccountId: 1, targetAccountId: 17, date: '2026-11-27', description: 'Return' };
+        component.itemsInTransfer = [new ShoppingListItem(10, 'Product', 6, -0.5, -3, 0, 1)];
+        component.onTotalCostChanged(-3);
+        expect(component.selectedTransferInputs.amount).toBe(-3);
+        expect(component.signedItemsTotal).toBe(-3);
+        expect(component.isTransferAmountValid).toBe(false);
+        component.onClickSaveTransfer();
+        expect(create).not.toHaveBeenCalled();
+        expect(edit).not.toHaveBeenCalled();
+        expect(error).toHaveBeenCalledWith(expect.stringContaining('must be zero or positive'));
+        expect(component.selectedTransferInputs).toMatchObject({ amount: -3, originAccountId: 1, targetAccountId: 17 });
+        expect(component.itemsInTransfer[0].price).toBe(-0.5);
+    });
+
+    it('preserves explicit incoming accounts when calculated totals cross zero during editing', async () => {
+        const data = TestBed.inject(CoinageDataService);
+        TestBed.inject(ActivatedRoute).params = of({ id: '3' });
+        jest.spyOn(component, 'todayInputFormat', 'get').mockReturnValue('2026-11-27');
+        jest.spyOn(data, 'getCategoryList').mockReturnValue(of([]));
+        jest.spyOn(data, 'getContractorList').mockReturnValue(of([]));
+        jest.spyOn(data, 'getContainerList').mockReturnValue(of([]));
+        jest.spyOn(data, 'getAllAvailableAccounts').mockReturnValue(of([{ id: 1, name: 'Cash' }]));
+        jest.spyOn(data, 'getTransferDetails').mockResolvedValue(
+            Object.assign(new TransferDetailsDTO(), {
+                id: 3,
+                amount: 3,
+                date: new Date('2026-11-27'),
+                description: 'Return',
+                categoryId: 1,
+                originAccount: { id: 17, name: 'Shop' },
+                targetAccount: { id: 1, name: 'Cash' },
+                items: [{ id: 10, itemName: 'Product', amount: 6, unitPrice: -0.5, totalPrice: -3, setDiscount: 0, transferItemId: 5 }],
+            }),
+        );
+        const save = jest.spyOn(data, 'postGranularSaveTransfer').mockReturnValue(of({}));
+        component.redirectAfterSave = false;
+        component.ngOnInit();
+        await fixture.whenStable();
+        expect(component.accounts).toContainEqual({ id: 17, name: 'Shop' });
+
+        component.onTotalCostChanged(-4);
+        component.onClickSaveTransfer();
+        expect(save).not.toHaveBeenCalled();
+        component.onTotalCostChanged(0);
+        component.onClickSaveTransfer();
+        expect(save.mock.calls[0][0]).toMatchObject({ amount: 0, originAccountId: 17, targetAccountId: 1 });
+        component.onTotalCostChanged(2);
+        component.onClickSaveTransfer();
+        expect(save.mock.calls[1][0]).toMatchObject({ amount: 2, originAccountId: 17, targetAccountId: 1 });
+    });
+
+    it('saves mixed positive and negative product lines with a nonnegative calculated total', () => {
+        const save = jest.spyOn(TestBed.inject(CoinageDataService), 'postCreateSaveTransfer').mockReturnValue(of({}));
+        component.redirectAfterSave = false;
+        component.selectedTransferInputs = { amount: 0, originAccountId: 1, targetAccountId: 17, date: '2026-11-27', description: 'Shopping' };
+        component.itemsInTransfer = [new ShoppingListItem(10, 'Product', 1, 5, 5, 0, 1), new ShoppingListItem(10, 'Product', 6, -0.5, -3, 0, 1)];
+        component.onTotalCostChanged(component.signedItemsTotal);
+        component.onClickSaveTransfer();
+        expect(save.mock.calls[0][0]).toMatchObject({ amount: 2, originAccountId: 1, targetAccountId: 17 });
+        expect(save.mock.calls[0][0].items.map((item) => item.price)).toEqual([5, -0.5]);
+    });
+
     it.each([3, 0])('detects a discount-only edit to %s when saving an existing transfer', (setDiscount) => {
         const data = TestBed.inject(CoinageDataService);
         const save = jest.spyOn(data, 'postGranularSaveTransfer').mockReturnValue(of({}));
@@ -155,7 +235,7 @@ describe('CreateEditTransferComponent', () => {
                 date: new Date('2026-11-01'),
                 description: 'Milk',
                 categoryId: 1,
-                account: { id: 1, name: 'Cash' },
+                originAccount: { id: 1, name: 'Cash' },
                 targetAccount: { id: 2, name: 'Shop' },
                 items: [{ id: 10, itemName: 'Milk', amount: 3, unitPrice: 3.33, totalPrice: 10, setDiscount: 1, transferItemId: 5 }],
             }),

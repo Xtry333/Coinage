@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, JoinTable, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 import { Category } from './Category.entity';
+import { ItemKind } from './ItemKind.entity';
 import { Tag } from './Tag.entity';
 import { WithDateEntity } from './WithDate.partialEntity';
 
@@ -14,6 +15,13 @@ export class Item extends WithDateEntity {
 
     @Column({ type: 'varchar', length: 50, nullable: false })
     public name!: string;
+
+    @Column({ type: 'varchar', length: 32, default: 'PRODUCT' })
+    public kindCode!: string;
+
+    @ManyToOne(() => ItemKind, { nullable: false, onDelete: 'RESTRICT', onUpdate: 'CASCADE' })
+    @JoinColumn({ name: 'kind_code', referencedColumnName: 'code', foreignKeyConstraintName: 'fk_item_kind' })
+    public kind!: ItemKind;
 
     @Column({ name: 'category_id', nullable: true })
     public categoryId!: number | null;

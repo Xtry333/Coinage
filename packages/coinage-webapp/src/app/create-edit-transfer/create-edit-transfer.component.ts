@@ -31,7 +31,7 @@ export interface NewTransferObject {
     date: string;
     categoryId?: number;
     contractorId?: number | null;
-    accountId?: number;
+    originAccountId?: number;
     targetAccountId?: number | null;
     items?: ShoppingListItem[];
     tagIds?: number[];
@@ -106,10 +106,11 @@ export class CreateEditTransferComponent implements OnInit {
                         date: transfer.date.toISOString().slice(0, 10),
                         description: transfer.description,
                         contractorId: transfer.contractorId ?? undefined,
-                        accountId: transfer.account.id,
+                        originAccountId: transfer.originAccount.id,
                         targetAccountId: transfer.targetAccount.id,
                         tagIds: (transfer.tags ?? []).filter((tag) => tag.isDirect).map((tag) => tag.id),
                     };
+                    this.includeTransferAccounts();
                 });
             } else if (this.initialData) {
                 this.selectedTransferInputs = {
@@ -118,7 +119,7 @@ export class CreateEditTransferComponent implements OnInit {
                     date: this.initialData.date || this.todayInputFormat,
                     categoryId: this.initialData.categoryId,
                     contractorId: this.initialData.contractorId,
-                    accountId: this.initialData.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
+                    originAccountId: this.initialData.originAccountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
                     targetAccountId: this.initialData.targetAccountId,
                     tagIds: [...new Set(this.initialData.tagIds ?? [])],
                 };
@@ -144,20 +145,25 @@ export class CreateEditTransferComponent implements OnInit {
                 this.contractors = contractors;
                 this.containers = containers;
                 this.accounts = accounts;
+                this.includeTransferAccounts();
             });
     }
 
     public onClickSaveTransfer(): void {
+        if (!this.isTransferAmountValid) {
+            this.notificationService.error('Transfer amount must be zero or positive. Use an explicit refund for returns.');
+            return;
+        }
         if (this.editMode && this.transferId) {
             // Use granular saving for existing transfers
             const itemChanges = this.calculateItemChanges();
             const granularTransfer = new GranularCreateEditTransferModelDTO(
                 this.transferId,
                 this.selectedTransferInputs.description,
-                parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
+                this.selectedTransferInputs.amount,
                 this.selectedTransferInputs.categoryId ?? 0,
                 this.selectedTransferInputs.contractorId ?? null,
-                this.selectedTransferInputs.accountId ?? 0,
+                this.selectedTransferInputs.originAccountId ?? 0,
                 new Date(this.selectedTransferInputs.date),
                 this.transferDTO?.receipt?.id ?? null,
                 itemChanges,
@@ -173,10 +179,10 @@ export class CreateEditTransferComponent implements OnInit {
             const newTransfer = new CreateEditTransferModelDTO(
                 this.transferId,
                 this.selectedTransferInputs.description,
-                parseFloat(this.selectedTransferInputs.amount?.toString()) ?? null,
+                this.selectedTransferInputs.amount,
                 this.selectedTransferInputs.categoryId ?? 0,
                 this.selectedTransferInputs.contractorId ?? null,
-                this.selectedTransferInputs.accountId ?? 0,
+                this.selectedTransferInputs.originAccountId ?? 0,
                 new Date(this.selectedTransferInputs.date),
                 this.transferDTO?.receipt?.id ?? null,
                 this.itemsInTransfer,
@@ -188,7 +194,7 @@ export class CreateEditTransferComponent implements OnInit {
                 this.handleSaveResult(result, newTransfer.categoryId, newTransfer.description);
             });
         }
-        this.coinageLocalStorageService.setNumber('lastUsedAccountId', this.selectedTransferInputs.accountId);
+        this.coinageLocalStorageService.setNumber('lastUsedAccountId', this.selectedTransferInputs.originAccountId);
     }
 
     private handleSaveResult(result: any, categoryId: number, description?: string): void {
@@ -270,7 +276,7 @@ export class CreateEditTransferComponent implements OnInit {
                 date: this.initialData.date || this.todayInputFormat,
                 categoryId: this.initialData.categoryId,
                 contractorId: this.initialData.contractorId,
-                accountId: this.initialData.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
+                originAccountId: this.initialData.originAccountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
                 targetAccountId: this.initialData.targetAccountId,
                 tagIds: [...new Set(this.initialData.tagIds ?? [])],
             };
@@ -288,7 +294,7 @@ export class CreateEditTransferComponent implements OnInit {
                 date: this.todayInputFormat,
                 categoryId: this.selectedTransferInputs?.categoryId,
                 contractorId: this.selectedTransferInputs?.contractorId,
-                accountId: this.selectedTransferInputs?.accountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
+                originAccountId: this.selectedTransferInputs?.originAccountId ?? this.coinageLocalStorageService.getNumber('lastUsedAccountId'),
                 tagIds: [],
             };
             this.itemsInTransfer = [];
@@ -304,6 +310,21 @@ export class CreateEditTransferComponent implements OnInit {
 
     public onTotalCostChanged(cost: number): void {
         this.selectedTransferInputs.amount = cost;
+    }
+
+    private includeTransferAccounts(): void {
+        if (!this.transferDTO) return;
+        for (const account of [this.transferDTO.originAccount, this.transferDTO.targetAccount]) {
+            if (account && !this.accounts.some((existing) => existing.id === account.id)) this.accounts.push(account);
+        }
+    }
+
+    public get signedItemsTotal(): number {
+        return Number(this.itemsInTransfer.reduce((sum, item) => sum + item.totalPrice - (item.setDiscount ?? 0), 0).toFixed(2));
+    }
+
+    public get isTransferAmountValid(): boolean {
+        return Number.isFinite(this.selectedTransferInputs?.amount) && this.selectedTransferInputs.amount >= 0;
     }
 
     public onItemListChanged(items: ShoppingListItem[]): void {

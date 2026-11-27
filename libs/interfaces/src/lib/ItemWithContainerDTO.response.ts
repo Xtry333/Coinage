@@ -5,6 +5,7 @@ import { TagDTO } from './TagDTO.response';
 export class ItemWithContainerDTO {
     public id!: number;
     public name!: string;
+    public kindCode?: string;
     public brand?: string | null;
     public categoryId!: number;
     public categoryName?: string | null;
